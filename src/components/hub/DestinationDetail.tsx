@@ -4,7 +4,6 @@ import type { Destination } from "@/data/resort";
 import { actionHref, actionsFor, instagramUrl } from "./DestinationPanel";
 import { InstagramStrip } from "./InstagramStrip";
 import { useI18n } from "@/i18n";
-import { EVENTS_BY_DESTINATION } from "@/data/events";
 
 /** Full-screen editorial detail view for one destination. */
 export function DestinationDetail({ dest, onClose }: { dest: Destination; onClose: () => void }) {

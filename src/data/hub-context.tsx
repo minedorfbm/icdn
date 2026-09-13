@@ -101,14 +101,9 @@ export function HubProvider({ data, children }: { data?: HubData; children: Reac
 
     return {
       levels,
-      destinations: withFallbackPhotos(
+      destinations: withFallbackMedia(
         data.destinations.map((row) =>
-          toDestination(
-            row,
-            photosByDest[row.id],
-            linksByDest[row.id],
-            eventsByDest[row.id] ?? EVENTS_BY_DESTINATION[row.id],
-          ),
+          toDestination(row, photosByDest[row.id], linksByDest[row.id], eventsByDest[row.id]),
         ),
       ),
       links: links.length > 0 ? links : FALLBACK.links,
