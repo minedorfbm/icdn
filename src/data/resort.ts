@@ -124,7 +124,7 @@ export interface DestinationPhotoRow {
 /** Official resort channels — configurable, no invented accounts. */
 export const OFFICIAL = {
   website: "https://www.danang.intercontinental.com/",
-  adj: "https://www.danang.intercontinental.com/gallery/",
+  
   ihg: "https://www.ihg.com/onerewards/content/us/en/home",
   instagram: "https://www.instagram.com/intercontinentaldanang/",
   map: "https://www.danang.intercontinental.com/contact-us/",
