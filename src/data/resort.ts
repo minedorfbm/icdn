@@ -662,12 +662,3 @@ export const DESTINATIONS: Destination[] = [
     },
   ),
 ];
-
-export const GLOBAL_LINKS = [
-  { id: "website", label: "Official Website", url: OFFICIAL.website },
-  { id: "adj", label: "Art Digital Journey", url: OFFICIAL.adj },
-  { id: "ihg_rewards", label: "IHG One Rewards", url: OFFICIAL.ihg },
-  { id: "instagram", label: "Instagram", url: OFFICIAL.instagram },
-  { id: "resort_map", label: "Resort Map", url: OFFICIAL.map },
-  { id: "contact", label: "Contact", url: OFFICIAL.contact },
-];
