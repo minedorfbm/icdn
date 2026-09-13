@@ -22,7 +22,7 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
 
   const { t, typeLabel, levelLabel, cluster, action, description } = useI18n();
   const actions = actionsFor(dest);
-  const events = dest.events ?? EVENTS_BY_DESTINATION[dest.id] ?? [];
+  const events = dest.events ?? [];
   const instagram = instagramUrl(dest);
 
   return (
