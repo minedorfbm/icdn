@@ -41,20 +41,24 @@ const FALLBACK_LINKS = [
   ["Contact", OFFICIAL.contact],
 ] as [string, string][];
 
-const withFallbackPhotos = (list: Destination[]): Destination[] =>
+/** Bundled photos and events, used only when the database is unreachable. */
+const withFallbackMedia = (list: Destination[]): Destination[] =>
   list.map((dest) => {
-    const keys = FALLBACK_PHOTOS[dest.id];
-    if (!keys) return dest;
-    const photos = keys
+    const photos = (FALLBACK_PHOTOS[dest.id] ?? [])
       .map((key) => resolveImage(key))
       .filter(Boolean)
       .map((image) => ({ image }));
-    return photos.length > 0 ? { ...dest, photos } : dest;
+    const events = dest.events ?? EVENTS_BY_DESTINATION[dest.id];
+    return {
+      ...dest,
+      ...(photos.length > 0 ? { photos } : {}),
+      ...(events ? { events } : {}),
+    };
   });
 
 const FALLBACK: HubValue = {
   levels: LEVELS,
-  destinations: withFallbackPhotos(DESTINATIONS),
+  destinations: withFallbackMedia(DESTINATIONS),
   links: FALLBACK_LINKS.map(([label, url]) => ({ label, url })),
   contact: OFFICIAL.contact,
 };
@@ -97,14 +101,9 @@ export function HubProvider({ data, children }: { data?: HubData; children: Reac
 
     return {
       levels,
-      destinations: withFallbackPhotos(
+      destinations: withFallbackMedia(
         data.destinations.map((row) =>
-          toDestination(
-            row,
-            photosByDest[row.id],
-            linksByDest[row.id],
-            eventsByDest[row.id] ?? EVENTS_BY_DESTINATION[row.id],
-          ),
+          toDestination(row, photosByDest[row.id], linksByDest[row.id], eventsByDest[row.id]),
         ),
       ),
       links: links.length > 0 ? links : FALLBACK.links,

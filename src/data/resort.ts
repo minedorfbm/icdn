@@ -124,7 +124,7 @@ export interface DestinationPhotoRow {
 /** Official resort channels — configurable, no invented accounts. */
 export const OFFICIAL = {
   website: "https://www.danang.intercontinental.com/",
-  adj: "https://www.danang.intercontinental.com/gallery/",
+  
   ihg: "https://www.ihg.com/onerewards/content/us/en/home",
   instagram: "https://www.instagram.com/intercontinentaldanang/",
   map: "https://www.danang.intercontinental.com/contact-us/",
@@ -661,13 +661,4 @@ export const DESTINATIONS: Destination[] = [
         "Hello, I'm interested in booking a seaside experience. Could you please assist me?",
     },
   ),
-];
-
-export const GLOBAL_LINKS = [
-  { id: "website", label: "Official Website", url: OFFICIAL.website },
-  { id: "adj", label: "Art Digital Journey", url: OFFICIAL.adj },
-  { id: "ihg_rewards", label: "IHG One Rewards", url: OFFICIAL.ihg },
-  { id: "instagram", label: "Instagram", url: OFFICIAL.instagram },
-  { id: "resort_map", label: "Resort Map", url: OFFICIAL.map },
-  { id: "contact", label: "Contact", url: OFFICIAL.contact },
 ];

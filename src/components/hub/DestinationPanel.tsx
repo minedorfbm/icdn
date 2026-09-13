@@ -24,26 +24,6 @@ export function linkUrl(dest: Destination, kind: string): string | undefined {
   return legacy[kind];
 }
 
-/** Every link kind available for a destination (database first, legacy columns as backup). */
-export function linkKinds(dest: Destination): string[] {
-  const kinds = new Set<string>(dest.links?.map((l) => l.kind) ?? []);
-  for (const kind of [
-    "DISCOVER",
-    "MENU",
-    "PRICE_LIST",
-    "VEGETARIAN_MENU",
-    "VEGAN_MENU",
-    "BREAKFAST_MENU",
-    "LUNCH_MENU",
-    "DINNER_MENU",
-    "BOOK",
-    "INSTAGRAM",
-  ]) {
-    if (linkUrl(dest, kind)) kinds.add(kind);
-  }
-  return [...kinds];
-}
-
 export function instagramUrl(dest: Destination) {
   return linkUrl(dest, "INSTAGRAM");
 }
