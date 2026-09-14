@@ -83,22 +83,27 @@ export function actionsFor(dest: Destination, limit?: number) {
 export function DestinationPanel({ dest, active }: { dest: Destination; active: boolean }) {
   const { typeLabel, action, description } = useI18n();
   const actions = actionsFor(dest, 3);
+  const [loaded, setLoaded] = useState(false);
 
   return (
-    <article className="relative h-full w-full overflow-hidden rounded-[26px] bg-black shadow-[0_30px_70px_-30px_rgba(0,0,0,0.65)]">
+    <article className="relative h-full w-full overflow-hidden rounded-[26px] bg-[oklch(0.18_0.02_250)] shadow-[0_30px_70px_-30px_rgba(0,0,0,0.65)]">
       <img
         src={dest.image}
         alt={dest.name}
         loading={active ? "eager" : "lazy"}
         decoding="async"
         {...(active ? { fetchPriority: "high" as const } : {})}
-        onLoad={(e) => e.currentTarget.classList.remove("opacity-0")}
+        onLoad={() => setLoaded(true)}
+        ref={(el) => {
+          if (el?.complete) setLoaded(true);
+        }}
         draggable={false}
         width={768}
         height={1152}
-        className={`h-full w-full select-none object-cover opacity-0 transition-[filter,transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          active ? "scale-100" : "scale-[1.03] brightness-[0.68] saturate-[0.75]"
-        }`}
+        sizes="(max-width: 520px) 76vw, 400px"
+        className={`h-full w-full select-none object-cover transition-[filter,transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          loaded ? "opacity-100" : "opacity-0"
+        } ${active ? "scale-100" : "scale-[1.03] brightness-[0.68] saturate-[0.75]"}`}
       />
 
       {/* readability gradient only at the bottom */}
