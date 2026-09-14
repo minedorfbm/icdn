@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Instagram } from "lucide-react";
 import { useI18n } from "@/i18n";
 import { CTA_BY_TYPE, bookingLink, type Destination } from "@/data/resort";
