@@ -35,6 +35,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
           alt=""
           aria-hidden
           loading="lazy"
+          decoding="async"
           width={900}
           height={1400}
           className="level-bg h-full w-full object-cover"

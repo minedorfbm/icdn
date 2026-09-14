@@ -39,6 +39,8 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
           className="h-full w-full object-cover"
           width={900}
           height={1400}
+          fetchPriority="high"
+          decoding="async"
         />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[oklch(0.13_0.02_250)] via-[oklch(0.13_0.02_250/0.4)] to-transparent" />
 

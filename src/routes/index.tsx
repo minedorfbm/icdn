@@ -12,6 +12,7 @@ import heavenImg from "@/assets/heaven.webp";
 export const Route = createFileRoute("/")({
   loader: () => getHubData(),
   head: () => ({
+    links: [{ rel: "preload", as: "image", href: heavenImg, fetchpriority: "high" }],
     meta: [
       { title: "InterContinental Danang — Digital Hub | Heaven to Sea" },
       {
@@ -128,6 +129,8 @@ function Hub() {
           alt="InterContinental Danang Sun Peninsula Resort seen from above the bay"
           width={900}
           height={1400}
+          fetchPriority="high"
+          decoding="async"
           className="threshold-img absolute inset-0 h-full w-full object-cover opacity-[0.6]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[oklch(0.99_0.005_90/0.82)] via-[oklch(0.99_0.005_90/0.35)] to-[oklch(0.985_0.008_90/0.98)]" />
