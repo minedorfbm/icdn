@@ -24,6 +24,16 @@ export function PhotoLightbox({ photos, index, onClose }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, photos.length]);
 
+  // Preload the neighbouring photos so swiping never shows a blank frame
+  useEffect(() => {
+    for (const i of [current + 1, current - 1]) {
+      const next = photos[i];
+      if (!next) continue;
+      const img = new Image();
+      img.src = next.image;
+    }
+  }, [current, photos]);
+
   const photo = photos[current];
   if (!photo) return null;
 
@@ -66,6 +76,8 @@ export function PhotoLightbox({ photos, index, onClose }: Props) {
       <img
         src={photo.image}
         alt={photo.caption ?? ""}
+        decoding="async"
+        fetchPriority="high"
         className="max-h-[78svh] w-full select-none object-contain"
         style={{
           transform: `translate3d(${drag.x}px, ${Math.max(drag.y, 0)}px, 0)`,

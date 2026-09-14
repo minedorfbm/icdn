@@ -41,6 +41,10 @@ export function InstagramStrip({ photos, instagramUrl, label }: Props) {
               src={photo.image}
               alt={photo.caption ?? ""}
               loading="lazy"
+              decoding="async"
+              width={520}
+              height={693}
+              sizes="(max-width: 520px) 58vw, 260px"
               className="h-full w-full object-cover"
             />
             {photo.caption && (
