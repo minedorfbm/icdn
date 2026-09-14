@@ -12,7 +12,7 @@ import heavenImg from "@/assets/heaven.webp";
 export const Route = createFileRoute("/")({
   loader: () => getHubData(),
   head: () => ({
-    links: [{ rel: "preload", as: "image", href: heavenImg, fetchpriority: "high" }],
+    links: [{ rel: "preload", as: "image", href: heavenImg, fetchPriority: "high" }],
     meta: [
       { title: "InterContinental Danang — Digital Hub | Heaven to Sea" },
       {
