@@ -7,7 +7,7 @@ import { type Level } from "@/data/resort";
 import { HubProvider, useHub } from "@/data/hub-context";
 import { getHubData } from "@/lib/hub.functions";
 import { I18nProvider, LanguageSwitch, useI18n } from "@/i18n";
-import heavenImg from "@/assets/heaven.jpg";
+import heavenImg from "@/assets/heaven.webp";
 
 export const Route = createFileRoute("/")({
   loader: () => getHubData(),
