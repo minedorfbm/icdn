@@ -174,12 +174,12 @@ export function CardStack({
             const t = bounded - low;
             const from = HEAVEN_SLOTS[low]!;
             const to = HEAVEN_SLOTS[high]!;
-            const hx = lerp(from[0], to[0], t);
+            const hx = pos < 0 ? x : lerp(from[0], to[0], t);
             const hy = lerp(from[1], to[1], t);
             const hz = lerp(from[2], to[2], t);
             const rx = lerp(from[3], to[3], t);
             const ry = lerp(from[4], to[4], t);
-            const rz = lerp(from[5], to[5], t);
+            const rz = pos < 0 ? lerp(-7, from[5], pos + 1) : lerp(from[5], to[5], t);
             transform = `translate3d(${hx}vw,${hy}px,${hz}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${scale})`;
           }
 
