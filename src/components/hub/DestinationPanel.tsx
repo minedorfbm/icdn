@@ -79,24 +79,12 @@ export function actionsFor(dest: Destination, limit?: number) {
 }
 
 /** The single universal card used everywhere in the hub. */
-export function DestinationPanel({
-  dest,
-  active,
-  perspective = false,
-}: {
-  dest: Destination;
-  active: boolean;
-  perspective?: boolean;
-}) {
+export function DestinationPanel({ dest, active }: { dest: Destination; active: boolean }) {
   const { typeLabel, action, description } = useI18n();
   const actions = actionsFor(dest, 3);
 
   return (
-    <article
-      className={`relative h-full w-full overflow-hidden rounded-[26px] bg-black shadow-[0_30px_70px_-30px_rgba(0,0,0,0.65)] ${
-        perspective ? "heaven-panel" : ""
-      }`}
-    >
+    <article className="relative h-full w-full overflow-hidden rounded-[26px] bg-black shadow-[0_30px_70px_-30px_rgba(0,0,0,0.65)]">
       <img
         src={dest.image}
         alt={dest.name}
@@ -105,8 +93,6 @@ export function DestinationPanel({
         width={768}
         height={1152}
         className={`h-full w-full select-none object-cover transition-[filter,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          perspective ? "heaven-panel-image " : ""
-        }${
           active ? "scale-100" : "scale-[1.03] brightness-[0.68] saturate-[0.75]"
         }`}
       />
