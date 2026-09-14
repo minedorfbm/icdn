@@ -88,11 +88,14 @@ export function DestinationPanel({ dest, active }: { dest: Destination; active: 
       <img
         src={dest.image}
         alt={dest.name}
-        loading="lazy"
+        loading={active ? "eager" : "lazy"}
+        decoding="async"
+        {...(active ? { fetchPriority: "high" as const } : {})}
+        onLoad={(e) => e.currentTarget.classList.remove("opacity-0")}
         draggable={false}
         width={768}
         height={1152}
-        className={`h-full w-full select-none object-cover transition-[filter,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`h-full w-full select-none object-cover opacity-0 transition-[filter,transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           active ? "scale-100" : "scale-[1.03] brightness-[0.68] saturate-[0.75]"
         }`}
       />
