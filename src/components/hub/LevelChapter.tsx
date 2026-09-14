@@ -72,7 +72,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
         </p>
 
         <div className="mt-5 overflow-hidden">
-          <CardStack items={list} />
+          <CardStack items={list} perspective={id === "heaven"} />
         </div>
       </div>
     </section>

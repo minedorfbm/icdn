@@ -20,6 +20,15 @@ const SLOTS: Array<[number, number, number, number]> = [
 const EXIT: [number, number, number, number] = [-84, 0.99, 0.9, 50]; // card swiping away, fully off-stage
 const VISIBLE = SLOTS.length;
 
+// Heaven keeps the same overlap rhythm, but each successive card also recedes
+// into a shared architectural perspective plane.
+const HEAVEN_SLOTS: Array<[number, number, number, number, number, number]> = [
+  [4, 0, 72, 0, -3.5, -1.2],
+  [45, -10, 6, 2.5, -8, 1.2],
+  [64, -18, -54, 4.5, -11, 2.4],
+  [78, -24, -108, 6, -13, 3.2],
+];
+
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
@@ -47,7 +56,13 @@ function slotAt(pos: number): [number, number, number, number] {
 
 const TRAVEL = 260; // px of drag equal to one full card step
 
-export function CardStack({ items }: { items: Destination[] }) {
+export function CardStack({
+  items,
+  perspective = false,
+}: {
+  items: Destination[];
+  perspective?: boolean;
+}) {
   const [index, setIndex] = useState(0);
   const [drag, setDrag] = useState(0); // px, negative = pulling next card in
   const [dragging, setDragging] = useState(false);
@@ -134,7 +149,9 @@ export function CardStack({ items }: { items: Destination[] }) {
     <div className="select-none">
       {/* single shared stage */}
       <div
-        className="relative h-[64vh] w-full touch-pan-y overflow-hidden"
+        className={`relative h-[64vh] w-full touch-pan-y overflow-hidden ${
+          perspective ? "heaven-card-stage" : ""
+        }`}
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
@@ -149,12 +166,31 @@ export function CardStack({ items }: { items: Destination[] }) {
           const [x, scale, bright, z] = slotAt(pos);
           const active = offset === 0;
 
+          let transform = `translate3d(${x}vw,0,0) scale(${scale})`;
+          if (perspective) {
+            const bounded = Math.max(0, Math.min(VISIBLE - 1, pos));
+            const low = Math.floor(bounded);
+            const high = Math.min(VISIBLE - 1, low + 1);
+            const t = bounded - low;
+            const from = HEAVEN_SLOTS[low]!;
+            const to = HEAVEN_SLOTS[high]!;
+            const hx = lerp(from[0], to[0], t);
+            const hy = lerp(from[1], to[1], t);
+            const hz = lerp(from[2], to[2], t);
+            const rx = lerp(from[3], to[3], t);
+            const ry = lerp(from[4], to[4], t);
+            const rz = lerp(from[5], to[5], t);
+            transform = `translate3d(${hx}vw,${hy}px,${hz}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${scale})`;
+          }
+
           return (
             <div
               key={dest.id}
-              className="absolute left-0 top-0 h-full w-[76vw] max-w-[400px] origin-center will-change-transform"
+              className={`absolute left-0 top-0 h-full w-[76vw] max-w-[400px] origin-center will-change-transform ${
+                perspective ? "heaven-card-shell" : ""
+              }`}
               style={{
-                transform: `translate3d(${x}vw,0,0) scale(${scale})`,
+                transform,
                 zIndex: z,
                 filter: `brightness(${bright})${active ? "" : " saturate(0.85)"}`,
                 opacity: pos > VISIBLE - 0.15 ? 0 : 1,
@@ -170,7 +206,7 @@ export function CardStack({ items }: { items: Destination[] }) {
                 else setIndex(i);
               }}
             >
-              <DestinationPanel dest={dest} active={active} />
+              <DestinationPanel dest={dest} active={active} perspective={perspective} />
             </div>
           );
         })}
