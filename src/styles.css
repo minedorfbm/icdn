@@ -220,6 +220,8 @@
 
 /* Four worlds: one continuous descent through light, sky, canopy and water. */
 .level {
+  --level-bg: var(--world-heaven);
+  --level-fg: oklch(0.16 0.01 90);
   transition:
     background-color 600ms ease,
     color 600ms ease;
@@ -230,8 +232,10 @@
 }
 
 .level[data-level="heaven"] {
-  background-color: var(--world-heaven);
-  color: oklch(0.16 0.01 90);
+  --level-bg: var(--world-heaven);
+  --level-fg: oklch(0.16 0.01 90);
+  background-color: var(--level-bg);
+  color: var(--level-fg);
 }
 .level[data-level="heaven"] .level-bg {
   opacity: 0.3;
