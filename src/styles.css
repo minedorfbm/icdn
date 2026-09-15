@@ -236,8 +236,8 @@
 }
 
 .level[data-level="sky"] {
-  background-color: oklch(0.93 0.035 70);
-  color: oklch(0.2 0.03 50);
+  background-color: oklch(0.15 0.04 245);
+  color: oklch(0.94 0.01 230);
 }
 .level[data-level="sky"] .level-bg {
   opacity: 0.5;
@@ -245,8 +245,8 @@
 .level[data-level="sky"] .level-veil {
   background: linear-gradient(
     to bottom,
-    oklch(0.97 0.02 70 / 0.9),
-    oklch(0.93 0.04 65 / 0.5) 45%,
+    oklch(0.97 0.02 70 / 0.92),
+    oklch(0.15 0.04 245 / 0.55) 45%,
     oklch(0.42 0.05 150 / 0.85)
   );
 }
@@ -268,8 +268,8 @@
 }
 
 .level[data-level="sea"] {
-  background-color: oklch(0.15 0.04 245);
-  color: oklch(0.94 0.01 230);
+  background-color: oklch(0.88 0.045 235);
+  color: oklch(0.2 0.05 250);
 }
 .level[data-level="sea"] .level-bg {
   opacity: 0.5;
@@ -278,8 +278,8 @@
   background: linear-gradient(
     to bottom,
     oklch(0.18 0.045 240 / 0.9),
-    oklch(0.14 0.04 245 / 0.6) 45%,
-    oklch(0.16 0.03 250 / 0.95)
+    oklch(0.88 0.045 235 / 0.55) 45%,
+    oklch(0.9 0.04 230 / 0.95)
   );
 }
 
