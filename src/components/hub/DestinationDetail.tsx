@@ -30,7 +30,8 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
       role="dialog"
       aria-modal="true"
       aria-label={dest.name}
-      className="detail-enter fixed inset-0 z-[80] overflow-y-auto overscroll-contain bg-[oklch(0.13_0.02_250)] text-[oklch(0.97_0.005_90)]"
+      data-level={dest.level}
+      className="level detail-enter fixed inset-0 z-[80] overflow-y-auto overscroll-contain"
     >
       <div className="relative h-[62svh] w-full overflow-hidden">
         <img
@@ -42,7 +43,13 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
           fetchPriority="high"
           decoding="async"
         />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[oklch(0.13_0.02_250)] via-[oklch(0.13_0.02_250/0.4)] to-transparent" />
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
+          style={{
+            background:
+              "linear-gradient(to top, var(--level-bg) 0%, color-mix(in oklab, var(--level-bg) 45%, transparent) 55%, transparent 100%)",
+          }}
+        />
 
         <button
           onClick={onClose}

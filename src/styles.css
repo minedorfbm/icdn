@@ -220,6 +220,8 @@
 
 /* Four worlds: one continuous descent through light, sky, canopy and water. */
 .level {
+  --level-bg: var(--world-heaven);
+  --level-fg: oklch(0.16 0.01 90);
   transition:
     background-color 600ms ease,
     color 600ms ease;
@@ -230,8 +232,10 @@
 }
 
 .level[data-level="heaven"] {
-  background-color: var(--world-heaven);
-  color: oklch(0.16 0.01 90);
+  --level-bg: var(--world-heaven);
+  --level-fg: oklch(0.16 0.01 90);
+  background-color: var(--level-bg);
+  color: var(--level-fg);
 }
 .level[data-level="heaven"] .level-bg {
   opacity: 0.3;
@@ -246,8 +250,10 @@
 }
 
 .level[data-level="sky"] {
-  background-color: var(--world-sky);
-  color: oklch(0.94 0.01 230);
+  --level-bg: var(--world-sky);
+  --level-fg: oklch(0.94 0.01 230);
+  background-color: var(--level-bg);
+  color: var(--level-fg);
 }
 .level[data-level="sky"] .level-bg {
   opacity: 0.42;
@@ -264,8 +270,10 @@
 }
 
 .level[data-level="earth"] {
-  background-color: var(--world-earth);
-  color: oklch(0.95 0.01 120);
+  --level-bg: var(--world-earth);
+  --level-fg: oklch(0.95 0.01 120);
+  background-color: var(--level-bg);
+  color: var(--level-fg);
 }
 .level[data-level="earth"] .level-bg {
   opacity: 0.4;
@@ -282,8 +290,10 @@
 }
 
 .level[data-level="sea"] {
-  background-color: var(--world-sea);
-  color: var(--world-sea-foreground);
+  --level-bg: var(--world-sea);
+  --level-fg: var(--world-sea-foreground);
+  background-color: var(--level-bg);
+  color: var(--level-fg);
 }
 .level[data-level="sea"] .level-bg {
   opacity: 0.38;
