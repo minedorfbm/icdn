@@ -59,6 +59,11 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-world-heaven: var(--world-heaven);
+  --color-world-sky: var(--world-sky);
+  --color-world-earth: var(--world-earth);
+  --color-world-sea: var(--world-sea);
+  --color-world-sea-foreground: var(--world-sea-foreground);
 }
 
 :root {
@@ -95,6 +100,11 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --world-heaven: oklch(0.965 0.018 85);
+  --world-sky: oklch(0.235 0.065 244);
+  --world-earth: oklch(0.37 0.075 151);
+  --world-sea: oklch(0.88 0.055 228);
+  --world-sea-foreground: oklch(0.22 0.055 248);
 }
 
 .dark {
@@ -208,7 +218,7 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
 }
 
-/* Four worlds: each level owns its atmosphere. */
+/* Four worlds: one continuous descent through light, sky, canopy and water. */
 .level {
   transition:
     background-color 600ms ease,
@@ -220,67 +230,80 @@
 }
 
 .level[data-level="heaven"] {
-  background-color: oklch(0.985 0.008 90);
+  background-color: var(--world-heaven);
   color: oklch(0.16 0.01 90);
 }
 .level[data-level="heaven"] .level-bg {
-  opacity: 0.35;
+  opacity: 0.3;
 }
 .level[data-level="heaven"] .level-veil {
   background: linear-gradient(
     to bottom,
-    oklch(0.985 0.008 90 / 0.92),
-    oklch(0.985 0.008 90 / 0.55) 45%,
-    oklch(0.97 0.02 70 / 0.9)
+    oklch(0.985 0.012 88 / 0.96) 0%,
+    oklch(0.965 0.018 85 / 0.68) 56%,
+    oklch(0.235 0.065 244 / 0.96) 100%
   );
 }
 
 .level[data-level="sky"] {
-  background-color: oklch(0.15 0.04 245);
+  background-color: var(--world-sky);
   color: oklch(0.94 0.01 230);
 }
 .level[data-level="sky"] .level-bg {
-  opacity: 0.5;
+  opacity: 0.42;
 }
 .level[data-level="sky"] .level-veil {
-  background: linear-gradient(
-    to bottom,
-    oklch(0.97 0.02 70 / 0.92),
-    oklch(0.15 0.04 245 / 0.55) 45%,
-    oklch(0.42 0.05 150 / 0.85)
-  );
+  background:
+    radial-gradient(ellipse at 50% 8%, oklch(0.4 0.085 238 / 0.34), transparent 46%),
+    linear-gradient(
+      to bottom,
+      oklch(0.235 0.065 244 / 0.96) 0%,
+      oklch(0.19 0.07 247 / 0.68) 58%,
+      oklch(0.37 0.075 151 / 0.96) 100%
+    );
 }
 
 .level[data-level="earth"] {
-  background-color: oklch(0.28 0.045 150);
+  background-color: var(--world-earth);
   color: oklch(0.95 0.01 120);
 }
 .level[data-level="earth"] .level-bg {
-  opacity: 0.45;
+  opacity: 0.4;
 }
 .level[data-level="earth"] .level-veil {
-  background: linear-gradient(
-    to bottom,
-    oklch(0.42 0.05 150 / 0.9),
-    oklch(0.25 0.05 155 / 0.6) 45%,
-    oklch(0.18 0.045 240 / 0.92)
-  );
+  background:
+    radial-gradient(ellipse at 25% 42%, oklch(0.52 0.09 145 / 0.22), transparent 48%),
+    linear-gradient(
+      to bottom,
+      oklch(0.37 0.075 151 / 0.96) 0%,
+      oklch(0.3 0.075 157 / 0.7) 58%,
+      oklch(0.88 0.055 228 / 0.96) 100%
+    );
 }
 
 .level[data-level="sea"] {
-  background-color: oklch(0.88 0.045 235);
-  color: oklch(0.2 0.05 250);
+  background-color: var(--world-sea);
+  color: var(--world-sea-foreground);
 }
 .level[data-level="sea"] .level-bg {
-  opacity: 0.5;
+  opacity: 0.38;
 }
 .level[data-level="sea"] .level-veil {
-  background: linear-gradient(
-    to bottom,
-    oklch(0.18 0.045 240 / 0.9),
-    oklch(0.88 0.045 235 / 0.55) 45%,
-    oklch(0.9 0.04 230 / 0.95)
-  );
+  background:
+    radial-gradient(ellipse at 75% 62%, oklch(0.95 0.035 220 / 0.3), transparent 44%),
+    linear-gradient(
+      to bottom,
+      oklch(0.88 0.055 228 / 0.96) 0%,
+      oklch(0.845 0.065 226 / 0.66) 54%,
+      oklch(0.9 0.045 225 / 0.97) 100%
+    );
+}
+
+.sea-footer {
+  background:
+    radial-gradient(ellipse at 15% 0%, oklch(0.96 0.03 220 / 0.52), transparent 42%),
+    linear-gradient(to bottom, oklch(0.9 0.045 225), var(--world-sea));
+  color: var(--world-sea-foreground);
 }
 
 @media (prefers-reduced-motion: reduce) {

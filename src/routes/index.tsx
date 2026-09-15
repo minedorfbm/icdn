@@ -26,6 +26,8 @@ export const Route = createFileRoute("/")({
         content:
           "A digital descent through the resort: Heaven, Sky, Earth, Sea. By Art Digital Journey.",
       },
+       { property: "og:type", content: "website" },
+       { name: "twitter:card", content: "summary" },
     ],
   }),
   component: HubRoute,
@@ -166,7 +168,7 @@ function Hub() {
       </div>
 
       {/* END OF JOURNEY */}
-      <section className="bg-[oklch(0.16_0.03_250)] px-6 py-24 text-[oklch(0.96_0.005_90)]">
+      <section className="sea-footer px-6 py-24">
         <h2 className="font-serif text-[30px] leading-tight tracking-tight">
           {t("footer_title")}
         </h2>
