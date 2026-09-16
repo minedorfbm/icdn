@@ -81,7 +81,7 @@ export function actionsFor(dest: Destination, limit?: number) {
 
 /** The single universal card used everywhere in the hub. */
 export function DestinationPanel({ dest, active }: { dest: Destination; active: boolean }) {
-  const { typeLabel, action, description } = useI18n();
+  const { t, typeLabel, action, description } = useI18n();
   const actions = actionsFor(dest, 3);
   const [loaded, setLoaded] = useState(false);
 
