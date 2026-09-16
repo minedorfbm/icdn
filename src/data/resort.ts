@@ -221,6 +221,10 @@ const IMAGE_BY_ID: Record<string, string> = {
   nursery: dSpa,
   "terra-mare": dFrenchDining,
   "nail-hair": dNailStudio,
+  "moulin-rouge": dBar,
+  "relaxation-pavilion": gTerraceDetail,
+  "instagram-spots": gTerraceDetail,
+  "wall-of-lanterns": gArchitectureDetail,
 };
 
 /** Asset registry — maps a CMS `image_key` to the bundled photography. */
