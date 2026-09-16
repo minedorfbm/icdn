@@ -70,6 +70,8 @@ export interface Destination {
   booking_url?: string;
   instagram_url?: string;
   booking_message?: string;
+  /** Marked as one of the resort's official Instagram photo spots. */
+  instagram_spot?: boolean;
   photos?: DestinationPhoto[];
   /** Flexible link list from the database (menus, brochures, price lists…). */
   links?: DestinationLink[];
@@ -313,6 +315,7 @@ export interface DestinationRow {
   booking_url: string | null;
   instagram_url: string | null;
   booking_message: string | null;
+  instagram_spot?: boolean | null;
   display_order: number;
   active: boolean;
 }
@@ -372,6 +375,7 @@ export function toDestination(
     ...(row.booking_url ? { booking_url: row.booking_url } : {}),
     ...(row.instagram_url ? { instagram_url: row.instagram_url } : {}),
     ...(row.booking_message ? { booking_message: row.booking_message } : {}),
+    ...(row.instagram_spot ? { instagram_spot: true } : {}),
     ...(photos && photos.length > 0 ? { photos } : {}),
     ...(links && links.length > 0 ? { links } : {}),
     ...(events && events.length > 0 ? { events } : {}),
