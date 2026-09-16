@@ -581,7 +581,7 @@ export const DESTINATIONS: Destination[] = [
     menu_url: "https://www.danang.intercontinental.com/wp-content/uploads/2023/11/Buffalo-bar-Menu-Highlight.pdf",
   }),
   d("wine-cellar", "The Wine Cellar", "sky", "bar", "Rare vintages in a hidden room.", 4),
-  d("tingara", "Tingara", "sky", "bar", "Sunset drinks above the horizon.", 5, {
+  d("tingara", "Tingara", "sky", "restaurant", "Japanese Omakase, Teppanyaki and Sushi.", 5, {
     instagram_url: "https://www.instagram.com/tingara_modern_teppanyaki",
     booking_url: "https://www.tablecheck.com/fr/intercontinental-danang-tingara/reserve/landing",
     lunch_menu_url:
@@ -625,28 +625,46 @@ export const DESTINATIONS: Destination[] = [
     cluster: "EAT",
     menu_url:
       "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Long-Bar-Menu-Highlights.Feb2026.pdf",
+    instagram_spot: true,
   }),
   d("soar-gym", "Soar Gym", "earth", "fitness", "Train inside the canopy.", 4, { cluster: "MOVE" }),
-  d("yoga-pavilion", "Yoga Pavilion", "earth", "experience", "Breath among the leaves.", 5, {
-    cluster: "MOVE",
-    booking_message:
-      "Hello, I'm interested in booking a session at the Yoga Pavilion. Could you please assist me?",
-  }),
   d("long-pool", "L_O_N_G Pool", "earth", "pool", "Green water, endless length.", 6, {
     cluster: "MOVE",
+    instagram_spot: true,
   }),
-  d("planet-trekkers", "Planet Trekkers", "earth", "kids", "A world for younger explorers.", 7, {
-    cluster: "PLAY",
-  }),
+  d(
+    "planet-trekkers",
+    "Planet Trekkers - Kids Club",
+    "earth",
+    "kids",
+    "A world for younger explorers.",
+    7,
+    { cluster: "PLAY" },
+  ),
   d("family-pool", "Family Pool", "earth", "pool", "Shallow, shaded, together.", 8, {
     cluster: "PLAY",
   }),
   d("kids-pool", "Kids Pool", "earth", "pool", "Small water for small guests.", 9, {
     cluster: "PLAY",
   }),
-  d("garden-jacuzzi", "Garden Jacuzzi", "earth", "pool", "Warm water in the vegetation.", 10, {
-    cluster: "PLAY",
-  }),
+  d(
+    "garden-jacuzzi",
+    "Garden Pool & Jacuzzi",
+    "earth",
+    "pool",
+    "Warm water in the vegetation.",
+    10,
+    { cluster: "PLAY", instagram_spot: true },
+  ),
+  d(
+    "wall-of-lanterns",
+    "Wall of Lanterns",
+    "earth",
+    "experience",
+    "A glowing wall of Hoi An lanterns on the way down to the pools — one of the resort's signature photo spots.",
+    11,
+    { cluster: "PLAY", instagram_spot: true },
+  ),
   d("nursery", "Nursery", "earth", "kids", "Care for the youngest guests.", 12, {
     cluster: "PLAY",
   }),
