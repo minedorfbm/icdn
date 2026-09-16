@@ -63,6 +63,12 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
           <p className="text-[9px] tracking-[0.42em] opacity-70">
             {levelLabel(dest.level)} · {typeLabel(dest.type)}
           </p>
+          {dest.instagram_spot && (
+            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-current/30 px-3 py-1 text-[8px] tracking-[0.26em] opacity-80">
+              <Instagram className="size-2.5" strokeWidth={1.6} />
+              {t("instagram_spot")}
+            </span>
+          )}
           <h2 className="mt-4 font-serif text-[clamp(34px,10vw,52px)] leading-[0.95] tracking-[-0.01em]">
             {dest.name}
           </h2>

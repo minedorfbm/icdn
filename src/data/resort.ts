@@ -70,6 +70,8 @@ export interface Destination {
   booking_url?: string;
   instagram_url?: string;
   booking_message?: string;
+  /** Marked as one of the resort's official Instagram photo spots. */
+  instagram_spot?: boolean;
   photos?: DestinationPhoto[];
   /** Flexible link list from the database (menus, brochures, price lists…). */
   links?: DestinationLink[];
@@ -219,6 +221,10 @@ const IMAGE_BY_ID: Record<string, string> = {
   nursery: dSpa,
   "terra-mare": dFrenchDining,
   "nail-hair": dNailStudio,
+  "moulin-rouge": dBar,
+  "relaxation-pavilion": gTerraceDetail,
+  "instagram-spots": gTerraceDetail,
+  "wall-of-lanterns": gArchitectureDetail,
 };
 
 /** Asset registry — maps a CMS `image_key` to the bundled photography. */
@@ -313,6 +319,7 @@ export interface DestinationRow {
   booking_url: string | null;
   instagram_url: string | null;
   booking_message: string | null;
+  instagram_spot?: boolean | null;
   display_order: number;
   active: boolean;
 }
@@ -372,6 +379,7 @@ export function toDestination(
     ...(row.booking_url ? { booking_url: row.booking_url } : {}),
     ...(row.instagram_url ? { instagram_url: row.instagram_url } : {}),
     ...(row.booking_message ? { booking_message: row.booking_message } : {}),
+    ...(row.instagram_spot ? { instagram_spot: true } : {}),
     ...(photos && photos.length > 0 ? { photos } : {}),
     ...(links && links.length > 0 ? { links } : {}),
     ...(events && events.length > 0 ? { events } : {}),
@@ -468,11 +476,21 @@ export const DESTINATIONS: Destination[] = [
   ),
   d(
     "reception",
-    "Reception",
+    "Reception Lobby",
     "heaven",
     "service",
-    "Arrival at the highest point of the resort.",
+    "Reception Lobby, Concierge and Executive Office — arrival at the highest point of the resort.",
     5,
+    { instagram_spot: true },
+  ),
+  d(
+    "instagram-spots",
+    "Top 9 Instagram Spots",
+    "heaven",
+    "experience",
+    "The nine most photographed places of the resort, from the Reception Hall to Coconut Beach.",
+    6,
+    { instagram_spot: true },
   ),
   d(
     "penthouses",
@@ -480,24 +498,54 @@ export const DESTINATIONS: Destination[] = [
     "heaven",
     "accommodation",
     "Panoramic suites at the summit.",
-    6,
+    7,
   ),
-  d("the-summit", "The Summit", "heaven", "experience", "Events and ceremonies in the clouds.", 7, {
-    booking_message: "Hello, I'm interested in booking The Summit. Could you please assist me?",
-  }),
-  d("rooms", "Rooms & Villas", "heaven", "accommodation", "Bensley design, level by level.", 7),
   d(
-    "m-club",
-    "Conference · Cinema · M-Club",
+    "the-summit",
+    "The Summit",
     "heaven",
     "experience",
-    "Gatherings, screenings, celebrations.",
-    9,
+    "The Summit Conference Centre, the Auditorium-Cinema and M Club — gatherings, screenings and celebrations.",
+    8,
+    {
+      booking_message: "Hello, I'm interested in booking The Summit. Could you please assist me?",
+    },
   ),
-  d("sports-centre", "Sports Centre", "heaven", "fitness", "Tennis and mountaintop play.", 9),
-  d("apec-garden", "APEC Sculpture Garden", "heaven", "gallery", "Sculpture along the ridge.", 10),
-  d("nam-tram", "Nam Tram", "heaven", "service", "The funicular between the four worlds.", 11),
-  d("information", "Information Desk", "heaven", "service", "Concierge and guest assistance.", 12),
+  d("rooms", "Rooms & Villas", "heaven", "accommodation", "Bensley design, level by level.", 9),
+  d(
+    "sports-centre",
+    "Sports Centre",
+    "heaven",
+    "fitness",
+    "Tennis and pickleball courts, football pitch and mountaintop play.",
+    10,
+  ),
+  d(
+    "apec-garden",
+    "APEC 2017 Sculpture Garden",
+    "heaven",
+    "gallery",
+    "Sculpture along the ridge.",
+    11,
+  ),
+  d("nam-tram", "Nam Tram", "heaven", "service", "The funicular between the four worlds.", 12),
+  d("information", "Information Desk", "heaven", "service", "Concierge and guest assistance.", 13),
+  d(
+    "moulin-rouge",
+    "Moulin Rouge Karaoke Club",
+    "heaven",
+    "experience",
+    "Sing the night away with family and friends in a playful private club.",
+    15,
+  ),
+  d(
+    "relaxation-pavilion",
+    "Relaxation Pavilion",
+    "heaven",
+    "experience",
+    "A quiet lookout above the bay — the resort's highest place to simply sit and breathe.",
+    16,
+  ),
 
   // SKY — dining and heritage terrace
   d("citron", "Citron", "sky", "restaurant", "Vietnamese cuisine in hanging nest pods.", 1, {
@@ -509,6 +557,7 @@ export const DESTINATIONS: Destination[] = [
       "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Citron-Dinner-Menu-Highlights.Feb2026.pdf",
     booking_message:
       "Hello, I would like to reserve a table at Citron. Could you please assist me?",
+    instagram_spot: true,
   }),
   d(
     "la-maison-1888",
@@ -529,13 +578,14 @@ export const DESTINATIONS: Destination[] = [
         "https://www.danang.intercontinental.com/wp-content/uploads/2025/05/La-Maison-1888-Michelin-Vegan-Dinner-Menu-Q3.26.pdf",
       booking_message:
         "Hello, I would like to reserve a table at La Maison 1888. Could you please assist me?",
+      instagram_spot: true,
     },
   ),
   d("buffalo-bar", "Buffalo Bar", "sky", "bar", "Cocktails beneath the Heritage Village.", 3, {
     menu_url: "https://www.danang.intercontinental.com/wp-content/uploads/2023/11/Buffalo-bar-Menu-Highlight.pdf",
   }),
   d("wine-cellar", "The Wine Cellar", "sky", "bar", "Rare vintages in a hidden room.", 4),
-  d("tingara", "Tingara", "sky", "bar", "Sunset drinks above the horizon.", 5, {
+  d("tingara", "Tingara", "sky", "restaurant", "Japanese Omakase, Teppanyaki and Sushi.", 5, {
     instagram_url: "https://www.instagram.com/tingara_modern_teppanyaki",
     booking_url: "https://www.tablecheck.com/fr/intercontinental-danang-tingara/reserve/landing",
     lunch_menu_url:
@@ -579,35 +629,53 @@ export const DESTINATIONS: Destination[] = [
     cluster: "EAT",
     menu_url:
       "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Long-Bar-Menu-Highlights.Feb2026.pdf",
+    instagram_spot: true,
   }),
   d("soar-gym", "Soar Gym", "earth", "fitness", "Train inside the canopy.", 4, { cluster: "MOVE" }),
-  d("yoga-pavilion", "Yoga Pavilion", "earth", "experience", "Breath among the leaves.", 5, {
-    cluster: "MOVE",
-    booking_message:
-      "Hello, I'm interested in booking a session at the Yoga Pavilion. Could you please assist me?",
-  }),
   d("long-pool", "L_O_N_G Pool", "earth", "pool", "Green water, endless length.", 6, {
     cluster: "MOVE",
+    instagram_spot: true,
   }),
-  d("planet-trekkers", "Planet Trekkers", "earth", "kids", "A world for younger explorers.", 7, {
-    cluster: "PLAY",
-  }),
+  d(
+    "planet-trekkers",
+    "Planet Trekkers - Kids Club",
+    "earth",
+    "kids",
+    "A world for younger explorers.",
+    7,
+    { cluster: "PLAY" },
+  ),
   d("family-pool", "Family Pool", "earth", "pool", "Shallow, shaded, together.", 8, {
     cluster: "PLAY",
   }),
   d("kids-pool", "Kids Pool", "earth", "pool", "Small water for small guests.", 9, {
     cluster: "PLAY",
   }),
-  d("garden-jacuzzi", "Garden Jacuzzi", "earth", "pool", "Warm water in the vegetation.", 10, {
-    cluster: "PLAY",
-  }),
+  d(
+    "garden-jacuzzi",
+    "Garden Pool & Jacuzzi",
+    "earth",
+    "pool",
+    "Warm water in the vegetation.",
+    10,
+    { cluster: "PLAY", instagram_spot: true },
+  ),
+  d(
+    "wall-of-lanterns",
+    "Wall of Lanterns",
+    "earth",
+    "experience",
+    "A glowing wall of Hoi An lanterns on the way down to the pools — one of the resort's signature photo spots.",
+    11,
+    { cluster: "PLAY", instagram_spot: true },
+  ),
   d("nursery", "Nursery", "earth", "kids", "Care for the youngest guests.", 12, {
     cluster: "PLAY",
   }),
   d("organic-garden", "Organic Garden", "earth", "experience", "Where the kitchens begin.", 13, {
     cluster: "PLAY",
   }),
-  d("dia-tang", "Địa Tạng Shrine", "earth", "experience", "A pause in the hillside.", 14, {
+  d("dia-tang", "Spirit House", "earth", "experience", "A pause in the hillside.", 14, {
     cluster: "PLAY",
   }),
 
@@ -630,8 +698,21 @@ export const DESTINATIONS: Destination[] = [
     booking_message:
       "Hello, I'm interested in booking The Nail & Hair Studio. Could you please assist me?",
   }),
-  d("marine-centre", "Marine Recreation Centre", "sea", "recreation", "Explore the bay.", 3),
-  d("coconut-beach", "Coconut Beach", "sea", "beach", "At the edge of Son Tra.", 4),
+  d(
+    "marine-centre",
+    "Beach Activity Centre",
+    "sea",
+    "recreation",
+    "Water sports and guided activities along the shoreline.",
+    3,
+  ),
+  d("coconut-beach", "Coconut Beach", "sea", "beach", "At the edge of Son Tra.", 4, {
+    instagram_spot: true,
+  }),
+  d("yoga-pavilion", "Yoga Pavilion", "sea", "experience", "Breath beside the shoreline.", 9, {
+    booking_message:
+      "Hello, I'm interested in booking a session at the Yoga Pavilion. Could you please assist me?",
+  }),
   d("family-beach", "Family Beach", "sea", "beach", "Soft sand, calm water.", 5),
   d(
     "club-beach",

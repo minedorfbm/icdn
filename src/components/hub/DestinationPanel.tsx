@@ -81,7 +81,7 @@ export function actionsFor(dest: Destination, limit?: number) {
 
 /** The single universal card used everywhere in the hub. */
 export function DestinationPanel({ dest, active }: { dest: Destination; active: boolean }) {
-  const { typeLabel, action, description } = useI18n();
+  const { t, typeLabel, action, description } = useI18n();
   const actions = actionsFor(dest, 3);
   const [loaded, setLoaded] = useState(false);
 
@@ -111,7 +111,15 @@ export function DestinationPanel({ dest, active }: { dest: Destination; active: 
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[28%] bg-gradient-to-b from-black/40 to-transparent" />
 
       <div className="absolute inset-0 flex flex-col justify-between p-7 text-[oklch(0.98_0.005_90)]">
-        <p className="text-[9px] tracking-[0.42em] opacity-80">{typeLabel(dest.type)}</p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-[9px] tracking-[0.42em] opacity-80">{typeLabel(dest.type)}</p>
+          {dest.instagram_spot && (
+            <span className="flex items-center gap-1.5 rounded-full border border-[oklch(0.78_0.11_85/0.5)] bg-black/25 px-2.5 py-1 text-[8px] tracking-[0.26em] text-[oklch(0.86_0.09_85)] backdrop-blur-sm">
+              <Instagram className="size-2.5" strokeWidth={1.6} />
+              {t("instagram_spot")}
+            </span>
+          )}
+        </div>
 
         <div className={`transition-opacity duration-500 ${active ? "opacity-100" : "opacity-60"}`}>
           <h3 className="font-serif text-[clamp(28px,8.5vw,40px)] leading-[0.98] tracking-[0.01em] drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">

@@ -162,6 +162,7 @@ export type Database = {
           display_order: number
           id: string
           image_key: string | null
+          instagram_spot: boolean
           instagram_url: string | null
           level_id: string
           lunch_menu_url: string | null
@@ -186,6 +187,7 @@ export type Database = {
           display_order?: number
           id: string
           image_key?: string | null
+          instagram_spot?: boolean
           instagram_url?: string | null
           level_id: string
           lunch_menu_url?: string | null
@@ -210,6 +212,7 @@ export type Database = {
           display_order?: number
           id?: string
           image_key?: string | null
+          instagram_spot?: boolean
           instagram_url?: string | null
           level_id?: string
           lunch_menu_url?: string | null
