@@ -114,7 +114,7 @@ export function DestinationPanel({ dest, active }: { dest: Destination; active: 
         <div className="flex items-start justify-between gap-3">
           <p className="text-[9px] tracking-[0.42em] opacity-80">{typeLabel(dest.type)}</p>
           {dest.instagram_spot && (
-            <span className="flex items-center gap-1.5 rounded-full border border-[oklch(0.78_0.11_85/0.5)] bg-black/25 px-2.5 py-1 text-[8px] tracking-[0.26em] text-[oklch(0.86_0.09_85)] backdrop-blur-sm">
+            <span className="flex items-center gap-1.5 rounded-full border border-background/30 bg-foreground/70 px-2.5 py-1 text-[8px] tracking-[0.26em] text-background shadow-md backdrop-blur-md">
               <Instagram className="size-2.5" strokeWidth={1.6} />
               {t("instagram_spot")}
             </span>
@@ -137,7 +137,7 @@ export function DestinationPanel({ dest, active }: { dest: Destination; active: 
                 target="_blank"
                 rel="noreferrer"
                 tabIndex={active ? 0 : -1}
-                className="text-[10px] tracking-[0.3em] transition-opacity hover:opacity-60"
+                className="rounded-full border border-background/25 bg-foreground/65 px-3 py-2 text-[10px] text-background shadow-md tracking-[0.3em] backdrop-blur-md transition-colors hover:bg-foreground/80"
               >
                 {action(a)}
               </a>
@@ -149,7 +149,7 @@ export function DestinationPanel({ dest, active }: { dest: Destination; active: 
                 rel="noreferrer"
                 aria-label={`${dest.name} on Instagram`}
                 tabIndex={active ? 0 : -1}
-                className="grid size-8 -my-1 place-items-center rounded-full border border-current/30 opacity-80 transition-opacity hover:opacity-50"
+                className="grid size-8 place-items-center rounded-full border border-background/25 bg-foreground/65 text-background shadow-md backdrop-blur-md transition-colors hover:bg-foreground/80"
               >
                 <Instagram className="size-3.5" strokeWidth={1.5} />
               </a>
