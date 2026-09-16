@@ -553,6 +553,7 @@ export const DESTINATIONS: Destination[] = [
       "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Citron-Dinner-Menu-Highlights.Feb2026.pdf",
     booking_message:
       "Hello, I would like to reserve a table at Citron. Could you please assist me?",
+    instagram_spot: true,
   }),
   d(
     "la-maison-1888",
@@ -573,6 +574,7 @@ export const DESTINATIONS: Destination[] = [
         "https://www.danang.intercontinental.com/wp-content/uploads/2025/05/La-Maison-1888-Michelin-Vegan-Dinner-Menu-Q3.26.pdf",
       booking_message:
         "Hello, I would like to reserve a table at La Maison 1888. Could you please assist me?",
+      instagram_spot: true,
     },
   ),
   d("buffalo-bar", "Buffalo Bar", "sky", "bar", "Cocktails beneath the Heritage Village.", 3, {
