@@ -671,7 +671,7 @@ export const DESTINATIONS: Destination[] = [
   d("organic-garden", "Organic Garden", "earth", "experience", "Where the kitchens begin.", 13, {
     cluster: "PLAY",
   }),
-  d("dia-tang", "Địa Tạng Shrine", "earth", "experience", "A pause in the hillside.", 14, {
+  d("dia-tang", "Spirit House", "earth", "experience", "A pause in the hillside.", 14, {
     cluster: "PLAY",
   }),
 
@@ -694,8 +694,21 @@ export const DESTINATIONS: Destination[] = [
     booking_message:
       "Hello, I'm interested in booking The Nail & Hair Studio. Could you please assist me?",
   }),
-  d("marine-centre", "Marine Recreation Centre", "sea", "recreation", "Explore the bay.", 3),
-  d("coconut-beach", "Coconut Beach", "sea", "beach", "At the edge of Son Tra.", 4),
+  d(
+    "marine-centre",
+    "Beach Activity Centre",
+    "sea",
+    "recreation",
+    "Water sports and guided activities along the shoreline.",
+    3,
+  ),
+  d("coconut-beach", "Coconut Beach", "sea", "beach", "At the edge of Son Tra.", 4, {
+    instagram_spot: true,
+  }),
+  d("yoga-pavilion", "Yoga Pavilion", "sea", "experience", "Breath beside the shoreline.", 9, {
+    booking_message:
+      "Hello, I'm interested in booking a session at the Yoga Pavilion. Could you please assist me?",
+  }),
   d("family-beach", "Family Beach", "sea", "beach", "Soft sand, calm water.", 5),
   d(
     "club-beach",
