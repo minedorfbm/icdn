@@ -26,7 +26,8 @@ export type UIKey =
   | "concierge"
   | "language"
   | "events"
-  | "explore_more";
+  | "explore_more"
+  | "instagram_spot";
 
 export const UI: Record<Lang, Record<UIKey, string>> = {
   en: {
@@ -49,6 +50,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     language: "Language",
     events: "SIGNATURE EVENTS",
     explore_more: "EXPLORE MORE",
+    instagram_spot: "INSTAGRAM SPOT",
   },
   vi: {
     hero_kicker: "BÁN ĐẢO SƠN TRÀ · ĐÀ NẴNG",
@@ -70,6 +72,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     language: "Ngôn ngữ",
     events: "SỰ KIỆN ĐẶC SẮC",
     explore_more: "KHÁM PHÁ THÊM",
+    instagram_spot: "ĐIỂM CHỤP HÌNH",
   },
   ru: {
     hero_kicker: "ПОЛУОСТРОВ ШОНЧА · ДАНАНГ",
@@ -91,6 +94,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     language: "Язык",
     events: "ФИРМЕННЫЕ СОБЫТИЯ",
     explore_more: "УЗНАТЬ БОЛЬШЕ",
+    instagram_spot: "ФОТОЗОНА",
   },
   zh: {
     hero_kicker: "山茶半岛 · 岘港",
@@ -112,6 +116,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     language: "语言",
     events: "特色活动",
     explore_more: "了解更多",
+    instagram_spot: "打卡点",
   },
 };
 
