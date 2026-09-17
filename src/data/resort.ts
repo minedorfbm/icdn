@@ -421,6 +421,7 @@ export function toDestination(
     ...(row.booking_message ? { booking_message: row.booking_message } : {}),
     ...(row.instagram_spot ? { instagram_spot: true } : {}),
     ...(photos && photos.length > 0 ? { photos } : {}),
+    ...(posts && posts.length > 0 ? { posts } : {}),
     ...(links && links.length > 0 ? { links } : {}),
     ...(events && events.length > 0 ? { events } : {}),
     display_order: row.display_order,
