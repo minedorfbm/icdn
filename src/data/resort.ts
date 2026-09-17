@@ -73,6 +73,8 @@ export interface Destination {
   /** Marked as one of the resort's official Instagram photo spots. */
   instagram_spot?: boolean;
   photos?: DestinationPhoto[];
+  /** Featured Instagram posts rendered as real embeds inside the detail sheet. */
+  posts?: DestinationPost[];
   /** Flexible link list from the database (menus, brochures, price lists…). */
   links?: DestinationLink[];
   /** Recurring events from the database. */
