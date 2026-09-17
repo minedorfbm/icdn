@@ -6,6 +6,7 @@ import {
   groupEvents,
   groupLinks,
   groupPhotos,
+  groupPosts,
   LEVELS,
   OFFICIAL,
   resolveImage,
@@ -49,10 +50,26 @@ const withFallbackMedia = (list: Destination[]): Destination[] =>
       .filter(Boolean)
       .map((image) => ({ image }));
     const events = dest.events ?? EVENTS_BY_DESTINATION[dest.id];
+    const gallery = dest.photos ?? (photos.length > 0 ? photos : undefined);
+    // A destination whose Instagram link already points at a single post gets a
+    // featured post automatically, even before an entry exists in the database.
+    const inferred =
+      dest.instagram_url && /instagram\.com\/(p|reel)\//.test(dest.instagram_url)
+        ? [
+            {
+              post_url: dest.instagram_url,
+              account: "intercontinentaldanang",
+              ...(gallery?.[0]?.image ? { image: gallery[0].image } : {}),
+              caption: dest.short_description,
+            },
+          ]
+        : undefined;
+    const posts = dest.posts ?? inferred;
     return {
       ...dest,
-      ...(photos.length > 0 ? { photos } : {}),
+      ...(gallery ? { photos: gallery } : {}),
       ...(events ? { events } : {}),
+      ...(posts ? { posts } : {}),
     };
   });
 
@@ -84,6 +101,7 @@ export function HubProvider({ data, children }: { data?: HubData; children: Reac
     const photosByDest = groupPhotos(data.photos ?? []);
     const linksByDest = groupLinks(data.links ?? []);
     const eventsByDest = groupEvents(data.events ?? []);
+    const postsByDest = groupPosts(data.posts ?? []);
     const s = data.settings;
     const links = (
       [
@@ -103,7 +121,13 @@ export function HubProvider({ data, children }: { data?: HubData; children: Reac
       levels,
       destinations: withFallbackMedia(
         data.destinations.map((row) =>
-          toDestination(row, photosByDest[row.id], linksByDest[row.id], eventsByDest[row.id]),
+          toDestination(
+            row,
+            photosByDest[row.id],
+            linksByDest[row.id],
+            eventsByDest[row.id],
+            postsByDest[row.id],
+          ),
         ),
       ),
       links: links.length > 0 ? links : FALLBACK.links,
