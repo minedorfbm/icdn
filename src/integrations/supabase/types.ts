@@ -149,6 +149,56 @@ export type Database = {
           },
         ]
       }
+      destination_posts: {
+        Row: {
+          account: string | null
+          active: boolean
+          caption: string | null
+          created_at: string
+          destination_id: string
+          display_order: number
+          id: string
+          image_url: string | null
+          post_url: string
+          posted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          account?: string | null
+          active?: boolean
+          caption?: string | null
+          created_at?: string
+          destination_id: string
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          post_url: string
+          posted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account?: string | null
+          active?: boolean
+          caption?: string | null
+          created_at?: string
+          destination_id?: string
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          post_url?: string
+          posted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "destination_posts_destination_id_fkey"
+            columns: ["destination_id"]
+            isOneToOne: false
+            referencedRelation: "destinations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       destinations: {
         Row: {
           active: boolean
