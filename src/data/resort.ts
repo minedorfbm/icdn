@@ -397,6 +397,7 @@ export function toDestination(
   photos?: DestinationPhoto[],
   links?: DestinationLink[],
   events?: DestinationEvent[],
+  posts?: DestinationPost[],
 ): Destination {
   const type = row.type as DestinationType;
   return {
