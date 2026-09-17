@@ -4,6 +4,7 @@ import type {
   DestinationEventRow,
   DestinationLinkRow,
   DestinationPhotoRow,
+  DestinationPostRow,
   DestinationRow,
 } from "@/data/resort";
 
@@ -22,6 +23,7 @@ export interface HubData {
   photos: DestinationPhotoRow[];
   links: DestinationLinkRow[];
   events: DestinationEventRow[];
+  posts: DestinationPostRow[];
   settings: Record<string, string>;
 }
 
@@ -33,7 +35,15 @@ export const getHubData = createServerFn({ method: "GET" }).handler(async (): Pr
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
   if (!url || !key)
-    return { levels: [], destinations: [], photos: [], links: [], events: [], settings: {} };
+    return {
+      levels: [],
+      destinations: [],
+      photos: [],
+      links: [],
+      events: [],
+      posts: [],
+      settings: {},
+    };
 
   const supabase = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
@@ -49,7 +59,7 @@ export const getHubData = createServerFn({ method: "GET" }).handler(async (): Pr
     },
   });
 
-  const [levels, destinations, photos, links, events, settings] = await Promise.all([
+  const [levels, destinations, photos, links, events, posts, settings] = await Promise.all([
     supabase
       .from("levels")
       .select("id, title, line, image_key, clusters, display_order")
@@ -76,6 +86,11 @@ export const getHubData = createServerFn({ method: "GET" }).handler(async (): Pr
       .select("destination_id, title, schedule, description, url, display_order")
       .eq("active", true)
       .order("display_order"),
+    supabase
+      .from("destination_posts")
+      .select("destination_id, post_url, account, caption, image_url, posted_at, display_order")
+      .eq("active", true)
+      .order("display_order"),
     supabase.from("site_settings").select("key, value"),
   ]);
 
@@ -85,6 +100,7 @@ export const getHubData = createServerFn({ method: "GET" }).handler(async (): Pr
     photos: (photos.data ?? []) as DestinationPhotoRow[],
     links: (links.data ?? []) as DestinationLinkRow[],
     events: (events.data ?? []) as DestinationEventRow[],
+    posts: (posts.data ?? []) as DestinationPostRow[],
     settings: Object.fromEntries(
       ((settings.data ?? []) as { key: string; value: string }[]).map((s) => [s.key, s.value]),
     ),
