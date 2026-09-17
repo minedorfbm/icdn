@@ -73,6 +73,8 @@ export interface Destination {
   /** Marked as one of the resort's official Instagram photo spots. */
   instagram_spot?: boolean;
   photos?: DestinationPhoto[];
+  /** Featured Instagram posts rendered as real embeds inside the detail sheet. */
+  posts?: DestinationPost[];
   /** Flexible link list from the database (menus, brochures, price lists…). */
   links?: DestinationLink[];
   /** Recurring events from the database. */
@@ -121,6 +123,43 @@ export interface DestinationPhotoRow {
   caption: string | null;
   post_url: string | null;
   display_order: number;
+}
+
+/** One featured Instagram post shown inside a destination detail sheet. */
+export interface DestinationPost {
+  post_url: string;
+  account?: string;
+  caption?: string;
+  image?: string;
+  posted_at?: string;
+}
+
+/** Row shape returned by the `destination_posts` table. */
+export interface DestinationPostRow {
+  destination_id: string;
+  post_url: string;
+  account: string | null;
+  caption: string | null;
+  image_url: string | null;
+  posted_at: string | null;
+  display_order: number;
+}
+
+/** Groups Instagram post rows by destination, in display order. */
+export function groupPosts(rows: DestinationPostRow[]): Record<string, DestinationPost[]> {
+  const out: Record<string, DestinationPost[]> = {};
+  for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
+    if (!row.post_url) continue;
+    const image = row.image_url ? resolveImage(row.image_url) : "";
+    (out[row.destination_id] ??= []).push({
+      post_url: row.post_url,
+      ...(row.account ? { account: row.account } : {}),
+      ...(row.caption ? { caption: row.caption } : {}),
+      ...(image ? { image } : {}),
+      ...(row.posted_at ? { posted_at: row.posted_at } : {}),
+    });
+  }
+  return out;
 }
 
 /** Official resort channels — configurable, no invented accounts. */
@@ -358,6 +397,7 @@ export function toDestination(
   photos?: DestinationPhoto[],
   links?: DestinationLink[],
   events?: DestinationEvent[],
+  posts?: DestinationPost[],
 ): Destination {
   const type = row.type as DestinationType;
   return {
@@ -381,6 +421,7 @@ export function toDestination(
     ...(row.booking_message ? { booking_message: row.booking_message } : {}),
     ...(row.instagram_spot ? { instagram_spot: true } : {}),
     ...(photos && photos.length > 0 ? { photos } : {}),
+    ...(posts && posts.length > 0 ? { posts } : {}),
     ...(links && links.length > 0 ? { links } : {}),
     ...(events && events.length > 0 ? { events } : {}),
     display_order: row.display_order,

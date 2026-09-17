@@ -27,7 +27,9 @@ export type UIKey =
   | "language"
   | "events"
   | "explore_more"
-  | "instagram_spot";
+  | "instagram_spot"
+  | "latest_post"
+  | "view_on_instagram";
 
 export const UI: Record<Lang, Record<UIKey, string>> = {
   en: {
@@ -51,6 +53,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     events: "SIGNATURE EVENTS",
     explore_more: "EXPLORE MORE",
     instagram_spot: "INSTAGRAM SPOT",
+    latest_post: "LATEST POST",
+    view_on_instagram: "VIEW ON INSTAGRAM",
   },
   vi: {
     hero_kicker: "BÁN ĐẢO SƠN TRÀ · ĐÀ NẴNG",
@@ -73,6 +77,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     events: "SỰ KIỆN ĐẶC SẮC",
     explore_more: "KHÁM PHÁ THÊM",
     instagram_spot: "ĐIỂM CHỤP HÌNH",
+    latest_post: "BÀI ĐĂNG MỚI NHẤT",
+    view_on_instagram: "XEM TRÊN INSTAGRAM",
   },
   ru: {
     hero_kicker: "ПОЛУОСТРОВ ШОНЧА · ДАНАНГ",
@@ -95,6 +101,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     events: "ФИРМЕННЫЕ СОБЫТИЯ",
     explore_more: "УЗНАТЬ БОЛЬШЕ",
     instagram_spot: "ФОТОЗОНА",
+    latest_post: "ПОСЛЕДНЯЯ ПУБЛИКАЦИЯ",
+    view_on_instagram: "СМОТРЕТЬ В INSTAGRAM",
   },
   zh: {
     hero_kicker: "山茶半岛 · 岘港",
@@ -117,6 +125,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     events: "特色活动",
     explore_more: "了解更多",
     instagram_spot: "打卡点",
+    latest_post: "最新帖子",
+    view_on_instagram: "在 INSTAGRAM 查看",
   },
 };
 
