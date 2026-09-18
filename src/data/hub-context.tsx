@@ -54,7 +54,7 @@ const withFallbackMedia = (list: Destination[]): Destination[] =>
     // A destination whose Instagram link already points at a single post gets a
     // featured post automatically, even before an entry exists in the database.
     const inferred =
-      dest.instagram_url && /instagram\.com\/(p|reel)\//.test(dest.instagram_url)
+      dest.instagram_url && /instagram\.com\//.test(dest.instagram_url)
         ? [
             {
               post_url: dest.instagram_url,
