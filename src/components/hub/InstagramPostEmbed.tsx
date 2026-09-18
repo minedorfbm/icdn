@@ -35,7 +35,14 @@ function loadEmbedScript(): Promise<void> {
  * official embed. If the embed does not render — offline preview, private post,
  * blocked script — a matching in-house post card is shown instead.
  */
-export function InstagramPostEmbed({ post }: { post: DestinationPost }) {
+export function InstagramPostEmbed({
+  post,
+  bare = false,
+}: {
+  post: DestinationPost;
+  /** Hides the section wrapper/label so a carousel can own the heading. */
+  bare?: boolean;
+}) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
   // Only single posts/reels can be embedded; account links show the post card.
