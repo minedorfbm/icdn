@@ -84,15 +84,9 @@ export function InstagramPostEmbed({
 
   const handle = post.account ? `@${post.account.replace(/^@/, "")}` : null;
 
-  return (
-    <section className="mt-12">
-      <p className="text-[9px] tracking-[0.38em] opacity-45">
-        {t("latest_post")}
-        {handle && <span className="ml-2 opacity-80">· {handle}</span>}
-      </p>
-
-      <div ref={host} className="mt-5">
-        {!failed && (
+  const body = (
+    <div ref={host} className={bare ? "" : "mt-5"}>
+      {!failed && (
           <div
             className={`overflow-hidden rounded-[18px] bg-white transition-opacity ${
               ready ? "opacity-100" : "opacity-0"
