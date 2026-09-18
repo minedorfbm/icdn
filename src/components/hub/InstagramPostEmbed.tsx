@@ -107,9 +107,20 @@ export function InstagramPostEmbed({
           </div>
         )}
 
-        {failed && <PostCard post={post} handle={handle} />}
-        {!failed && !ready && <PostSkeleton />}
-      </div>
+      {failed && <PostCard post={post} handle={handle} />}
+      {!failed && !ready && <PostSkeleton />}
+    </div>
+  );
+
+  if (bare) return body;
+
+  return (
+    <section className="mt-12">
+      <p className="text-[9px] tracking-[0.38em] opacity-45">
+        {t("latest_post")}
+        {handle && <span className="ml-2 opacity-80">· {handle}</span>}
+      </p>
+      {body}
     </section>
   );
 }
