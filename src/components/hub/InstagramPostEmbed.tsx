@@ -38,12 +38,14 @@ function loadEmbedScript(): Promise<void> {
 export function InstagramPostEmbed({ post }: { post: DestinationPost }) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
-  const [failed, setFailed] = useState(false);
+  // Only single posts/reels can be embedded; account links show the post card.
+  const embeddable = /instagram\.com\/(p|reel|reels)\//.test(post.post_url);
+  const [failed, setFailed] = useState(!embeddable);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const node = host.current;
-    if (!node) return;
+    if (!node || !embeddable) return;
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
 

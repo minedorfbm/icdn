@@ -138,14 +138,17 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
           </section>
         )}
 
-        {dest.posts?.[0] && <InstagramPostEmbed post={dest.posts[0]} />}
-
-        {dest.photos && dest.photos.length > 0 && (
-          <InstagramStrip
-            photos={dest.photos}
-            {...(instagram ? { instagramUrl: instagram } : {})}
-            label={t("instagram")}
-          />
+        {dest.posts?.[0] ? (
+          <InstagramPostEmbed post={dest.posts[0]} />
+        ) : (
+          dest.photos &&
+          dest.photos.length > 0 && (
+            <InstagramStrip
+              photos={dest.photos}
+              {...(instagram ? { instagramUrl: instagram } : {})}
+              label={t("instagram")}
+            />
+          )
         )}
 
         <div className="mt-10 flex flex-col gap-3">
