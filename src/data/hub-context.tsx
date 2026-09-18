@@ -53,12 +53,17 @@ const withFallbackMedia = (list: Destination[]): Destination[] =>
     const gallery = dest.photos ?? (photos.length > 0 ? photos : undefined);
     // A destination whose Instagram link already points at a single post gets a
     // featured post automatically, even before an entry exists in the database.
+    const handleMatch = dest.instagram_url?.match(/instagram\.com\/([^/?]+)/);
+    const handle =
+      handleMatch && !["p", "reel", "reels"].includes(handleMatch[1] ?? "")
+        ? handleMatch[1]
+        : undefined;
     const inferred =
       dest.instagram_url && /instagram\.com\//.test(dest.instagram_url)
         ? [
             {
               post_url: dest.instagram_url,
-              account: "intercontinentaldanang",
+              account: handle ?? "intercontinentaldanang",
               ...(gallery?.[0]?.image ? { image: gallery[0].image } : {}),
               caption: dest.short_description,
             },
