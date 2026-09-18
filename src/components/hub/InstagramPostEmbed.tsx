@@ -45,7 +45,7 @@ export function InstagramPostEmbed({ post }: { post: DestinationPost }) {
 
   useEffect(() => {
     const node = host.current;
-    if (!node) return;
+    if (!node || !embeddable) return;
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
