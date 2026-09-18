@@ -35,7 +35,14 @@ function loadEmbedScript(): Promise<void> {
  * official embed. If the embed does not render — offline preview, private post,
  * blocked script — a matching in-house post card is shown instead.
  */
-export function InstagramPostEmbed({ post }: { post: DestinationPost }) {
+export function InstagramPostEmbed({
+  post,
+  bare = false,
+}: {
+  post: DestinationPost;
+  /** Hides the section wrapper/label so a carousel can own the heading. */
+  bare?: boolean;
+}) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
   // Only single posts/reels can be embedded; account links show the post card.
@@ -77,15 +84,9 @@ export function InstagramPostEmbed({ post }: { post: DestinationPost }) {
 
   const handle = post.account ? `@${post.account.replace(/^@/, "")}` : null;
 
-  return (
-    <section className="mt-12">
-      <p className="text-[9px] tracking-[0.38em] opacity-45">
-        {t("latest_post")}
-        {handle && <span className="ml-2 opacity-80">· {handle}</span>}
-      </p>
-
-      <div ref={host} className="mt-5">
-        {!failed && (
+  const body = (
+    <div ref={host} className={bare ? "" : "mt-5"}>
+      {!failed && (
           <div
             className={`overflow-hidden rounded-[18px] bg-white transition-opacity ${
               ready ? "opacity-100" : "opacity-0"
@@ -106,9 +107,20 @@ export function InstagramPostEmbed({ post }: { post: DestinationPost }) {
           </div>
         )}
 
-        {failed && <PostCard post={post} handle={handle} />}
-        {!failed && !ready && <PostSkeleton />}
-      </div>
+      {failed && <PostCard post={post} handle={handle} />}
+      {!failed && !ready && <PostSkeleton />}
+    </div>
+  );
+
+  if (bare) return body;
+
+  return (
+    <section className="mt-12">
+      <p className="text-[9px] tracking-[0.38em] opacity-45">
+        {t("latest_post")}
+        {handle && <span className="ml-2 opacity-80">· {handle}</span>}
+      </p>
+      {body}
     </section>
   );
 }
