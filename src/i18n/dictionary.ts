@@ -29,6 +29,7 @@ export type UIKey =
   | "explore_more"
   | "instagram_spot"
   | "latest_post"
+  | "latest_posts"
   | "view_on_instagram";
 
 export const UI: Record<Lang, Record<UIKey, string>> = {
@@ -54,6 +55,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     explore_more: "EXPLORE MORE",
     instagram_spot: "INSTAGRAM SPOT",
     latest_post: "LATEST POST",
+    latest_posts: "LATEST POSTS",
     view_on_instagram: "VIEW ON INSTAGRAM",
   },
   vi: {
@@ -78,6 +80,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     explore_more: "KHÁM PHÁ THÊM",
     instagram_spot: "ĐIỂM CHỤP HÌNH",
     latest_post: "BÀI ĐĂNG MỚI NHẤT",
+    latest_posts: "BÀI ĐĂNG MỚI NHẤT",
     view_on_instagram: "XEM TRÊN INSTAGRAM",
   },
   ru: {
@@ -102,6 +105,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     explore_more: "УЗНАТЬ БОЛЬШЕ",
     instagram_spot: "ФОТОЗОНА",
     latest_post: "ПОСЛЕДНЯЯ ПУБЛИКАЦИЯ",
+    latest_posts: "ПОСЛЕДНИЕ ПУБЛИКАЦИИ",
     view_on_instagram: "СМОТРЕТЬ В INSTAGRAM",
   },
   zh: {
@@ -126,6 +130,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     explore_more: "了解更多",
     instagram_spot: "打卡点",
     latest_post: "最新帖子",
+    latest_posts: "最新帖子",
     view_on_instagram: "在 INSTAGRAM 查看",
   },
 };
