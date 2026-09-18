@@ -30,7 +30,7 @@ export function InstagramPostCarousel({ posts }: { posts: DestinationPost[] }) {
       <div
         ref={track}
         onScroll={onScroll}
-        className="hide-scrollbar -mx-6 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6"
+        className="-mx-6 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 [&::-webkit-scrollbar]:hidden"
         style={{ scrollbarWidth: "none" }}
       >
         {items.map((post) => (

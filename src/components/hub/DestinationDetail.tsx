@@ -3,7 +3,7 @@ import { ArrowLeft, Instagram } from "lucide-react";
 import type { Destination } from "@/data/resort";
 import { actionHref, actionsFor, instagramUrl } from "./DestinationPanel";
 import { InstagramStrip } from "./InstagramStrip";
-import { InstagramPostEmbed } from "./InstagramPostEmbed";
+import { InstagramPostCarousel } from "./InstagramPostCarousel";
 import { useI18n } from "@/i18n";
 
 /** Full-screen editorial detail view for one destination. */
@@ -138,8 +138,8 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
           </section>
         )}
 
-        {dest.posts?.[0] ? (
-          <InstagramPostEmbed post={dest.posts[0]} />
+        {dest.posts && dest.posts.length > 0 ? (
+          <InstagramPostCarousel posts={dest.posts} />
         ) : (
           dest.photos &&
           dest.photos.length > 0 && (
