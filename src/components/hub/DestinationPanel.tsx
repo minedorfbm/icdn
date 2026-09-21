@@ -37,7 +37,7 @@ export function DestinationPanel({
         draggable={false}
         width={768}
         height={1152}
-        sizes="(max-width: 550px) 80vw, 440px"
+        sizes="60vw"
         className={`absolute inset-0 h-full w-full select-none object-cover transition-[filter,transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           loaded ? "opacity-100" : "opacity-0"
         } ${active ? "scale-100" : "scale-[1.03] saturate-[0.9]"}`}
@@ -47,9 +47,9 @@ export function DestinationPanel({
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[72%] bg-gradient-to-b from-black/75 via-black/30 to-transparent" />
 
-      <div className="relative flex h-full min-h-[inherit] flex-col justify-between gap-12 px-5 py-7 sm:px-7 sm:py-9 text-[oklch(0.98_0.005_90)]">
+      <div className="relative flex h-full min-h-[inherit] flex-col justify-between gap-6 overflow-y-auto overscroll-y-contain px-4 py-5 sm:px-7 sm:py-9 text-[oklch(0.98_0.005_90)]">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-[11px] tracking-[0.24em] opacity-80">
+          <p className="text-[9px] tracking-[0.18em] opacity-80">
             {levelLabel(dest.level)} / {typeLabel(dest.type)}
           </p>
           {dest.instagram_spot && (
@@ -62,8 +62,8 @@ export function DestinationPanel({
           )}
         </div>
 
-        <div className="-mt-6">
-          <h3 className="font-serif text-[clamp(32px,8.5vw,48px)] leading-[0.98] tracking-[0.01em] drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">
+        <div className="shrink-0">
+          <h3 className="font-serif text-[clamp(26px,6.5vw,48px)] leading-[0.98] tracking-[0.01em] drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">
             <button
               type="button"
               onClick={onOpen}
@@ -78,7 +78,7 @@ export function DestinationPanel({
           </p>
         </div>
 
-        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/25 pt-3">
+        <div className="mt-auto flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/25 pt-3">
           {actions.map((a, i) => (
             <a
               key={`${a.kind}-${i}`}

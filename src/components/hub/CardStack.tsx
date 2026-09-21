@@ -8,8 +8,8 @@ import type { Destination } from "@/data/resort";
 type Slot = [number, number, number, number, number];
 const SLOTS: Slot[] = [
   [4, 1, 1, 40, 0],
-  [23, 0.88, 0.65, 30, -16],
-  [39, 0.76, 0.43, 20, -24],
+  [30, 0.88, 0.65, 30, -16],
+  [50, 0.76, 0.43, 20, -24],
 ];
 const EXIT: Slot = [-88, 0.94, 0.8, 50, 12];
 const VISIBLE = SLOTS.length;
@@ -126,7 +126,7 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
   };
 
   return (
-    <div className="mx-auto max-w-[740px] select-none [--deck-spread:1] sm:[--deck-spread:1.8]">
+    <div className="w-full select-none">
       {/* single shared stage */}
       <div
         className="relative grid w-full touch-pan-y overflow-hidden py-6"
@@ -152,9 +152,9 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
           return (
             <div
               key={dest.id}
-              className="perspective-card relative col-start-1 row-start-1 min-h-[max(480px,64svh)] w-[80%] max-w-[440px] origin-left will-change-transform"
+              className="perspective-card relative col-start-1 row-start-1 h-[80svh] w-[60%] origin-left will-change-transform"
               style={{
-                transform: `translate3d(calc(${(x / 80) * 100}% * var(--deck-spread)),0,0) perspective(1200px) rotateY(${rotation}deg) scale(${scale})`,
+                transform: `translate3d(${(x / 60) * 100}%,0,0) perspective(1200px) rotateY(${rotation}deg) scale(${scale})`,
                 zIndex: z,
                 filter: `brightness(${bright})${active ? "" : " saturate(0.85)"}`,
                 opacity: pos > VISIBLE - 0.15 ? 0 : 1,
