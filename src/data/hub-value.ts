@@ -85,7 +85,7 @@ export const FALLBACK: HubValue = {
 };
 
 export function createHubValue(data?: HubData): HubValue {
-  if (!data || data.levels === null || data.destinations === null) return FALLBACK;
+  if (!data?.levels || data.destinations === null) return FALLBACK;
 
   const levels: HubLevel[] = data.levels.map((l) => ({
     id: l.id as Level,

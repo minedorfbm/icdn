@@ -48,7 +48,11 @@ export function actionHref(action: string, dest: Destination) {
   }
 }
 
-/** Action list for a destination — built from the links stored in the database. */
+function appendConfiguredActions(list: string[], kinds: string[], dest: Destination) {
+  return [...list, ...kinds.filter((kind) => !list.includes(kind) && Boolean(linkUrl(dest, kind)))];
+}
+
+/** Compatibility actions for destinations without a database link collection. */
 function legacyActions(dest: Destination) {
   const has = (kind: string) => Boolean(linkUrl(dest, kind));
   let list = CTA_BY_TYPE[dest.type];
@@ -56,23 +60,15 @@ function legacyActions(dest: Destination) {
     list = list.map((a) => (a === "DETAILS" ? "BROCHURE" : a));
     if (!list.includes("BROCHURE")) list = [...list, "BROCHURE"];
   }
-  if (has("BOOK") && !list.includes("BOOK")) list = [...list, "BOOK"];
+  list = appendConfiguredActions(list, ["BOOK"], dest);
   // Meal-specific menus replace the generic MENU action
-  const menus = [
-    ...(has("BREAKFAST_MENU") ? ["BREAKFAST_MENU"] : []),
-    ...(has("LUNCH_MENU") ? ["LUNCH_MENU"] : []),
-    ...(has("DINNER_MENU") ? ["DINNER_MENU"] : []),
-  ];
+  const menus = ["BREAKFAST_MENU", "LUNCH_MENU", "DINNER_MENU"].filter(has);
   if (menus.length > 0) {
     list = list.includes("MENU")
       ? list.flatMap((a) => (a === "MENU" ? menus : [a]))
       : [...list, ...menus];
   }
-  if (has("PRICE_LIST") && !list.includes("PRICE_LIST")) list = [...list, "PRICE_LIST"];
-  if (has("VEGETARIAN_MENU") && !list.includes("VEGETARIAN_MENU"))
-    list = [...list, "VEGETARIAN_MENU"];
-  if (has("VEGAN_MENU") && !list.includes("VEGAN_MENU")) list = [...list, "VEGAN_MENU"];
-  return list;
+  return appendConfiguredActions(list, ["PRICE_LIST", "VEGETARIAN_MENU", "VEGAN_MENU"], dest);
 }
 
 export interface DestinationAction {

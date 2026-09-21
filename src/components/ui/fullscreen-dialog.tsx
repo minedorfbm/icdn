@@ -7,13 +7,13 @@ export function FullscreenDialog({
   className,
   children,
   ...props
-}: {
+}: Readonly<{
   title: string;
   onClose: () => void;
   className: string;
   children: ReactNode;
   "data-level"?: string;
-}) {
+}>) {
   const returnFocus = useRef(typeof document !== "undefined" ? document.activeElement : null);
   return (
     <Dialog.Root

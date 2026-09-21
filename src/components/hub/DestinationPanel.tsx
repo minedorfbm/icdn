@@ -9,11 +9,11 @@ export function DestinationPanel({
   dest,
   active,
   onOpen,
-}: {
+}: Readonly<{
   dest: Destination;
   active: boolean;
   onOpen: () => void;
-}) {
+}>) {
   const { t, typeLabel, action, description } = useI18n();
   const actions = actionsFor(dest, 3);
   const [loaded, setLoaded] = useState(false);

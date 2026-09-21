@@ -90,3 +90,38 @@ describe("configured actions", () => {
     expect(actionsFor(dest).some((a) => a.kind === "BOOK")).toBe(false);
   });
 });
+
+describe("legacy actions", () => {
+  test("meal menus replace the generic menu and retain booking and dietary links", () => {
+    const dest = {
+      ...toDestination(row),
+      breakfast_menu_url: "https://example.com/breakfast",
+      dinner_menu_url: "https://example.com/dinner",
+      booking_url: "https://example.com/book",
+      vegetarian_menu_url: "https://example.com/vegetarian",
+      vegan_menu_url: "https://example.com/vegan",
+      price_list_url: "https://example.com/prices",
+    };
+    expect(actionsFor(dest).map((a) => a.kind)).toEqual([
+      "DISCOVER",
+      "BREAKFAST_MENU",
+      "DINNER_MENU",
+      "BOOK",
+      "PRICE_LIST",
+      "VEGETARIAN_MENU",
+      "VEGAN_MENU",
+    ]);
+  });
+  test("accommodation details become a brochure and explicit booking is appended", () => {
+    const dest = {
+      ...toDestination(row),
+      type: "accommodation" as const,
+      booking_url: "https://example.com/book",
+    };
+    expect(actionsFor(dest)).toEqual([
+      { kind: "DISCOVER", url: row.discover_url },
+      { kind: "BROCHURE", url: row.menu_url },
+      { kind: "BOOK", url: "https://example.com/book" },
+    ]);
+  });
+});
