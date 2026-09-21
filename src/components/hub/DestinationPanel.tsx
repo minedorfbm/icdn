@@ -14,14 +14,15 @@ export function DestinationPanel({
   active: boolean;
   onOpen: () => void;
 }>) {
-  const { t, typeLabel, action, description } = useI18n();
+  const { t, typeLabel, levelLabel, action, description } = useI18n();
   const actions = actionsFor(dest, 3);
   const [loaded, setLoaded] = useState(false);
 
   return (
     <article
       aria-hidden={!active}
-      className="relative h-full min-h-[inherit] w-full overflow-hidden rounded-[26px] bg-[oklch(0.18_0.02_250)] shadow-[0_30px_70px_-30px_rgba(0,0,0,0.65)]"
+      inert={!active}
+      className="relative h-full min-h-[inherit] w-full overflow-hidden rounded-[18px] border border-[#e5d3aa]/65 bg-[oklch(0.18_0.02_250)] shadow-[10px_24px_36px_-18px_rgba(0,0,0,0.7)]"
     >
       <img
         src={dest.image}
@@ -36,29 +37,33 @@ export function DestinationPanel({
         draggable={false}
         width={768}
         height={1152}
-        sizes="(max-width: 520px) 76vw, 400px"
+        sizes="(max-width: 550px) 80vw, 440px"
         className={`absolute inset-0 h-full w-full select-none object-cover transition-[filter,transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           loaded ? "opacity-100" : "opacity-0"
         } ${active ? "scale-100" : "scale-[1.03] saturate-[0.9]"}`}
       />
 
       {/* readability gradient only at the bottom */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[28%] bg-gradient-to-b from-black/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[72%] bg-gradient-to-b from-black/75 via-black/30 to-transparent" />
 
-      <div className="relative flex h-full min-h-[inherit] flex-col justify-between gap-10 p-6 text-[oklch(0.98_0.005_90)]">
+      <div className="relative flex h-full min-h-[inherit] flex-col justify-between gap-12 px-5 py-7 sm:px-7 sm:py-9 text-[oklch(0.98_0.005_90)]">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-[11px] tracking-[0.24em] opacity-80">{typeLabel(dest.type)}</p>
+          <p className="text-[11px] tracking-[0.24em] opacity-80">
+            {levelLabel(dest.level)} / {typeLabel(dest.type)}
+          </p>
           {dest.instagram_spot && (
-            <span className="flex items-center gap-1.5 rounded-full border border-background/30 bg-foreground/70 px-2.5 py-1 text-[8px] tracking-[0.26em] text-background shadow-md backdrop-blur-md">
+            <span
+              aria-label={t("instagram_spot")}
+              className="grid size-7 shrink-0 place-items-center rounded-full border border-white/30 bg-black/30 text-white"
+            >
               <Instagram className="size-2.5" strokeWidth={1.6} />
-              {t("instagram_spot")}
             </span>
           )}
         </div>
 
-        <div className={`transition-opacity duration-500 ${active ? "opacity-100" : "opacity-60"}`}>
-          <h3 className="font-serif text-[clamp(28px,8.5vw,40px)] leading-[0.98] tracking-[0.01em] drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">
+        <div className="-mt-6">
+          <h3 className="font-serif text-[clamp(32px,8.5vw,48px)] leading-[0.98] tracking-[0.01em] drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">
             <button
               type="button"
               onClick={onOpen}
@@ -71,33 +76,33 @@ export function DestinationPanel({
           <p className="mt-3 max-w-[30ch] font-serif text-[15px] italic leading-snug opacity-85">
             {description(dest.id, dest.short_description)}
           </p>
+        </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
-            {actions.map((a, i) => (
-              <a
-                key={`${a.kind}-${i}`}
-                href={a.url}
-                target="_blank"
-                rel="noreferrer"
-                tabIndex={active ? 0 : -1}
-                className="inline-flex min-h-11 items-center rounded-full border border-background/25 bg-foreground/65 px-3 py-2 text-[11px] text-background shadow-md tracking-[0.3em] backdrop-blur-md transition-colors hover:bg-foreground/80"
-              >
-                {a.label ?? action(a.kind)}
-              </a>
-            ))}
-            {instagramUrl(dest) && (
-              <a
-                href={instagramUrl(dest)}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`${dest.name} on Instagram`}
-                tabIndex={active ? 0 : -1}
-                className="grid size-11 place-items-center rounded-full border border-background/25 bg-foreground/65 text-background shadow-md backdrop-blur-md transition-colors hover:bg-foreground/80"
-              >
-                <Instagram className="size-3.5" strokeWidth={1.5} />
-              </a>
-            )}
-          </div>
+        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/25 pt-3">
+          {actions.map((a, i) => (
+            <a
+              key={`${a.kind}-${i}`}
+              href={a.url}
+              target="_blank"
+              rel="noreferrer"
+              tabIndex={active ? 0 : -1}
+              className="inline-flex min-h-11 max-w-full items-center py-2 text-[10px] leading-relaxed tracking-[0.2em] text-white transition-colors hover:text-[#e5d3aa] focus-visible:outline-2 focus-visible:outline-offset-4"
+            >
+              {a.label ?? action(a.kind)}
+            </a>
+          ))}
+          {instagramUrl(dest) && (
+            <a
+              href={instagramUrl(dest)}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${dest.name} on Instagram`}
+              tabIndex={active ? 0 : -1}
+              className="grid size-11 place-items-center rounded-full border border-background/25 bg-foreground/65 text-background shadow-md backdrop-blur-md transition-colors hover:bg-foreground/80"
+            >
+              <Instagram className="size-3.5" strokeWidth={1.5} />
+            </a>
+          )}
         </div>
       </div>
     </article>

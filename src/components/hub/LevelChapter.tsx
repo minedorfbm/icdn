@@ -47,7 +47,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
       </div>
 
       <div className="relative">
-        <header className="px-6">
+        <header className="mx-auto max-w-[740px] px-6">
           <span className="block h-px w-10 bg-current/40" aria-hidden />
           <h2 className="mt-6 font-serif text-[clamp(56px,21vw,116px)] leading-[0.82] tracking-[-0.03em]">
             {title}
@@ -58,7 +58,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
         </header>
 
         {clusters && (
-          <div className="mt-10 flex gap-6 px-6">
+          <div className="mx-auto mt-10 flex max-w-[740px] gap-6 px-6">
             {clusters.map((c) => (
               <button
                 key={c}
@@ -73,7 +73,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
           </div>
         )}
 
-        <p className="mt-10 px-6 text-[9px] tracking-[0.34em] opacity-40">
+        <p className="mx-auto mt-10 max-w-[740px] px-6 text-[9px] tracking-[0.34em] opacity-40">
           {list.length} {t("places")} · {t("swipe_hint")} · {t("tap_hint")}
         </p>
 

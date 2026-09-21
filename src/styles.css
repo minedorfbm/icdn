@@ -326,7 +326,6 @@
   }
 }
 
-
 @keyframes detail-in {
   from {
     opacity: 0;
@@ -340,4 +339,13 @@
 
 .detail-enter {
   animation: detail-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Keep the deck usable without animated depth when reduced motion is requested. */
+@media (prefers-reduced-motion: reduce) {
+  .perspective-card,
+  .perspective-card * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
