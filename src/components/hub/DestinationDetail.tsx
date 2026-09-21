@@ -7,8 +7,11 @@ import { InstagramPostCarousel } from "./InstagramPostCarousel";
 import { useI18n } from "@/i18n";
 
 /** Full-screen editorial detail view for one destination. */
-export function DestinationDetail({ dest, onClose }: { dest: Destination; onClose: () => void }) {
-  const { t, typeLabel, levelLabel, cluster, action, description } = useI18n();
+export function DestinationDetail({
+  dest,
+  onClose,
+}: Readonly<{ dest: Destination; onClose: () => void }>) {
+  const { t, typeLabel, levelLabel, action, description } = useI18n();
   const actions = actionsFor(dest);
   const events = dest.events ?? [];
   const instagram = instagramUrl(dest);
@@ -69,22 +72,24 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
 
         <span className="mt-8 block h-px w-10 bg-current/30" aria-hidden />
 
-        <dl className="mt-8 divide-y divide-current/10 border-y border-current/10 text-[10px] tracking-[0.24em]">
-          <div className="flex justify-between py-3">
-            <dt className="opacity-45">{t("level")}</dt>
-            <dd>{levelLabel(dest.level)}</dd>
+        {actions.length > 0 && (
+          <div className="mt-8 flex flex-col">
+            {actions.map((a, i) => (
+              <a
+                key={`${a.kind}-${i}`}
+                href={a.url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between min-h-12 gap-4 border-b border-current/20 py-4 text-[11px] tracking-[0.3em] transition-opacity hover:opacity-60"
+              >
+                {a.label ?? action(a.kind)}
+                <span className="shrink-0 opacity-40" aria-hidden>
+                  ↗
+                </span>
+              </a>
+            ))}
           </div>
-          <div className="flex justify-between py-3">
-            <dt className="opacity-45">{t("category")}</dt>
-            <dd>{typeLabel(dest.type)}</dd>
-          </div>
-          {dest.cluster && (
-            <div className="flex justify-between py-3">
-              <dt className="opacity-45">{t("area")}</dt>
-              <dd>{cluster(dest.cluster)}</dd>
-            </div>
-          )}
-        </dl>
+        )}
 
         {events.length > 0 && (
           <section className="mt-12">
@@ -138,18 +143,6 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
         )}
 
         <div className="mt-10 flex flex-col gap-3">
-          {actions.map((a, i) => (
-            <a
-              key={`${a.kind}-${i}`}
-              href={a.url}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center justify-between border-b border-current/20 pb-3 text-[11px] tracking-[0.3em] transition-opacity hover:opacity-60"
-            >
-              {a.label ?? action(a.kind)}
-              <span className="opacity-40">↗</span>
-            </a>
-          ))}
           {instagram && (
             <a
               href={instagram}
