@@ -25,7 +25,10 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
     [destinations, id],
   );
 
-  const list = clusters ? all.filter((d) => d.cluster === cluster) : all;
+  const list = useMemo(
+    () => (clusters ? all.filter((d) => d.cluster === cluster) : all),
+    [all, clusters, cluster],
+  );
 
   return (
     <section id={id} data-level={id} className="level relative min-h-[100svh] py-24">
@@ -49,7 +52,9 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
           <h2 className="mt-6 font-serif text-[clamp(56px,21vw,116px)] leading-[0.82] tracking-[-0.03em]">
             {title}
           </h2>
-          <p className="mt-5 text-[12px] tracking-[0.24em] opacity-55">{levelLine(id, line).toUpperCase()}</p>
+          <p className="mt-5 text-[12px] tracking-[0.24em] opacity-55">
+            {levelLine(id, line).toUpperCase()}
+          </p>
         </header>
 
         {clusters && (

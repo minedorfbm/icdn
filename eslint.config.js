@@ -37,4 +37,12 @@ export default tseslint.config(
     },
   },
   eslintPluginPrettier,
+  {
+    files: ["src/integrations/supabase/**/*.ts", "src/routeTree.gen.ts"],
+    rules: {
+      // Generated files are re-created by Supabase/Lovable tooling.
+      "prettier/prettier": "off",
+      "prefer-const": "warn",
+    },
+  },
 );

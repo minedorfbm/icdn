@@ -11,23 +11,31 @@ declare global {
   }
 }
 
-/** Loads Instagram's embed script once for the whole page. */
+let embedScript: Promise<void> | undefined;
+
+/** All embeds wait for the same load, with a bounded wait on slow networks. */
 function loadEmbedScript(): Promise<void> {
-  if (typeof document === "undefined") return Promise.resolve();
-  if (window.instgrm) {
-    window.instgrm.Embeds.process();
-    return Promise.resolve();
-  }
-  const existing = document.querySelector<HTMLScriptElement>(`script[src="${SCRIPT_SRC}"]`);
-  if (existing) return Promise.resolve();
-  return new Promise((resolve) => {
-    const script = document.createElement("script");
-    script.src = SCRIPT_SRC;
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () => resolve();
-    document.body.appendChild(script);
+  if (typeof document === "undefined" || window.instgrm) return Promise.resolve();
+  if (embedScript) return embedScript;
+  embedScript = new Promise((resolve) => {
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${SCRIPT_SRC}"]`);
+    const script = existing ?? document.createElement("script");
+    const done = () => {
+      clearTimeout(timeout);
+      script.removeEventListener("load", done);
+      script.removeEventListener("error", done);
+      resolve();
+    };
+    const timeout = setTimeout(done, 8000);
+    script.addEventListener("load", done, { once: true });
+    script.addEventListener("error", done, { once: true });
+    if (!existing) {
+      script.src = SCRIPT_SRC;
+      script.async = true;
+      document.body.appendChild(script);
+    }
   });
+  return embedScript;
 }
 
 /**
@@ -51,6 +59,8 @@ export function InstagramPostEmbed({
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    setFailed(!embeddable);
+    setReady(false);
     const node = host.current;
     if (!node || !embeddable) return;
     let cancelled = false;
@@ -80,32 +90,32 @@ export function InstagramPostEmbed({
       observer.disconnect();
       if (timer) clearTimeout(timer);
     };
-  }, [post.post_url]);
+  }, [post.post_url, embeddable]);
 
   const handle = post.account ? `@${post.account.replace(/^@/, "")}` : null;
 
   const body = (
     <div ref={host} className={bare ? "" : "mt-5"}>
       {!failed && (
-          <div
-            className={`overflow-hidden rounded-[18px] bg-white transition-opacity ${
-              ready ? "opacity-100" : "opacity-0"
-            }`}
-            style={ready ? undefined : { height: 1, pointerEvents: "none" }}
+        <div
+          className={`overflow-hidden rounded-[18px] bg-white transition-opacity ${
+            ready ? "opacity-100" : "opacity-0"
+          }`}
+          style={ready ? undefined : { height: 1, pointerEvents: "none" }}
+        >
+          <blockquote
+            className="instagram-media"
+            data-instgrm-permalink={post.post_url}
+            data-instgrm-version="14"
+            data-instgrm-captioned=""
+            style={{ margin: 0, width: "100%", minWidth: "unset" }}
           >
-            <blockquote
-              className="instagram-media"
-              data-instgrm-permalink={post.post_url}
-              data-instgrm-version="14"
-              data-instgrm-captioned=""
-              style={{ margin: 0, width: "100%", minWidth: "unset" }}
-            >
-              <a href={post.post_url} target="_blank" rel="noreferrer">
-                {post.post_url}
-              </a>
-            </blockquote>
-          </div>
-        )}
+            <a href={post.post_url} target="_blank" rel="noreferrer">
+              {post.post_url}
+            </a>
+          </blockquote>
+        </div>
+      )}
 
       {failed && <PostCard post={post} handle={handle} />}
       {!failed && !ready && <PostSkeleton />}

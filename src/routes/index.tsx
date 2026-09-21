@@ -26,8 +26,8 @@ export const Route = createFileRoute("/")({
         content:
           "A digital descent through the resort: Heaven, Sky, Earth, Sea. By Art Digital Journey.",
       },
-       { property: "og:type", content: "website" },
-       { name: "twitter:card", content: "summary" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: HubRoute,
@@ -73,7 +73,8 @@ function Hub() {
       const last = sections[sections.length - 1]!;
       const visible =
         probe >= first.offsetTop - window.innerHeight * 0.4 &&
-        window.scrollY + window.innerHeight < last.offsetTop + last.offsetHeight + window.innerHeight * 0.4;
+        window.scrollY + window.innerHeight <
+          last.offsetTop + last.offsetHeight + window.innerHeight * 0.4;
       setRailVisible(visible);
       if (probe < first.offsetTop) {
         if (lastProgress !== 0) setProgress((lastProgress = 0));
@@ -169,9 +170,7 @@ function Hub() {
 
       {/* END OF JOURNEY */}
       <section className="sea-footer px-6 py-24">
-        <h2 className="font-serif text-[30px] leading-tight tracking-tight">
-          {t("footer_title")}
-        </h2>
+        <h2 className="font-serif text-[30px] leading-tight tracking-tight">{t("footer_title")}</h2>
         <ul className="mt-8 flex flex-col divide-y divide-current/10 border-y border-current/10">
           {links.map(({ label, url }) => (
             <li key={label}>
@@ -188,9 +187,7 @@ function Hub() {
           ))}
         </ul>
 
-        <p className="mt-16 text-[9px] tracking-[0.3em] opacity-40">
-          {t("footer_credit")}
-        </p>
+        <p className="mt-16 text-[9px] tracking-[0.3em] opacity-40">{t("footer_credit")}</p>
       </section>
 
       {/* FIXED CONCIERGE BUTTON */}

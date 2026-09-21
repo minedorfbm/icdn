@@ -72,6 +72,7 @@ export function NamTramRail({ active, progress, visible = true, onJump }: Props)
               key={l.id}
               onClick={() => onJump(l.id)}
               aria-current={isActive ? "true" : undefined}
+              tabIndex={visible ? 0 : -1}
               className="group flex items-center gap-2.5"
               style={{ minHeight: 28 }}
             >

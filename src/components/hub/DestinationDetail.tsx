@@ -1,36 +1,22 @@
-import { useEffect } from "react";
+import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import { ArrowLeft, Instagram } from "lucide-react";
 import type { Destination } from "@/data/resort";
-import { actionHref, actionsFor, instagramUrl } from "./DestinationPanel";
+import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 import { InstagramStrip } from "./InstagramStrip";
 import { InstagramPostCarousel } from "./InstagramPostCarousel";
 import { useI18n } from "@/i18n";
 
 /** Full-screen editorial detail view for one destination. */
 export function DestinationDetail({ dest, onClose }: { dest: Destination; onClose: () => void }) {
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose]);
-
   const { t, typeLabel, levelLabel, cluster, action, description } = useI18n();
   const actions = actionsFor(dest);
   const events = dest.events ?? [];
   const instagram = instagramUrl(dest);
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={dest.name}
+    <FullscreenDialog
+      title={dest.name}
+      onClose={onClose}
       data-level={dest.level}
       className="level detail-enter fixed inset-0 z-[80] overflow-y-auto overscroll-contain"
     >
@@ -152,15 +138,15 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
         )}
 
         <div className="mt-10 flex flex-col gap-3">
-          {actions.map((a) => (
+          {actions.map((a, i) => (
             <a
-              key={a}
-              href={actionHref(a, dest)}
+              key={`${a.kind}-${i}`}
+              href={a.url}
               target="_blank"
               rel="noreferrer"
               className="flex items-center justify-between border-b border-current/20 pb-3 text-[11px] tracking-[0.3em] transition-opacity hover:opacity-60"
             >
-              {action(a)}
+              {a.label ?? action(a.kind)}
               <span className="opacity-40">↗</span>
             </a>
           ))}
@@ -186,6 +172,6 @@ export function DestinationDetail({ dest, onClose }: { dest: Destination; onClos
           ← {t("back_journey")}
         </button>
       </div>
-    </div>
+    </FullscreenDialog>
   );
 }
