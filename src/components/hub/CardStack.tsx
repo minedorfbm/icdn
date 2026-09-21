@@ -3,21 +3,15 @@ import { DestinationPanel } from "./DestinationPanel";
 import { DestinationDetail } from "./DestinationDetail";
 import type { Destination } from "@/data/resort";
 
-/**
- * Universal stacked card deck.
- * One hero card + strongly overlapping previews behind it.
- * All cards share the same stage and the same base dimensions —
- * depth comes purely from translateX + scale + brightness.
- */
-
-// Slot geometry: [translateX (vw), scale, brightness, zIndex]
-const SLOTS: Array<[number, number, number, number]> = [
-  [4, 1, 1, 40], // active
-  [46, 0.92, 0.72, 30], // second
-  [65, 0.84, 0.52, 20], // third
-  [79, 0.77, 0.38, 10], // fourth
+/** A front-facing hero and two receding previews, all sharing one responsive stage. */
+// Slot geometry: [horizontal offset, scale, brightness, stacking order, rotation Y].
+type Slot = [number, number, number, number, number];
+const SLOTS: Slot[] = [
+  [4, 1, 1, 40, 0],
+  [23, 0.88, 0.65, 30, -16],
+  [39, 0.76, 0.43, 20, -24],
 ];
-const EXIT: [number, number, number, number] = [-84, 0.99, 0.9, 50]; // card swiping away, fully off-stage
+const EXIT: Slot = [-88, 0.94, 0.8, 50, 12];
 const VISIBLE = SLOTS.length;
 
 function lerp(a: number, b: number, t: number) {
@@ -25,7 +19,7 @@ function lerp(a: number, b: number, t: number) {
 }
 
 /** Interpolated transform for a continuous position `pos` (0 = active). */
-function slotAt(pos: number): [number, number, number, number] {
+function slotAt(pos: number): Slot {
   if (pos <= -1) return EXIT;
   if (pos < 0) {
     const t = pos + 1; // -1..0
@@ -35,6 +29,7 @@ function slotAt(pos: number): [number, number, number, number] {
       lerp(EXIT[1], a[1], t),
       lerp(EXIT[2], a[2], t),
       pos > -0.5 ? 50 : a[3],
+      lerp(EXIT[4], a[4], t),
     ];
   }
   if (pos >= VISIBLE - 1) return SLOTS[VISIBLE - 1]!;
@@ -42,12 +37,12 @@ function slotAt(pos: number): [number, number, number, number] {
   const t = pos - i;
   const a = SLOTS[i]!;
   const b = SLOTS[i + 1]!;
-  return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t), a[3]];
+  return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t), a[3], lerp(a[4], b[4], t)];
 }
 
 const TRAVEL = 260; // px of drag equal to one full card step
 
-export function CardStack({ items }: { items: Destination[] }) {
+export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
   const [index, setIndex] = useState(0);
   const [drag, setDrag] = useState(0); // px, negative = pulling next card in
   const [dragging, setDragging] = useState(false);
@@ -131,10 +126,10 @@ export function CardStack({ items }: { items: Destination[] }) {
   };
 
   return (
-    <div className="select-none">
+    <div className="mx-auto max-w-[740px] select-none [--deck-spread:1] sm:[--deck-spread:1.8]">
       {/* single shared stage */}
       <div
-        className="relative grid w-full touch-pan-y overflow-hidden"
+        className="relative grid w-full touch-pan-y overflow-hidden py-6"
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
@@ -151,15 +146,15 @@ export function CardStack({ items }: { items: Destination[] }) {
 
           // continuous position influenced by the in-flight drag
           const pos = offset - drag / TRAVEL;
-          const [x, scale, bright, z] = slotAt(pos);
+          const [x, scale, bright, z, rotation] = slotAt(pos);
           const active = offset === 0;
 
           return (
             <div
               key={dest.id}
-              className="relative col-start-1 row-start-1 min-h-[max(480px,64svh)] w-[76%] max-w-[400px] origin-center will-change-transform"
+              className="perspective-card relative col-start-1 row-start-1 min-h-[max(480px,64svh)] w-[80%] max-w-[440px] origin-left will-change-transform"
               style={{
-                transform: `translate3d(${(x / 76) * 100}%,0,0) scale(${scale})`,
+                transform: `translate3d(calc(${(x / 80) * 100}% * var(--deck-spread)),0,0) perspective(1200px) rotateY(${rotation}deg) scale(${scale})`,
                 zIndex: z,
                 filter: `brightness(${bright})${active ? "" : " saturate(0.85)"}`,
                 opacity: pos > VISIBLE - 0.15 ? 0 : 1,
