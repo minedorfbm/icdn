@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import { X } from "lucide-react";
 import type { DestinationPhoto } from "@/data/resort";
 
@@ -16,7 +17,6 @@ export function PhotoLightbox({ photos, index, onClose }: Props) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight") setCurrent((c) => Math.min(c + 1, photos.length - 1));
       if (e.key === "ArrowLeft") setCurrent((c) => Math.max(c - 1, 0));
     };
@@ -55,14 +55,9 @@ export function PhotoLightbox({ photos, index, onClose }: Props) {
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={photo.caption ?? "Photo"}
-      onPointerDown={down}
-      onPointerMove={move}
-      onPointerUp={up}
-      onPointerCancel={up}
+    <FullscreenDialog
+      title={photo.caption ?? "Photo"}
+      onClose={onClose}
       className="fixed inset-0 z-[120] flex touch-none flex-col justify-center bg-[oklch(0.09_0.015_250/0.97)] backdrop-blur-sm"
     >
       <button
@@ -74,6 +69,16 @@ export function PhotoLightbox({ photos, index, onClose }: Props) {
       </button>
 
       <img
+        onPointerDown={(event) => {
+          event.currentTarget.setPointerCapture(event.pointerId);
+          down(event);
+        }}
+        onPointerMove={move}
+        onPointerUp={up}
+        onPointerCancel={() => {
+          start.current = null;
+          setDrag({ x: 0, y: 0 });
+        }}
         src={photo.image}
         alt={photo.caption ?? ""}
         decoding="async"
@@ -97,14 +102,12 @@ export function PhotoLightbox({ photos, index, onClose }: Props) {
             <span
               key={i}
               className={`h-px transition-all duration-300 ${
-                i === current
-                  ? "w-6 bg-[oklch(0.86_0.1_85)]"
-                  : "w-3 bg-[oklch(0.86_0.1_85/0.3)]"
+                i === current ? "w-6 bg-[oklch(0.86_0.1_85)]" : "w-3 bg-[oklch(0.86_0.1_85/0.3)]"
               }`}
             />
           ))}
         </div>
       </div>
-    </div>
+    </FullscreenDialog>
   );
 }

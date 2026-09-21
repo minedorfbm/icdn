@@ -16,8 +16,12 @@ export function InstagramPostCarousel({ posts }: { posts: DestinationPost[] }) {
   const onScroll = useCallback(() => {
     const node = track.current;
     if (!node) return;
-    const slide = node.clientWidth || 1;
-    setIndex(Math.round(node.scrollLeft / slide));
+    const center = node.getBoundingClientRect().left + node.clientWidth / 2;
+    const distances = Array.from(node.children, (slide) => {
+      const rect = slide.getBoundingClientRect();
+      return Math.abs(rect.left + rect.width / 2 - center);
+    });
+    setIndex(distances.indexOf(Math.min(...distances)));
   }, []);
 
   if (items.length === 0) return null;
@@ -49,12 +53,29 @@ export function InstagramPostCarousel({ posts }: { posts: DestinationPost[] }) {
             onClick={() => {
               const node = track.current;
               if (!node) return;
-              node.scrollTo({ left: i * node.clientWidth, behavior: "smooth" });
+              const slide = node.children[i];
+              if (!slide) return;
+              const rect = slide.getBoundingClientRect();
+              const left =
+                node.scrollLeft +
+                rect.left -
+                node.getBoundingClientRect().left -
+                (node.clientWidth - rect.width) / 2;
+              node.scrollTo({
+                left,
+                behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                  ? "auto"
+                  : "smooth",
+              });
             }}
-            className={`h-1.5 rounded-full transition-all ${
-              i === index ? "w-5 bg-current opacity-70" : "w-1.5 bg-current opacity-25"
-            }`}
-          />
+            aria-current={i === index ? "true" : undefined}
+            className="grid size-11 place-items-center rounded focus-visible:outline-2"
+          >
+            <span
+              aria-hidden
+              className={`h-1.5 rounded-full bg-current transition-all ${i === index ? "w-5 opacity-70" : "w-1.5 opacity-40"}`}
+            />
+          </button>
         ))}
       </div>
     </section>

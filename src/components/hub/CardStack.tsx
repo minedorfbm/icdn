@@ -134,11 +134,16 @@ export function CardStack({ items }: { items: Destination[] }) {
     <div className="select-none">
       {/* single shared stage */}
       <div
-        className="relative h-[64vh] w-full touch-pan-y overflow-hidden"
+        className="relative grid w-full touch-pan-y overflow-hidden"
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
-        onPointerCancel={onUp}
+        onPointerCancel={() => {
+          start.current = null;
+          setDragging(false);
+          setDrag(0);
+          moved.current = true;
+        }}
       >
         {items.map((dest, i) => {
           const offset = i - index;
@@ -152,9 +157,9 @@ export function CardStack({ items }: { items: Destination[] }) {
           return (
             <div
               key={dest.id}
-              className="absolute left-0 top-0 h-full w-[76vw] max-w-[400px] origin-center will-change-transform"
+              className="relative col-start-1 row-start-1 min-h-[max(480px,64svh)] w-[76%] max-w-[400px] origin-center will-change-transform"
               style={{
-                transform: `translate3d(${x}vw,0,0) scale(${scale})`,
+                transform: `translate3d(${(x / 76) * 100}%,0,0) scale(${scale})`,
                 zIndex: z,
                 filter: `brightness(${bright})${active ? "" : " saturate(0.85)"}`,
                 opacity: pos > VISIBLE - 0.15 ? 0 : 1,
@@ -163,29 +168,47 @@ export function CardStack({ items }: { items: Destination[] }) {
                   : "transform 600ms cubic-bezier(0.22,1,0.36,1), filter 600ms ease, opacity 420ms ease",
                 cursor: "pointer",
               }}
+              onClickCapture={(e) => {
+                if (moved.current && e.detail > 0) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+              }}
               onClick={(e) => {
                 if (moved.current) return;
-                if ((e.target as HTMLElement).closest("a")) return;
-                if (active) setOpen(dest);
-                else setIndex(i);
+                if ((e.target as HTMLElement).closest("a, button")) return;
+                if (active) {
+                  e.currentTarget
+                    .querySelector<HTMLButtonElement>("h3 button")
+                    ?.focus({ preventScroll: true });
+                  setOpen(dest);
+                } else setIndex(i);
               }}
             >
-              <DestinationPanel dest={dest} active={active} />
+              <DestinationPanel
+                dest={dest}
+                active={active}
+                onOpen={() => (active ? setOpen(dest) : setIndex(i))}
+              />
             </div>
           );
         })}
       </div>
 
-      <div className="mt-5 flex items-center gap-1.5 px-6">
+      <div className="mt-2 flex flex-wrap items-center px-4">
         {items.map((d, i) => (
           <button
             key={d.id}
             aria-label={d.name}
             onClick={() => setIndex(i)}
-            className={`h-px transition-all duration-500 ${
-              i === index ? "w-6 bg-current opacity-80" : "w-2 bg-current opacity-25"
-            }`}
-          />
+            aria-current={i === index ? "true" : undefined}
+            className="grid size-11 place-items-center rounded focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            <span
+              aria-hidden
+              className={`h-px bg-current transition-all duration-300 ${i === index ? "w-6 opacity-80" : "w-2 opacity-40"}`}
+            />
+          </button>
         ))}
       </div>
 

@@ -165,7 +165,7 @@ export function groupPosts(rows: DestinationPostRow[]): Record<string, Destinati
 /** Official resort channels — configurable, no invented accounts. */
 export const OFFICIAL = {
   website: "https://www.danang.intercontinental.com/",
-  
+
   ihg: "https://www.ihg.com/onerewards/content/us/en/home",
   instagram: "https://www.instagram.com/intercontinentaldanang/",
   map: "https://www.danang.intercontinental.com/contact-us/",
@@ -420,10 +420,10 @@ export function toDestination(
     ...(row.instagram_url ? { instagram_url: row.instagram_url } : {}),
     ...(row.booking_message ? { booking_message: row.booking_message } : {}),
     ...(row.instagram_spot ? { instagram_spot: true } : {}),
-    ...(photos && photos.length > 0 ? { photos } : {}),
-    ...(posts && posts.length > 0 ? { posts } : {}),
-    ...(links && links.length > 0 ? { links } : {}),
-    ...(events && events.length > 0 ? { events } : {}),
+    ...(photos !== undefined ? { photos } : {}),
+    ...(posts !== undefined ? { posts } : {}),
+    ...(links !== undefined ? { links } : {}),
+    ...(events !== undefined ? { events } : {}),
     display_order: row.display_order,
     active: row.active,
   };
@@ -623,7 +623,8 @@ export const DESTINATIONS: Destination[] = [
     },
   ),
   d("buffalo-bar", "Buffalo Bar", "sky", "bar", "Cocktails beneath the Heritage Village.", 3, {
-    menu_url: "https://www.danang.intercontinental.com/wp-content/uploads/2023/11/Buffalo-bar-Menu-Highlight.pdf",
+    menu_url:
+      "https://www.danang.intercontinental.com/wp-content/uploads/2023/11/Buffalo-bar-Menu-Highlight.pdf",
   }),
   d("wine-cellar", "The Wine Cellar", "sky", "bar", "Rare vintages in a hidden room.", 4),
   d("tingara", "Tingara", "sky", "restaurant", "Japanese Omakase, Teppanyaki and Sushi.", 5, {

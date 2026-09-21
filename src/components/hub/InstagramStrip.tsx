@@ -34,6 +34,7 @@ export function InstagramStrip({ photos, instagramUrl, label }: Props) {
         {photos.map((photo, i) => (
           <button
             key={`${photo.image}-${i}`}
+            aria-label={photo.caption ?? `${label} ${i + 1} / ${photos.length}`}
             onClick={() => setOpen(i)}
             className="relative aspect-[3/4] w-[58vw] max-w-[260px] shrink-0 snap-start overflow-hidden bg-[oklch(0.18_0.02_250)] transition-opacity active:opacity-80"
           >
