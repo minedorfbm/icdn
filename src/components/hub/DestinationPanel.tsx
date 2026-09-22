@@ -37,7 +37,7 @@ export function DestinationPanel({
         draggable={false}
         width={768}
         height={1152}
-        sizes="60vw"
+        sizes="75vw"
         className={`absolute inset-0 h-full w-full select-none object-cover transition-[filter,transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           loaded ? "opacity-100" : "opacity-0"
         } ${active ? "scale-100" : "scale-[1.03] saturate-[0.9]"}`}
