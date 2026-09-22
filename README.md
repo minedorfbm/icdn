@@ -31,7 +31,7 @@ Les tests de régression portent sur l’autorité des contenus Supabase et la s
 
 ## Configuration
 
-Les valeurs propres à un environnement peuvent être placées dans `.env.local` (ignoré par Git). Le dépôt historique contient déjà un `.env` avec la configuration publique du projet actuel ; ne pas y ajouter de secret.
+Les valeurs propres à un environnement peuvent être placées dans `.env.local` (ignoré par Git). Le fichier `.env` contient la configuration publique du projet Supabase indépendant `cxcffaegqyvbhrpzpowa` ; ne pas y ajouter de secret.
 
 | Variable                        | Utilisation                                                  |
 | ------------------------------- | ------------------------------------------------------------ |
@@ -43,6 +43,20 @@ Les valeurs propres à un environnement peuvent être placées dans `.env.local`
 Exemple sans valeurs de production : `.env.example`. Le hub public ne nécessite pas de clé `service_role`. Une clé administrateur ne doit jamais être incluse dans une variable `VITE_*`.
 
 L’export Git ne sauvegarde pas les données vivantes de la base. Avant toute migration, exporter également les lignes actuelles, y compris inactives, et les éventuels fichiers Storage. Les migrations contiennent des données initiales : ne pas les additionner aveuglément à un export réel.
+
+## Migration vers le Supabase indépendant
+
+Les sept tables du hub ont été importées depuis l’export Lovable du 22 septembre 2026 : 4 niveaux, 47 destinations, 75 liens, 40 photos, 4 événements, 1 publication et 10 paramètres. La lecture via la clé publique du nouveau projet a été vérifiée sur les sept tables (181 lignes au total).
+
+Pour lancer le serveur local avec les variables serveur du nouveau projet :
+
+```sh
+node --env-file=.env node_modules/vite/bin/vite.js
+```
+
+Les variables déjà définies par l’hébergeur ont priorité sur `.env`. Lors du déploiement, configurer `SUPABASE_URL` et `SUPABASE_PUBLISHABLE_KEY` côté serveur, et leurs équivalents `VITE_*` lors du build. Modifier le fichier Git ne remplace pas les variables gérées dans Lovable ou Cloudflare. La bascule de l’hébergement et du domaine reste une étape distincte.
+
+Le `project_id` dans `supabase/config.toml` ne constitue pas une authentification ni une liaison CLI au projet distant. Ne pas relancer les migrations historiques et leurs données initiales sur la base déjà importée. Aucune clé administrateur n’est nécessaire pour servir le hub public.
 
 ## Contenu et base de données
 
