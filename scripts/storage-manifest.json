@@ -1,0 +1,158 @@
+[
+  {
+    "key": "d-bar",
+    "file": "d-bar-7863afb9c6f2.webp",
+    "bytes": 33414,
+    "sha256": "7863afb9c6f26772a75526079f2d6f437a5510cbee76f9adc8cfc5dbee841e90"
+  },
+  {
+    "key": "d-beach",
+    "file": "d-beach-c3b1d0cd8fa1.webp",
+    "bytes": 75362,
+    "sha256": "c3b1d0cd8fa1a7c21ddcdadbd1d23f1f95366a46561154554184aae48f68cd27"
+  },
+  {
+    "key": "d-bensley-gallery",
+    "file": "d-bensley-gallery-eeafd2e3888b.webp",
+    "bytes": 86486,
+    "sha256": "eeafd2e3888bc70f7d71ef4ed8cb253ab762bb7165df50a8cea54dee53f9e502"
+  },
+  {
+    "key": "d-citron",
+    "file": "d-citron-d42923c6bf35.webp",
+    "bytes": 129858,
+    "sha256": "d42923c6bf35487dcce530e0490a24f1e8e9010197659be900c3ff8db6b63fde"
+  },
+  {
+    "key": "d-french-dining",
+    "file": "d-french-dining-a4f396c9b5a1.webp",
+    "bytes": 54262,
+    "sha256": "a4f396c9b5a10679c998d5491c6a4eb68cb3717c5e6ccd6267a6e6854a9cd186"
+  },
+  {
+    "key": "d-gallery",
+    "file": "d-gallery-41471950ef6e.webp",
+    "bytes": 114820,
+    "sha256": "41471950ef6ea9fb4da967d6f1b2050d9dd338ff41f2e6fbfc29540ac595e4d2"
+  },
+  {
+    "key": "d-gym",
+    "file": "d-gym-05ed57a0d9ca.webp",
+    "bytes": 97004,
+    "sha256": "05ed57a0d9ca7513077899b54eae02d156efe383b39902d648adc73bdb5864c5"
+  },
+  {
+    "key": "d-nail-studio",
+    "file": "d-nail-studio-2b669c901f94.webp",
+    "bytes": 73240,
+    "sha256": "2b669c901f9487beb11e1ddb4ccb827c21bebcc243f20ec45efc9850f83925b0"
+  },
+  {
+    "key": "d-pool",
+    "file": "d-pool-76ebaebbc754.webp",
+    "bytes": 64148,
+    "sha256": "76ebaebbc754ec7b90c7315b80eb158c830e832c6991b8cd0bd0fff65febe30c"
+  },
+  {
+    "key": "d-retail",
+    "file": "d-retail-34c667051dfc.webp",
+    "bytes": 97808,
+    "sha256": "34c667051dfc4d587e9ed89b1e60dcadbe353c59012ca85e7cbbcab816d8ac94"
+  },
+  {
+    "key": "d-spa",
+    "file": "d-spa-91680b332f02.webp",
+    "bytes": 37494,
+    "sha256": "91680b332f0204b4611d2a5f46c07445414ec463b75dcc7a826c406e79488572"
+  },
+  {
+    "key": "d-tram",
+    "file": "d-tram-35bc3a2da405.webp",
+    "bytes": 104682,
+    "sha256": "35bc3a2da405ab275ede50f4dc71e9083170ec7bdbf5fc647feaeef7d8ea2b58"
+  },
+  {
+    "key": "d-villa",
+    "file": "d-villa-72fd9b04e555.webp",
+    "bytes": 25096,
+    "sha256": "72fd9b04e555b7b63abc380d717abbd55c9caed6bc5a426833d9ff66976828e8"
+  },
+  {
+    "key": "d-wine",
+    "file": "d-wine-222b033ff8e8.webp",
+    "bytes": 61462,
+    "sha256": "222b033ff8e80cec306535b3873b6997c5b2a552490b882d04d1e3bb93f8f3b2"
+  },
+  {
+    "key": "earth",
+    "file": "earth-4a34efbb9e42.webp",
+    "bytes": 266852,
+    "sha256": "4a34efbb9e42c6fcccdfe27485c11207ccafbd3bfc88f6fcca0238ac6fc9cde3"
+  },
+  {
+    "key": "g-architecture-detail",
+    "file": "g-architecture-detail-7fa994be78a7.webp",
+    "bytes": 56584,
+    "sha256": "7fa994be78a7edd5ed63b2034f592bc8aa282edbeb766d108f356028d19c220b"
+  },
+  {
+    "key": "g-bar-detail",
+    "file": "g-bar-detail-1b97fdd455ee.webp",
+    "bytes": 29866,
+    "sha256": "1b97fdd455eea53e9ba074a07b215b1eae42da5c4e5ecd696014a955528ccee4"
+  },
+  {
+    "key": "g-dining-detail",
+    "file": "g-dining-detail-c6ae656e7c03.webp",
+    "bytes": 30850,
+    "sha256": "c6ae656e7c03c076a7b51bb5b18758a09e5f9526fa46ddf7dd7cbb6a151e9924"
+  },
+  {
+    "key": "g-terrace-detail",
+    "file": "g-terrace-detail-cd9d8a5e3238.webp",
+    "bytes": 32194,
+    "sha256": "cd9d8a5e3238e8ae83df2918f423a69a79d152dc7b34e22b04ecff778f9fa4ca"
+  },
+  {
+    "key": "heaven",
+    "file": "heaven-07ebb3932730.webp",
+    "bytes": 120668,
+    "sha256": "07ebb3932730acdd22c00df794519a89f54917fcc6df9b544498cc8b6315ef2f"
+  },
+  {
+    "key": "ihg-rewards",
+    "file": "ihg-rewards-bb369aabc258.webp",
+    "bytes": 37252,
+    "sha256": "bb369aabc258dfa79a69ba8eff2ffa5f530428a9fce9ae84bd3d5afb32cbb968"
+  },
+  {
+    "key": "offer-bensley",
+    "file": "offer-bensley-dca5bf101a26.webp",
+    "bytes": 105810,
+    "sha256": "dca5bf101a2604484f8e5418d5d22b4ab82dba204836ddba9cdc6de2281b1f84"
+  },
+  {
+    "key": "offer-enchanted",
+    "file": "offer-enchanted-a75b10e6aacb.webp",
+    "bytes": 229572,
+    "sha256": "a75b10e6aacb996c5abcfa89ef9af00838f24f0c88035c8e0c30fd776f0d38ce"
+  },
+  {
+    "key": "offer-wedding",
+    "file": "offer-wedding-2c9efc8b2bcf.webp",
+    "bytes": 169438,
+    "sha256": "2c9efc8b2bcf14e8a34f1a0437cbb8212c5a54c82a4051a9fdb8eff3fbdc6975"
+  },
+  {
+    "key": "sea",
+    "file": "sea-75015ae061fa.webp",
+    "bytes": 10666,
+    "sha256": "75015ae061fab598e92ba660f8ec240fe146e617b1dd475b678fcb8f923745e2"
+  },
+  {
+    "key": "sky",
+    "file": "sky-3733802086de.webp",
+    "bytes": 60540,
+    "sha256": "3733802086deb6e9892e1d84ec36146755895e5fdf975fe7aa51e8611eade9fb"
+  }
+]

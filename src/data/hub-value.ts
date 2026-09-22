@@ -1,5 +1,4 @@
 import {
-  ASSET_BY_KEY,
   DESTINATIONS,
   FALLBACK_PHOTOS,
   groupEvents,
@@ -25,6 +24,7 @@ export interface HubLevel {
 }
 
 export interface HubValue {
+  heroImage: string;
   levels: HubLevel[];
   destinations: Destination[];
   links: { label: string; url: string }[];
@@ -78,11 +78,21 @@ const withFallbackMedia = (list: Destination[]): Destination[] =>
   });
 
 export const FALLBACK: HubValue = {
+  heroImage: LEVELS[0]!.image,
   levels: LEVELS,
   destinations: withFallbackMedia(DESTINATIONS),
   links: FALLBACK_LINKS.map(([label, url]) => ({ label, url })),
   contact: OFFICIAL.contact,
 };
+
+/** Use the same CMS image for the hero and its preload. */
+export function resolveHeroImage(data?: HubData): string {
+  const reference = data?.settings?.["hero_image"];
+  const heaven = data?.levels?.find((level) => level.id === "heaven");
+  return (
+    resolveImage(reference ?? "") || resolveImage(heaven?.image_key ?? "") || FALLBACK.heroImage
+  );
+}
 
 export function createHubValue(data?: HubData): HubValue {
   if (!data?.levels || data.destinations === null) return FALLBACK;
@@ -91,10 +101,7 @@ export function createHubValue(data?: HubData): HubValue {
     id: l.id as Level,
     title: l.title,
     line: l.line,
-    image:
-      (l.image_key ? ASSET_BY_KEY[l.image_key] : undefined) ??
-      LEVELS.find((x) => x.id === l.id)?.image ??
-      "",
+    image: resolveImage(l.image_key ?? "") || LEVELS.find((x) => x.id === l.id)?.image || "",
     ...(l.clusters.length > 0 ? { clusters: l.clusters } : {}),
   }));
 
@@ -118,6 +125,7 @@ export function createHubValue(data?: HubData): HubValue {
     .map(([label, url]) => ({ label, url }));
 
   return {
+    heroImage: resolveHeroImage(data),
     levels,
     destinations: data.destinations.map((row) => {
       const dest = toDestination(

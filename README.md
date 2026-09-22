@@ -87,3 +87,5 @@ Les traductions éditoriales sont vérifiées contre une copie de leur texte sou
 Travailler sur une branche et ouvrir une pull request. La branche connectée à Lovable se synchronise avec son éditeur. Ne pas réécrire l’historique publié : pas de force push, amend ou rebase des commits déjà poussés. Le passage à Cloudflare et au nouveau Supabase sera validé avant de basculer le domaine du QR code.
 
 Le [brief créatif historique](docs/design-brief.md) est conservé séparément.
+
+Gestion et migration des images : [guide Supabase Storage](docs/images.md).

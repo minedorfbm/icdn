@@ -33,3 +33,6 @@ dist-ssr
 
 # Generated translation audit report
 translation-audit.json
+
+# Generated image migration audit
+image-audit.json

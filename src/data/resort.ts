@@ -409,7 +409,7 @@ export function toDestination(
     ...(row.cluster ? { cluster: row.cluster } : {}),
     type,
     short_description: row.short_description,
-    image: (row.image_key ? ASSET_BY_KEY[row.image_key] : undefined) ?? TYPE_IMAGE[type],
+    image: resolveImage(row.image_key ?? "") || TYPE_IMAGE[type],
     ...(row.discover_url ? { discover_url: row.discover_url } : {}),
     ...(row.menu_url ? { menu_url: row.menu_url } : {}),
     ...(row.price_list_url ? { price_list_url: row.price_list_url } : {}),

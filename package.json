@@ -17,7 +17,9 @@
     "deploy:check": "wrangler deploy --dry-run --config .output/server/wrangler.json",
     "i18n:check": "bun scripts/check-translations.ts",
     "i18n:audit": "bun scripts/check-translations.ts --live",
-    "i18n:audit:database": "bun scripts/check-translations.ts --live --database"
+    "i18n:audit:database": "bun scripts/check-translations.ts --live --database",
+    "images:check": "bun scripts/check-images.ts",
+    "images:audit": "bun scripts/check-images.ts --remote"
   },
   "overrides": {
     "rolldown": "1.2.1"
