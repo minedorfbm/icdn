@@ -14,12 +14,13 @@ Après fusion de cette branche, créer un projet **Workers** depuis GitHub, dép
 
 Nitro génère `.output/server/wrangler.json` et `.output/public`. Le script de déploiement utilise cette configuration générée, qui contient les bons chemins. Ce projet nécessite le serveur : ne pas publier uniquement les fichiers statiques dans Pages.
 
-Les variables serveur publiques Supabase sont versionnées dans `wrangler.json`. Le fichier `.env` fournit les variables publiques `VITE_*` de compilation. Aucune clé administrateur ni `service_role` n'est nécessaire. Ne pas recopier les anciennes variables Lovable dans Cloudflare.
+Les variables serveur publiques Supabase sont versionnées dans `wrangler.json`. Le client navigateur ne contacte plus Supabase directement. Aucune clé administrateur ni `service_role` n'est nécessaire. Les fichiers `.env` restent locaux et ne doivent pas être versionnés.
 
 ## Vérifications avant bascule
 
 ```sh
 bun install --frozen-lockfile --ignore-scripts
+bun run security:audit
 bun run test
 bun run typecheck
 bun run lint

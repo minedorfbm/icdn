@@ -1,8 +1,21 @@
 import { CTA_BY_TYPE, bookingLink, type Destination } from "@/data/resort";
 
+const ALLOWED_LINK_PROTOCOLS = new Set(["https:", "mailto:", "tel:"]);
+
+export function safeExternalUrl(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  try {
+    return ALLOWED_LINK_PROTOCOLS.has(new URL(value).protocol) ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Resolves a link kind from the database list, falling back to the legacy columns. */
 export function linkUrl(dest: Destination, kind: string): string | undefined {
-  if (dest.links !== undefined) return dest.links.find((l) => l.kind === kind)?.url;
+  if (dest.links !== undefined) {
+    return safeExternalUrl(dest.links.find((link) => link.kind === kind)?.url);
+  }
   const legacy: Record<string, string | undefined> = {
     DISCOVER: dest.discover_url,
     MENU: dest.menu_url,
@@ -18,7 +31,7 @@ export function linkUrl(dest: Destination, kind: string): string | undefined {
     BOOK: dest.booking_url,
     INSTAGRAM: dest.instagram_url,
   };
-  return legacy[kind];
+  return safeExternalUrl(legacy[kind]);
 }
 
 export function instagramUrl(dest: Destination) {
@@ -81,7 +94,10 @@ export interface DestinationAction {
 export function actionsFor(dest: Destination, limit?: number): DestinationAction[] {
   const actions =
     dest.links !== undefined
-      ? dest.links.filter((link) => link.kind !== "INSTAGRAM" && Boolean(link.url))
+      ? dest.links.flatMap((link) => {
+          const url = safeExternalUrl(link.url);
+          return link.kind !== "INSTAGRAM" && url ? [{ ...link, url }] : [];
+        })
       : legacyActions(dest).flatMap((kind) => {
           const url = actionHref(kind, dest);
           return url ? [{ kind, url }] : [];

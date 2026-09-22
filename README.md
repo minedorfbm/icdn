@@ -2,7 +2,7 @@
 
 Expérience mobile accessible depuis un QR code intégré à une œuvre d’Art Digital Journey. Le parcours descend à travers **Heaven → Sky → Earth → Sea** ; chaque niveau propose des lieux à parcourir horizontalement, avec fiches, menus, événements et réservations.
 
-Adresse du hub : https://icdnd.artdigitaljourney.com/ . L’hébergement actuel reste géré par Lovable ; le dépôt est prêt pour un déploiement indépendant sur Cloudflare Workers. Voir le [guide Cloudflare](docs/cloudflare.md).
+Adresse du hub : https://icdnd.artdigitaljourney.com/ . Le site est déployé sur Cloudflare Workers et lit son contenu public dans Supabase. Voir le [guide Cloudflare](docs/cloudflare.md).
 
 ## Développement
 
@@ -22,7 +22,8 @@ bun run test
 bun run typecheck
 bun run lint
 bun run build
-bun run preview
+bun run security:audit
+bun run preview:cloudflare
 ```
 
 Le workflow GitHub Actions `.github/workflows/ci.yml` exécute ces contrôles sur les pull requests et les mises à jour de `main`.
@@ -31,16 +32,15 @@ Les tests de régression portent sur l’autorité des contenus Supabase et la s
 
 ## Configuration
 
-Les valeurs propres à un environnement peuvent être placées dans `.env.local` (ignoré par Git). Le fichier `.env` contient la configuration publique du projet Supabase indépendant `cxcffaegqyvbhrpzpowa` ; ne pas y ajouter de secret.
+Les valeurs locales doivent être placées dans `.env.local`, ignoré par Git. Copier `.env.example`, puis remplacer ses valeurs fictives. La configuration publique de production est définie dans `wrangler.json`.
 
 | Variable                        | Utilisation                                                  |
 | ------------------------------- | ------------------------------------------------------------ |
-| `SUPABASE_URL`                  | URL du projet, lecture côté serveur                          |
-| `SUPABASE_PUBLISHABLE_KEY`      | Clé publique pour les lectures autorisées par les règles RLS |
-| `VITE_SUPABASE_URL`             | URL du client Supabase navigateur                            |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Clé publique du client navigateur                            |
+| `SUPABASE_URL`                     | URL du projet, lecture côté serveur                          |
+| `SUPABASE_PUBLISHABLE_KEY`         | Clé publique pour les lectures autorisées par les règles RLS |
+| `HUB_TRANSLATIONS_FROM_DATABASE`   | Active les traductions publiées dans Supabase                |
 
-Exemple sans valeurs de production : `.env.example`. Le hub public ne nécessite pas de clé `service_role`. Une clé administrateur ne doit jamais être incluse dans une variable `VITE_*`.
+Le hub public ne nécessite pas de clé `service_role`. Une clé administrateur ne doit jamais être placée dans un fichier `.env`, dans `wrangler.json` ou dans une variable exposée au navigateur.
 
 L’export Git ne sauvegarde pas les données vivantes de la base. Avant toute migration, exporter également les lignes actuelles, y compris inactives, et les éventuels fichiers Storage. Les migrations contiennent des données initiales : ne pas les additionner aveuglément à un export réel.
 
@@ -51,10 +51,11 @@ Les sept tables du hub ont été importées depuis l’export Lovable du 22 sept
 Pour lancer le serveur local avec les variables serveur du nouveau projet :
 
 ```sh
-node --env-file=.env node_modules/vite/bin/vite.js
+cp .env.example .env.local
+bun run dev
 ```
 
-Les variables déjà définies par l’hébergeur ont priorité sur `.env`. Lors du déploiement, configurer `SUPABASE_URL` et `SUPABASE_PUBLISHABLE_KEY` côté serveur, et leurs équivalents `VITE_*` lors du build. Modifier le fichier Git ne remplace pas les variables gérées dans Lovable ou Cloudflare. La bascule de l’hébergement et du domaine reste une étape distincte.
+Les variables déjà définies par l’hébergeur ont priorité sur le fichier local. Lors du déploiement, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` et `HUB_TRANSLATIONS_FROM_DATABASE` sont transmises au Worker par sa configuration. Modifier `.env.local` ne change jamais Cloudflare.
 
 Le `project_id` dans `supabase/config.toml` ne constitue pas une authentification ni une liaison CLI au projet distant. Ne pas relancer les migrations historiques et leurs données initiales sur la base déjà importée. Aucune clé administrateur n’est nécessaire pour servir le hub public.
 

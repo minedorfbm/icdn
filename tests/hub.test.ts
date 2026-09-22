@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { createHubValue, FALLBACK, resolveHeroImage } from "../src/data/hub-value";
-import { actionsFor, instagramUrl } from "../src/lib/destination-actions";
+import { actionsFor, instagramUrl, safeExternalUrl } from "../src/lib/destination-actions";
 import { DESTINATIONS, toDestination, type DestinationRow } from "../src/data/resort";
 import type { HubData } from "../src/lib/hub.functions";
 
@@ -88,6 +88,20 @@ describe("configured actions", () => {
     delete dest.booking_url;
     delete dest.booking_message;
     expect(actionsFor(dest).some((a) => a.kind === "BOOK")).toBe(false);
+  });
+  test("unsafe database URLs never reach rendered actions", () => {
+    expect(safeExternalUrl("javascript:alert(1)")).toBeUndefined();
+    expect(safeExternalUrl("not a URL")).toBeUndefined();
+    expect(safeExternalUrl("https://example.com/menu")).toBe("https://example.com/menu");
+    const dest = toDestination(
+      row,
+      [],
+      [
+        { kind: "DISCOVER", url: "javascript:alert(1)" },
+        { kind: "MENU", url: "https://example.com/menu" },
+      ],
+    );
+    expect(actionsFor(dest)).toEqual([{ kind: "MENU", url: "https://example.com/menu" }]);
   });
 });
 
