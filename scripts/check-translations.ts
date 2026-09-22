@@ -1,3 +1,4 @@
+import { writeFileSync } from "node:fs";
 import { ACTION, LANGUAGES, UI } from "../src/i18n/dictionary";
 import { DESTINATION_DESCRIPTION } from "../src/i18n/destinations";
 import { EVENT_TRANSLATIONS } from "../src/i18n/events";
@@ -81,11 +82,23 @@ for (const { code } of LANGUAGES) {
       issues.push(`${code}: stale event ${item.id}`);
   }
 }
+writeFileSync(
+  "translation-audit.json",
+  JSON.stringify(
+    {
+      destinations: destinations.length,
+      events: events.length,
+      live,
+      database,
+      issues,
+    },
+    null,
+    2,
+  ) + "\n",
+);
 if (issues.length) {
-  console.error(JSON.stringify({ translationIssues: issues }));
+  console.error("Translation audit failed. See translation-audit.json for details.");
   process.exitCode = 1;
 } else {
-  console.log(
-    `Translations complete: ${destinations.length} destinations, ${events.length} events, 3 secondary languages (${live ? "live content" : "source snapshot"}; ${database ? "database" : "bundled"} translations).`,
-  );
+  console.log("Translation audit passed. See translation-audit.json for details.");
 }

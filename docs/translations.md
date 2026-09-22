@@ -6,7 +6,7 @@ Les textes fixes d’interface restent dans `src/i18n/dictionary.ts`. Les descri
 
 La configuration actuelle utilise les traductions du dépôt : `destinations.ts` et `events.ts`. Les fichiers `sources.json` et `event-sources.json` conservent le texte anglais exact auquel elles correspondent. Si la description, le titre ou l’horaire source change, le site revient au contenu anglais courant ; il ne présente pas une ancienne traduction comme à jour.
 
-`bun run i18n:check` vérifie la couverture du catalogue de référence dans la CI. `bun run i18n:audit` lit la base publique actuelle et signale les nouvelles fiches, traductions manquantes ou dépassées. Ce second contrôle doit être exécuté après une modification éditoriale ; il n’est pas encore raccordé à une interface de publication ou à une surveillance périodique.
+`bun run i18n:check` vérifie la couverture du catalogue de référence dans la CI. `bun run i18n:audit` lit la base publique actuelle et signale les nouvelles fiches, traductions manquantes ou dépassées. Chaque contrôle écrit ses résultats dans `translation-audit.json` (ignoré par Git) et renvoie un échec si une traduction manque ou est dépassée. Ce second contrôle doit être exécuté après une modification éditoriale ; il n’est pas encore raccordé à une interface de publication ou à une surveillance périodique.
 
 ## Activer les traductions dans Supabase
 
@@ -28,3 +28,7 @@ Aucune écriture en production n’est effectuée par le code du site. Aucun acc
 - Les événements utilisent leur identifiant stable, pas leur titre, en mode base.
 
 Les nouveaux textes sont des propositions de traduction à relire par des locuteurs natifs, notamment les offres et conditions. Les montants, horaires et liens existants ont été conservés. La traduction automatique par IA et l’administration visuelle ne sont pas incluses dans cette étape. Les pages d’erreur, textes d’accessibilité, légendes et libellés personnalisés restent des éléments d’un chantier distinct ; ils ne sont pas couverts par les deux nouvelles tables.
+
+## Prévisualisations Cloudflare
+
+Le bloc `previews.vars` de `wrangler.json` configure la commande `wrangler preview` utilisée pour les branches. Il utilise volontairement le même catalogue public Supabase que le site, avec la clé publiable et les droits de lecture RLS ; aucune clé administrateur n’est fournie. Après activation du mode base, ajouter aussi `HUB_TRANSLATIONS_FROM_DATABASE` dans ce bloc pour tester le même comportement en prévisualisation.
