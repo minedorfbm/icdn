@@ -11,7 +11,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "preview:cloudflare": "wrangler dev --config .output/server/wrangler.json",
+    "deploy": "wrangler deploy --config .output/server/wrangler.json",
+    "deploy:check": "wrangler deploy --dry-run --config .output/server/wrangler.json"
   },
   "overrides": {
     "rolldown": "1.2.1"
@@ -51,6 +54,7 @@
     "prettier": "^3.7.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "8.1.5"
+    "vite": "8.1.5",
+    "wrangler": "4.135.0"
   }
 }
