@@ -47,7 +47,7 @@ export function DestinationPanel({
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[72%] bg-gradient-to-b from-black/75 via-black/30 to-transparent" />
 
-      <div className="relative flex h-full min-h-[inherit] flex-col justify-between gap-6 overflow-y-auto overscroll-y-contain px-4 py-5 sm:px-7 sm:py-9 text-[oklch(0.98_0.005_90)]">
+      <div className="relative flex h-full min-h-[inherit] flex-col justify-between gap-6 touch-pan-y overflow-y-auto overscroll-y-contain px-4 py-5 sm:px-7 sm:py-9 text-[oklch(0.98_0.005_90)]">
         <div className="flex items-start justify-between gap-3">
           <p className="text-[9px] tracking-[0.18em] opacity-80">
             {levelLabel(dest.level)} / {typeLabel(dest.type)}
