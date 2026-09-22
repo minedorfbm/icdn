@@ -2,7 +2,7 @@
 
 Expérience mobile accessible depuis un QR code intégré à une œuvre d’Art Digital Journey. Le parcours descend à travers **Heaven → Sky → Earth → Sea** ; chaque niveau propose des lieux à parcourir horizontalement, avec fiches, menus, événements et réservations.
 
-Adresse du hub : https://icdnd.artdigitaljourney.com/ . L’hébergement actuel reste géré par Lovable ; la migration vers un compte Cloudflare et un projet Supabase indépendants est préparée séparément.
+Adresse du hub : https://icdnd.artdigitaljourney.com/ . L’hébergement actuel reste géré par Lovable ; le dépôt est prêt pour un déploiement indépendant sur Cloudflare Workers. Voir le [guide Cloudflare](docs/cloudflare.md).
 
 ## Développement
 
