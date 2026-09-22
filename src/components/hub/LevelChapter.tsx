@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CardStack } from "./CardStack";
 import { useHub } from "@/data/hub-context";
 import { type Level } from "@/data/resort";
@@ -14,6 +14,8 @@ interface Props {
 
 export function LevelChapter({ id, title, line, image, clusters }: Props) {
   const [cluster, setCluster] = useState(clusters?.[0]);
+  const [near, setNear] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const { destinations } = useHub();
   const { t, levelLine, cluster: clusterLabel } = useI18n();
 
@@ -30,8 +32,33 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
     [all, clusters, cluster],
   );
 
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || near) return;
+    if (!("IntersectionObserver" in window)) {
+      setNear(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setNear(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "800px 0px" },
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [near]);
+
   return (
-    <section id={id} data-level={id} className="level relative min-h-[100svh] py-24">
+    <section
+      ref={sectionRef}
+      id={id}
+      data-level={id}
+      className="level relative min-h-[100svh] py-24"
+    >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <img
           src={image}
@@ -78,7 +105,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
         </p>
 
         <div className="mt-5 overflow-hidden">
-          <CardStack items={list} />
+          <CardStack items={list} near={near} />
         </div>
       </div>
     </section>

@@ -41,9 +41,9 @@ function slotAt(pos: number): Slot {
   return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t), a[3], lerp(a[4], b[4], t)];
 }
 
-const SETTLE = "420ms cubic-bezier(0.22,1,0.36,1)";
+const SETTLE = "360ms cubic-bezier(0.22,1,0.36,1)";
 
-export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
+export function CardStack({ items, near }: Readonly<{ items: Destination[]; near: boolean }>) {
   const [index, setIndex] = useState(0);
   const [drag, setDrag] = useState(0); // px, negative = pulling next card in
   const [dragging, setDragging] = useState(false);
@@ -84,10 +84,11 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
           key={dest.id}
           dest={dest}
           active={i === index}
+          priority={near && i === index}
           onOpen={() => (i === index ? setOpen(dest) : setIndex(i))}
         />
       )),
-    [items, index],
+    [items, index, near],
   );
 
   if (items.length === 0) return null;
@@ -190,7 +191,7 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
           return (
             <div
               key={dest.id}
-              className="perspective-card relative col-start-1 row-start-1 h-[90svh] w-[75%] origin-left will-change-transform"
+              className={`perspective-card relative col-start-1 row-start-1 h-[90svh] w-[75%] origin-left ${near ? "will-change-transform" : ""}`}
               style={{
                 transform: `translate3d(${(x / 75) * 100}%,0,0) perspective(1200px) rotateY(${rotation}deg) scale(${scale})`,
                 zIndex: z,
