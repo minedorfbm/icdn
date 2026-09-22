@@ -2,19 +2,23 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "icdnd",
   "compatibility_date": "2026-09-22",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "workers_dev": true,
   "observability": {
     "enabled": true
   },
   "vars": {
     "SUPABASE_URL": "https://cxcffaegqyvbhrpzpowa.supabase.co",
-    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_fCrshqSxyDVJe3LXQbTHYw_CMH_tVI9"
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_fCrshqSxyDVJe3LXQbTHYw_CMH_tVI9",
+    "HUB_TRANSLATIONS_FROM_DATABASE": "true"
   },
   "previews": {
     "vars": {
       "SUPABASE_URL": "https://cxcffaegqyvbhrpzpowa.supabase.co",
-      "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_fCrshqSxyDVJe3LXQbTHYw_CMH_tVI9"
+      "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_fCrshqSxyDVJe3LXQbTHYw_CMH_tVI9",
+      "HUB_TRANSLATIONS_FROM_DATABASE": "true"
     }
   }
 }
