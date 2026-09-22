@@ -1,42 +1,26 @@
-# Héberger le hub sur Cloudflare Workers
+# Hébergement Cloudflare Workers
 
-Le changement de serveurs DNS ne déplace pas l'hébergement. Ce dépôt prépare un Worker nommé `icdnd`, avec le rendu serveur TanStack Start, les fichiers statiques et la lecture du Supabase indépendant.
+Le hub est déjà en production sur <https://icdnd.artdigitaljourney.com/>. Le Worker `icdnd` est relié au dépôt `minedorfbm/icdnd`, branche `main`. Cloudflare sert à la fois le rendu serveur TanStack Start et les fichiers statiques. La landing page `artdigitaljourney.com` relève d’un autre dépôt et d’un autre Worker.
 
-## Configuration Cloudflare
+## Construction et déploiement
 
-Après fusion de cette branche, créer un projet **Workers** depuis GitHub, dépôt `minedorfbm/icdnd`, branche `main`, racine `/` :
+La configuration du dépôt est dans `wrangler.json`. Le build `bun run build` génère `.output/server/wrangler.json` et `.output/public` ; `bun run deploy` déploie cette sortie. Le Worker ne doit pas être remplacé par une publication du seul dossier statique.
 
-- Version Node : 22.12 ou supérieure ; Bun : 1.4.2 (`BUN_VERSION`).
-- Installation : `bun install --frozen-lockfile --ignore-scripts`.
-- Build : `bun run build`.
-- Déploiement : `bun run deploy`.
-- Nom du Worker : `icdnd`, identique à `wrangler.json`.
+Pour reproduire la configuration du build Cloudflare :
 
-Nitro génère `.output/server/wrangler.json` et `.output/public`. Le script de déploiement utilise cette configuration générée, qui contient les bons chemins. Ce projet nécessite le serveur : ne pas publier uniquement les fichiers statiques dans Pages.
+- Node.js 22.12 ou supérieur et Bun 1.4.2 ;
+- installation : `bun install --frozen-lockfile --ignore-scripts` ;
+- build : `bun run build` ;
+- déploiement : `bun run deploy`.
 
-Les variables serveur publiques Supabase sont versionnées dans `wrangler.json`. Le client navigateur ne contacte plus Supabase directement. Aucune clé administrateur ni `service_role` n'est nécessaire. Les fichiers `.env` restent locaux et ne doivent pas être versionnés.
+Le workflow GitHub Actions valide les pull requests et `main`. `bun run deploy:check` vérifie le paquet local sans le publier. `bun run preview:cloudflare` démarre le Worker construit dans le moteur local de Cloudflare.
 
-## Vérifications avant bascule
+Le site et les prévisualisations utilisent `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` et `HUB_TRANSLATIONS_FROM_DATABASE` définis dans `wrangler.json`. La clé est **publique** et les lectures restent limitées par les politiques RLS. Ne jamais ajouter de clé secrète Supabase au Worker ou au dépôt. Les fichiers `.env.local` ne concernent que le développement local.
 
-```sh
-bun install --frozen-lockfile --ignore-scripts
-bun run security:audit
-bun run test
-bun run typecheck
-bun run lint
-bun run build
-bun run deploy:check
-bun run preview:cloudflare
-```
+## Vérifier une publication
 
-`deploy:check` vérifie le paquet sans publier et sans authentification Cloudflare. `preview:cloudflare` exécute le build dans le moteur local de Cloudflare ; `preview` conserve l'aperçu Vite existant.
+Après un déploiement, ouvrir le domaine de production et contrôler les quatre niveaux, le swipe dans les deux sens, l’ouverture d’une fiche, ses liens et les traductions. Vérifier également qu’aucune erreur `[hub]` ne signale une lecture Supabase indisponible dans les logs du Worker. Une modification du contenu en base peut prendre environ deux minutes à se refléter, car les données publiques sont mises en cache brièvement dans les instances et dans le centre de données Cloudflare.
 
-Tester d'abord l'adresse `workers.dev` obtenue après le déploiement : les quatre niveaux, les cards, les fiches, les menus et les réservations. Vérifier dans les logs qu'il n'y a pas de message `[hub]` indiquant une indisponibilité Supabase ou l'utilisation des données de secours.
+Le domaine personnalisé est configuré dans Cloudflare et n’est pas recréé par `wrangler.json`. Le DNS du domaine racine et les enregistrements de messagerie OVH (MX, SPF, DKIM, DMARC) ne sont pas modifiés par ce dépôt.
 
-Ensuite seulement, ajouter `icdnd.artdigitaljourney.com` dans les domaines personnalisés du Worker. Aucun domaine de production n'est défini dans le dépôt : publier une version ne bascule pas automatiquement le domaine existant. Conserver les anciens enregistrements web pour pouvoir revenir à l'hébergement précédent en cas de problème.
-
-La landing page `artdigitaljourney.com` utilise son propre dépôt et son propre Worker. Les enregistrements de messagerie OVH (MX, SPF, DKIM et DMARC) restent dans le DNS Cloudflare ; le déploiement de ce dépôt ne les modifie pas.
-
-## Compilation
-
-Le preset Nitro est explicitement `cloudflare-module`. La bibliothèque `@lovable.dev/vite-tanstack-config` reste une dépendance de compilation ; le Worker produit s'exécute chez Cloudflare et ne nécessite pas un serveur Lovable.
+Le preset Nitro est `cloudflare-module`. `@lovable.dev/vite-tanstack-config` reste une dépendance de compilation, mais l’exécution du site ne dépend plus de l’hébergement Lovable.

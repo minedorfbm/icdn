@@ -1,92 +1,57 @@
 # InterContinental Danang — Digital Hub
 
-Expérience mobile accessible depuis un QR code intégré à une œuvre d’Art Digital Journey. Le parcours descend à travers **Heaven → Sky → Earth → Sea** ; chaque niveau propose des lieux à parcourir horizontalement, avec fiches, menus, événements et réservations.
+Le hub mobile s’ouvre depuis le QR code intégré à une œuvre d’Art Digital Journey. Le visiteur parcourt les niveaux **Heaven → Sky → Earth → Sea**, fait défiler les cards et ouvre les fiches, menus et liens de réservation.
 
-Adresse du hub : https://icdnd.artdigitaljourney.com/ . Le site est déployé sur Cloudflare Workers et lit son contenu public dans Supabase. Voir le [guide Cloudflare](docs/cloudflare.md).
+**Production :** <https://icdnd.artdigitaljourney.com/>. Le rendu serveur et les fichiers statiques sont hébergés sur Cloudflare Workers. Le contenu public et les traductions éditoriales viennent du projet Supabase indépendant ; les images publiées sont dans le bucket public `hub-images`. La landing page <https://artdigitaljourney.com/> possède son propre dépôt et son propre Worker.
 
-## Développement
+## Démarrer en local
 
-Stack : React 19, TypeScript, TanStack Start (rendu serveur), Vite, Tailwind CSS 4 et Supabase. La configuration de compilation actuelle est fournie par `@lovable.dev/vite-tanstack-config` et utilise Nitro pour sa sortie Cloudflare.
-
-Prérequis : Node.js 22.12+ et Bun 1.4.2 (version utilisée pour les vérifications).
+Prérequis : Node.js 22.12+ et Bun 1.4.2.
 
 ```sh
-bun install --frozen-lockfile
+cp .env.example .env.local
+bun install --frozen-lockfile --ignore-scripts
 bun run dev
 ```
 
-Ouvrir l’adresse affichée par Vite. Les commandes de validation sont :
+Renseigner dans `.env.local` l’URL du projet Supabase et sa **clé publiable**. Ce fichier est ignoré par Git. Les mêmes valeurs publiques de production et de prévisualisation sont déclarées dans `wrangler.json` ; modifier `.env.local` ne modifie pas le Worker déployé. `HUB_TRANSLATIONS_FROM_DATABASE=true` active les traductions publiées dans Supabase.
+
+Le site ne demande ni compte utilisateur ni clé secrète pour lire le contenu. Les politiques RLS limitent les lectures publiques aux lignes autorisées et aucune écriture publique n’est accordée. Une clé secrète Supabase sert uniquement à une opération d’administration locale, par exemple la mise à jour du cache des images ; elle ne doit jamais être ajoutée au dépôt ni aux variables du Worker.
+
+## Vérifier une modification
 
 ```sh
+bun run security:audit
+bun run i18n:check
+bun run images:check
 bun run test
 bun run typecheck
 bun run lint
 bun run build
-bun run security:audit
-bun run preview:cloudflare
+bun run deploy:check
 ```
 
-Le workflow GitHub Actions `.github/workflows/ci.yml` exécute ces contrôles sur les pull requests et les mises à jour de `main`.
+Le workflow [Validate hub](.github/workflows/ci.yml) exécute ces contrôles sur les pull requests et `main`. `bun run preview:cloudflare` permet ensuite de tester le Worker construit en local. Les gestes tactiles et le rendu responsive doivent aussi être vérifiés dans un navigateur et sur téléphone.
 
-Les tests de régression portent sur l’autorité des contenus Supabase et la sélection des actions. Les vérifications de navigation et de responsive nécessitent aussi un navigateur, notamment en portrait et paysage.
+## Modifier le contenu
 
-## Configuration
+Supabase est la source de vérité du catalogue. Les tables principales sont `levels`, `destinations`, `destination_links`, `destination_photos`, `destination_events`, `destination_posts` et `site_settings`. Les descriptions et événements traduits se trouvent dans `destination_translations` et `event_translations`. Les anciennes migrations du dépôt décrivent l’historique Lovable ; **ne pas les rejouer sur la base de production déjà importée**.
 
-Les valeurs locales doivent être placées dans `.env.local`, ignoré par Git. Copier `.env.example`, puis remplacer ses valeurs fictives. La configuration publique de production est définie dans `wrangler.json`.
+Pour modifier une card, mettre à jour sa ligne dans `destinations`. Les actions affichées et leur ordre viennent des lignes actives de `destination_links` : la card en montre au plus trois, la fiche toutes. Après un changement de texte anglais, vérifier les traductions associées avec `bun run i18n:audit` ; une traduction dont le texte source ne correspond plus est écartée au profit du texte anglais courant. Les nouveaux textes ne sont pas traduits automatiquement. Procédure détaillée : [traductions](docs/translations.md).
 
-| Variable                        | Utilisation                                                  |
-| ------------------------------- | ------------------------------------------------------------ |
-| `SUPABASE_URL`                     | URL du projet, lecture côté serveur                          |
-| `SUPABASE_PUBLISHABLE_KEY`         | Clé publique pour les lectures autorisées par les règles RLS |
-| `HUB_TRANSLATIONS_FROM_DATABASE`   | Active les traductions publiées dans Supabase                |
+Les photos des cards, niveaux et galeries sont référencées par URL publique Supabase Storage. Pour remplacer une image, publier un WebP optimisé sous un **nouveau nom**, puis changer son URL dans la ligne concernée. Pour l’image d’accueil seulement, `site_settings.hero_image` peut remplacer l’image de Heaven. Les objets déjà publiés et leur cache sont documentés dans le [guide des images](docs/images.md).
 
-Le hub public ne nécessite pas de clé `service_role`. Une clé administrateur ne doit jamais être placée dans un fichier `.env`, dans `wrangler.json` ou dans une variable exposée au navigateur.
+Les contenus publics complets sont conservés brièvement en mémoire et dans le cache Cloudflare du centre de données, pendant deux minutes. Une modification Supabase peut donc prendre environ deux minutes à apparaître sur tous les visiteurs. Si une lecture échoue, le site utilise les données locales de secours ; une réponse réussie mais vide reste vide et ne fait pas réapparaître d’anciens contenus.
 
-L’export Git ne sauvegarde pas les données vivantes de la base. Avant toute migration, exporter également les lignes actuelles, y compris inactives, et les éventuels fichiers Storage. Les migrations contiennent des données initiales : ne pas les additionner aveuglément à un export réel.
+## Déploiement et structure
 
-## Migration vers le Supabase indépendant
+Les changements fusionnés dans `main` sont construits pour le Worker `icdnd`. Nitro génère `.output/server/wrangler.json` et `.output/public` ; le site nécessite le rendu serveur et ne se publie pas comme un simple dossier statique. Les paramètres du Worker, des prévisualisations et du domaine sont dans le [guide Cloudflare](docs/cloudflare.md).
 
-Les sept tables du hub ont été importées depuis l’export Lovable du 22 septembre 2026 : 4 niveaux, 47 destinations, 75 liens, 40 photos, 4 événements, 1 publication et 10 paramètres. La lecture via la clé publique du nouveau projet a été vérifiée sur les sept tables (181 lignes au total).
+- `src/routes/index.tsx` : parcours et progression Nam Tram.
+- `src/components/hub/` : cards, fiches, images et navigation.
+- `src/lib/hub.functions.ts` : lectures et cache des données Supabase côté serveur.
+- `src/data/hub-value.ts` : préparation du contenu et données de secours.
+- `src/i18n/` : interface et traductions éditoriales de secours.
+- `src/assets/` : images locales de secours ; `tests/` : tests de régression.
 
-Pour lancer le serveur local avec les variables serveur du nouveau projet :
-
-```sh
-cp .env.example .env.local
-bun run dev
-```
-
-Les variables déjà définies par l’hébergeur ont priorité sur le fichier local. Lors du déploiement, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` et `HUB_TRANSLATIONS_FROM_DATABASE` sont transmises au Worker par sa configuration. Modifier `.env.local` ne change jamais Cloudflare.
-
-Le `project_id` dans `supabase/config.toml` ne constitue pas une authentification ni une liaison CLI au projet distant. Ne pas relancer les migrations historiques et leurs données initiales sur la base déjà importée. Aucune clé administrateur n’est nécessaire pour servir le hub public.
-
-## Contenu et base de données
-
-Les sept tables principales sont `levels`, `destinations`, `destination_links`, `destination_photos`, `destination_events`, `destination_posts` et `site_settings`. Leurs migrations, contraintes et politiques RLS se trouvent dans `supabase/migrations`.
-
-**Une réponse réussie de la base est la source de vérité, même vide.** Retirer tous les événements, photos ou liens d’un lieu ne réactive plus les anciennes données locales. Une table indisponible est représentée par `null`, tandis qu’une liste vide `[]` signifie qu’aucun contenu n’est publié.
-
-Les données locales servent uniquement si la configuration ou la lecture correspondante est indisponible ; un message est alors écrit dans les logs serveur. Les requêtes de contenu ont un délai réseau borné. Si les tables essentielles des niveaux ou destinations échouent, le catalogue local prend le relais.
-
-Les liens actifs de `destination_links` déterminent les actions, leurs libellés personnalisés et leur ordre. Tous restent visibles dans la fiche. La card en présente au maximum trois, en réservant une place à BOOK lorsqu’un lien de réservation est explicitement configuré. Instagram dispose d’un accès séparé. Les anciennes colonnes de liens restent compatibles uniquement en mode de secours ; aucune colonne ni donnée n’est supprimée par ces corrections.
-
-Les traductions éditoriales sont vérifiées contre une copie de leur texte source : une traduction dépassée ne remplace pas le contenu anglais courant. Le dépôt couvre les 47 destinations et 4 événements du catalogue de référence. La lecture des traductions dans Supabase peut être activée après la migration additive décrite dans le [guide des traductions](docs/translations.md). La traduction automatique par IA reste une étape ultérieure.
-
-## Organisation
-
-- `src/routes/index.tsx` : parcours principal et progression Nam Tram.
-- `src/components/hub/` : cards, fiches, galeries et navigation.
-- `src/components/ui/fullscreen-dialog.tsx` : dialogue partagé, focus et fermeture des couches.
-- `src/lib/hub.functions.ts` : lectures Supabase côté serveur.
-- `src/data/hub-value.ts` : transformation du contenu et stratégie de secours.
-- `src/lib/destination-actions.ts` : sélection des actions configurées.
-- `src/data/resort.ts`, `src/data/events.ts` : types, correspondance des images et contenu de secours.
-- `src/i18n/` : traductions ; `src/assets/` : photographies locales.
-- `tests/` : tests métier de non-régression.
-
-## Git et Lovable
-
-Travailler sur une branche et ouvrir une pull request. La branche connectée à Lovable se synchronise avec son éditeur. Ne pas réécrire l’historique publié : pas de force push, amend ou rebase des commits déjà poussés. Le passage à Cloudflare et au nouveau Supabase sera validé avant de basculer le domaine du QR code.
-
-Le [brief créatif historique](docs/design-brief.md) est conservé séparément.
-
-Gestion et migration des images : [guide Supabase Storage](docs/images.md).
+Le projet reste connecté à Lovable pour son historique Git. Travailler sur une branche et ouvrir une pull request ; ne pas forcer un push ni réécrire des commits déjà publiés. Le [brief créatif historique](docs/design-brief.md) reste disponible séparément.
