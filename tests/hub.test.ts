@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createHubValue, FALLBACK } from "../src/data/hub-value";
+import { createHubValue, FALLBACK, resolveHeroImage } from "../src/data/hub-value";
 import { actionsFor, instagramUrl } from "../src/lib/destination-actions";
 import { DESTINATIONS, toDestination, type DestinationRow } from "../src/data/resort";
 import type { HubData } from "../src/lib/hub.functions";
@@ -123,5 +123,39 @@ describe("legacy actions", () => {
       { kind: "BROCHURE", url: row.menu_url },
       { kind: "BOOK", url: "https://example.com/book" },
     ]);
+  });
+});
+
+describe("CMS image URLs", () => {
+  const image = "https://example.supabase.co/storage/v1/object/public/hub-images/photo.webp";
+  test("card and level URLs take priority over bundled type images", () => {
+    const hub = createHubValue({
+      ...ready,
+      destinations: [{ ...row, image_key: image }],
+      levels: [{ ...ready.levels![0]!, image_key: image }],
+    });
+    expect(hub.destinations[0]!.image).toBe(image);
+    expect(hub.levels[0]!.image).toBe(image);
+    expect(toDestination({ ...row, image_key: "unknown-key" }).image).toBe(
+      toDestination(row).image,
+    );
+  });
+  test("hero and preload share the configured image, then Heaven, then local fallback", () => {
+    const configured = { ...ready, settings: { hero_image: image } };
+    expect(createHubValue(configured).heroImage).toBe(image);
+    expect(resolveHeroImage(configured)).toBe(image);
+    expect(
+      resolveHeroImage({
+        ...ready,
+        levels: [{ ...ready.levels![0]!, id: "heaven", image_key: image }],
+      }),
+    ).toBe(image);
+    expect(resolveHeroImage()).toBe(FALLBACK.heroImage);
+  });
+  test("legacy keys continue to work before storage migration", () => {
+    expect(toDestination({ ...row, image_key: "d-citron" }).image).toBeTruthy();
+    expect(resolveHeroImage({ ...ready, settings: { hero_image: "heaven" } })).toBe(
+      FALLBACK.heroImage,
+    );
   });
 });

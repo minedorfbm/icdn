@@ -7,12 +7,14 @@ import { type Level } from "@/data/resort";
 import { HubProvider, useHub } from "@/data/hub-context";
 import { getHubData } from "@/lib/hub.functions";
 import { I18nProvider, LanguageSwitch, useI18n } from "@/i18n";
-import heavenImg from "@/assets/heaven.webp";
+import { resolveHeroImage } from "@/data/hub-value";
 
 export const Route = createFileRoute("/")({
   loader: () => getHubData(),
-  head: () => ({
-    links: [{ rel: "preload", as: "image", href: heavenImg, fetchPriority: "high" }],
+  head: ({ loaderData }) => ({
+    links: [
+      { rel: "preload", as: "image", href: resolveHeroImage(loaderData), fetchPriority: "high" },
+    ],
     meta: [
       { title: "InterContinental Danang — Digital Hub | Heaven to Sea" },
       {
@@ -49,7 +51,7 @@ function Hub() {
   const [progress, setProgress] = useState(0);
   const [railVisible, setRailVisible] = useState(false);
   const journeyRef = useRef<HTMLDivElement>(null);
-  const { levels, links, contact } = useHub();
+  const { levels, links, contact, heroImage } = useHub();
   const { t, linkLabel } = useI18n();
 
   useEffect(() => {
@@ -128,7 +130,7 @@ function Hub() {
       {/* THRESHOLD */}
       <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden">
         <img
-          src={heavenImg}
+          src={heroImage}
           alt="InterContinental Danang Sun Peninsula Resort seen from above the bay"
           width={900}
           height={1400}
