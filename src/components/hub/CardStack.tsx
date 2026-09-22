@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { DestinationPanel } from "./DestinationPanel";
 import { DestinationDetail } from "./DestinationDetail";
 import type { Destination } from "@/data/resort";
-import { swipeStep } from "@/lib/card-swipe";
+import { cardPosition, swipeStep } from "@/lib/card-swipe";
 
 /** A front-facing hero and two receding previews, all sharing one responsive stage. */
 // Slot geometry: [horizontal offset, scale, brightness, stacking order, rotation Y].
@@ -183,7 +183,7 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
           if (offset < -1 || offset > VISIBLE) return null;
 
           // continuous position influenced by the in-flight drag
-          const pos = offset - drag / travel.current;
+          const pos = cardPosition(offset, drag, travel.current);
           const [x, scale, bright, z, rotation] = slotAt(pos);
           const active = offset === 0;
 

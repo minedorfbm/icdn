@@ -10,3 +10,8 @@ export function swipeStep(
   const direction = flick ? velocity : distance;
   return direction < 0 ? 1 : -1;
 }
+
+/** Negative drag brings the next card (offset 1) towards the active slot (0). */
+export function cardPosition(offset: number, distance: number, travel: number): number {
+  return offset + distance / travel;
+}
