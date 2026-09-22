@@ -172,7 +172,11 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
         onPointerMove={onMove}
         onPointerUp={(e) => finish(e)}
         onPointerCancel={(e) => finish(e, true)}
-        onLostPointerCapture={(e) => finish(e, true)}
+        onLostPointerCapture={(e) => {
+          // Touch starts with implicit capture on the child under the finger.
+          // Its loss bubbles when capture transfers to this stage; the drag is still active.
+          if (e.target === e.currentTarget) finish(e, true);
+        }}
       >
         {items.map((dest, i) => {
           const offset = i - index;
