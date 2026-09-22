@@ -34,7 +34,7 @@ export interface HubData {
   settings: Record<string, string> | null;
 }
 
-const readCachedHubData = createTimedCache<HubData>(120_000, (data) => {
+function isCompleteHubData(data: HubData): boolean {
   const publicDataComplete = [
     data.levels,
     data.destinations,
@@ -47,14 +47,52 @@ const readCachedHubData = createTimedCache<HubData>(120_000, (data) => {
   const editorialComplete =
     !data.editorial || (data.editorial.descriptions !== null && data.editorial.events !== null);
   return publicDataComplete && editorialComplete;
-});
+}
+
+const readCachedHubData = createTimedCache<HubData>(120_000, isCompleteHubData);
+
+const CACHE_URL = "https://icdnd.artdigitaljourney.com/__cache/public-hub-v1";
+const CACHE_SECONDS = 120;
+
+/** Reuse complete public data across Worker instances in the same Cloudflare data center. */
+async function readEdgeCachedHubData(): Promise<HubData> {
+  const edgeCache = (
+    globalThis as typeof globalThis & { caches?: CacheStorage & { default?: Cache } }
+  ).caches?.default;
+  if (edgeCache) {
+    try {
+      const response = await edgeCache.match(CACHE_URL);
+      if (response?.ok) return (await response.json()) as HubData;
+    } catch {
+      // Local previews and cache outages still use the database directly.
+    }
+  }
+
+  const data = await readHubData();
+  if (edgeCache && isCompleteHubData(data)) {
+    try {
+      await edgeCache.put(
+        CACHE_URL,
+        new Response(JSON.stringify(data), {
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": `public, max-age=${CACHE_SECONDS}`,
+          },
+        }),
+      );
+    } catch {
+      // Cache storage is an optimization, never a prerequisite for serving the hub.
+    }
+  }
+  return data;
+}
 
 /**
  * Public, read-only hub content. Anonymous read policies cover every table
  * queried here — the experience is opened by scanning a QR code, with no login.
  */
 export const getHubData = createServerFn({ method: "GET" }).handler(() =>
-  readCachedHubData(readHubData),
+  readCachedHubData(readEdgeCachedHubData),
 );
 
 async function readHubData(): Promise<HubData> {
@@ -93,6 +131,7 @@ async function readHubData(): Promise<HubData> {
       },
     });
 
+    const editorialPromise = readEditorial(supabase);
     const [levels, destinations, photos, links, events, posts, settings] = await Promise.all([
       supabase
         .from("levels")
@@ -140,7 +179,7 @@ async function readHubData(): Promise<HubData> {
       if (result.error) console.error(`[hub] Unable to read ${table}`, result.error.code);
     }
 
-    const editorial = await readEditorial(supabase);
+    const editorial = await editorialPromise;
 
     return {
       ...(editorial ? { editorial } : {}),

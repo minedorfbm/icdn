@@ -8,10 +8,12 @@ import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 export function DestinationPanel({
   dest,
   active,
+  priority,
   onOpen,
 }: Readonly<{
   dest: Destination;
   active: boolean;
+  priority: boolean;
   onOpen: () => void;
 }>) {
   const { t, typeLabel, levelLabel, action, description } = useI18n();
@@ -27,9 +29,9 @@ export function DestinationPanel({
       <img
         src={dest.image}
         alt={dest.name}
-        loading={active ? "eager" : "lazy"}
+        loading={priority ? "eager" : "lazy"}
         decoding="async"
-        {...(active ? { fetchPriority: "high" as const } : {})}
+        {...(priority ? { fetchPriority: "high" as const } : {})}
         onLoad={() => setLoaded(true)}
         ref={(el) => {
           if (el?.complete) setLoaded(true);
@@ -38,7 +40,7 @@ export function DestinationPanel({
         width={768}
         height={1152}
         sizes="75vw"
-        className={`absolute inset-0 h-full w-full select-none object-cover transition-[filter,transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`absolute inset-0 h-full w-full select-none object-cover transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           loaded ? "opacity-100" : "opacity-0"
         } ${active ? "scale-100" : "scale-[1.03] saturate-[0.9]"}`}
       />

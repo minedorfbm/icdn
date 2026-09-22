@@ -21,7 +21,9 @@
     "i18n:audit": "bun scripts/check-translations.ts --live",
     "i18n:audit:database": "bun scripts/check-translations.ts --live --database",
     "images:check": "bun scripts/check-images.ts",
-    "images:audit": "bun scripts/check-images.ts --remote"
+    "images:audit": "bun scripts/check-images.ts --remote",
+    "images:cache": "bun scripts/update-image-cache.ts",
+    "images:cache:apply": "bun scripts/update-image-cache.ts --apply"
   },
   "overrides": {
     "rolldown": "1.2.1"
