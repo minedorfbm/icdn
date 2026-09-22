@@ -4,7 +4,7 @@ Les textes fixes d’interface restent dans `src/i18n/dictionary.ts`. Les descri
 
 ## Fonctionnement avant migration
 
-La configuration actuelle utilise les traductions du dépôt : `destinations.ts` et `events.ts`. Les fichiers `sources.json` et `event-sources.json` conservent le texte anglais exact auquel elles correspondent. Si la description, le titre ou l’horaire source change, le site revient au contenu anglais courant ; il ne présente pas une ancienne traduction comme à jour.
+La configuration actuelle utilise les traductions du dépôt : `destinations.json` et `events.json` (chargés par leurs modules TypeScript typés). Les fichiers `sources.json` et `event-sources.json` conservent le texte anglais exact auquel elles correspondent. Si la description, le titre ou l’horaire source change, le site revient au contenu anglais courant ; il ne présente pas une ancienne traduction comme à jour.
 
 `bun run i18n:check` vérifie la couverture du catalogue de référence dans la CI. `bun run i18n:audit` lit la base publique actuelle et signale les nouvelles fiches, traductions manquantes ou dépassées. Chaque contrôle écrit ses résultats dans `translation-audit.json` (ignoré par Git) et renvoie un échec si une traduction manque ou est dépassée. Ce second contrôle doit être exécuté après une modification éditoriale ; il n’est pas encore raccordé à une interface de publication ou à une surveillance périodique.
 
