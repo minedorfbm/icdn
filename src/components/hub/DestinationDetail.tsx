@@ -13,7 +13,7 @@ export function DestinationDetail({
 }: Readonly<{ dest: Destination; onClose: () => void }>) {
   const { t, typeLabel, levelLabel, action, description, event } = useI18n();
   const actions = actionsFor(dest);
-  const events = (dest.events ?? []).map(event);
+  const events = (dest.events ?? []).map((item) => event(item));
   const instagram = instagramUrl(dest);
 
   return (

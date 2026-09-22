@@ -151,13 +151,13 @@ async function readEditorial(supabase: SupabaseClient): Promise<EditorialTransla
     supabase
       .from("destination_translations")
       .select("destination_id, locale, description, source_description")
-      .eq("status", "published"),
+      .eq("published", true),
     supabase
       .from("event_translations")
       .select(
         "event_id, locale, title, schedule, description, source_title, source_schedule, source_description",
       )
-      .eq("status", "published"),
+      .eq("published", true),
   ]);
   if (descriptions.error || eventTranslations.error) {
     console.error(

@@ -21,9 +21,9 @@ Aucune écriture en production n’est effectuée par le code du site. Aucun acc
 
 ## Modifier une traduction dans Supabase
 
-- `destination_translations` : destination_id, locale, description, source_description, status.
-- `event_translations` : event_id, locale, title, schedule, description, source_title, source_schedule, source_description, status.
-- Statut par défaut : `draft`. Passer à `published` après relecture.
+- `destination_translations` : destination_id, locale, description, source_description, published.
+- `event_translations` : event_id, locale, title, schedule, description, source_title, source_schedule, source_description, published.
+- Par défaut : `published = false` (brouillon). Passer à `true` après relecture.
 - Les colonnes source doivent contenir le texte anglais exact effectivement traduit. Ne pas les mettre à jour sans vérifier la traduction : elles servent à détecter les changements éditoriaux.
 - Les événements utilisent leur identifiant stable, pas leur titre, en mode base.
 

@@ -38,11 +38,11 @@ const events = live
 const descriptions = database
   ? await readTable<DescriptionTranslation>(
       "destination_translations",
-      "select=*&status=eq.published",
+      "select=*&published=eq.true",
     )
   : null;
 const translatedEvents = database
-  ? await readTable<EventTranslation>("event_translations", "select=*&status=eq.published")
+  ? await readTable<EventTranslation>("event_translations", "select=*&published=eq.true")
   : null;
 const issues: string[] = [];
 for (const { code } of LANGUAGES) {
@@ -82,7 +82,7 @@ for (const { code } of LANGUAGES) {
   }
 }
 if (issues.length) {
-  console.error(issues.join("\n"));
+  console.error(JSON.stringify({ translationIssues: issues }));
   process.exitCode = 1;
 } else {
   console.log(
