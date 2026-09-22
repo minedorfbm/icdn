@@ -21,6 +21,7 @@ jobs:
         with:
           bun-version: 1.4.2
       - run: bun install --frozen-lockfile --ignore-scripts
+      - run: bun run i18n:check
       - run: bun run test
       - run: bun run typecheck
       - run: bun run lint

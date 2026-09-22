@@ -14,7 +14,8 @@ import {
   type Lang,
   type UIKey,
 } from "./dictionary";
-import { DESTINATION_DESCRIPTION } from "./destinations";
+import { translatedDescription, translatedEvent, type EditorialTranslations } from "./editorial";
+import type { DestinationEvent } from "@/data/events";
 
 const STORAGE_KEY = "adj-lang";
 
@@ -29,6 +30,7 @@ interface I18nValue {
   action: (a: string) => string;
   linkLabel: (l: string) => string;
   description: (id: string, fallback: string) => string;
+  event: (event: DestinationEvent) => DestinationEvent;
 }
 
 const I18nContext = createContext<I18nValue | null>(null);
@@ -37,7 +39,10 @@ function isLang(v: string | null): v is Lang {
   return !!v && LANGUAGES.some((l) => l.code === v);
 }
 
-export function I18nProvider({ children }: { children: ReactNode }) {
+export function I18nProvider({
+  children,
+  editorial,
+}: Readonly<{ children: ReactNode; editorial?: EditorialTranslations | undefined }>) {
   const [lang, setLangState] = useState<Lang>("en");
 
   // English by default; a previous choice or the device language is restored after hydration.
@@ -73,9 +78,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       action: (a) => ACTION[lang][a] ?? a,
       linkLabel: (l) => LINK_LABEL[lang][l] ?? l,
       description: (id, fallback) =>
-        lang === "en" ? fallback : (DESTINATION_DESCRIPTION[lang][id] ?? fallback),
+        translatedDescription(lang, id, fallback, editorial?.descriptions),
+      event: (event) => translatedEvent(lang, event, editorial?.events),
     }),
-    [lang, setLang],
+    [lang, setLang, editorial],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

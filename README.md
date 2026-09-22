@@ -68,7 +68,7 @@ Les données locales servent uniquement si la configuration ou la lecture corres
 
 Les liens actifs de `destination_links` déterminent les actions, leurs libellés personnalisés et leur ordre. Tous restent visibles dans la fiche. La card en présente au maximum trois, en réservant une place à BOOK lorsqu’un lien de réservation est explicitement configuré. Instagram dispose d’un accès séparé. Les anciennes colonnes de liens restent compatibles uniquement en mode de secours ; aucune colonne ni donnée n’est supprimée par ces corrections.
 
-Les traductions éditoriales sont encore dans le code. Une modification du texte anglais en base ne modifie pas automatiquement les traductions ; leur administration en base reste une évolution à prévoir.
+Les traductions éditoriales sont vérifiées contre une copie de leur texte source : une traduction dépassée ne remplace pas le contenu anglais courant. Le dépôt couvre les 47 destinations et 4 événements du catalogue de référence. La lecture des traductions dans Supabase peut être activée après la migration additive décrite dans le [guide des traductions](docs/translations.md). La traduction automatique par IA reste une étape ultérieure.
 
 ## Organisation
 
