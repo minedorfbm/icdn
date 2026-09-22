@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DestinationPanel } from "./DestinationPanel";
 import { DestinationDetail } from "./DestinationDetail";
 import type { Destination } from "@/data/resort";
+import { swipeStep } from "@/lib/card-swipe";
 
 /** A front-facing hero and two receding previews, all sharing one responsive stage. */
 // Slot geometry: [horizontal offset, scale, brightness, stacking order, rotation Y].
@@ -28,7 +29,7 @@ function slotAt(pos: number): Slot {
       lerp(EXIT[0], a[0], t),
       lerp(EXIT[1], a[1], t),
       lerp(EXIT[2], a[2], t),
-      pos > -0.5 ? 50 : a[3],
+      EXIT[3],
       lerp(EXIT[4], a[4], t),
     ];
   }
@@ -40,7 +41,7 @@ function slotAt(pos: number): Slot {
   return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t), a[3], lerp(a[4], b[4], t)];
 }
 
-const TRAVEL = 260; // px of drag equal to one full card step
+const SETTLE = "420ms cubic-bezier(0.22,1,0.36,1)";
 
 export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
   const [index, setIndex] = useState(0);
@@ -48,10 +49,17 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
   const [dragging, setDragging] = useState(false);
   const [open, setOpen] = useState<Destination | null>(null);
   const moved = useRef(false);
+  const frame = useRef<number | null>(null);
+  const pendingDrag = useRef(0);
+  const travel = useRef(260);
+  const cancelFrame = () => {
+    if (frame.current !== null) cancelAnimationFrame(frame.current);
+    frame.current = null;
+  };
   const start = useRef<{
     x: number;
     y: number;
-    t: number;
+    pointerId: number;
     lastX: number;
     lastT: number;
     v: number;
@@ -59,9 +67,28 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
   } | null>(null);
 
   useEffect(() => {
+    cancelFrame();
+    start.current = null;
+    pendingDrag.current = 0;
+    setDragging(false);
     setIndex(0);
     setDrag(0);
+    return cancelFrame;
   }, [items]);
+
+  // Keep images, text and links out of the per-frame drag renders.
+  const panels = useMemo(
+    () =>
+      items.map((dest, i) => (
+        <DestinationPanel
+          key={dest.id}
+          dest={dest}
+          active={i === index}
+          onOpen={() => (i === index ? setOpen(dest) : setIndex(i))}
+        />
+      )),
+    [items, index],
+  );
 
   if (items.length === 0) return null;
 
@@ -69,11 +96,13 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
   const clamp = (i: number) => Math.min(last, Math.max(0, i));
 
   const onDown = (e: React.PointerEvent) => {
+    if (!e.isPrimary || e.button !== 0 || start.current) return;
+    travel.current = Math.max(1, e.currentTarget.getBoundingClientRect().width * 0.75);
     moved.current = false;
     start.current = {
       x: e.clientX,
       y: e.clientY,
-      t: e.timeStamp,
+      pointerId: e.pointerId,
       lastX: e.clientX,
       lastT: e.timeStamp,
       v: 0,
@@ -83,13 +112,13 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
 
   const onMove = (e: React.PointerEvent) => {
     const s = start.current;
-    if (!s) return;
+    if (!s || s.pointerId !== e.pointerId) return;
     const dx = e.clientX - s.x;
     const dy = e.clientY - s.y;
     if (s.locked === null) {
       if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
       // only card navigation when horizontal clearly exceeds vertical
-      s.locked = Math.abs(dx) > Math.abs(dy) * 0.9;
+      s.locked = Math.abs(dx) > Math.abs(dy) * 1.2;
       if (s.locked) {
         setDragging(true);
         (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
@@ -106,23 +135,32 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
     // rubber band at both ends
     const atStart = index === 0 && dx > 0;
     const atEnd = index === last && dx < 0;
-    setDrag(atStart || atEnd ? dx * 0.3 : dx);
+    pendingDrag.current =
+      atStart || atEnd ? dx * 0.25 : Math.max(-travel.current, Math.min(travel.current, dx));
+    if (frame.current === null) {
+      frame.current = requestAnimationFrame(() => {
+        frame.current = null;
+        setDrag(pendingDrag.current);
+      });
+    }
   };
 
-  const onUp = () => {
+  const finish = (e: React.PointerEvent, cancelled = false) => {
     const s = start.current;
+    if (!s || s.pointerId !== e.pointerId) return;
+    cancelFrame();
     start.current = null;
     setDragging(false);
-    if (s?.locked) {
-      const v = s.v;
-      const flick = Math.abs(v) > 0.3;
-      const passed = Math.abs(drag) > TRAVEL * 0.28;
-      if (flick || passed) {
-        const dir = (flick ? v : drag) < 0 ? 1 : -1;
-        setIndex((i) => clamp(i + dir));
-      }
+    if (s.locked && !cancelled) {
+      const step = swipeStep(pendingDrag.current, travel.current, s.v, e.timeStamp - s.lastT);
+      setIndex((i) => clamp(i + step));
     }
+    if (cancelled) moved.current = true;
+    pendingDrag.current = 0;
     setDrag(0);
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
   };
 
   return (
@@ -132,20 +170,16 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
         className="relative grid w-full touch-pan-y overflow-hidden py-6"
         onPointerDown={onDown}
         onPointerMove={onMove}
-        onPointerUp={onUp}
-        onPointerCancel={() => {
-          start.current = null;
-          setDragging(false);
-          setDrag(0);
-          moved.current = true;
-        }}
+        onPointerUp={(e) => finish(e)}
+        onPointerCancel={(e) => finish(e, true)}
+        onLostPointerCapture={(e) => finish(e, true)}
       >
         {items.map((dest, i) => {
           const offset = i - index;
-          if (offset < -1 || offset >= VISIBLE) return null;
+          if (offset < -1 || offset > VISIBLE) return null;
 
           // continuous position influenced by the in-flight drag
-          const pos = offset - drag / TRAVEL;
+          const pos = offset - drag / travel.current;
           const [x, scale, bright, z, rotation] = slotAt(pos);
           const active = offset === 0;
 
@@ -156,11 +190,8 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
               style={{
                 transform: `translate3d(${(x / 75) * 100}%,0,0) perspective(1200px) rotateY(${rotation}deg) scale(${scale})`,
                 zIndex: z,
-                filter: `brightness(${bright})${active ? "" : " saturate(0.85)"}`,
-                opacity: pos > VISIBLE - 0.15 ? 0 : 1,
-                transition: dragging
-                  ? "none"
-                  : "transform 600ms cubic-bezier(0.22,1,0.36,1), filter 600ms ease, opacity 420ms ease",
+                opacity: Math.max(0, Math.min(1, VISIBLE - pos)),
+                transition: dragging ? "none" : `transform ${SETTLE}, opacity ${SETTLE}`,
                 cursor: "pointer",
               }}
               onClickCapture={(e) => {
@@ -180,10 +211,11 @@ export function CardStack({ items }: Readonly<{ items: Destination[] }>) {
                 } else setIndex(i);
               }}
             >
-              <DestinationPanel
-                dest={dest}
-                active={active}
-                onOpen={() => (active ? setOpen(dest) : setIndex(i))}
+              {panels[i]}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-[18px] bg-black"
+                style={{ opacity: 1 - bright, transition: dragging ? "none" : `opacity ${SETTLE}` }}
               />
             </div>
           );
