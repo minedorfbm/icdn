@@ -5,6 +5,7 @@ import type {
 } from "@/i18n/editorial";
 import { createServerFn } from "@tanstack/react-start";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createTimedCache } from "./timed-cache";
 import type {
   DestinationEventRow,
   DestinationLinkRow,
@@ -33,11 +34,30 @@ export interface HubData {
   settings: Record<string, string> | null;
 }
 
+const readCachedHubData = createTimedCache<HubData>(120_000, (data) => {
+  const publicDataComplete = [
+    data.levels,
+    data.destinations,
+    data.photos,
+    data.links,
+    data.events,
+    data.posts,
+    data.settings,
+  ].every((collection) => collection !== null);
+  const editorialComplete =
+    !data.editorial || (data.editorial.descriptions !== null && data.editorial.events !== null);
+  return publicDataComplete && editorialComplete;
+});
+
 /**
  * Public, read-only hub content. Anonymous read policies cover every table
  * queried here — the experience is opened by scanning a QR code, with no login.
  */
-export const getHubData = createServerFn({ method: "GET" }).handler(async (): Promise<HubData> => {
+export const getHubData = createServerFn({ method: "GET" }).handler(() =>
+  readCachedHubData(readHubData),
+);
+
+async function readHubData(): Promise<HubData> {
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
   const unavailable: HubData = {
@@ -143,7 +163,7 @@ export const getHubData = createServerFn({ method: "GET" }).handler(async (): Pr
     console.error("[hub] Content request failed; using bundled content.");
     return unavailable;
   }
-});
+}
 
 async function readEditorial(supabase: SupabaseClient): Promise<EditorialTranslations | undefined> {
   if (process.env["HUB_TRANSLATIONS_FROM_DATABASE"] !== "true") return undefined;

@@ -32,8 +32,14 @@ export default tseslint.config(
           ],
         },
       ],
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-      "@typescript-eslint/no-unused-vars": "off",
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true, allowExportNames: ["useHub", "useI18n"] },
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
     },
   },
   eslintPluginPrettier,
@@ -43,6 +49,7 @@ export default tseslint.config(
       // Generated files are re-created by Supabase/Lovable tooling.
       "prettier/prettier": "off",
       "prefer-const": "warn",
+      "@typescript-eslint/no-unused-vars": "off",
     },
   },
 );
