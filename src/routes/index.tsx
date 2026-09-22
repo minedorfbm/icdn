@@ -36,7 +36,7 @@ export const Route = createFileRoute("/")({
 function HubRoute() {
   const data = Route.useLoaderData();
   return (
-    <I18nProvider>
+    <I18nProvider editorial={data.editorial}>
       <HubProvider data={data}>
         <Hub />
       </HubProvider>

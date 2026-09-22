@@ -1,5 +1,10 @@
+import type {
+  EditorialTranslations,
+  DescriptionTranslation,
+  EventTranslation,
+} from "@/i18n/editorial";
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type {
   DestinationEventRow,
   DestinationLinkRow,
@@ -18,6 +23,7 @@ export interface LevelRow {
 }
 
 export interface HubData {
+  editorial?: EditorialTranslations;
   levels: LevelRow[] | null;
   destinations: DestinationRow[] | null;
   photos: DestinationPhotoRow[] | null;
@@ -91,7 +97,7 @@ export const getHubData = createServerFn({ method: "GET" }).handler(async (): Pr
         .order("display_order"),
       supabase
         .from("destination_events")
-        .select("destination_id, title, schedule, description, url, display_order")
+        .select("id, destination_id, title, schedule, description, url, display_order")
         .eq("active", true)
         .order("display_order"),
       supabase
@@ -114,7 +120,10 @@ export const getHubData = createServerFn({ method: "GET" }).handler(async (): Pr
       if (result.error) console.error(`[hub] Unable to read ${table}`, result.error.code);
     }
 
+    const editorial = await readEditorial(supabase);
+
     return {
+      ...(editorial ? { editorial } : {}),
       levels: levels.error ? null : ((levels.data ?? []) as LevelRow[]),
       destinations: destinations.error ? null : ((destinations.data ?? []) as DestinationRow[]),
       photos: photos.error ? null : ((photos.data ?? []) as DestinationPhotoRow[]),
@@ -135,3 +144,30 @@ export const getHubData = createServerFn({ method: "GET" }).handler(async (): Pr
     return unavailable;
   }
 });
+
+async function readEditorial(supabase: SupabaseClient): Promise<EditorialTranslations | undefined> {
+  if (process.env["HUB_TRANSLATIONS_FROM_DATABASE"] !== "true") return undefined;
+  const [descriptions, eventTranslations] = await Promise.all([
+    supabase
+      .from("destination_translations")
+      .select("destination_id, locale, description, source_description")
+      .eq("status", "published"),
+    supabase
+      .from("event_translations")
+      .select(
+        "event_id, locale, title, schedule, description, source_title, source_schedule, source_description",
+      )
+      .eq("status", "published"),
+  ]);
+  if (descriptions.error || eventTranslations.error) {
+    console.error(
+      "[hub] Translation storage unavailable; using source-checked bundled translations.",
+    );
+  }
+  return {
+    descriptions: descriptions.error
+      ? null
+      : ((descriptions.data ?? []) as DescriptionTranslation[]),
+    events: eventTranslations.error ? null : ((eventTranslations.data ?? []) as EventTranslation[]),
+  };
+}

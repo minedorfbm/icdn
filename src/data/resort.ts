@@ -101,6 +101,7 @@ export interface DestinationLinkRow {
 
 /** Row shape returned by the `destination_events` table. */
 export interface DestinationEventRow {
+  id?: string;
   destination_id: string;
   title: string;
   schedule: string[];
@@ -382,6 +383,7 @@ export function groupEvents(rows: DestinationEventRow[]): Record<string, Destina
   const out: Record<string, DestinationEvent[]> = {};
   for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
     (out[row.destination_id] ??= []).push({
+      ...(row.id ? { id: row.id } : {}),
       title: row.title,
       schedule: row.schedule ?? [],
       description: row.description,

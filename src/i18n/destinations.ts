@@ -1,10 +1,6 @@
 import type { Lang } from "./dictionary";
 
-/**
- * Editorial descriptions per destination id.
- * English lives in the content source (database / resort.ts); the maps below
- * translate it. Venue names stay as-is — they are proper nouns.
- */
+/** Published editorial translations; source snapshots are tracked separately. */
 export const DESTINATION_DESCRIPTION: Record<Exclude<Lang, "en">, Record<string, string>> = {
   vi: {
     "enchanted-holiday":
@@ -16,12 +12,14 @@ export const DESTINATION_DESCRIPTION: Record<Exclude<Lang, "en">, Record<string,
       "Hai đêm tại Heavenly Penthouse, tour thiết kế riêng, thưởng lãm nghệ thuật cùng Champagne tại Bensley Outsider Gallery và Trà chiều Heavenly.",
     weddings:
       "Nói lời hẹn ước phía trên vịnh biển — lễ cưới bên bãi biển, tiệc riêng theo yêu cầu và những khoảnh khắc tuần trăng mật do chuyên gia của chúng tôi thực hiện.",
-    reception: "Điểm đón tiếp tại vị trí cao nhất khu nghỉ dưỡng.",
+    reception:
+      "Sảnh Đón Tiếp, bộ phận Concierge và Văn phòng Điều hành — chào đón khách tại điểm cao nhất của khu nghỉ dưỡng.",
     penthouses: "Những suite toàn cảnh trên đỉnh cao.",
-    "the-summit": "Sự kiện và nghi lễ giữa tầng mây.",
+    "the-summit":
+      "Trung tâm Hội nghị The Summit, Phòng khán giả–Chiếu phim và M Club — nơi hội họp, trình chiếu và tổ chức tiệc mừng.",
     rooms: "Thiết kế Bensley, từng tầng một.",
-    "m-club": "Hội họp, chiếu phim và tiệc mừng.",
-    "sports-centre": "Quần vợt và thể thao trên đỉnh núi.",
+    "sports-centre":
+      "Sân tennis, sân pickleball, sân bóng đá và các hoạt động vui chơi trên đỉnh núi.",
     "apec-garden": "Điêu khắc dọc theo sườn núi.",
     "nam-tram": "Tuyến cáp kéo nối bốn thế giới.",
     information: "Bộ phận hỗ trợ và chăm sóc khách.",
@@ -50,12 +48,19 @@ export const DESTINATION_DESCRIPTION: Record<Exclude<Lang, "en">, Record<string,
     "organic-garden": "Nơi gian bếp bắt đầu.",
     "dia-tang": "Một khoảng lặng bên sườn đồi.",
     "mi-sol-spa": "Âm thanh. Tĩnh lặng. Tái sinh.",
-    "marine-centre": "Khám phá vịnh biển.",
+    "marine-centre": "Thể thao dưới nước và các hoạt động có hướng dẫn dọc bờ biển.",
     "coconut-beach": "Bên rìa bán đảo Sơn Trà.",
     "family-beach": "Cát mịn, nước lặng.",
     "club-beach": "Bờ biển riêng dành cho khách Club.",
     "spa-lagoon-villas": "Ngủ bên làn nước tĩnh.",
     "sea-experiences": "Thuyền buồm bình minh và những lần lặn tĩnh lặng.",
+    "moulin-rouge": "Hát hết mình cùng gia đình và bạn bè trong một câu lạc bộ riêng đầy vui nhộn.",
+    "relaxation-pavilion":
+      "Một góc ngắm cảnh yên tĩnh phía trên vịnh — nơi cao nhất của khu nghỉ dưỡng để ngồi thư giãn và hít thở.",
+    "instagram-spots":
+      "Chín địa điểm được chụp ảnh nhiều nhất tại khu nghỉ dưỡng, từ Sảnh Đón Tiếp đến Bãi biển Coconut.",
+    "wall-of-lanterns":
+      "Bức tường đèn lồng Hội An rực sáng trên lối xuống các hồ bơi — một trong những điểm chụp ảnh đặc trưng của khu nghỉ dưỡng.",
   },
   ru: {
     "enchanted-holiday":
@@ -67,12 +72,14 @@ export const DESTINATION_DESCRIPTION: Record<Exclude<Lang, "en">, Record<string,
       "Две ночи в Heavenly Penthouse, частный дизайн-тур, просмотр искусства с шампанским в Bensley Outsider Gallery и Heavenly Afternoon Tea.",
     weddings:
       "Скажите «да» над заливом — церемонии на пляже, приёмы по индивидуальному сценарию и медовый месяц под опекой наших свадебных специалистов.",
-    reception: "Прибытие в высшей точке курорта.",
+    reception:
+      "Вестибюль, служба консьержей и офис администрации — встреча гостей в самой высокой точке курорта.",
     penthouses: "Панорамные сьюты на вершине.",
-    "the-summit": "События и церемонии в облаках.",
+    "the-summit":
+      "Конференц-центр The Summit, зал-кинотеатр и M Club — для встреч, кинопоказов и торжеств.",
     rooms: "Дизайн Бенсли, уровень за уровнем.",
-    "m-club": "Встречи, кинопоказы, праздники.",
-    "sports-centre": "Теннис и спорт на вершине.",
+    "sports-centre":
+      "Теннисные корты, площадки для пиклбола, футбольное поле и активный отдых на вершине горы.",
     "apec-garden": "Скульптуры вдоль хребта.",
     "nam-tram": "Фуникулёр между четырьмя мирами.",
     information: "Консьерж и помощь гостям.",
@@ -101,12 +108,19 @@ export const DESTINATION_DESCRIPTION: Record<Exclude<Lang, "en">, Record<string,
     "organic-garden": "Там, где начинается кухня.",
     "dia-tang": "Пауза на склоне холма.",
     "mi-sol-spa": "Звук. Тишина. Обновление.",
-    "marine-centre": "Исследуйте залив.",
+    "marine-centre": "Водные виды спорта и занятия с инструктором вдоль побережья.",
     "coconut-beach": "На краю Шонча.",
     "family-beach": "Мягкий песок, спокойная вода.",
     "club-beach": "Приватный берег для гостей Club.",
     "spa-lagoon-villas": "Сон у неподвижной воды.",
     "sea-experiences": "Парусный рассвет и тихие погружения.",
+    "moulin-rouge":
+      "Пойте весь вечер с семьёй и друзьями в уютном частном клубе с весёлой атмосферой.",
+    "relaxation-pavilion":
+      "Тихая смотровая площадка над заливом — самая высокая точка курорта, где можно просто посидеть и спокойно подышать.",
+    "instagram-spots": "Девять самых фотографируемых мест курорта — от вестибюля до пляжа Coconut.",
+    "wall-of-lanterns":
+      "Сияющая стена фонарей Хойана по пути к бассейнам — одно из самых узнаваемых мест курорта для фотографий.",
   },
   zh: {
     "enchanted-holiday":
@@ -116,12 +130,11 @@ export const DESTINATION_DESCRIPTION: Record<Exclude<Lang, "en">, Record<string,
     "bensley-package":
       "两晚 Heavenly Penthouse 住宿、私人设计导览、Bensley Outsider Gallery 香槟艺术鉴赏及 Heavenly 下午茶。",
     weddings: "在海湾之上许下誓言 — 海滨仪式、定制宴会，以及婚礼专家打造的蜜月时光。",
-    reception: "抵达度假村的最高点。",
+    reception: "接待大厅、礼宾部及行政办公室——在度假村的最高处迎接宾客。",
     penthouses: "峰顶的全景套房。",
-    "the-summit": "云端之上的活动与典礼。",
+    "the-summit": "The Summit 会议中心、礼堂兼电影院及 M Club——举办聚会、放映与庆典的场所。",
     rooms: "Bensley 设计，层层展开。",
-    "m-club": "会议、放映与庆典。",
-    "sports-centre": "山顶网球与运动。",
+    "sports-centre": "山顶网球场、匹克球场、足球场及休闲运动。",
     "apec-garden": "山脊之上的雕塑之径。",
     "nam-tram": "连接四个世界的缆车。",
     information: "礼宾与宾客服务。",
@@ -150,11 +163,15 @@ export const DESTINATION_DESCRIPTION: Record<Exclude<Lang, "en">, Record<string,
     "organic-garden": "厨房开始的地方。",
     "dia-tang": "山坡上的片刻停顿。",
     "mi-sol-spa": "声音。静谧。焕新。",
-    "marine-centre": "探索这片海湾。",
+    "marine-centre": "沿海岸开展的水上运动及有向导带领的活动。",
     "coconut-beach": "山茶半岛的边缘。",
     "family-beach": "细软沙滩，平静海水。",
     "club-beach": "Club 宾客专属海岸。",
     "spa-lagoon-villas": "在静水之畔入眠。",
     "sea-experiences": "日出扬帆与静谧潜水。",
+    "moulin-rouge": "在充满欢乐的私人俱乐部，与家人朋友尽情欢唱一整晚。",
+    "relaxation-pavilion": "海湾上方宁静的观景处——在度假村的最高处静坐、放松呼吸。",
+    "instagram-spots": "度假村最受欢迎的九处摄影地点，从接待大厅到 Coconut 海滩。",
+    "wall-of-lanterns": "通往泳池的路上，一面璀璨的会安灯笼墙——度假村标志性的摄影地点之一。",
   },
 };

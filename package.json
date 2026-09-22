@@ -14,7 +14,10 @@
     "typecheck": "tsc --noEmit",
     "preview:cloudflare": "wrangler dev --config .output/server/wrangler.json",
     "deploy": "wrangler deploy --config .output/server/wrangler.json",
-    "deploy:check": "wrangler deploy --dry-run --config .output/server/wrangler.json"
+    "deploy:check": "wrangler deploy --dry-run --config .output/server/wrangler.json",
+    "i18n:check": "bun scripts/check-translations.ts",
+    "i18n:audit": "bun scripts/check-translations.ts --live",
+    "i18n:audit:database": "bun scripts/check-translations.ts --live --database"
   },
   "overrides": {
     "rolldown": "1.2.1"
