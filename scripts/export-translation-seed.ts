@@ -6,11 +6,13 @@ import { LANGUAGES } from "../src/i18n/dictionary";
 
 const localeFlag = process.argv.find((arg) => arg.startsWith("--locales="));
 const requestedLocales = localeFlag?.slice("--locales=".length).split(",");
-const supportedLocales = LANGUAGES.filter(({ code }) => code !== "en").map(({ code }) => code);
+const supportedLocales: string[] = LANGUAGES.filter(({ code }) => code !== "en").map(
+  ({ code }) => code,
+);
 if (
   requestedLocales &&
   (requestedLocales.length === 0 ||
-    requestedLocales.some((code) => !supportedLocales.some((supported) => supported === code)))
+    requestedLocales.some((code) => !supportedLocales.includes(code)))
 ) {
   throw new Error(`--locales must contain only: ${supportedLocales.join(", ")}`);
 }
