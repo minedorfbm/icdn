@@ -1,6 +1,6 @@
 # Traductions éditoriales
 
-Les textes fixes d’interface restent dans `src/i18n/dictionary.ts`. Les descriptions et événements utilisent des traductions éditoriales en vietnamien, russe, chinois simplifié, coréen et japonais. Les marques et noms officiels ne sont pas renommés.
+Les textes fixes d’interface sont dans `src/i18n/dictionary.ts`, avec les libellés coréens et japonais dans `src/i18n/dictionary.ko.json` et `src/i18n/dictionary.ja.json`. Les descriptions et événements utilisent des traductions éditoriales en vietnamien, russe, chinois simplifié, coréen et japonais. Les marques et noms officiels ne sont pas renommés.
 
 ## Fonctionnement actuel
 
