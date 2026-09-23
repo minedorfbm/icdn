@@ -1,0 +1,90 @@
+{
+  "UI": {
+    "hero_kicker": "ソンチャ半島 · ダナン",
+    "hero_title_1": "天空から",
+    "hero_title_2": "海へ",
+    "hero_sub": "天国から海まで",
+    "places": "スポット",
+    "swipe_hint": "スワイプ →",
+    "tap_hint": "タップして開く",
+    "footer_title": "インターコンチネンタル・ダナンのすべて",
+    "footer_credit": "ART DIGITAL JOURNEYによるデジタル体験",
+    "back": "戻る",
+    "back_journey": "旅に戻る",
+    "level": "レベル",
+    "category": "カテゴリー",
+    "area": "エリア",
+    "instagram": "インスタグラム",
+    "concierge": "コンシェルジュに電話",
+    "language": "言語",
+    "events": "特別イベント",
+    "explore_more": "もっと見る",
+    "instagram_spot": "フォトスポット",
+    "latest_post": "最新の投稿",
+    "latest_posts": "最新の投稿",
+    "view_on_instagram": "インスタグラムで見る",
+    "resort_levels": "ナムトラム — リゾートの各レベル",
+    "photo": "写真",
+    "close": "閉じる",
+    "hero_image_alt": "湾を見下ろすインターコンチネンタル・ダナン・サンペニンシュラ・リゾート"
+  },
+  "LEVEL_LINE": {
+    "heaven": "湾を見下ろす場所。",
+    "sky": "水平線が広がる場所。",
+    "earth": "リゾートの活気が息づく場所。",
+    "sea": "すべてがゆっくりと流れる場所。"
+  },
+  "CLUSTER": {
+    "EAT": "ダイニング",
+    "MOVE": "アクティビティ",
+    "PLAY": "レジャー"
+  },
+  "TYPE_LABEL": {
+    "restaurant": "レストラン",
+    "bar": "バー",
+    "spa": "スパ",
+    "experience": "体験",
+    "pool": "プール",
+    "fitness": "フィットネス",
+    "kids": "キッズ",
+    "retail": "ショップ",
+    "gallery": "ギャラリー",
+    "accommodation": "宿泊",
+    "service": "サービス",
+    "beach": "ビーチ",
+    "recreation": "レクリエーション"
+  },
+  "LEVEL_LABEL": {
+    "heaven": "ヘブン",
+    "sky": "スカイ",
+    "earth": "アース",
+    "sea": "シー"
+  },
+  "ACTION": {
+    "DISCOVER": "詳しく見る",
+    "MENU": "メニュー",
+    "PRICE_LIST": "料金表",
+    "VEGETARIAN_MENU": "ベジタリアンメニュー",
+    "VEGAN_MENU": "ヴィーガンメニュー",
+    "BREAKFAST_MENU": "朝食メニュー",
+    "LUNCH_MENU": "ランチメニュー",
+    "DINNER_MENU": "ディナーメニュー",
+    "BOOK": "予約する",
+    "TREATMENTS": "トリートメント",
+    "ACTIVITIES": "アクティビティ",
+    "HOURS": "営業時間",
+    "INFO": "ご案内",
+    "DETAILS": "詳細",
+    "VISIT": "訪れる",
+    "BROCHURE": "パンフレット"
+  },
+  "LINK_LABEL": {
+    "Website": "公式サイト",
+    "Instagram": "インスタグラム",
+    "Dining": "ダイニング",
+    "Spa": "スパ",
+    "IHG One Rewards": "IHGワンリワーズ",
+    "Resort Map": "リゾートマップ",
+    "Contact": "お問い合わせ"
+  }
+}

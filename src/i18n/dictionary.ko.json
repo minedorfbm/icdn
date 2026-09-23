@@ -1,0 +1,90 @@
+{
+  "UI": {
+    "hero_kicker": "선짜 반도 · 다낭",
+    "hero_title_1": "하늘에서",
+    "hero_title_2": "바다로",
+    "hero_sub": "천국에서 바다까지",
+    "places": "장소",
+    "swipe_hint": "밀어서 보기 →",
+    "tap_hint": "탭하여 열기",
+    "footer_title": "인터컨티넨탈 다낭의 모든 곳",
+    "footer_credit": "ART DIGITAL JOURNEY가 선보이는 디지털 경험",
+    "back": "뒤로",
+    "back_journey": "여정으로 돌아가기",
+    "level": "레벨",
+    "category": "카테고리",
+    "area": "구역",
+    "instagram": "인스타그램",
+    "concierge": "컨시어지에 전화하기",
+    "language": "언어",
+    "events": "특별 이벤트",
+    "explore_more": "더 알아보기",
+    "instagram_spot": "사진 명소",
+    "latest_post": "최근 게시물",
+    "latest_posts": "최근 게시물",
+    "view_on_instagram": "인스타그램에서 보기",
+    "resort_levels": "남트램 — 리조트 레벨",
+    "photo": "사진",
+    "close": "닫기",
+    "hero_image_alt": "만 위에서 내려다본 인터컨티넨탈 다낭 선 페닌슐라 리조트"
+  },
+  "LEVEL_LINE": {
+    "heaven": "만 위의 특별한 공간.",
+    "sky": "수평선이 펼쳐지는 곳.",
+    "earth": "리조트의 활기가 살아나는 곳.",
+    "sea": "모든 것이 느긋해지는 곳."
+  },
+  "CLUSTER": {
+    "EAT": "다이닝",
+    "MOVE": "액티비티",
+    "PLAY": "즐길 거리"
+  },
+  "TYPE_LABEL": {
+    "restaurant": "레스토랑",
+    "bar": "바",
+    "spa": "스파",
+    "experience": "체험",
+    "pool": "수영장",
+    "fitness": "피트니스",
+    "kids": "어린이",
+    "retail": "쇼핑",
+    "gallery": "갤러리",
+    "accommodation": "객실",
+    "service": "서비스",
+    "beach": "해변",
+    "recreation": "레저"
+  },
+  "LEVEL_LABEL": {
+    "heaven": "헤븐",
+    "sky": "스카이",
+    "earth": "어스",
+    "sea": "씨"
+  },
+  "ACTION": {
+    "DISCOVER": "자세히 보기",
+    "MENU": "메뉴",
+    "PRICE_LIST": "가격표",
+    "VEGETARIAN_MENU": "채식 메뉴",
+    "VEGAN_MENU": "비건 메뉴",
+    "BREAKFAST_MENU": "조식 메뉴",
+    "LUNCH_MENU": "점심 메뉴",
+    "DINNER_MENU": "저녁 메뉴",
+    "BOOK": "예약하기",
+    "TREATMENTS": "트리트먼트",
+    "ACTIVITIES": "액티비티",
+    "HOURS": "운영 시간",
+    "INFO": "안내",
+    "DETAILS": "상세 정보",
+    "VISIT": "방문하기",
+    "BROCHURE": "브로슈어"
+  },
+  "LINK_LABEL": {
+    "Website": "공식 웹사이트",
+    "Instagram": "인스타그램",
+    "Dining": "다이닝",
+    "Spa": "스파",
+    "IHG One Rewards": "IHG 원 리워드",
+    "Resort Map": "리조트 지도",
+    "Contact": "문의하기"
+  }
+}

@@ -1,8 +1,13 @@
+import koDict from "./dictionary.ko.json";
+import jaDict from "./dictionary.ja.json";
+
 export const LANGUAGES = [
   { code: "en", label: "EN", name: "English" },
   { code: "vi", label: "VI", name: "Tiếng Việt" },
   { code: "ru", label: "RU", name: "Русский" },
   { code: "zh", label: "中文", name: "简体中文" },
+  { code: "ko", label: "KO", name: "한국어" },
+  { code: "ja", label: "JA", name: "日本語" },
 ] as const;
 
 export type Lang = (typeof LANGUAGES)[number]["code"];
@@ -30,7 +35,11 @@ export type UIKey =
   | "instagram_spot"
   | "latest_post"
   | "latest_posts"
-  | "view_on_instagram";
+  | "view_on_instagram"
+  | "resort_levels"
+  | "photo"
+  | "close"
+  | "hero_image_alt";
 
 export const UI: Record<Lang, Record<UIKey, string>> = {
   en: {
@@ -57,6 +66,10 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     latest_post: "LATEST POST",
     latest_posts: "LATEST POSTS",
     view_on_instagram: "VIEW ON INSTAGRAM",
+    resort_levels: "Nam Tram — resort levels",
+    photo: "Photo",
+    close: "Close",
+    hero_image_alt: "InterContinental Danang Sun Peninsula Resort seen from above the bay",
   },
   vi: {
     hero_kicker: "BÁN ĐẢO SƠN TRÀ · ĐÀ NẴNG",
@@ -82,6 +95,10 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     latest_post: "BÀI ĐĂNG MỚI NHẤT",
     latest_posts: "BÀI ĐĂNG MỚI NHẤT",
     view_on_instagram: "XEM TRÊN INSTAGRAM",
+    resort_levels: "Nam Tram — các tầng của khu nghỉ dưỡng",
+    photo: "Ảnh",
+    close: "Đóng",
+    hero_image_alt: "Khu nghỉ dưỡng InterContinental Danang Sun Peninsula nhìn từ trên vịnh",
   },
   ru: {
     hero_kicker: "ПОЛУОСТРОВ ШОНЧА · ДАНАНГ",
@@ -107,6 +124,10 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     latest_post: "ПОСЛЕДНЯЯ ПУБЛИКАЦИЯ",
     latest_posts: "ПОСЛЕДНИЕ ПУБЛИКАЦИИ",
     view_on_instagram: "СМОТРЕТЬ В INSTAGRAM",
+    resort_levels: "Nam Tram — уровни курорта",
+    photo: "Фото",
+    close: "Закрыть",
+    hero_image_alt: "Курорт InterContinental Danang Sun Peninsula над заливом",
   },
   zh: {
     hero_kicker: "山茶半岛 · 岘港",
@@ -132,7 +153,13 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     latest_post: "最新帖子",
     latest_posts: "最新帖子",
     view_on_instagram: "在 INSTAGRAM 查看",
+    resort_levels: "Nam Tram — 度假村层级",
+    photo: "照片",
+    close: "关闭",
+    hero_image_alt: "从海湾上方俯瞰岘港洲际阳光半岛度假酒店",
   },
+  ko: koDict.UI,
+  ja: jaDict.UI,
 };
 
 /** Level taglines (titles stay in English as resort signage). */
@@ -161,6 +188,8 @@ export const LEVEL_LINE: Record<Lang, Record<string, string>> = {
     earth: "度假村的生活中心。",
     sea: "一切慢下来的地方。",
   },
+  ko: koDict.LEVEL_LINE,
+  ja: jaDict.LEVEL_LINE,
 };
 
 /** Cluster tabs on the Earth level. */
@@ -169,6 +198,8 @@ export const CLUSTER: Record<Lang, Record<string, string>> = {
   vi: { EAT: "ẨM THỰC", MOVE: "VẬN ĐỘNG", PLAY: "VUI CHƠI" },
   ru: { EAT: "ЕДА", MOVE: "ДВИЖЕНИЕ", PLAY: "ОТДЫХ" },
   zh: { EAT: "餐饮", MOVE: "运动", PLAY: "玩乐" },
+  ko: koDict.CLUSTER,
+  ja: jaDict.CLUSTER,
 };
 
 /** Content categories. */
@@ -233,6 +264,8 @@ export const TYPE_LABEL: Record<Lang, Record<string, string>> = {
     beach: "海滩",
     recreation: "休闲",
   },
+  ko: koDict.TYPE_LABEL,
+  ja: jaDict.TYPE_LABEL,
 };
 
 /** Level names used in the detail sheet. */
@@ -241,6 +274,8 @@ export const LEVEL_LABEL: Record<Lang, Record<string, string>> = {
   vi: { heaven: "THIÊN ĐƯỜNG", sky: "TRỜI", earth: "ĐẤT", sea: "BIỂN" },
   ru: { heaven: "НЕБЕСА", sky: "НЕБО", earth: "ЗЕМЛЯ", sea: "МОРЕ" },
   zh: { heaven: "天境", sky: "天空", earth: "大地", sea: "海洋" },
+  ko: koDict.LEVEL_LABEL,
+  ja: jaDict.LEVEL_LABEL,
 };
 
 /** Call-to-action labels. */
@@ -317,6 +352,8 @@ export const ACTION: Record<Lang, Record<string, string>> = {
     VISIT: "前往",
     BROCHURE: "手册",
   },
+  ko: koDict.ACTION,
+  ja: jaDict.ACTION,
 };
 
 /** Footer link labels. */
@@ -357,4 +394,6 @@ export const LINK_LABEL: Record<Lang, Record<string, string>> = {
     "Resort Map": "度假村地图",
     Contact: "联系我们",
   },
+  ko: koDict.LINK_LABEL,
+  ja: jaDict.LINK_LABEL,
 };

@@ -1,5 +1,14 @@
 import { writeFileSync } from "node:fs";
-import { ACTION, LANGUAGES, UI } from "../src/i18n/dictionary";
+import {
+  ACTION,
+  CLUSTER,
+  LANGUAGES,
+  LEVEL_LABEL,
+  LEVEL_LINE,
+  LINK_LABEL,
+  TYPE_LABEL,
+  UI,
+} from "../src/i18n/dictionary";
 import { DESTINATION_DESCRIPTION } from "../src/i18n/destinations";
 import { EVENT_TRANSLATIONS } from "../src/i18n/events";
 import sources from "../src/i18n/sources.json";
@@ -46,13 +55,15 @@ const translatedEvents = database
   ? await readTable<EventTranslation>("event_translations", "select=*&published=eq.true")
   : null;
 const issues: string[] = [];
+const labelGroups = { UI, ACTION, CLUSTER, LEVEL_LABEL, LEVEL_LINE, LINK_LABEL, TYPE_LABEL };
 for (const { code } of LANGUAGES) {
   if (code === "en") continue;
-  for (const key of Object.keys(UI.en) as (keyof typeof UI.en)[]) {
-    if (!UI[code][key]?.trim()) issues.push(`${code}: UI ${key}`);
-  }
-  for (const key of Object.keys(ACTION.en)) {
-    if (!ACTION[code][key]?.trim()) issues.push(`${code}: action ${key}`);
+  for (const [group, labels] of Object.entries(labelGroups)) {
+    const english = labels.en as Record<string, string>;
+    const localized = labels[code] as Record<string, string>;
+    for (const key of Object.keys(english)) {
+      if (!localized[key]?.trim()) issues.push(`${code}: ${group} ${key}`);
+    }
   }
   for (const item of destinations) {
     const row = descriptions?.find((r) => r.destination_id === item.id && r.locale === code);

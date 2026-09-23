@@ -1,10 +1,18 @@
 # Traductions éditoriales
 
-Les textes fixes d’interface restent dans `src/i18n/dictionary.ts`. Les descriptions et événements utilisent des traductions éditoriales en vietnamien, russe et chinois simplifié. Les marques et noms officiels ne sont pas renommés.
+Les textes fixes d’interface sont dans `src/i18n/dictionary.ts`, avec les libellés coréens et japonais dans `src/i18n/dictionary.ko.json` et `src/i18n/dictionary.ja.json`. Les descriptions et événements utilisent des traductions éditoriales en vietnamien, russe, chinois simplifié, coréen et japonais. Les marques et noms officiels ne sont pas renommés.
 
 ## Fonctionnement actuel
 
 La production et les prévisualisations lisent les traductions publiées dans Supabase (`HUB_TRANSLATIONS_FROM_DATABASE=true`). L’import initial a été validé le 22 septembre 2026 : 141 descriptions et 12 événements traduits ; l’audit public ne signale aucune source dépassée ni traduction manquante. Les procédures ci-dessous restent utiles pour une nouvelle installation ; ne pas rejouer la création des tables sur la base déjà migrée.
+
+## Ajouter le coréen et le japonais à la production existante
+
+1. **Avant le déploiement du code qui affiche KO et JA**, exécuter une fois `supabase/migrations/20260925120000_korean_japanese_translations.sql` dans le SQL Editor du projet `cxcffaegqyvbhrpzpowa`. Ce fichier étend les deux contraintes de langue, importe 47 descriptions et 4 événements par nouvelle langue, puis refuse la transaction si une source anglaise a changé ou si une fiche manque. Les langues existantes ne sont pas modifiées.
+2. Vérifier `SELECT locale, count(*) FROM public.destination_translations WHERE published GROUP BY locale ORDER BY locale;` et la même requête sur `public.event_translations`. Pour le catalogue actuel, KO et JA doivent chacun avoir 47 descriptions et 4 événements publiés ; le total devient 235 descriptions et 20 événements.
+3. Fusionner et déployer le code, puis contrôler le sélecteur et quelques fiches dans les deux langues sur mobile. Exécuter `bun run i18n:audit:database` après import. Les textes coréens et japonais sont des propositions éditoriales : faire relire les offres, tarifs et formulations par des locuteurs natifs avant de considérer la publication définitive.
+
+Le script est transactionnel : si Supabase affiche une erreur, rien de cette extension n'est appliqué. Ne pas relancer les migrations historiques pour résoudre l'erreur ; vérifier d'abord le texte anglais signalé.
 
 En cas d’indisponibilité de la base, le site peut utiliser les traductions du dépôt : `destinations.json` et `events.json` (chargés par leurs modules TypeScript typés). Les fichiers `sources.json` et `event-sources.json` conservent le texte anglais exact auquel elles correspondent. Si la description, le titre ou l’horaire source change, le site revient au contenu anglais courant ; il ne présente pas une ancienne traduction comme à jour.
 
@@ -16,7 +24,7 @@ La base importée n’a pas nécessairement le même historique de migrations qu
 
 1. Sauvegarder la base et exécuter uniquement `supabase/migrations/20260922130000_editorial_translations.sql` dans le SQL Editor du projet indépendant. Cette migration additive crée deux tables et leurs droits. Elle se lance une seule fois.
 2. Générer le peuplement avec `bun scripts/export-translation-seed.ts > /tmp/editorial-seed.sql`, relire le résultat et exécuter ce fichier dans le même SQL Editor. Il importe les traductions déjà embarquées, uniquement lorsque la source anglaise correspond. Il préserve toute traduction déjà présente (ON CONFLICT DO NOTHING).
-3. Exécuter `bun run i18n:audit:database`. Pour le catalogue du 22 septembre, on attend 141 descriptions publiées (47 × 3) et 12 événements traduits (4 × 3). Si un texte source a changé entre-temps, corriger et valider sa traduction avant de continuer.
+3. Exécuter `bun run i18n:audit:database`. Pour le catalogue initial du 22 septembre, on attend 141 descriptions publiées (47 × 3) et 12 événements traduits (4 × 3). Après l'extension coréen/japonais, on attend 235 descriptions et 20 événements. Si un texte source a changé entre-temps, corriger et valider sa traduction avant de continuer.
 4. Après validation, ajouter `"HUB_TRANSLATIONS_FROM_DATABASE": "true"` dans les `vars` de `wrangler.json`, puis déployer. Conserver cette valeur dans Git pour les prochains déploiements. Pour revenir au mode précédent, supprimer la variable ou la mettre à `"false"`, puis redéployer.
 
 Aucune écriture en production n’est effectuée par le code du site. Aucun accès administrateur n’est nécessaire pour sa lecture. Les tables sont protégées par RLS : seuls les contenus publiés liés à une destination/un événement actif sont lisibles publiquement ; aucune écriture publique n’est accordée. Une erreur réseau utilise les traductions locales uniquement lorsque leur source correspond encore ; une collection vide lue avec succès reste vide et déclenche le retour au texte anglais.

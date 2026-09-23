@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import { X } from "lucide-react";
 import type { DestinationPhoto } from "@/data/resort";
+import { useI18n } from "@/i18n";
 
 interface Props {
   photos: DestinationPhoto[];
@@ -11,6 +12,7 @@ interface Props {
 
 /** Full-screen photo viewer: swipe left/right between photos, swipe down to close. */
 export function PhotoLightbox({ photos, index, onClose }: Props) {
+  const { t } = useI18n();
   const [current, setCurrent] = useState(index);
   const [drag, setDrag] = useState({ x: 0, y: 0 });
   const start = useRef<{ x: number; y: number } | null>(null);
@@ -56,13 +58,13 @@ export function PhotoLightbox({ photos, index, onClose }: Props) {
 
   return (
     <FullscreenDialog
-      title={photo.caption ?? "Photo"}
+      title={photo.caption ?? t("photo")}
       onClose={onClose}
       className="fixed inset-0 z-[120] flex touch-none flex-col justify-center bg-[oklch(0.09_0.015_250/0.97)] backdrop-blur-sm"
     >
       <button
         onClick={onClose}
-        aria-label="Close"
+        aria-label={t("close")}
         className="absolute right-5 top-6 z-10 grid size-9 place-items-center rounded-full border border-[oklch(0.86_0.1_85/0.25)] text-[oklch(0.9_0.05_85)] transition-opacity hover:opacity-60"
       >
         <X className="size-4" strokeWidth={1.5} />

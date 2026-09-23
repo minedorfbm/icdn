@@ -4,13 +4,26 @@ import sources from "../src/i18n/sources.json";
 import eventSources from "../src/i18n/event-sources.json";
 import { LANGUAGES } from "../src/i18n/dictionary";
 
+const localeFlag = process.argv.find((arg) => arg.startsWith("--locales="));
+const requestedLocales = localeFlag?.slice("--locales=".length).split(",");
+const supportedLocales: string[] = LANGUAGES.filter(({ code }) => code !== "en").map(
+  ({ code }) => code,
+);
+if (
+  requestedLocales &&
+  (requestedLocales.length === 0 ||
+    requestedLocales.some((code) => !supportedLocales.includes(code)))
+) {
+  throw new Error(`--locales must contain only: ${supportedLocales.join(", ")}`);
+}
+
 const literal = (value: string) => "'" + value.replaceAll("'", "''") + "'";
 const sqlArray = (values: string[]) => `ARRAY[${values.map(literal).join(", ")}]::text[]`;
 console.log(
   "-- Import only against unchanged source text. Existing translations are preserved.\nBEGIN;",
 );
 for (const { code } of LANGUAGES) {
-  if (code === "en") continue;
+  if (code === "en" || (requestedLocales && !requestedLocales.includes(code))) continue;
   for (const [id, source] of Object.entries(sources)) {
     const text = DESTINATION_DESCRIPTION[code][id];
     if (!text) throw new Error(`Missing ${code}/${id}`);

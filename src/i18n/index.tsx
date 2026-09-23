@@ -53,7 +53,7 @@ export function I18nProvider({
       return;
     }
     const nav = navigator.language.slice(0, 2).toLowerCase();
-    const guess = nav === "vi" ? "vi" : nav === "ru" ? "ru" : nav === "zh" ? "zh" : null;
+    const guess = isLang(nav) ? nav : null;
     if (guess) setLangState(guess);
   }, []);
 
