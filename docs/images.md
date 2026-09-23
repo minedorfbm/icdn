@@ -1,21 +1,14 @@
 # Images dans Supabase Storage
 
-## État de la bascule
+## Fonctionnement actuel
 
 Le site accepte les URL publiques dans `destinations.image_key`, `levels.image_key`, `destination_photos.image_url` et `destination_posts.image_url`. Les anciennes clés locales fonctionnent toujours. La page d’accueil utilise l’image de Heaven, sauf si une valeur `hero_image` existe dans `site_settings`. Son préchargement utilise exactement la même URL.
 
-La PR prépare le code ; elle ne crée pas le bucket, ne téléverse aucun fichier et ne modifie aucune référence en production. Les 26 images initiales (2,2 Mo) et leurs empreintes sont décrites dans `scripts/storage-manifest.json`. Elles correspondent aux images du dépôt, sans conversion ni perte de qualité. Les fichiers locaux restent disponibles pour le mode de secours lorsque les données essentielles Supabase sont indisponibles ; il n’y a pas de remplacement automatique d’une URL distante qui renvoie 404.
+Le bucket `hub-images` est public et les références du hub ont été basculées vers Supabase Storage. Les 26 images initiales (2,2 Mo) et leurs empreintes sont décrites dans `scripts/storage-manifest.json`. Les fichiers locaux restent disponibles pour le mode de secours lorsque les données essentielles Supabase sont indisponibles ; une URL distante qui renvoie 404 n’est pas remplacée automatiquement.
 
-## Ordre de migration du projet existant
+Les images du catalogue déjà publiées ont été vérifiées après l’import. La migration est terminée : **ne pas relancer** `activate-images.sql` ni les anciennes migrations SQL sur la production. Le script `bun run images:audit` vérifie uniquement les 26 fichiers initiaux du manifeste ; il ne couvre pas les nouvelles images ajoutées ensuite.
 
-1. Fusionner la PR et attendre le déploiement Cloudflare.
-2. Dans Supabase Storage, créer `hub-images` en mode **Public**. Il ne contient que les images publiques du site. Ne pas ajouter de politique d’écriture publique. L’administration des fichiers se fait dans le tableau de bord Supabase.
-3. Téléverser les 26 fichiers versionnés du dossier préparé `hub-images` à la racine du bucket, sans renommer les fichiers et sans ajouter de sous-dossier. Ne pas téléverser les fichiers SQL ou les rapports d’inventaire.
-4. Exécuter `bun run images:audit` : les 26 fichiers doivent être lisibles sans authentification et avoir les mêmes octets que les originaux. `image-audit.json` fournit les détails. La clé publique de l’application ne sert pas à téléverser des fichiers.
-5. Après cet audit, exécuter le fichier préparé `activate-images.sql` dans le SQL Editor. Ce fichier spécifique au relevé du 23 septembre 2026 vérifie le bucket et la présence/taille des objets. Il ne met à jour que les références qui correspondent encore au relevé, en une transaction. Les 47 images principales (y compris les images par défaut), 4 fonds de niveau et 40 photos passent sur Storage. Les traductions ne sont pas modifiées. Aucun média distant existant n’est copié.
-6. Exécuter `verify-images.sql` : aucune ligne attendue. Une référence modifiée depuis le relevé doit être examinée, pas écrasée. Contrôler aussi les cards, galeries et fonds sur le site.
-
-Le dossier de livraison local contient aussi `inventory-before.json` et `rollback-images.sql`. Le retour arrière ne restaure que les URL encore identiques à celles de cette bascule ; il préserve les changements ultérieurs et ne supprime aucun fichier du bucket. Ne pas exécuter les anciennes migrations SQL du dépôt pour cette opération.
+Les objets du bucket sont lisibles publiquement, mais l’écriture reste réservée à l’administration. Ne pas créer de politique d’écriture publique pour faciliter l’ajout d’images.
 
 ## Changer une image ensuite
 
