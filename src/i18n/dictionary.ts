@@ -3,6 +3,8 @@ export const LANGUAGES = [
   { code: "vi", label: "VI", name: "Tiếng Việt" },
   { code: "ru", label: "RU", name: "Русский" },
   { code: "zh", label: "中文", name: "简体中文" },
+  { code: "ko", label: "KO", name: "한국어" },
+  { code: "ja", label: "JA", name: "日本語" },
 ] as const;
 
 export type Lang = (typeof LANGUAGES)[number]["code"];
@@ -30,7 +32,11 @@ export type UIKey =
   | "instagram_spot"
   | "latest_post"
   | "latest_posts"
-  | "view_on_instagram";
+  | "view_on_instagram"
+  | "resort_levels"
+  | "photo"
+  | "close"
+  | "hero_image_alt";
 
 export const UI: Record<Lang, Record<UIKey, string>> = {
   en: {
@@ -57,6 +63,10 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     latest_post: "LATEST POST",
     latest_posts: "LATEST POSTS",
     view_on_instagram: "VIEW ON INSTAGRAM",
+    resort_levels: "Nam Tram — resort levels",
+    photo: "Photo",
+    close: "Close",
+    hero_image_alt: "InterContinental Danang Sun Peninsula Resort seen from above the bay",
   },
   vi: {
     hero_kicker: "BÁN ĐẢO SƠN TRÀ · ĐÀ NẴNG",
@@ -82,6 +92,10 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     latest_post: "BÀI ĐĂNG MỚI NHẤT",
     latest_posts: "BÀI ĐĂNG MỚI NHẤT",
     view_on_instagram: "XEM TRÊN INSTAGRAM",
+    resort_levels: "Nam Tram — các tầng của khu nghỉ dưỡng",
+    photo: "Ảnh",
+    close: "Đóng",
+    hero_image_alt: "Khu nghỉ dưỡng InterContinental Danang Sun Peninsula nhìn từ trên vịnh",
   },
   ru: {
     hero_kicker: "ПОЛУОСТРОВ ШОНЧА · ДАНАНГ",
@@ -107,6 +121,10 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     latest_post: "ПОСЛЕДНЯЯ ПУБЛИКАЦИЯ",
     latest_posts: "ПОСЛЕДНИЕ ПУБЛИКАЦИИ",
     view_on_instagram: "СМОТРЕТЬ В INSTAGRAM",
+    resort_levels: "Nam Tram — уровни курорта",
+    photo: "Фото",
+    close: "Закрыть",
+    hero_image_alt: "Курорт InterContinental Danang Sun Peninsula над заливом",
   },
   zh: {
     hero_kicker: "山茶半岛 · 岘港",
@@ -132,6 +150,68 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     latest_post: "最新帖子",
     latest_posts: "最新帖子",
     view_on_instagram: "在 INSTAGRAM 查看",
+    resort_levels: "Nam Tram — 度假村层级",
+    photo: "照片",
+    close: "关闭",
+    hero_image_alt: "从海湾上方俯瞰岘港洲际阳光半岛度假酒店",
+  },
+  ko: {
+    hero_kicker: "선짜 반도 · 다낭",
+    hero_title_1: "하늘에서",
+    hero_title_2: "바다로",
+    hero_sub: "천국에서 바다까지",
+    places: "장소",
+    swipe_hint: "밀어서 보기 →",
+    tap_hint: "탭하여 열기",
+    footer_title: "인터컨티넨탈 다낭의 모든 곳",
+    footer_credit: "ART DIGITAL JOURNEY가 선보이는 디지털 경험",
+    back: "뒤로",
+    back_journey: "여정으로 돌아가기",
+    level: "레벨",
+    category: "카테고리",
+    area: "구역",
+    instagram: "인스타그램",
+    concierge: "컨시어지에 전화하기",
+    language: "언어",
+    events: "특별 이벤트",
+    explore_more: "더 알아보기",
+    instagram_spot: "사진 명소",
+    latest_post: "최근 게시물",
+    latest_posts: "최근 게시물",
+    view_on_instagram: "인스타그램에서 보기",
+    resort_levels: "남트램 — 리조트 레벨",
+    photo: "사진",
+    close: "닫기",
+    hero_image_alt: "만 위에서 내려다본 인터컨티넨탈 다낭 선 페닌슐라 리조트",
+  },
+  ja: {
+    hero_kicker: "ソンチャ半島 · ダナン",
+    hero_title_1: "天空から",
+    hero_title_2: "海へ",
+    hero_sub: "天国から海まで",
+    places: "スポット",
+    swipe_hint: "スワイプ →",
+    tap_hint: "タップして開く",
+    footer_title: "インターコンチネンタル・ダナンのすべて",
+    footer_credit: "ART DIGITAL JOURNEYによるデジタル体験",
+    back: "戻る",
+    back_journey: "旅に戻る",
+    level: "レベル",
+    category: "カテゴリー",
+    area: "エリア",
+    instagram: "インスタグラム",
+    concierge: "コンシェルジュに電話",
+    language: "言語",
+    events: "特別イベント",
+    explore_more: "もっと見る",
+    instagram_spot: "フォトスポット",
+    latest_post: "最新の投稿",
+    latest_posts: "最新の投稿",
+    view_on_instagram: "インスタグラムで見る",
+    resort_levels: "ナムトラム — リゾートの各レベル",
+    photo: "写真",
+    close: "閉じる",
+    hero_image_alt: "湾を見下ろすインターコンチネンタル・ダナン・サンペニンシュラ・リゾート",
   },
 };
 
@@ -161,6 +241,18 @@ export const LEVEL_LINE: Record<Lang, Record<string, string>> = {
     earth: "度假村的生活中心。",
     sea: "一切慢下来的地方。",
   },
+  ko: {
+    heaven: "만 위의 특별한 공간.",
+    sky: "수평선이 펼쳐지는 곳.",
+    earth: "리조트의 활기가 살아나는 곳.",
+    sea: "모든 것이 느긋해지는 곳.",
+  },
+  ja: {
+    heaven: "湾を見下ろす場所。",
+    sky: "水平線が広がる場所。",
+    earth: "リゾートの活気が息づく場所。",
+    sea: "すべてがゆっくりと流れる場所。",
+  },
 };
 
 /** Cluster tabs on the Earth level. */
@@ -169,6 +261,8 @@ export const CLUSTER: Record<Lang, Record<string, string>> = {
   vi: { EAT: "ẨM THỰC", MOVE: "VẬN ĐỘNG", PLAY: "VUI CHƠI" },
   ru: { EAT: "ЕДА", MOVE: "ДВИЖЕНИЕ", PLAY: "ОТДЫХ" },
   zh: { EAT: "餐饮", MOVE: "运动", PLAY: "玩乐" },
+  ko: { EAT: "다이닝", MOVE: "액티비티", PLAY: "즐길 거리" },
+  ja: { EAT: "ダイニング", MOVE: "アクティビティ", PLAY: "レジャー" },
 };
 
 /** Content categories. */
@@ -233,6 +327,36 @@ export const TYPE_LABEL: Record<Lang, Record<string, string>> = {
     beach: "海滩",
     recreation: "休闲",
   },
+  ko: {
+    restaurant: "레스토랑",
+    bar: "바",
+    spa: "스파",
+    experience: "체험",
+    pool: "수영장",
+    fitness: "피트니스",
+    kids: "어린이",
+    retail: "쇼핑",
+    gallery: "갤러리",
+    accommodation: "객실",
+    service: "서비스",
+    beach: "해변",
+    recreation: "레저",
+  },
+  ja: {
+    restaurant: "レストラン",
+    bar: "バー",
+    spa: "スパ",
+    experience: "体験",
+    pool: "プール",
+    fitness: "フィットネス",
+    kids: "キッズ",
+    retail: "ショップ",
+    gallery: "ギャラリー",
+    accommodation: "宿泊",
+    service: "サービス",
+    beach: "ビーチ",
+    recreation: "レクリエーション",
+  },
 };
 
 /** Level names used in the detail sheet. */
@@ -241,6 +365,8 @@ export const LEVEL_LABEL: Record<Lang, Record<string, string>> = {
   vi: { heaven: "THIÊN ĐƯỜNG", sky: "TRỜI", earth: "ĐẤT", sea: "BIỂN" },
   ru: { heaven: "НЕБЕСА", sky: "НЕБО", earth: "ЗЕМЛЯ", sea: "МОРЕ" },
   zh: { heaven: "天境", sky: "天空", earth: "大地", sea: "海洋" },
+  ko: { heaven: "헤븐", sky: "스카이", earth: "어스", sea: "씨" },
+  ja: { heaven: "ヘブン", sky: "スカイ", earth: "アース", sea: "シー" },
 };
 
 /** Call-to-action labels. */
@@ -317,6 +443,42 @@ export const ACTION: Record<Lang, Record<string, string>> = {
     VISIT: "前往",
     BROCHURE: "手册",
   },
+  ko: {
+    DISCOVER: "자세히 보기",
+    MENU: "메뉴",
+    PRICE_LIST: "가격표",
+    VEGETARIAN_MENU: "채식 메뉴",
+    VEGAN_MENU: "비건 메뉴",
+    BREAKFAST_MENU: "조식 메뉴",
+    LUNCH_MENU: "점심 메뉴",
+    DINNER_MENU: "저녁 메뉴",
+    BOOK: "예약하기",
+    TREATMENTS: "트리트먼트",
+    ACTIVITIES: "액티비티",
+    HOURS: "운영 시간",
+    INFO: "안내",
+    DETAILS: "상세 정보",
+    VISIT: "방문하기",
+    BROCHURE: "브로슈어",
+  },
+  ja: {
+    DISCOVER: "詳しく見る",
+    MENU: "メニュー",
+    PRICE_LIST: "料金表",
+    VEGETARIAN_MENU: "ベジタリアンメニュー",
+    VEGAN_MENU: "ヴィーガンメニュー",
+    BREAKFAST_MENU: "朝食メニュー",
+    LUNCH_MENU: "ランチメニュー",
+    DINNER_MENU: "ディナーメニュー",
+    BOOK: "予約する",
+    TREATMENTS: "トリートメント",
+    ACTIVITIES: "アクティビティ",
+    HOURS: "営業時間",
+    INFO: "ご案内",
+    DETAILS: "詳細",
+    VISIT: "訪れる",
+    BROCHURE: "パンフレット",
+  },
 };
 
 /** Footer link labels. */
@@ -356,5 +518,23 @@ export const LINK_LABEL: Record<Lang, Record<string, string>> = {
     "IHG One Rewards": "IHG 优悦会",
     "Resort Map": "度假村地图",
     Contact: "联系我们",
+  },
+  ko: {
+    Website: "공식 웹사이트",
+    Instagram: "인스타그램",
+    Dining: "다이닝",
+    Spa: "스파",
+    "IHG One Rewards": "IHG 원 리워드",
+    "Resort Map": "리조트 지도",
+    Contact: "문의하기",
+  },
+  ja: {
+    Website: "公式サイト",
+    Instagram: "インスタグラム",
+    Dining: "ダイニング",
+    Spa: "スパ",
+    "IHG One Rewards": "IHGワンリワーズ",
+    "Resort Map": "リゾートマップ",
+    Contact: "お問い合わせ",
   },
 };

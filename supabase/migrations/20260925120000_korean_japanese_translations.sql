@@ -1,0 +1,746 @@
+-- Add Korean and Japanese only to the already imported production schema.
+-- Review the editorial translations before publishing. This migration is atomic.
+BEGIN;
+ALTER TABLE public.destination_translations
+  DROP CONSTRAINT destination_translations_locale_check,
+  ADD CONSTRAINT destination_translations_locale_check CHECK (locale IN ('vi', 'ru', 'zh', 'ko', 'ja'));
+ALTER TABLE public.event_translations
+  DROP CONSTRAINT event_translations_locale_check,
+  ADD CONSTRAINT event_translations_locale_check CHECK (locale IN ('vi', 'ru', 'zh', 'ko', 'ja'));
+
+INSERT INTO public.destination_translations (destination_id, locale, description, source_description, published)
+SELECT d.id, t.locale, t.description, d.short_description, true
+FROM jsonb_to_recordset(
+'[
+  {
+    "destination_id": "bensley-package",
+    "locale": "ko",
+    "description": "Heavenly Penthouse 2박, 프라이빗 디자인 투어, Bensley Outsider Gallery에서의 샴페인 아트 감상, Heavenly 애프터눈 티를 즐겨보세요.",
+    "source_description": "Two nights in the Heavenly Penthouse, a private Design Tour, Champagne art viewing at the Bensley Outsider Gallery and Heavenly Afternoon Tea."
+  },
+  {
+    "destination_id": "moulin-rouge",
+    "locale": "ko",
+    "description": "유쾌한 프라이빗 클럽에서 가족, 친구와 함께 밤늦도록 노래를 즐겨보세요.",
+    "source_description": "Sing the night away with family and friends in a playful private club."
+  },
+  {
+    "destination_id": "relaxation-pavilion",
+    "locale": "ko",
+    "description": "만을 내려다보는 조용한 전망대. 리조트에서 가장 높은 곳에 앉아 숨을 고르기 좋습니다.",
+    "source_description": "A quiet lookout above the bay — the resort''s highest place to simply sit and breathe."
+  },
+  {
+    "destination_id": "instagram-spots",
+    "locale": "ko",
+    "description": "리셉션 홀에서 코코넛 비치까지, 리조트에서 가장 많이 사진에 담기는 아홉 곳을 만나보세요.",
+    "source_description": "The nine most photographed places of the resort, from the Reception Hall to Coconut Beach."
+  },
+  {
+    "destination_id": "wall-of-lanterns",
+    "locale": "ko",
+    "description": "수영장으로 내려가는 길을 밝히는 호이안 등불 벽. 리조트를 대표하는 사진 명소 중 하나입니다.",
+    "source_description": "A glowing wall of Hoi An lanterns on the way down to the pools — one of the resort''s signature photo spots."
+  },
+  {
+    "destination_id": "la-maison-1888",
+    "locale": "ko",
+    "description": "미쉐린 가이드가 인정한 프렌치 다이닝.",
+    "source_description": "MICHELIN-recognised French dining."
+  },
+  {
+    "destination_id": "the-summit",
+    "locale": "ko",
+    "description": "The Summit 컨퍼런스 센터, 오디토리움 겸 영화관, M Club에서 모임과 상영회, 축하 행사를 즐겨보세요.",
+    "source_description": "The Summit Conference Centre, the Auditorium-Cinema and M Club — gatherings, screenings and celebrations."
+  },
+  {
+    "destination_id": "dia-tang",
+    "locale": "ko",
+    "description": "산비탈에서 잠시 쉬어 가는 곳.",
+    "source_description": "A pause in the hillside."
+  },
+  {
+    "destination_id": "garden-jacuzzi",
+    "locale": "ko",
+    "description": "푸른 정원 속 따뜻한 물.",
+    "source_description": "Warm water in the vegetation."
+  },
+  {
+    "destination_id": "planet-trekkers",
+    "locale": "ko",
+    "description": "어린 탐험가를 위한 세상.",
+    "source_description": "A world for younger explorers."
+  },
+  {
+    "destination_id": "reception",
+    "locale": "ko",
+    "description": "리셉션 로비, 컨시어지, 운영 사무실. 리조트의 가장 높은 곳에서 여정이 시작됩니다.",
+    "source_description": "Reception Lobby, Concierge and Executive Office — arrival at the highest point of the resort."
+  },
+  {
+    "destination_id": "apec-garden",
+    "locale": "ko",
+    "description": "능선을 따라 만나는 조각 작품.",
+    "source_description": "Sculpture along the ridge."
+  },
+  {
+    "destination_id": "sports-centre",
+    "locale": "ko",
+    "description": "산 정상에서 테니스와 피클볼 코트, 축구장, 다양한 스포츠를 즐겨보세요.",
+    "source_description": "Tennis and pickleball courts, football pitch and mountaintop play."
+  },
+  {
+    "destination_id": "penthouses",
+    "locale": "ko",
+    "description": "정상에서 펼쳐지는 파노라마 전망의 스위트.",
+    "source_description": "Panoramic suites at the summit."
+  },
+  {
+    "destination_id": "rooms",
+    "locale": "ko",
+    "description": "레벨마다 펼쳐지는 벤슬리의 디자인.",
+    "source_description": "Bensley design, level by level."
+  },
+  {
+    "destination_id": "heritage-village",
+    "locale": "ko",
+    "description": "베트남의 공예와 건축을 만나는 곳.",
+    "source_description": "Vietnamese craft and architecture."
+  },
+  {
+    "destination_id": "kate-mccoy",
+    "locale": "ko",
+    "description": "현대적인 리조트 패션.",
+    "source_description": "Contemporary resort wear."
+  },
+  {
+    "destination_id": "sammys",
+    "locale": "ko",
+    "description": "엄선한 소품과 기념품.",
+    "source_description": "Curated pieces and keepsakes."
+  },
+  {
+    "destination_id": "nam-tram",
+    "locale": "ko",
+    "description": "네 개의 세계를 잇는 푸니쿨라.",
+    "source_description": "The funicular between the four worlds."
+  },
+  {
+    "destination_id": "information",
+    "locale": "ko",
+    "description": "컨시어지 및 고객 안내 서비스.",
+    "source_description": "Concierge and guest assistance."
+  },
+  {
+    "destination_id": "mi-sol-spa",
+    "locale": "ko",
+    "description": "소리. 고요함. 새로운 활력.",
+    "source_description": "Sound. Stillness. Renewal."
+  },
+  {
+    "destination_id": "soar-gym",
+    "locale": "ko",
+    "description": "숲의 나뭇가지 아래에서 운동하세요.",
+    "source_description": "Train inside the canopy."
+  },
+  {
+    "destination_id": "family-pool",
+    "locale": "ko",
+    "description": "얕은 물과 그늘에서 함께하는 시간.",
+    "source_description": "Shallow, shaded, together."
+  },
+  {
+    "destination_id": "kids-pool",
+    "locale": "ko",
+    "description": "어린 고객을 위한 작은 수영장.",
+    "source_description": "Small water for small guests."
+  },
+  {
+    "destination_id": "nursery",
+    "locale": "ko",
+    "description": "가장 어린 고객을 위한 돌봄 서비스.",
+    "source_description": "Care for the youngest guests."
+  },
+  {
+    "destination_id": "organic-garden",
+    "locale": "ko",
+    "description": "리조트의 요리가 시작되는 정원.",
+    "source_description": "Where the kitchens begin."
+  },
+  {
+    "destination_id": "club-lounge",
+    "locale": "ko",
+    "description": "만 위에 자리한 프라이빗 라운지.",
+    "source_description": "Private lounge above the bay."
+  },
+  {
+    "destination_id": "bensley-gallery",
+    "locale": "ko",
+    "description": "리조트 설계자 빌 벤슬리의 대담하고 다채로운 회화와 Kate McCoy의 고급 다이아몬드 주얼리를 만나보세요. 수요일부터 일요일까지 운영합니다.",
+    "source_description": "Bold, colourful paintings by Bill Bensley, the architect behind the resort — with Kate McCoy''s high-end diamond jewelry. Open Wed–Sun."
+  },
+  {
+    "destination_id": "nail-hair",
+    "locale": "ko",
+    "description": "수영 사이에 누리는 조용한 뷰티 케어.",
+    "source_description": "Quiet care between swims."
+  },
+  {
+    "destination_id": "family-beach",
+    "locale": "ko",
+    "description": "부드러운 모래와 잔잔한 바다.",
+    "source_description": "Soft sand, calm water."
+  },
+  {
+    "destination_id": "club-beach",
+    "locale": "ko",
+    "description": "클럽 고객을 위한 프라이빗 해변.",
+    "source_description": "Private shoreline for Club guests."
+  },
+  {
+    "destination_id": "long-pool",
+    "locale": "ko",
+    "description": "초록빛 물결이 길게 이어지는 수영장.",
+    "source_description": "Green water, endless length."
+  },
+  {
+    "destination_id": "coconut-beach",
+    "locale": "ko",
+    "description": "선짜 반도 끝자락의 해변.",
+    "source_description": "At the edge of Son Tra."
+  },
+  {
+    "destination_id": "yoga-pavilion",
+    "locale": "ko",
+    "description": "나뭇잎 사이에서 고르는 호흡.",
+    "source_description": "Breath among the leaves."
+  },
+  {
+    "destination_id": "marine-centre",
+    "locale": "ko",
+    "description": "해안에서 수상 스포츠와 가이드가 함께하는 액티비티를 즐겨보세요.",
+    "source_description": "Water sports and guided activities along the shoreline."
+  },
+  {
+    "destination_id": "wine-cellar",
+    "locale": "ko",
+    "description": "숨겨진 공간에서 만나는 귀한 빈티지 와인.",
+    "source_description": "Rare vintages in a hidden room."
+  },
+  {
+    "destination_id": "b-lounge",
+    "locale": "ko",
+    "description": "나무 사이에서 즐기는 애프터눈 티.",
+    "source_description": "Afternoon tea in the trees."
+  },
+  {
+    "destination_id": "ihg-one-rewards",
+    "locale": "ko",
+    "description": "IHG Hotels & Resorts의 로열티 프로그램. 전 세계에서 포인트를 적립하고 혜택을 누리세요.",
+    "source_description": "The loyalty programme of IHG Hotels & Resorts — earn and enjoy worldwide."
+  },
+  {
+    "destination_id": "enchanted-holiday",
+    "locale": "ko",
+    "description": "2026년 크리스마스. 매일 제공되는 조식, 애프터눈 티, 축하 음료, 찰스의 자연 탐험 산책로가 포함된 축제의 휴가입니다.",
+    "source_description": "Christmas 2026 — a festive stay with daily breakfast, Afternoon Tea, celebratory drinks and Charles''s nature discovery trail."
+  },
+  {
+    "destination_id": "weddings",
+    "locale": "ko",
+    "description": "만 위에서 사랑을 약속하세요. 해변 예식, 맞춤형 피로연, 웨딩 전문가가 준비하는 허니문 순간이 기다립니다.",
+    "source_description": "Say ''I do'' above the bay — beachfront ceremonies, bespoke receptions and honeymoon moments crafted by our wedding specialists."
+  },
+  {
+    "destination_id": "buffalo-bar",
+    "locale": "ko",
+    "description": "헤리티지 빌리지 아래에서 즐기는 칵테일.",
+    "source_description": "Cocktails beneath the Heritage Village."
+  },
+  {
+    "destination_id": "spa-lagoon-villas",
+    "locale": "ko",
+    "description": "고요한 물가에서 맞이하는 밤.",
+    "source_description": "Sleep beside still water."
+  },
+  {
+    "destination_id": "sea-experiences",
+    "locale": "ko",
+    "description": "일출을 맞는 세일링과 고요한 다이빙.",
+    "source_description": "Sunrise sailing and quiet dives."
+  },
+  {
+    "destination_id": "terra-mare",
+    "locale": "ko",
+    "description": "하루 종일 즐기는 땅과 바다의 맛.",
+    "source_description": "Land and sea, all day long."
+  },
+  {
+    "destination_id": "citron",
+    "locale": "ko",
+    "description": "공중에 매달린 둥지형 좌석에서 즐기는 베트남 요리.",
+    "source_description": "Vietnamese cuisine in hanging nest pods."
+  },
+  {
+    "destination_id": "long-bar",
+    "locale": "ko",
+    "description": "정글 위로 길게 뻗은 바.",
+    "source_description": "The long line above the jungle."
+  },
+  {
+    "destination_id": "tingara",
+    "locale": "ko",
+    "description": "수평선 위로 지는 해를 바라보며 즐기는 음료.",
+    "source_description": "Sunset drinks above the horizon."
+  },
+  {
+    "destination_id": "bensley-package",
+    "locale": "ja",
+    "description": "Heavenly Penthouseでの2泊、プライベート・デザインツアー、Bensley Outsider Galleryでのシャンパン付きアート鑑賞、Heavenlyアフタヌーンティーをお楽しみください。",
+    "source_description": "Two nights in the Heavenly Penthouse, a private Design Tour, Champagne art viewing at the Bensley Outsider Gallery and Heavenly Afternoon Tea."
+  },
+  {
+    "destination_id": "moulin-rouge",
+    "locale": "ja",
+    "description": "遊び心あふれるプライベートクラブで、ご家族やご友人と夜まで歌をお楽しみください。",
+    "source_description": "Sing the night away with family and friends in a playful private club."
+  },
+  {
+    "destination_id": "relaxation-pavilion",
+    "locale": "ja",
+    "description": "湾を望む静かな展望スポット。リゾートで最も高い場所で、腰を下ろしてひと息つけます。",
+    "source_description": "A quiet lookout above the bay — the resort''s highest place to simply sit and breathe."
+  },
+  {
+    "destination_id": "instagram-spots",
+    "locale": "ja",
+    "description": "レセプションホールからココナッツビーチまで、リゾートで特に写真に撮られる9つのスポット。",
+    "source_description": "The nine most photographed places of the resort, from the Reception Hall to Coconut Beach."
+  },
+  {
+    "destination_id": "wall-of-lanterns",
+    "locale": "ja",
+    "description": "プールへ下る道を彩るホイアンのランタンの壁。リゾートを代表するフォトスポットのひとつです。",
+    "source_description": "A glowing wall of Hoi An lanterns on the way down to the pools — one of the resort''s signature photo spots."
+  },
+  {
+    "destination_id": "la-maison-1888",
+    "locale": "ja",
+    "description": "ミシュランガイドに認められたフレンチダイニング。",
+    "source_description": "MICHELIN-recognised French dining."
+  },
+  {
+    "destination_id": "the-summit",
+    "locale": "ja",
+    "description": "The Summitカンファレンスセンター、オーディトリアム兼シネマ、M Club。会議や上映会、お祝いの場に。",
+    "source_description": "The Summit Conference Centre, the Auditorium-Cinema and M Club — gatherings, screenings and celebrations."
+  },
+  {
+    "destination_id": "dia-tang",
+    "locale": "ja",
+    "description": "丘の斜面でひと休み。",
+    "source_description": "A pause in the hillside."
+  },
+  {
+    "destination_id": "garden-jacuzzi",
+    "locale": "ja",
+    "description": "緑に包まれた温かな湯。",
+    "source_description": "Warm water in the vegetation."
+  },
+  {
+    "destination_id": "planet-trekkers",
+    "locale": "ja",
+    "description": "小さな冒険家たちのための世界。",
+    "source_description": "A world for younger explorers."
+  },
+  {
+    "destination_id": "reception",
+    "locale": "ja",
+    "description": "レセプションロビー、コンシェルジュ、運営オフィス。リゾートの最も高い場所でお客様をお迎えします。",
+    "source_description": "Reception Lobby, Concierge and Executive Office — arrival at the highest point of the resort."
+  },
+  {
+    "destination_id": "apec-garden",
+    "locale": "ja",
+    "description": "尾根沿いに並ぶ彫刻。",
+    "source_description": "Sculpture along the ridge."
+  },
+  {
+    "destination_id": "sports-centre",
+    "locale": "ja",
+    "description": "山頂にあるテニスとピックルボールのコート、サッカー場、さまざまなスポーツをお楽しみください。",
+    "source_description": "Tennis and pickleball courts, football pitch and mountaintop play."
+  },
+  {
+    "destination_id": "penthouses",
+    "locale": "ja",
+    "description": "山頂にあるパノラマビューのスイート。",
+    "source_description": "Panoramic suites at the summit."
+  },
+  {
+    "destination_id": "rooms",
+    "locale": "ja",
+    "description": "各レベルに広がるベンズリーのデザイン。",
+    "source_description": "Bensley design, level by level."
+  },
+  {
+    "destination_id": "heritage-village",
+    "locale": "ja",
+    "description": "ベトナムの工芸と建築に出会う場所。",
+    "source_description": "Vietnamese craft and architecture."
+  },
+  {
+    "destination_id": "kate-mccoy",
+    "locale": "ja",
+    "description": "現代的なリゾートウェア。",
+    "source_description": "Contemporary resort wear."
+  },
+  {
+    "destination_id": "sammys",
+    "locale": "ja",
+    "description": "厳選されたアイテムと記念品。",
+    "source_description": "Curated pieces and keepsakes."
+  },
+  {
+    "destination_id": "nam-tram",
+    "locale": "ja",
+    "description": "4つの世界をつなぐケーブルカー。",
+    "source_description": "The funicular between the four worlds."
+  },
+  {
+    "destination_id": "information",
+    "locale": "ja",
+    "description": "コンシェルジュとゲストサポート。",
+    "source_description": "Concierge and guest assistance."
+  },
+  {
+    "destination_id": "mi-sol-spa",
+    "locale": "ja",
+    "description": "音。静けさ。生まれ変わる心地よさ。",
+    "source_description": "Sound. Stillness. Renewal."
+  },
+  {
+    "destination_id": "soar-gym",
+    "locale": "ja",
+    "description": "木々の天蓋の下でトレーニング。",
+    "source_description": "Train inside the canopy."
+  },
+  {
+    "destination_id": "family-pool",
+    "locale": "ja",
+    "description": "浅い水と木陰で、家族一緒に。",
+    "source_description": "Shallow, shaded, together."
+  },
+  {
+    "destination_id": "kids-pool",
+    "locale": "ja",
+    "description": "小さなお客様のための小さなプール。",
+    "source_description": "Small water for small guests."
+  },
+  {
+    "destination_id": "nursery",
+    "locale": "ja",
+    "description": "小さなお客様をお預かりします。",
+    "source_description": "Care for the youngest guests."
+  },
+  {
+    "destination_id": "organic-garden",
+    "locale": "ja",
+    "description": "リゾートの料理が始まる庭。",
+    "source_description": "Where the kitchens begin."
+  },
+  {
+    "destination_id": "club-lounge",
+    "locale": "ja",
+    "description": "湾を見下ろすプライベートラウンジ。",
+    "source_description": "Private lounge above the bay."
+  },
+  {
+    "destination_id": "bensley-gallery",
+    "locale": "ja",
+    "description": "リゾートを手がけた建築家ビル・ベンズリーによる大胆で色彩豊かな絵画と、Kate McCoyの高級ダイヤモンドジュエリー。水曜～日曜営業。",
+    "source_description": "Bold, colourful paintings by Bill Bensley, the architect behind the resort — with Kate McCoy''s high-end diamond jewelry. Open Wed–Sun."
+  },
+  {
+    "destination_id": "nail-hair",
+    "locale": "ja",
+    "description": "水遊びの合間に楽しむ静かなビューティーケア。",
+    "source_description": "Quiet care between swims."
+  },
+  {
+    "destination_id": "family-beach",
+    "locale": "ja",
+    "description": "柔らかな砂と穏やかな海。",
+    "source_description": "Soft sand, calm water."
+  },
+  {
+    "destination_id": "club-beach",
+    "locale": "ja",
+    "description": "クラブゲスト専用のプライベートビーチ。",
+    "source_description": "Private shoreline for Club guests."
+  },
+  {
+    "destination_id": "long-pool",
+    "locale": "ja",
+    "description": "緑色の水がどこまでも続くプール。",
+    "source_description": "Green water, endless length."
+  },
+  {
+    "destination_id": "coconut-beach",
+    "locale": "ja",
+    "description": "ソンチャ半島の端に広がるビーチ。",
+    "source_description": "At the edge of Son Tra."
+  },
+  {
+    "destination_id": "yoga-pavilion",
+    "locale": "ja",
+    "description": "木の葉に囲まれて深呼吸。",
+    "source_description": "Breath among the leaves."
+  },
+  {
+    "destination_id": "marine-centre",
+    "locale": "ja",
+    "description": "海岸沿いでウォータースポーツやガイド付きアクティビティをお楽しみください。",
+    "source_description": "Water sports and guided activities along the shoreline."
+  },
+  {
+    "destination_id": "wine-cellar",
+    "locale": "ja",
+    "description": "隠れた一室に眠る希少なヴィンテージワイン。",
+    "source_description": "Rare vintages in a hidden room."
+  },
+  {
+    "destination_id": "b-lounge",
+    "locale": "ja",
+    "description": "木々の中で楽しむアフタヌーンティー。",
+    "source_description": "Afternoon tea in the trees."
+  },
+  {
+    "destination_id": "ihg-one-rewards",
+    "locale": "ja",
+    "description": "IHG Hotels & Resortsのロイヤルティプログラム。世界中でポイントを貯めて特典をお楽しみください。",
+    "source_description": "The loyalty programme of IHG Hotels & Resorts — earn and enjoy worldwide."
+  },
+  {
+    "destination_id": "enchanted-holiday",
+    "locale": "ja",
+    "description": "2026年のクリスマス。毎日の朝食、アフタヌーンティー、お祝いのドリンク、チャールズの自然散策が付いた祝祭のご滞在。",
+    "source_description": "Christmas 2026 — a festive stay with daily breakfast, Afternoon Tea, celebratory drinks and Charles''s nature discovery trail."
+  },
+  {
+    "destination_id": "weddings",
+    "locale": "ja",
+    "description": "湾を見下ろしながら愛を誓うひととき。ビーチでの挙式、オーダーメイドの披露宴、ウェディングの専門スタッフが演出するハネムーンを。",
+    "source_description": "Say ''I do'' above the bay — beachfront ceremonies, bespoke receptions and honeymoon moments crafted by our wedding specialists."
+  },
+  {
+    "destination_id": "buffalo-bar",
+    "locale": "ja",
+    "description": "ヘリテージビレッジの下で味わうカクテル。",
+    "source_description": "Cocktails beneath the Heritage Village."
+  },
+  {
+    "destination_id": "spa-lagoon-villas",
+    "locale": "ja",
+    "description": "静かな水辺で眠る夜。",
+    "source_description": "Sleep beside still water."
+  },
+  {
+    "destination_id": "sea-experiences",
+    "locale": "ja",
+    "description": "日の出のセーリングと静かなダイビング。",
+    "source_description": "Sunrise sailing and quiet dives."
+  },
+  {
+    "destination_id": "terra-mare",
+    "locale": "ja",
+    "description": "陸と海の恵みを、一日中。",
+    "source_description": "Land and sea, all day long."
+  },
+  {
+    "destination_id": "citron",
+    "locale": "ja",
+    "description": "空中に浮かぶ鳥の巣のような席で味わうベトナム料理。",
+    "source_description": "Vietnamese cuisine in hanging nest pods."
+  },
+  {
+    "destination_id": "long-bar",
+    "locale": "ja",
+    "description": "ジャングルの上に長く伸びるバー。",
+    "source_description": "The long line above the jungle."
+  },
+  {
+    "destination_id": "tingara",
+    "locale": "ja",
+    "description": "水平線に沈む夕日を眺めながら楽しむドリンク。",
+    "source_description": "Sunset drinks above the horizon."
+  }
+]'::jsonb
+) AS t(destination_id text, locale text, description text, source_description text)
+JOIN public.destinations d ON d.id = t.destination_id AND d.short_description = t.source_description
+ON CONFLICT (destination_id, locale) DO NOTHING;
+
+INSERT INTO public.event_translations (event_id, locale, title, schedule, description, source_title, source_schedule, source_description, published)
+SELECT e.id, t.locale, t.title, t.schedule, t.description, e.title, e.schedule, e.description, true
+FROM jsonb_to_recordset(
+'[
+  {
+    "event_id": "920eea0f-5e13-43eb-881f-6a96f3c2b238",
+    "locale": "ko",
+    "title": "일요일 샴페인 브런치",
+    "schedule": [
+      "매주 일요일",
+      "12:30 – 15:30"
+    ],
+    "description": "재능 있는 셰프들이 정성껏 준비한 뷔페를 즐기고 리조트의 레저 시설을 하루 종일 이용해 보세요. 예약 가격은 선택한 무제한 음료 패키지에 따라 1인당 VND 2,599,000부터 시작합니다.",
+    "source_title": "Sunday Champagne Brunch",
+    "source_schedule": [
+      "EVERY SUNDAY",
+      "12:30 – 15:30"
+    ],
+    "source_description": "Enjoy a buffet artfully prepared by our talented chefs, and enjoy our recreational facilities for the whole day. Reservations begin from VND 2.599.000 per person depending on your choice of free flow package."
+  },
+  {
+    "event_id": "340562fd-069e-4bf7-9ded-a3df81af8e12",
+    "locale": "ko",
+    "title": "Heavenly 애프터눈 티",
+    "schedule": [
+      "14:30 – 16:30 (월요일 – 토요일)",
+      "15:30 – 17:00 (일요일)"
+    ],
+    "description": "입맛을 돋우는 다과와 함께 고급 차를 즐겨보세요. 무제한 칵테일 또는 샴페인으로 경험을 더할 수 있습니다. 특별한 시간을 원한다면 Non-La 테이블을 예약하고 오감을 만족시키는 Royal Afternoon Tea로 업그레이드해 보세요.",
+    "source_title": "Heavenly Afternoon Tea",
+    "source_schedule": [
+      "14:30 – 16:30 (MONDAY – SATURDAY)",
+      "15:30 – 17:00 (SUNDAY)"
+    ],
+    "source_description": "Relish premium teas accompanied by mouthwatering bites. Enhance your experience with free-flow cocktails or champagne. For the ultimate indulgence, book one of our Non-La tables and upgrade to Royal Afternoon Tea, designed to delight all the senses."
+  },
+  {
+    "event_id": "62c1a955-b0ae-42a0-9e04-e767000bce4d",
+    "locale": "ko",
+    "title": "Souvenirs de France 와인 테이스팅",
+    "schedule": [
+      "월요일·수요일·금요일",
+      "16:00 – 17:00"
+    ],
+    "description": "La Maison 1888에서 유명한 빈티지 와인에 담긴 이야기를 만나보세요. 프랑스 와인의 이야기를 소믈리에가 들려드리고 직접 시음하실 수 있습니다. 전날 17:00까지 예약해 주세요.",
+    "source_title": "Souvenirs de France Wine Tasting",
+    "source_schedule": [
+      "MONDAY, WEDNESDAY AND FRIDAY",
+      "16:00 – 17:00"
+    ],
+    "source_description": "Uncork the chapters of some of the most famous vintages at La Maison 1888. France has many wine stories to tell, and our sommeliers love to tell them—and let you taste them! Reservations required by 17:00 the day prior."
+  },
+  {
+    "event_id": "8a7ba54e-da33-4a7e-9530-ac5ef12f89c5",
+    "locale": "ko",
+    "title": "해변 바비큐 뷔페와 모닥불",
+    "schedule": [
+      "매주 토요일",
+      "18:00 – 21:30"
+    ],
+    "description": "매주 해변에서 열리는 바비큐 뷔페와 모닥불 행사에 함께하세요. 그릴에 구운 육류와 해산물을 중심으로 다양한 사이드 메뉴와 디저트를 즐기실 수 있습니다.",
+    "source_title": "Beach BBQ Buffet & Bonfire",
+    "source_schedule": [
+      "EVERY SATURDAY",
+      "18:00 – 21:30"
+    ],
+    "source_description": "Join us on the beach for our weekly Barbecue Buffet and Bonfire. Grilled meats and seafood are the stars of the show, accompanied by a tempting selection of side dishes and desserts!"
+  },
+  {
+    "event_id": "920eea0f-5e13-43eb-881f-6a96f3c2b238",
+    "locale": "ja",
+    "title": "日曜シャンパンブランチ",
+    "schedule": [
+      "毎週日曜日",
+      "12:30 – 15:30"
+    ],
+    "description": "シェフが丹精込めて用意するビュッフェと、リゾートのレジャー施設を一日中お楽しみください。ご予約料金はフリーフローのドリンクプランにより、お一人様VND 2,599,000からです。",
+    "source_title": "Sunday Champagne Brunch",
+    "source_schedule": [
+      "EVERY SUNDAY",
+      "12:30 – 15:30"
+    ],
+    "source_description": "Enjoy a buffet artfully prepared by our talented chefs, and enjoy our recreational facilities for the whole day. Reservations begin from VND 2.599.000 per person depending on your choice of free flow package."
+  },
+  {
+    "event_id": "340562fd-069e-4bf7-9ded-a3df81af8e12",
+    "locale": "ja",
+    "title": "Heavenlyアフタヌーンティー",
+    "schedule": [
+      "14:30 – 16:30（月曜～土曜）",
+      "15:30 – 17:00（日曜）"
+    ],
+    "description": "上質な紅茶と食欲をそそる軽食をお楽しみください。フリーフローのカクテルまたはシャンパンを追加することもできます。より贅沢なひとときには、Non-Laのテーブルを予約し、五感を満たすRoyal Afternoon Teaへアップグレードしてください。",
+    "source_title": "Heavenly Afternoon Tea",
+    "source_schedule": [
+      "14:30 – 16:30 (MONDAY – SATURDAY)",
+      "15:30 – 17:00 (SUNDAY)"
+    ],
+    "source_description": "Relish premium teas accompanied by mouthwatering bites. Enhance your experience with free-flow cocktails or champagne. For the ultimate indulgence, book one of our Non-La tables and upgrade to Royal Afternoon Tea, designed to delight all the senses."
+  },
+  {
+    "event_id": "62c1a955-b0ae-42a0-9e04-e767000bce4d",
+    "locale": "ja",
+    "title": "Souvenirs de Franceワインテイスティング",
+    "schedule": [
+      "月曜・水曜・金曜",
+      "16:00 – 17:00"
+    ],
+    "description": "La Maison 1888で名高いヴィンテージワインの物語に触れてください。ソムリエがフランスワインの魅力を語り、テイスティングへご案内します。前日の17:00までにご予約ください。",
+    "source_title": "Souvenirs de France Wine Tasting",
+    "source_schedule": [
+      "MONDAY, WEDNESDAY AND FRIDAY",
+      "16:00 – 17:00"
+    ],
+    "source_description": "Uncork the chapters of some of the most famous vintages at La Maison 1888. France has many wine stories to tell, and our sommeliers love to tell them—and let you taste them! Reservations required by 17:00 the day prior."
+  },
+  {
+    "event_id": "8a7ba54e-da33-4a7e-9530-ac5ef12f89c5",
+    "locale": "ja",
+    "title": "ビーチBBQビュッフェ＆ボンファイア",
+    "schedule": [
+      "毎週土曜日",
+      "18:00 – 21:30"
+    ],
+    "description": "毎週ビーチで開催されるバーベキュービュッフェと焚き火の夕べへ。グリルした肉やシーフードを主役に、魅力的なサイドディッシュとデザートをご用意しています。",
+    "source_title": "Beach BBQ Buffet & Bonfire",
+    "source_schedule": [
+      "EVERY SATURDAY",
+      "18:00 – 21:30"
+    ],
+    "source_description": "Join us on the beach for our weekly Barbecue Buffet and Bonfire. Grilled meats and seafood are the stars of the show, accompanied by a tempting selection of side dishes and desserts!"
+  }
+]'::jsonb
+) AS t(event_id uuid, locale text, title text, schedule text[], description text, source_title text, source_schedule text[], source_description text)
+JOIN public.destination_events e ON e.id = t.event_id AND e.title = t.source_title AND e.schedule = t.source_schedule AND e.description = t.source_description
+ON CONFLICT (event_id, locale) DO NOTHING;
+
+DO $$
+DECLARE requested_locale text;
+BEGIN
+  FOREACH requested_locale IN ARRAY ARRAY['ko', 'ja'] LOOP
+    IF (SELECT count(*) FROM public.destination_translations t
+        JOIN public.destinations d ON d.id = t.destination_id
+        WHERE t.locale = requested_locale AND t.published AND d.active
+          AND t.source_description = d.short_description)
+       <> (SELECT count(*) FROM public.destinations WHERE active) THEN
+      RAISE EXCEPTION 'Incomplete destination translations for %', requested_locale;
+    END IF;
+    IF (SELECT count(*) FROM public.event_translations t
+        JOIN public.destination_events e ON e.id = t.event_id
+        JOIN public.destinations d ON d.id = e.destination_id
+        WHERE t.locale = requested_locale AND t.published AND e.active AND d.active
+          AND t.source_title = e.title AND t.source_schedule = e.schedule
+          AND t.source_description = e.description)
+       <> (SELECT count(*) FROM public.destination_events e
+           JOIN public.destinations d ON d.id = e.destination_id
+           WHERE e.active AND d.active) THEN
+      RAISE EXCEPTION 'Incomplete event translations for %', requested_locale;
+    END IF;
+  END LOOP;
+END;
+$$;
+COMMIT;

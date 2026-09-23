@@ -131,7 +131,7 @@ function Hub() {
       <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden">
         <img
           src={heroImage}
-          alt="InterContinental Danang Sun Peninsula Resort seen from above the bay"
+          alt={t("hero_image_alt")}
           width={900}
           height={1400}
           fetchPriority="high"

@@ -1,4 +1,5 @@
 import { LEVELS, type Level } from "@/data/resort";
+import { useI18n } from "@/i18n";
 
 interface Props {
   active: Level;
@@ -17,6 +18,7 @@ const NEUTRAL = "oklch(0.62 0.02 80)";
  * stylized cabin marker travelling along it.
  */
 export function NamTramRail({ active, progress, visible = true, onJump }: Props) {
+  const { t } = useI18n();
   const activeIndex = Math.max(
     0,
     LEVELS.findIndex((l) => l.id === active),
@@ -31,7 +33,7 @@ export function NamTramRail({ active, progress, visible = true, onJump }: Props)
 
   return (
     <nav
-      aria-label="Nam Tram — resort levels"
+      aria-label={t("resort_levels")}
       aria-hidden={!visible}
       className={`fixed right-3 top-1/2 z-40 -translate-y-1/2 select-none transition-all duration-700 ease-out max-[360px]:right-2 ${
         visible ? "translate-x-0 opacity-100" : "pointer-events-none translate-x-3 opacity-0"

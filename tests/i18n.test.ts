@@ -2,8 +2,21 @@ import { describe, expect, test } from "bun:test";
 import { translatedDescription, translatedEvent } from "../src/i18n/editorial";
 import sources from "../src/i18n/sources.json";
 import eventSources from "../src/i18n/event-sources.json";
+import { LANGUAGES, UI } from "../src/i18n/dictionary";
 
 describe("editorial translation authority", () => {
+  test("Korean and Japanese cover the current catalogue and can be selected", () => {
+    for (const lang of ["ko", "ja"] as const) {
+      expect(LANGUAGES.some((option) => option.code === lang)).toBe(true);
+      expect(UI[lang].language).toBeTruthy();
+      for (const [id, source] of Object.entries(sources)) {
+        expect(translatedDescription(lang, id, source, null)).not.toBe(source);
+      }
+      for (const event of eventSources) {
+        expect(translatedEvent(lang, event, null).title).not.toBe(event.title);
+      }
+    }
+  });
   test("newly covered destinations translate, but changed English is never hidden by old text", () => {
     expect(translatedDescription("vi", "moulin-rouge", sources["moulin-rouge"])).not.toBe(
       sources["moulin-rouge"],
