@@ -12,17 +12,6 @@ const row: DestinationRow = {
   type: "restaurant",
   short_description: "Current database description",
   image_key: null,
-  discover_url: "https://example.com/discover",
-  menu_url: "https://example.com/old-menu",
-  booking_url: null,
-  instagram_url: "https://instagram.com/example",
-  booking_message: null,
-  price_list_url: null,
-  vegetarian_menu_url: null,
-  vegan_menu_url: null,
-  breakfast_menu_url: null,
-  lunch_menu_url: null,
-  dinner_menu_url: null,
   instagram_spot: false,
   display_order: 0,
   active: true,
@@ -50,7 +39,7 @@ describe("database authority", () => {
     expect(hub.links).toEqual([]);
   });
   test("disabled links never fall back to old columns", () => {
-    const dest = createHubValue(ready).destinations[0]!;
+    const dest = { ...createHubValue(ready).destinations[0]!, discover_url: "https://example.com" };
     expect(actionsFor(dest)).toEqual([]);
     expect(instagramUrl(dest)).toBeUndefined();
   });
@@ -86,7 +75,10 @@ describe("configured actions", () => {
   test("service type does not fabricate a booking link", () => {
     const dest = { ...DESTINATIONS[0]!, type: "service" as const };
     delete dest.booking_url;
-    delete dest.booking_message;
+    expect(actionsFor(dest).some((a) => a.kind === "BOOK")).toBe(false);
+  });
+  test("an unused booking message cannot generate a WhatsApp button", () => {
+    const dest = { ...toDestination(row), booking_message: "Legacy draft" };
     expect(actionsFor(dest).some((a) => a.kind === "BOOK")).toBe(false);
   });
   test("unsafe database URLs never reach rendered actions", () => {
@@ -109,6 +101,8 @@ describe("legacy actions", () => {
   test("meal menus replace the generic menu and retain booking and dietary links", () => {
     const dest = {
       ...toDestination(row),
+      discover_url: "https://example.com/discover",
+      menu_url: "https://example.com/old-menu",
       breakfast_menu_url: "https://example.com/breakfast",
       dinner_menu_url: "https://example.com/dinner",
       booking_url: "https://example.com/book",
@@ -130,11 +124,13 @@ describe("legacy actions", () => {
     const dest = {
       ...toDestination(row),
       type: "accommodation" as const,
+      discover_url: "https://example.com/discover",
+      menu_url: "https://example.com/old-menu",
       booking_url: "https://example.com/book",
     };
     expect(actionsFor(dest)).toEqual([
-      { kind: "DISCOVER", url: row.discover_url },
-      { kind: "BROCHURE", url: row.menu_url },
+      { kind: "DISCOVER", url: "https://example.com/discover" },
+      { kind: "BROCHURE", url: "https://example.com/old-menu" },
       { kind: "BOOK", url: "https://example.com/book" },
     ]);
   });

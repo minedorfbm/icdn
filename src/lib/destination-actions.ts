@@ -1,4 +1,4 @@
-import { CTA_BY_TYPE, bookingLink, type Destination } from "@/data/resort";
+import { CTA_BY_TYPE, type Destination } from "@/data/resort";
 
 const ALLOWED_LINK_PROTOCOLS = new Set(["https:", "mailto:", "tel:"]);
 
@@ -55,7 +55,7 @@ export function actionHref(action: string, dest: Destination) {
     case "DINNER_MENU":
       return linkUrl(dest, "MENU") ?? linkUrl(dest, "DISCOVER");
     case "BOOK":
-      return dest.links === undefined && dest.booking_message ? bookingLink(dest) : undefined;
+      return undefined;
     default:
       return linkUrl(dest, "DISCOVER");
   }
