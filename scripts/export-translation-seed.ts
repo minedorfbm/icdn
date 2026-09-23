@@ -10,9 +10,7 @@ const supportedLocales = LANGUAGES.filter(({ code }) => code !== "en").map(({ co
 if (
   requestedLocales &&
   (requestedLocales.length === 0 ||
-    requestedLocales.some(
-      (code) => !supportedLocales.some((supported) => supported === code),
-    ))
+    requestedLocales.some((code) => !supportedLocales.some((supported) => supported === code)))
 ) {
   throw new Error(`--locales must contain only: ${supportedLocales.join(", ")}`);
 }
