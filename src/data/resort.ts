@@ -69,7 +69,6 @@ export interface Destination {
   dinner_menu_url?: string;
   booking_url?: string;
   instagram_url?: string;
-  booking_message?: string;
   /** Marked as one of the resort's official Instagram photo spots. */
   instagram_spot?: boolean;
   photos?: DestinationPhoto[];
@@ -174,18 +173,6 @@ export const OFFICIAL = {
   dining: "https://www.danang.intercontinental.com/dining/",
   spa: "https://www.danang.intercontinental.com/spa-and-wellbeing/",
 } as const;
-
-/** Existing human booking channel (WhatsApp). Editable via CMS. */
-export const BOOKING_CHANNEL = {
-  channel: "whatsapp" as const,
-  destination: "842363938888",
-};
-
-export function bookingLink(d: Destination) {
-  const template =
-    d.booking_message ?? `Hello, I'm interested in booking ${d.name}. Could you please assist me?`;
-  return `https://wa.me/${BOOKING_CHANNEL.destination}?text=${encodeURIComponent(template)}`;
-}
 
 /** Action sets by content type. */
 export const CTA_BY_TYPE: Record<DestinationType, string[]> = {
@@ -348,17 +335,6 @@ export interface DestinationRow {
   type: string;
   short_description: string;
   image_key: string | null;
-  discover_url: string | null;
-  menu_url: string | null;
-  price_list_url: string | null;
-  vegetarian_menu_url: string | null;
-  breakfast_menu_url: string | null;
-  vegan_menu_url: string | null;
-  lunch_menu_url: string | null;
-  dinner_menu_url: string | null;
-  booking_url: string | null;
-  instagram_url: string | null;
-  booking_message: string | null;
   instagram_spot?: boolean | null;
   display_order: number;
   active: boolean;
@@ -410,17 +386,6 @@ export function toDestination(
     type,
     short_description: row.short_description,
     image: resolveImage(row.image_key ?? "") || TYPE_IMAGE[type],
-    ...(row.discover_url ? { discover_url: row.discover_url } : {}),
-    ...(row.menu_url ? { menu_url: row.menu_url } : {}),
-    ...(row.price_list_url ? { price_list_url: row.price_list_url } : {}),
-    ...(row.vegetarian_menu_url ? { vegetarian_menu_url: row.vegetarian_menu_url } : {}),
-    ...(row.breakfast_menu_url ? { breakfast_menu_url: row.breakfast_menu_url } : {}),
-    ...(row.vegan_menu_url ? { vegan_menu_url: row.vegan_menu_url } : {}),
-    ...(row.lunch_menu_url ? { lunch_menu_url: row.lunch_menu_url } : {}),
-    ...(row.dinner_menu_url ? { dinner_menu_url: row.dinner_menu_url } : {}),
-    ...(row.booking_url ? { booking_url: row.booking_url } : {}),
-    ...(row.instagram_url ? { instagram_url: row.instagram_url } : {}),
-    ...(row.booking_message ? { booking_message: row.booking_message } : {}),
     ...(row.instagram_spot ? { instagram_spot: true } : {}),
     ...(photos !== undefined ? { photos } : {}),
     ...(posts !== undefined ? { posts } : {}),
@@ -466,8 +431,6 @@ export const DESTINATIONS: Destination[] = [
     {
       discover_url:
         "https://www.danang.intercontinental.com/offers/enchanted-holiday-escape-offer-2/",
-      booking_message:
-        "Hello, I'm interested in the Enchanted Holiday Escape offer. Could you please assist me?",
     },
   ),
   d(
@@ -497,8 +460,6 @@ export const DESTINATIONS: Destination[] = [
     {
       discover_url: "https://www.danang.intercontinental.com/offers/bensley-design-package/",
       instagram_url: "https://www.instagram.com/billbensley/",
-      booking_message:
-        "Hello, I'm interested in the Bensley Design Discovery Package. Could you please assist me?",
     },
   ),
   d(
@@ -513,8 +474,6 @@ export const DESTINATIONS: Destination[] = [
       menu_url:
         "https://www.danang.intercontinental.com/wp-content/uploads/2026/06/InterContinental-Danang-Wedding-Brochure.pdf",
       instagram_url: "https://www.instagram.com/p/Db-zN6-Gorb/",
-      booking_message:
-        "Hello, I'm interested in planning a wedding at the resort. Could you please assist me?",
     },
   ),
   d(
@@ -550,9 +509,6 @@ export const DESTINATIONS: Destination[] = [
     "experience",
     "The Summit Conference Centre, the Auditorium-Cinema and M Club — gatherings, screenings and celebrations.",
     8,
-    {
-      booking_message: "Hello, I'm interested in booking The Summit. Could you please assist me?",
-    },
   ),
   d("rooms", "Rooms & Villas", "heaven", "accommodation", "Bensley design, level by level.", 9),
   d(
@@ -598,8 +554,6 @@ export const DESTINATIONS: Destination[] = [
       "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Citron-Lunch-Menu-Highlights.Feb2026.pdf",
     dinner_menu_url:
       "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Citron-Dinner-Menu-Highlights.Feb2026.pdf",
-    booking_message:
-      "Hello, I would like to reserve a table at Citron. Could you please assist me?",
     instagram_spot: true,
   }),
   d(
@@ -619,8 +573,6 @@ export const DESTINATIONS: Destination[] = [
         "https://www.danang.intercontinental.com/wp-content/uploads/2025/05/La-Maison-1888-Michelin-Vegetarian-Dinner-Menu-Q3.26.pdf",
       vegan_menu_url:
         "https://www.danang.intercontinental.com/wp-content/uploads/2025/05/La-Maison-1888-Michelin-Vegan-Dinner-Menu-Q3.26.pdf",
-      booking_message:
-        "Hello, I would like to reserve a table at La Maison 1888. Could you please assist me?",
       instagram_spot: true,
     },
   ),
@@ -665,8 +617,6 @@ export const DESTINATIONS: Destination[] = [
     cluster: "EAT",
     menu_url:
       "https://www.danang.intercontinental.com/wp-content/uploads/2026/09/Terra-Mare-A-la-carte-Menu.pdf",
-    booking_message:
-      "Hello, I would like to reserve a table at Terra Mare. Could you please assist me?",
   }),
   d("b-lounge", "B Lounge", "earth", "bar", "Afternoon tea in the trees.", 2, { cluster: "EAT" }),
   d("long-bar", "L_O_N_G Bar", "earth", "bar", "The long line above the jungle.", 3, {
@@ -730,7 +680,6 @@ export const DESTINATIONS: Destination[] = [
     price_list_url:
       "https://www.danang.intercontinental.com/wp-content/uploads/2025/12/TREATMENT-PRICE-LIST-Mi-Sol-Spa.pdf",
     booking_url: "https://www.danang.intercontinental.com/spas/mi-sol-spa/",
-    booking_message: "Hello, I'm interested in booking Mi Sol Spa. Could you please assist me?",
   }),
   d("nail-hair", "The Nail & Hair Studio", "sea", "service", "Quiet care between swims.", 2, {
     discover_url: "https://www.danang.intercontinental.com/spas/nail-and-hair-studio/",
@@ -739,8 +688,6 @@ export const DESTINATIONS: Destination[] = [
     price_list_url:
       "https://www.danang.intercontinental.com/wp-content/uploads/2025/07/The-Nail-Hair-Studio-Price-List.Jul2025.pdf",
     booking_url: "https://www.danang.intercontinental.com/spas/nail-and-hair-studio/",
-    booking_message:
-      "Hello, I'm interested in booking The Nail & Hair Studio. Could you please assist me?",
   }),
   d(
     "marine-centre",
@@ -753,10 +700,7 @@ export const DESTINATIONS: Destination[] = [
   d("coconut-beach", "Coconut Beach", "sea", "beach", "At the edge of Son Tra.", 4, {
     instagram_spot: true,
   }),
-  d("yoga-pavilion", "Yoga Pavilion", "sea", "experience", "Breath beside the shoreline.", 9, {
-    booking_message:
-      "Hello, I'm interested in booking a session at the Yoga Pavilion. Could you please assist me?",
-  }),
+  d("yoga-pavilion", "Yoga Pavilion", "sea", "experience", "Breath beside the shoreline.", 9),
   d("family-beach", "Family Beach", "sea", "beach", "Soft sand, calm water.", 5),
   d(
     "club-beach",
@@ -781,9 +725,5 @@ export const DESTINATIONS: Destination[] = [
     "experience",
     "Sunrise sailing and quiet dives.",
     8,
-    {
-      booking_message:
-        "Hello, I'm interested in booking a seaside experience. Could you please assist me?",
-    },
   ),
 ];

@@ -27,6 +27,7 @@ Aucune écriture en production n’est effectuée par le code du site. Aucun acc
 - `event_translations` : event_id, locale, title, schedule, description, source_title, source_schedule, source_description, published.
 - Par défaut : `published = false` (brouillon). Passer à `true` après relecture.
 - Les colonnes source doivent contenir le texte anglais exact effectivement traduit. Ne pas les mettre à jour sans vérifier la traduction : elles servent à détecter les changements éditoriaux.
+- Après les migrations de [maintenance de la base](database.md), une modification de la source anglaise dépublie automatiquement les traductions devenues obsolètes. Vérifier leur texte et leurs colonnes `source_*` avant de les republier ; `updated_at` trace les modifications ultérieures.
 - Les événements utilisent leur identifiant stable, pas leur titre, en mode base.
 
 Les nouveaux textes sont des propositions de traduction à relire par des locuteurs natifs, notamment les offres et conditions. Les montants, horaires et liens existants ont été conservés. La traduction automatique par IA et l’administration visuelle ne sont pas incluses dans cette étape. Les pages d’erreur, textes d’accessibilité, légendes et libellés personnalisés restent des éléments d’un chantier distinct ; ils ne sont pas couverts par les deux nouvelles tables.
