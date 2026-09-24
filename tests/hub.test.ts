@@ -96,9 +96,15 @@ describe("curated YouTube videos", () => {
         video("other", "https://youtu.be/dQw4w9WgXcQ", 0),
         video("citron", "https://youtu.be/invalid-id", 1),
         video("citron", "https://youtu.be/dQw4w9WgXcQ", 2),
+        video("citron", "https://youtu.be/abcdefghijk", 0),
       ],
     });
     expect(hub.destinations[0]?.videos).toEqual([
+      {
+        video_id: "abcdefghijk",
+        title: "Resort film",
+        title_translations: { vi: "Phim khu nghỉ dưỡng" },
+      },
       {
         video_id: "dQw4w9WgXcQ",
         title: "Resort film",
