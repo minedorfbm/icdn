@@ -136,46 +136,48 @@ async function readHubData(): Promise<HubData> {
     });
 
     const editorialPromise = readEditorial(supabase);
-    const [levels, destinations, photos, links, events, posts, videos, settings] =
-      await Promise.all([
-        supabase
-          .from("levels")
-          .select("id, title, line, image_key, clusters, display_order")
-          .order("display_order"),
-        supabase
-          .from("destinations")
-          .select(
-            "id, name, level_id, cluster, type, short_description, image_key, instagram_spot, display_order, active",
-          )
-          .eq("active", true)
-          .order("display_order"),
-        supabase
-          .from("destination_photos")
-          .select("destination_id, image_url, caption, post_url, display_order")
-          .eq("active", true)
-          .order("display_order"),
-        supabase
-          .from("destination_links")
-          .select("destination_id, kind, label, url, display_order")
-          .eq("active", true)
-          .order("display_order"),
-        supabase
-          .from("destination_events")
-          .select("id, destination_id, title, schedule, description, url, display_order")
-          .eq("active", true)
-          .order("display_order"),
-        supabase
-          .from("destination_posts")
-          .select("destination_id, post_url, account, caption, image_url, posted_at, display_order")
-          .eq("active", true)
-          .order("display_order"),
-        supabase
-          .from("destination_videos")
-          .select("destination_id, video_url, title, title_translations, display_order")
-          .eq("active", true)
-          .order("display_order"),
-        supabase.from("site_settings").select("key, value"),
-      ]);
+    const videosPromise = Promise.resolve(
+      supabase
+        .from("destination_videos")
+        .select("destination_id, video_url, title, title_translations, display_order")
+        .eq("active", true)
+        .order("display_order"),
+    );
+    const [levels, destinations, photos, links, events, posts, settings] = await Promise.all([
+      supabase
+        .from("levels")
+        .select("id, title, line, image_key, clusters, display_order")
+        .order("display_order"),
+      supabase
+        .from("destinations")
+        .select(
+          "id, name, level_id, cluster, type, short_description, image_key, instagram_spot, display_order, active",
+        )
+        .eq("active", true)
+        .order("display_order"),
+      supabase
+        .from("destination_photos")
+        .select("destination_id, image_url, caption, post_url, display_order")
+        .eq("active", true)
+        .order("display_order"),
+      supabase
+        .from("destination_links")
+        .select("destination_id, kind, label, url, display_order")
+        .eq("active", true)
+        .order("display_order"),
+      supabase
+        .from("destination_events")
+        .select("id, destination_id, title, schedule, description, url, display_order")
+        .eq("active", true)
+        .order("display_order"),
+      supabase
+        .from("destination_posts")
+        .select("destination_id, post_url, account, caption, image_url, posted_at, display_order")
+        .eq("active", true)
+        .order("display_order"),
+      supabase.from("site_settings").select("key, value"),
+    ]);
+    const videos = await videosPromise;
 
     for (const [table, result] of Object.entries({
       levels,
