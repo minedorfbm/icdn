@@ -2,7 +2,7 @@
 
 ## Fonctionnement actuel
 
-Le site accepte les URL publiques dans `destinations.image_key`, `levels.image_key`, `destination_photos.image_url` et `destination_posts.image_url`. Les anciennes clés locales fonctionnent toujours. La page d’accueil utilise l’image de Heaven, sauf si une valeur `hero_image` existe dans `site_settings`. Son préchargement utilise exactement la même URL.
+Le site accepte les URL publiques dans `destinations.image_key`, `levels.image_key`, `destination_photos.image_url` et `destination_posts.image_url`. Les anciennes clés locales fonctionnent toujours. La page d’accueil utilise par défaut la photo de la vasque fleurie dans le hall, intégrée au site. Une valeur `hero_image` dans `site_settings` peut la remplacer sans déploiement. Son préchargement utilise exactement la même URL.
 
 Le bucket `hub-images` est public et les références du hub ont été basculées vers Supabase Storage. Les 26 images initiales (2,2 Mo) et leurs empreintes sont décrites dans `scripts/storage-manifest.json`. Les fichiers locaux restent disponibles pour le mode de secours lorsque les données essentielles Supabase sont indisponibles ; une URL distante qui renvoie 404 n’est pas remplacée automatiquement.
 
@@ -15,7 +15,7 @@ Les objets du bucket sont lisibles publiquement, mais l’écriture reste réser
 - Ajouter une nouvelle image WebP optimisée dans `hub-images` avec un **nouveau nom** pour éviter qu’un cache conserve l’ancienne photo. Conserver l’ancienne image tant qu’elle est référencée.
 - Lors du téléversement, régler le cache navigateur sur `31536000` secondes (un an). Les noms versionnés changent avec le contenu, ce qui permet ce cache long. Le réglage se fait avec l’option `cacheControl` de l’API Storage.
 - Copier son URL **publique**, sans expiration, dans le champ correspondant à la card, au niveau ou à la galerie. Malgré son nom historique, `image_key` accepte maintenant cette URL complète.
-- Pour changer seulement l’image d’accueil, ajouter/modifier `site_settings` : `key = hero_image`, `value = URL publique`. Sans ce réglage, l’accueil suit Heaven.
+- Pour changer seulement l’image d’accueil, ajouter/modifier `site_settings` : `key = hero_image`, `value = URL publique` de la nouvelle image dans `hub-images`. Sans ce réglage, l’accueil utilise la photo de la vasque intégrée au site.
 - Vérifier l’affichage après rechargement. Aucun déploiement ni changement de traduction n’est nécessaire pour remplacer une image.
 
 `bun run images:check` contrôle l’intégrité du paquet initial local en CI. `bun run images:audit` vérifie les fichiers initiaux publiés, pas les nouvelles images ajoutées manuellement après la migration. Le bucket ne constitue pas une interface de sélection d’image intégrée au site et n’optimise pas automatiquement les nouveaux fichiers.

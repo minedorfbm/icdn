@@ -3,6 +3,7 @@ import { createHubValue, FALLBACK, resolveHeroImage } from "../src/data/hub-valu
 import { actionsFor, instagramUrl, safeExternalUrl } from "../src/lib/destination-actions";
 import {
   DESTINATIONS,
+  LEVELS,
   toDestination,
   youtubeVideoId,
   type DestinationRow,
@@ -209,7 +210,7 @@ describe("CMS image URLs", () => {
       toDestination(row).image,
     );
   });
-  test("hero and preload share the configured image, then Heaven, then local fallback", () => {
+  test("hero and preload share the configured image, then the dedicated welcome photo", () => {
     const configured = { ...ready, settings: { hero_image: image } };
     expect(createHubValue(configured).heroImage).toBe(image);
     expect(resolveHeroImage(configured)).toBe(image);
@@ -218,13 +219,13 @@ describe("CMS image URLs", () => {
         ...ready,
         levels: [{ ...ready.levels![0]!, id: "heaven", image_key: image }],
       }),
-    ).toBe(image);
+    ).toBe(FALLBACK.heroImage);
     expect(resolveHeroImage()).toBe(FALLBACK.heroImage);
   });
   test("legacy keys continue to work before storage migration", () => {
     expect(toDestination({ ...row, image_key: "d-citron" }).image).toBeTruthy();
     expect(resolveHeroImage({ ...ready, settings: { hero_image: "heaven" } })).toBe(
-      FALLBACK.heroImage,
+      LEVELS[0]!.image,
     );
   });
 });
