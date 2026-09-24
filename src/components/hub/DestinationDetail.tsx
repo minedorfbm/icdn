@@ -1,9 +1,10 @@
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
-import { ArrowLeft, Instagram } from "lucide-react";
-import type { Destination } from "@/data/resort";
+import { ArrowLeft, Instagram, Youtube } from "lucide-react";
+import { OFFICIAL, type Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 import { InstagramStrip } from "./InstagramStrip";
 import { InstagramPostCarousel } from "./InstagramPostCarousel";
+import { YouTubeVideos } from "./YouTubeVideos";
 import { useI18n } from "@/i18n";
 
 /** Full-screen editorial detail view for one destination. */
@@ -129,6 +130,8 @@ export function DestinationDetail({
           </section>
         )}
 
+        {dest.videos && dest.videos.length > 0 && <YouTubeVideos videos={dest.videos} />}
+
         {dest.posts && dest.posts.length > 0 ? (
           <InstagramPostCarousel posts={dest.posts} />
         ) : (
@@ -156,6 +159,17 @@ export function DestinationDetail({
               {t("instagram")}
             </a>
           )}
+          <a
+            href={OFFICIAL.youtube}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex items-center gap-3 text-[10px] tracking-[0.3em] opacity-75 transition-opacity hover:opacity-50"
+          >
+            <span className="grid size-8 place-items-center rounded-full border border-current/30">
+              <Youtube className="size-3.5" strokeWidth={1.5} />
+            </span>
+            YOUTUBE
+          </a>
         </div>
 
         <button

@@ -35,9 +35,11 @@ Le workflow [Validate hub](.github/workflows/ci.yml) exécute ces contrôles sur
 
 ## Modifier le contenu
 
-Supabase est la source de vérité du catalogue. Les tables principales sont `levels`, `destinations`, `destination_links`, `destination_photos`, `destination_events`, `destination_posts` et `site_settings`. Les descriptions et événements traduits se trouvent dans `destination_translations` et `event_translations`. Les anciennes migrations du dépôt décrivent l’historique Lovable ; **ne pas les rejouer sur la base de production déjà importée**.
+Supabase est la source de vérité du catalogue. Les tables principales sont `levels`, `destinations`, `destination_links`, `destination_photos`, `destination_events`, `destination_posts`, `destination_videos` et `site_settings`. Les descriptions et événements traduits se trouvent dans `destination_translations` et `event_translations`. Les anciennes migrations du dépôt décrivent l’historique Lovable ; **ne pas les rejouer sur la base de production déjà importée**.
 
 Pour modifier une card, mettre à jour sa ligne dans `destinations`. Les actions affichées et leur ordre viennent des lignes actives de `destination_links` : la card en montre au plus trois, la fiche toutes. Le hub propose l’anglais, le vietnamien, le russe, le chinois simplifié, le coréen et le japonais. Après un changement de texte anglais, vérifier les traductions associées avec `bun run i18n:audit` ; une traduction dont le texte source ne correspond plus est écartée au profit du texte anglais courant. Les nouveaux textes ne sont pas traduits automatiquement. Procédure détaillée : [traductions](docs/translations.md).
+
+Les vidéos YouTube des fiches agrandies viennent de `destination_videos`. La première vidéo est associée à Mi Sol Spa ; toute nouvelle ligne est inactive par défaut. Voir [la procédure de publication](docs/database.md#vidéos-youtube) avant d'activer une autre vidéo.
 
 La [procédure de maintenance de la base](docs/database.md) décrit les protections de publication et les migrations du 23 septembre. Les anciennes colonnes d'URL de `destinations` ne pilotent plus les boutons du Worker ; les modifier ne changera pas les cards. Leur suppression physique est une deuxième étape, à lancer seulement après validation du déploiement compatible.
 

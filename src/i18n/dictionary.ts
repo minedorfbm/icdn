@@ -35,6 +35,8 @@ export type UIKey =
   | "instagram_spot"
   | "latest_post"
   | "latest_posts"
+  | "videos"
+  | "play_video"
   | "view_on_instagram"
   | "resort_levels"
   | "photo"
@@ -65,6 +67,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     instagram_spot: "INSTAGRAM SPOT",
     latest_post: "LATEST POST",
     latest_posts: "LATEST POSTS",
+    videos: "VIDEOS",
+    play_video: "Play video",
     view_on_instagram: "VIEW ON INSTAGRAM",
     resort_levels: "Nam Tram — resort levels",
     photo: "Photo",
@@ -94,6 +98,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     instagram_spot: "ĐIỂM CHỤP HÌNH",
     latest_post: "BÀI ĐĂNG MỚI NHẤT",
     latest_posts: "BÀI ĐĂNG MỚI NHẤT",
+    videos: "VIDEO",
+    play_video: "Phát video",
     view_on_instagram: "XEM TRÊN INSTAGRAM",
     resort_levels: "Nam Tram — các tầng của khu nghỉ dưỡng",
     photo: "Ảnh",
@@ -123,6 +129,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     instagram_spot: "ФОТОЗОНА",
     latest_post: "ПОСЛЕДНЯЯ ПУБЛИКАЦИЯ",
     latest_posts: "ПОСЛЕДНИЕ ПУБЛИКАЦИИ",
+    videos: "ВИДЕО",
+    play_video: "Смотреть видео",
     view_on_instagram: "СМОТРЕТЬ В INSTAGRAM",
     resort_levels: "Nam Tram — уровни курорта",
     photo: "Фото",
@@ -152,6 +160,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     instagram_spot: "打卡点",
     latest_post: "最新帖子",
     latest_posts: "最新帖子",
+    videos: "视频",
+    play_video: "播放视频",
     view_on_instagram: "在 INSTAGRAM 查看",
     resort_levels: "Nam Tram — 度假村层级",
     photo: "照片",

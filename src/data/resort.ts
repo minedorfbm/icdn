@@ -74,6 +74,8 @@ export interface Destination {
   photos?: DestinationPhoto[];
   /** Featured Instagram posts rendered as real embeds inside the detail sheet. */
   posts?: DestinationPost[];
+  /** Curated YouTube videos shown only when published for this destination. */
+  videos?: DestinationVideo[];
   /** Flexible link list from the database (menus, brochures, price lists…). */
   links?: DestinationLink[];
   /** Recurring events from the database. */
@@ -145,6 +147,56 @@ export interface DestinationPostRow {
   display_order: number;
 }
 
+export interface DestinationVideo {
+  video_id: string;
+  title: string;
+  title_translations: Record<string, string>;
+}
+
+export interface DestinationVideoRow {
+  destination_id: string;
+  video_url: string;
+  title: string;
+  title_translations: Record<string, string> | null;
+  display_order: number;
+}
+
+/** Accept only video IDs from known YouTube URL formats before building an embed URL. */
+export function youtubeVideoId(value: string): string | null {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:") return null;
+    const host = url.hostname.toLowerCase();
+    let id: string | null = null;
+    if (host === "youtu.be") {
+      id = url.pathname.slice(1);
+    } else if (host === "youtube.com" || host === "www.youtube.com" || host === "m.youtube.com") {
+      if (url.pathname === "/watch") id = url.searchParams.get("v");
+      else {
+        const match = url.pathname.match(/^\/(?:shorts|live|embed)\/([^/]+)\/?$/);
+        id = match?.[1] ?? null;
+      }
+    }
+    return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? id : null;
+  } catch {
+    return null;
+  }
+}
+
+export function groupVideos(rows: DestinationVideoRow[]): Record<string, DestinationVideo[]> {
+  const out: Record<string, DestinationVideo[]> = {};
+  for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
+    const video_id = youtubeVideoId(row.video_url);
+    if (!video_id) continue;
+    (out[row.destination_id] ??= []).push({
+      video_id,
+      title: row.title,
+      title_translations: row.title_translations ?? {},
+    });
+  }
+  return out;
+}
+
 /** Groups Instagram post rows by destination, in display order. */
 export function groupPosts(rows: DestinationPostRow[]): Record<string, DestinationPost[]> {
   const out: Record<string, DestinationPost[]> = {};
@@ -168,6 +220,7 @@ export const OFFICIAL = {
 
   ihg: "https://www.ihg.com/onerewards/content/us/en/home",
   instagram: "https://www.instagram.com/intercontinentaldanang/",
+  youtube: "https://www.youtube.com/@ICDanang",
   map: "https://www.danang.intercontinental.com/contact-us/",
   contact: "tel:+842363938888",
   dining: "https://www.danang.intercontinental.com/dining/",
@@ -376,6 +429,7 @@ export function toDestination(
   links?: DestinationLink[],
   events?: DestinationEvent[],
   posts?: DestinationPost[],
+  videos?: DestinationVideo[],
 ): Destination {
   const type = row.type as DestinationType;
   return {
@@ -389,6 +443,7 @@ export function toDestination(
     ...(row.instagram_spot ? { instagram_spot: true } : {}),
     ...(photos !== undefined ? { photos } : {}),
     ...(posts !== undefined ? { posts } : {}),
+    ...(videos !== undefined ? { videos } : {}),
     ...(links !== undefined ? { links } : {}),
     ...(events !== undefined ? { events } : {}),
     display_order: row.display_order,
