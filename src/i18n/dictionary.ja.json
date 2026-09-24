@@ -5,6 +5,8 @@
     "hero_title_2": "海へ",
     "hero_sub": "天国から海まで",
     "places": "スポット",
+    "all_places": "すべてのスポット",
+    "collections": "カテゴリー",
     "swipe_hint": "スワイプ →",
     "tap_hint": "タップして開く",
     "footer_title": "インターコンチネンタル・ダナンのすべて",
@@ -37,9 +39,17 @@
     "sea": "すべてがゆっくりと流れる場所。"
   },
   "CLUSTER": {
+    "STAY": "宿泊",
+    "DISCOVER": "探訪",
+    "GATHER": "集い",
+    "WELLNESS": "ウェルネス",
+    "DINE": "美食",
     "EAT": "ダイニング",
     "MOVE": "アクティビティ",
-    "PLAY": "レジャー"
+    "FAMILY": "ファミリー",
+    "BEACH": "ビーチ",
+    "PLAY": "レジャー",
+    "OTHER": "その他"
   },
   "TYPE_LABEL": {
     "restaurant": "レストラン",

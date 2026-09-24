@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { DestinationPanel } from "./DestinationPanel";
 import { DestinationDetail } from "./DestinationDetail";
 import type { Destination } from "@/data/resort";
@@ -43,8 +43,17 @@ function slotAt(pos: number): Slot {
 
 const SETTLE = "360ms cubic-bezier(0.22,1,0.36,1)";
 
-export function CardStack({ items, near }: Readonly<{ items: Destination[]; near: boolean }>) {
-  const [index, setIndex] = useState(0);
+export function CardStack({
+  items,
+  near,
+  index,
+  onIndexChange,
+}: Readonly<{
+  items: Destination[];
+  near: boolean;
+  index: number;
+  onIndexChange: Dispatch<SetStateAction<number>>;
+}>) {
   const [drag, setDrag] = useState(0); // px, negative = pulling next card in
   const [dragging, setDragging] = useState(false);
   const [open, setOpen] = useState<Destination | null>(null);
@@ -71,7 +80,6 @@ export function CardStack({ items, near }: Readonly<{ items: Destination[]; near
     start.current = null;
     pendingDrag.current = 0;
     setDragging(false);
-    setIndex(0);
     setDrag(0);
     return cancelFrame;
   }, [items]);
@@ -85,10 +93,10 @@ export function CardStack({ items, near }: Readonly<{ items: Destination[]; near
           dest={dest}
           active={i === index}
           priority={near && i === index}
-          onOpen={() => (i === index ? setOpen(dest) : setIndex(i))}
+          onOpen={() => (i === index ? setOpen(dest) : onIndexChange(i))}
         />
       )),
-    [items, index, near],
+    [items, index, near, onIndexChange],
   );
 
   if (items.length === 0) return null;
@@ -154,7 +162,7 @@ export function CardStack({ items, near }: Readonly<{ items: Destination[]; near
     setDragging(false);
     if (s.locked && !cancelled) {
       const step = swipeStep(pendingDrag.current, travel.current, s.v, e.timeStamp - s.lastT);
-      setIndex((i) => clamp(i + step));
+      onIndexChange((i) => clamp(i + step));
     }
     if (cancelled) moved.current = true;
     pendingDrag.current = 0;
@@ -191,6 +199,7 @@ export function CardStack({ items, near }: Readonly<{ items: Destination[]; near
           return (
             <div
               key={dest.id}
+              data-destination-id={dest.id}
               className={`perspective-card relative col-start-1 row-start-1 h-[90svh] w-[75%] origin-left ${near ? "will-change-transform" : ""}`}
               style={{
                 transform: `translate3d(${(x / 75) * 100}%,0,0) perspective(1200px) rotateY(${rotation}deg) scale(${scale})`,
@@ -213,7 +222,7 @@ export function CardStack({ items, near }: Readonly<{ items: Destination[]; near
                     .querySelector<HTMLButtonElement>("h3 button")
                     ?.focus({ preventScroll: true });
                   setOpen(dest);
-                } else setIndex(i);
+                } else onIndexChange(i);
               }}
             >
               {panels[i]}
@@ -227,21 +236,22 @@ export function CardStack({ items, near }: Readonly<{ items: Destination[]; near
         })}
       </div>
 
-      <div className="mt-2 flex flex-wrap items-center px-4">
-        {items.map((d, i) => (
-          <button
-            key={d.id}
-            aria-label={d.name}
-            onClick={() => setIndex(i)}
-            aria-current={i === index ? "true" : undefined}
-            className="grid size-11 place-items-center rounded focus-visible:outline-2 focus-visible:outline-offset-2"
-          >
-            <span
-              aria-hidden
-              className={`h-px bg-current transition-all duration-300 ${i === index ? "w-6 opacity-80" : "w-2 opacity-40"}`}
-            />
-          </button>
-        ))}
+      <div className="mx-auto mt-3 flex max-w-[740px] items-center gap-4 px-6">
+        <span
+          className="min-w-16 font-serif text-[24px] leading-none tabular-nums"
+          aria-live="polite"
+        >
+          {String(index + 1).padStart(2, "0")}
+          <span className="ml-1 text-[15px] opacity-50">
+            / {String(items.length).padStart(2, "0")}
+          </span>
+        </span>
+        <div className="h-px flex-1 bg-current/25" aria-hidden>
+          <div
+            className="h-px bg-current transition-[width] duration-300"
+            style={{ width: `${((index + 1) / items.length) * 100}%` }}
+          />
+        </div>
       </div>
 
       {open && <DestinationDetail dest={open} onClose={() => setOpen(null)} />}

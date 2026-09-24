@@ -5,6 +5,8 @@
     "hero_title_2": "바다로",
     "hero_sub": "천국에서 바다까지",
     "places": "장소",
+    "all_places": "모든 장소",
+    "collections": "장소 모음",
     "swipe_hint": "밀어서 보기 →",
     "tap_hint": "탭하여 열기",
     "footer_title": "인터컨티넨탈 다낭의 모든 곳",
@@ -37,9 +39,17 @@
     "sea": "모든 것이 느긋해지는 곳."
   },
   "CLUSTER": {
+    "STAY": "머무름",
+    "DISCOVER": "둘러보기",
+    "GATHER": "모임",
+    "WELLNESS": "웰니스",
+    "DINE": "미식",
     "EAT": "다이닝",
     "MOVE": "액티비티",
-    "PLAY": "즐길 거리"
+    "FAMILY": "가족",
+    "BEACH": "해변",
+    "PLAY": "즐길 거리",
+    "OTHER": "더 보기"
   },
   "TYPE_LABEL": {
     "restaurant": "레스토랑",

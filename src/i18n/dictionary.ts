@@ -18,6 +18,8 @@ export type UIKey =
   | "hero_title_2"
   | "hero_sub"
   | "places"
+  | "all_places"
+  | "collections"
   | "swipe_hint"
   | "tap_hint"
   | "footer_title"
@@ -50,6 +52,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     hero_title_2: "the Descent",
     hero_sub: "FROM HEAVEN TO SEA",
     places: "PLACES",
+    all_places: "ALL PLACES",
+    collections: "collections",
     swipe_hint: "SWIPE →",
     tap_hint: "TAP TO OPEN",
     footer_title: "All of InterContinental Danang",
@@ -81,6 +85,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     hero_title_2: "hành trình xuống biển",
     hero_sub: "TỪ THIÊN ĐƯỜNG ĐẾN BIỂN CẢ",
     places: "ĐIỂM ĐẾN",
+    all_places: "TẤT CẢ ĐỊA ĐIỂM",
+    collections: "nhóm địa điểm",
     swipe_hint: "VUỐT →",
     tap_hint: "CHẠM ĐỂ MỞ",
     footer_title: "Toàn cảnh InterContinental Danang",
@@ -112,6 +118,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     hero_title_2: "спуск",
     hero_sub: "С НЕБЕС К МОРЮ",
     places: "МЕСТ",
+    all_places: "ВСЕ МЕСТА",
+    collections: "разделы",
     swipe_hint: "СВАЙП →",
     tap_hint: "НАЖМИТЕ, ЧТОБЫ ОТКРЫТЬ",
     footer_title: "Весь InterContinental Danang",
@@ -143,6 +151,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     hero_title_2: "向海之旅",
     hero_sub: "自天境至海洋",
     places: "个场所",
+    all_places: "所有地点",
+    collections: "分类",
     swipe_hint: "滑动 →",
     tap_hint: "轻触查看",
     footer_title: "岘港洲际度假酒店全览",
@@ -202,12 +212,60 @@ export const LEVEL_LINE: Record<Lang, Record<string, string>> = {
   ja: jaDict.LEVEL_LINE,
 };
 
-/** Cluster tabs on the Earth level. */
+/** Editorial groups within each resort level. */
 export const CLUSTER: Record<Lang, Record<string, string>> = {
-  en: { EAT: "EAT", MOVE: "MOVE", PLAY: "PLAY" },
-  vi: { EAT: "ẨM THỰC", MOVE: "VẬN ĐỘNG", PLAY: "VUI CHƠI" },
-  ru: { EAT: "ЕДА", MOVE: "ДВИЖЕНИЕ", PLAY: "ОТДЫХ" },
-  zh: { EAT: "餐饮", MOVE: "运动", PLAY: "玩乐" },
+  en: {
+    STAY: "STAY",
+    DISCOVER: "DISCOVER",
+    GATHER: "GATHER",
+    WELLNESS: "WELLNESS",
+    DINE: "DINE",
+    EAT: "EAT",
+    MOVE: "MOVE",
+    FAMILY: "FAMILY",
+    BEACH: "BEACH",
+    PLAY: "PLAY",
+    OTHER: "MORE",
+  },
+  vi: {
+    STAY: "LƯU TRÚ",
+    DISCOVER: "KHÁM PHÁ",
+    GATHER: "GẶP GỠ",
+    WELLNESS: "THƯ GIÃN",
+    DINE: "ẨM THỰC",
+    EAT: "ẨM THỰC",
+    MOVE: "VẬN ĐỘNG",
+    FAMILY: "GIA ĐÌNH",
+    BEACH: "BÃI BIỂN",
+    PLAY: "VUI CHƠI",
+    OTHER: "KHÁC",
+  },
+  ru: {
+    STAY: "ПРОЖИВАНИЕ",
+    DISCOVER: "ОТКРЫТЬ",
+    GATHER: "ВСТРЕЧИ",
+    WELLNESS: "РЕЛАКС",
+    DINE: "РЕСТОРАНЫ",
+    EAT: "ЕДА",
+    MOVE: "ДВИЖЕНИЕ",
+    FAMILY: "СЕМЬЯ",
+    BEACH: "ПЛЯЖ",
+    PLAY: "ОТДЫХ",
+    OTHER: "ДРУГОЕ",
+  },
+  zh: {
+    STAY: "住宿",
+    DISCOVER: "探索",
+    GATHER: "欢聚",
+    WELLNESS: "康养",
+    DINE: "美食",
+    EAT: "餐饮",
+    MOVE: "运动",
+    FAMILY: "亲子",
+    BEACH: "海滩",
+    PLAY: "玩乐",
+    OTHER: "更多",
+  },
   ko: koDict.CLUSTER,
   ja: jaDict.CLUSTER,
 };
