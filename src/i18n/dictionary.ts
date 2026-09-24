@@ -73,7 +73,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     resort_levels: "Nam Tram — resort levels",
     photo: "Photo",
     close: "Close",
-    hero_image_alt: "InterContinental Danang Sun Peninsula Resort seen from above the bay",
+    hero_image_alt: "Flower-filled marble bowl in the resort lobby, overlooking the sea",
   },
   vi: {
     hero_kicker: "BÁN ĐẢO SƠN TRÀ · ĐÀ NẴNG",
@@ -104,7 +104,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     resort_levels: "Nam Tram — các tầng của khu nghỉ dưỡng",
     photo: "Ảnh",
     close: "Đóng",
-    hero_image_alt: "Khu nghỉ dưỡng InterContinental Danang Sun Peninsula nhìn từ trên vịnh",
+    hero_image_alt: "Bát đá cẩm thạch đầy hoa trong sảnh khu nghỉ dưỡng, nhìn ra biển",
   },
   ru: {
     hero_kicker: "ПОЛУОСТРОВ ШОНЧА · ДАНАНГ",
@@ -135,7 +135,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     resort_levels: "Nam Tram — уровни курорта",
     photo: "Фото",
     close: "Закрыть",
-    hero_image_alt: "Курорт InterContinental Danang Sun Peninsula над заливом",
+    hero_image_alt: "Мраморная чаша с цветами в холле курорта с видом на море",
   },
   zh: {
     hero_kicker: "山茶半岛 · 岘港",
@@ -166,7 +166,7 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     resort_levels: "Nam Tram — 度假村层级",
     photo: "照片",
     close: "关闭",
-    hero_image_alt: "从海湾上方俯瞰岘港洲际阳光半岛度假酒店",
+    hero_image_alt: "度假酒店大堂内盛满鲜花的大理石花盆，远处是大海",
   },
   ko: koDict.UI,
   ja: jaDict.UI,

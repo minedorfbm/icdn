@@ -14,6 +14,7 @@ import {
   type Level,
 } from "@/data/resort";
 import { EVENTS_BY_DESTINATION } from "@/data/events";
+import receptionHero from "@/assets/hero-reception-20260925.webp";
 import type { HubData } from "@/lib/hub.functions";
 
 export interface HubLevel {
@@ -79,7 +80,7 @@ const withFallbackMedia = (list: Destination[]): Destination[] =>
   });
 
 export const FALLBACK: HubValue = {
-  heroImage: LEVELS[0]!.image,
+  heroImage: receptionHero,
   levels: LEVELS,
   destinations: withFallbackMedia(DESTINATIONS),
   links: FALLBACK_LINKS.map(([label, url]) => ({ label, url })),
@@ -89,10 +90,7 @@ export const FALLBACK: HubValue = {
 /** Use the same CMS image for the hero and its preload. */
 export function resolveHeroImage(data?: HubData): string {
   const reference = data?.settings?.["hero_image"];
-  const heaven = data?.levels?.find((level) => level.id === "heaven");
-  return (
-    resolveImage(reference ?? "") || resolveImage(heaven?.image_key ?? "") || FALLBACK.heroImage
-  );
+  return resolveImage(reference ?? "") || FALLBACK.heroImage;
 }
 
 export function createHubValue(data?: HubData): HubValue {

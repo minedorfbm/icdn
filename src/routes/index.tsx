@@ -128,36 +128,34 @@ function Hub() {
       <NamTramRail active={active} progress={progress} visible={railVisible} onJump={jump} />
 
       {/* THRESHOLD */}
-      <section className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden">
+      <section className="relative h-[100svh] min-h-[600px] overflow-hidden">
         <img
           src={heroImage}
           alt={t("hero_image_alt")}
-          width={900}
-          height={1400}
+          width={1170}
+          height={2532}
           fetchPriority="high"
           decoding="async"
-          className="threshold-img absolute inset-0 h-full w-full object-cover opacity-[0.6]"
+          className="threshold-img absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[oklch(0.99_0.005_90/0.82)] via-[oklch(0.99_0.005_90/0.35)] to-[oklch(0.985_0.008_90/0.98)]" />
-        <div className="grain pointer-events-none absolute inset-0" aria-hidden />
 
         <button
           onClick={() => jump("heaven")}
-          className="relative flex flex-col items-center gap-6 px-6 text-center"
+          className="absolute inset-x-0 top-[46%] z-10 flex flex-col items-center gap-4 px-5 text-center text-[#102d43] [text-shadow:0_1px_12px_rgba(255,255,255,0.9)]"
         >
-          <span className="reveal text-[10px] tracking-[0.46em] opacity-55 [animation-delay:120ms]">
+          <span className="reveal text-[9px] tracking-[0.36em] [animation-delay:120ms]">
             {t("hero_kicker")}
           </span>
-          <h1 className="reveal font-serif text-[clamp(40px,13vw,68px)] leading-[0.92] tracking-[-0.02em] [animation-delay:260ms]">
+          <h1 className="reveal max-w-[90vw] font-serif text-[clamp(36px,10vw,60px)] leading-[0.94] tracking-[-0.02em] [animation-delay:260ms]">
             {t("hero_title_1")}
             <br />
             {t("hero_title_2")}
           </h1>
           <span
-            className="reveal line-drop h-24 w-px bg-current/40 [animation-delay:520ms]"
+            className="reveal line-drop h-12 w-px bg-current/60 [animation-delay:520ms]"
             aria-hidden
           />
-          <span className="reveal text-[9px] tracking-[0.42em] opacity-50 [animation-delay:680ms]">
+          <span className="reveal text-[9px] tracking-[0.32em] [animation-delay:680ms]">
             {t("hero_sub")}
           </span>
         </button>
