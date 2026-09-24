@@ -11,6 +11,7 @@ import type {
   DestinationLinkRow,
   DestinationPhotoRow,
   DestinationPostRow,
+  DestinationVideoRow,
   DestinationRow,
 } from "@/data/resort";
 
@@ -31,6 +32,7 @@ export interface HubData {
   links: DestinationLinkRow[] | null;
   events: DestinationEventRow[] | null;
   posts: DestinationPostRow[] | null;
+  videos: DestinationVideoRow[] | null;
   settings: Record<string, string> | null;
 }
 
@@ -42,6 +44,7 @@ function isCompleteHubData(data: HubData): boolean {
     data.links,
     data.events,
     data.posts,
+    data.videos,
     data.settings,
   ].every((collection) => collection !== null);
   const editorialComplete =
@@ -105,6 +108,7 @@ async function readHubData(): Promise<HubData> {
     links: null,
     events: null,
     posts: null,
+    videos: null,
     settings: null,
   };
   if (!url || !key) {
@@ -132,6 +136,13 @@ async function readHubData(): Promise<HubData> {
     });
 
     const editorialPromise = readEditorial(supabase);
+    const videosPromise = Promise.resolve(
+      supabase
+        .from("destination_videos")
+        .select("destination_id, video_url, title, title_translations, display_order")
+        .eq("active", true)
+        .order("display_order"),
+    );
     const [levels, destinations, photos, links, events, posts, settings] = await Promise.all([
       supabase
         .from("levels")
@@ -166,6 +177,7 @@ async function readHubData(): Promise<HubData> {
         .order("display_order"),
       supabase.from("site_settings").select("key, value"),
     ]);
+    const videos = await videosPromise;
 
     for (const [table, result] of Object.entries({
       levels,
@@ -174,6 +186,7 @@ async function readHubData(): Promise<HubData> {
       links,
       events,
       posts,
+      videos,
       settings,
     })) {
       if (result.error) console.error(`[hub] Unable to read ${table}`, result.error.code);
@@ -189,6 +202,7 @@ async function readHubData(): Promise<HubData> {
       links: links.error ? null : ((links.data ?? []) as DestinationLinkRow[]),
       events: events.error ? null : ((events.data ?? []) as DestinationEventRow[]),
       posts: posts.error ? null : ((posts.data ?? []) as DestinationPostRow[]),
+      videos: videos.error ? null : ((videos.data ?? []) as DestinationVideoRow[]),
       settings: settings.error
         ? null
         : Object.fromEntries(

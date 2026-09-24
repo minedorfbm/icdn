@@ -1,5 +1,11 @@
 # Base Supabase : cohérence et publication
 
+## Vidéos YouTube
+
+La migration [`20260925130000_destination_videos.sql`](../supabase/migrations/20260925130000_destination_videos.sql) ajoute la table `destination_videos` au projet `cxcffaegqyvbhrpzpowa` et publie la vidéo officielle fournie pour `mi-sol-spa`. Elle a été appliquée au projet de production le 25 septembre 2026 ; la requête de contrôle a confirmé une seule ligne active pour `mi-sol-spa`. **Ne pas rejouer l'historique complet des migrations** sur cette base. Le fichier est réexécutable sans dupliquer cette vidéo si l'intégration GitHub le reprend. La table active RLS et n'autorise la lecture publique que pour une vidéo active appartenant à un lieu actif.
+
+Pour préparer une vidéo, créer une ligne dans `destination_videos` avec l'identifiant exact de la card dans `destination_id`, l'URL officielle YouTube en HTTPS dans `video_url`, un `title` et, si souhaité, un objet `title_translations` avec les clés `vi`, `ru`, `zh`, `ko` et `ja`. Régler `display_order` pour l'ordre d'affichage. Laisser `active = false` pendant la préparation, puis le passer à `true` pour publier. Une URL non reconnue est ignorée par le hub ; formats acceptés : `youtube.com/watch?v=…`, `youtu.be/…`, `youtube.com/shorts/…` et `youtube.com/live/…`. Vérifier que le propriétaire de la vidéo autorise l'intégration. Une modification peut mettre environ deux minutes à apparaître à cause du cache.
+
 Le projet de production utilise neuf tables `public` dans Supabase. La base importée depuis Lovable ne partage pas nécessairement l'historique des migrations du dépôt : **ne pas exécuter `db push` ni rejouer toutes les migrations historiques sur la production**. Les deux migrations datées du 23 septembre 2026 sont prévues pour ce schéma déjà importé et se lancent une fois chacune, dans l'ordre, après sauvegarde.
 
 ## Source de vérité du contenu

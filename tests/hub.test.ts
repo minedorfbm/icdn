@@ -1,7 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { createHubValue, FALLBACK, resolveHeroImage } from "../src/data/hub-value";
 import { actionsFor, instagramUrl, safeExternalUrl } from "../src/lib/destination-actions";
-import { DESTINATIONS, toDestination, type DestinationRow } from "../src/data/resort";
+import {
+  DESTINATIONS,
+  toDestination,
+  youtubeVideoId,
+  type DestinationRow,
+} from "../src/data/resort";
 import type { HubData } from "../src/lib/hub.functions";
 
 const row: DestinationRow = {
@@ -23,6 +28,7 @@ const ready: HubData = {
   links: [],
   events: [],
   posts: [],
+  videos: [],
   settings: {},
 };
 
@@ -36,6 +42,7 @@ describe("database authority", () => {
     expect(hub.destinations[0]?.events).toEqual([]);
     expect(hub.destinations[0]?.photos).toEqual([]);
     expect(hub.destinations[0]?.posts).toEqual([]);
+    expect(hub.destinations[0]?.videos).toEqual([]);
     expect(hub.links).toEqual([]);
   });
   test("disabled links never fall back to old columns", () => {
@@ -52,6 +59,58 @@ describe("database authority", () => {
     expect(dest.photos).toEqual([]);
     expect(dest.posts).toEqual([]);
     expect(actionsFor(dest)).toEqual([]);
+  });
+});
+
+describe("curated YouTube videos", () => {
+  test("only recognized HTTPS YouTube links produce video IDs", () => {
+    for (const url of [
+      "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "https://youtu.be/dQw4w9WgXcQ?t=5",
+      "https://youtube.com/shorts/dQw4w9WgXcQ",
+      "https://youtube.com/live/dQw4w9WgXcQ",
+    ]) {
+      expect(youtubeVideoId(url)).toBe("dQw4w9WgXcQ");
+    }
+    for (const url of [
+      "https://youtube.com.evil.test/watch?v=dQw4w9WgXcQ",
+      "javascript:alert(1)",
+      "http://youtu.be/dQw4w9WgXcQ",
+      "https://youtu.be/invalid-id",
+    ]) {
+      expect(youtubeVideoId(url)).toBeNull();
+    }
+  });
+
+  test("only fetched videos appear on their own destination in display order", () => {
+    const video = (destination_id: string, video_url: string, display_order: number) => ({
+      destination_id,
+      video_url,
+      title: "Resort film",
+      title_translations: { vi: "Phim khu nghỉ dưỡng" },
+      display_order,
+    });
+    const hub = createHubValue({
+      ...ready,
+      videos: [
+        video("other", "https://youtu.be/dQw4w9WgXcQ", 0),
+        video("citron", "https://youtu.be/invalid-id", 1),
+        video("citron", "https://youtu.be/dQw4w9WgXcQ", 2),
+        video("citron", "https://youtu.be/abcdefghijk", 0),
+      ],
+    });
+    expect(hub.destinations[0]?.videos).toEqual([
+      {
+        video_id: "abcdefghijk",
+        title: "Resort film",
+        title_translations: { vi: "Phim khu nghỉ dưỡng" },
+      },
+      {
+        video_id: "dQw4w9WgXcQ",
+        title: "Resort film",
+        title_translations: { vi: "Phim khu nghỉ dưỡng" },
+      },
+    ]);
   });
 });
 

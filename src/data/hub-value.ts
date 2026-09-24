@@ -5,6 +5,7 @@ import {
   groupLinks,
   groupPhotos,
   groupPosts,
+  groupVideos,
   LEVELS,
   OFFICIAL,
   resolveImage,
@@ -109,6 +110,7 @@ export function createHubValue(data?: HubData): HubValue {
   const linksByDest = groupLinks(data.links ?? []);
   const eventsByDest = groupEvents(data.events ?? []);
   const postsByDest = groupPosts(data.posts ?? []);
+  const videosByDest = groupVideos(data.videos ?? []);
   const s = data.settings ?? {};
   const links = (
     [
@@ -134,6 +136,7 @@ export function createHubValue(data?: HubData): HubValue {
         data.links === null ? undefined : (linksByDest[row.id] ?? []),
         eventsByDest[row.id] ?? [],
         postsByDest[row.id] ?? [],
+        videosByDest[row.id] ?? [],
       );
       if (data.photos !== null && data.events !== null && data.posts !== null) return dest;
       const fallback = withFallbackMedia([toDestination(row)])[0]!;
