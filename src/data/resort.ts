@@ -251,16 +251,34 @@ export const LEVELS: {
   image: string;
   clusters?: string[];
 }[] = [
-  { id: "heaven", title: "HEAVEN", line: "Above the bay.", image: heavenImg },
-  { id: "sky", title: "SKY", line: "Where the horizon opens.", image: skyImg },
+  {
+    id: "heaven",
+    title: "HEAVEN",
+    line: "Above the bay.",
+    image: heavenImg,
+    clusters: ["STAY", "DISCOVER", "GATHER", "WELLNESS"],
+  },
+  {
+    id: "sky",
+    title: "SKY",
+    line: "Where the horizon opens.",
+    image: skyImg,
+    clusters: ["DINE", "DISCOVER"],
+  },
   {
     id: "earth",
     title: "EARTH",
     line: "Where the resort comes alive.",
     image: earthImg,
-    clusters: ["EAT", "MOVE", "PLAY"],
+    clusters: ["EAT", "MOVE", "FAMILY", "DISCOVER"],
   },
-  { id: "sea", title: "SEA", line: "Where everything slows down.", image: seaImg },
+  {
+    id: "sea",
+    title: "SEA",
+    line: "Where everything slows down.",
+    image: seaImg,
+    clusters: ["WELLNESS", "BEACH", "DISCOVER"],
+  },
 ];
 
 const w = OFFICIAL.website;

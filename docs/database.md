@@ -1,5 +1,21 @@
 # Base Supabase : cohérence et publication
 
+## Collections et navigation
+
+La migration [`20260925150000_funicular_collections.sql`](../supabase/migrations/20260925150000_funicular_collections.sql) regroupe les 47 lieux existants à l'intérieur des quatre niveaux Heaven, Sky, Earth et Sea. Elle modifie seulement `levels.clusters` et `destinations.cluster` ; les identifiants, niveaux, types, traductions, médias et liens des lieux restent identiques. Sur le mobile, chaque collection affiche 2 à 6 cards, un compteur de progression et un accès « All places » vers tous les lieux du niveau. Le rail Nam Tram continue de piloter les quatre niveaux ; leurs identifiants et ceux des lieux sont conservés pour la future carte et une animation de funiculaire.
+
+Pour réorganiser les lieux, modifier d'abord le tableau `levels.clusters` dans l'ordre souhaité, puis affecter à chaque card un `destinations.cluster` présent dans ce tableau. La base refuse une valeur inconnue et la suppression d'une collection encore utilisée. Une card sans collection apparaît dans « More » ; elle ne disparaît donc pas du parcours. Les libellés des collections connues sont traduits dans `src/i18n/dictionary.ts` et les dictionnaires coréen/japonais. Si vous créez une nouvelle clé, ajouter ses six traductions au code avant de la publier ; sinon la clé brute s'affichera. Le catalogue local de secours reprend l'organisation initiale, mais les modifications faites ensuite dans Supabase ne le mettent pas à jour automatiquement.
+
+Sur la base de production déjà importée, exécuter uniquement cette migration dans le SQL Editor, après sauvegarde. Il ne faut pas rejouer toutes les migrations historiques du dépôt. Le script est transactionnel et peut être relancé sans dupliquer de contenu. Vérifier ensuite les groupes avec :
+
+```sql
+SELECT l.id AS niveau, d.cluster AS collection, count(*) AS lieux
+FROM public.levels l
+JOIN public.destinations d ON d.level_id = l.id AND d.active
+GROUP BY l.id, l.display_order, d.cluster
+ORDER BY l.display_order, d.cluster;
+```
+
 ## Vidéos YouTube
 
 La migration [`20260925130000_destination_videos.sql`](../supabase/migrations/20260925130000_destination_videos.sql) ajoute la table `destination_videos` au projet `cxcffaegqyvbhrpzpowa` et publie la vidéo officielle fournie pour `mi-sol-spa`. Elle a été appliquée au projet de production le 25 septembre 2026 ; la requête de contrôle a confirmé une seule ligne active pour `mi-sol-spa`. **Ne pas rejouer l'historique complet des migrations** sur cette base. Le fichier est réexécutable sans dupliquer cette vidéo si l'intégration GitHub le reprend. La table active RLS et n'autorise la lecture publique que pour une vidéo active appartenant à un lieu actif.

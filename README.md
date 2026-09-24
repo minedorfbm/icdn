@@ -2,7 +2,7 @@
 
 Le hub mobile s’ouvre depuis le QR code intégré à une œuvre d’Art Digital Journey. Le visiteur parcourt les niveaux **Heaven → Sky → Earth → Sea**, fait défiler les cards et ouvre les fiches, menus et liens de réservation.
 
-**Production :** <https://icdnd.artdigitaljourney.com/>. Le rendu serveur et les fichiers statiques sont hébergés sur Cloudflare Workers. Le contenu public et les traductions éditoriales viennent du projet Supabase indépendant ; les images publiées sont dans le bucket public `hub-images`. La landing page <https://artdigitaljourney.com/> possède son propre dépôt et son propre Worker.
+**Production :** <https://icdn.artdigitaljourney.com/> (alias : <https://icdnd.artdigitaljourney.com/>). Le rendu serveur et les fichiers statiques sont hébergés sur Cloudflare Workers. Le contenu public et les traductions éditoriales viennent du projet Supabase indépendant ; les images publiées sont dans le bucket public `hub-images`. La landing page <https://artdigitaljourney.com/> possède son propre dépôt et son propre Worker.
 
 ## Démarrer en local
 
@@ -39,11 +39,13 @@ Supabase est la source de vérité du catalogue. Les tables principales sont `le
 
 Pour modifier une card, mettre à jour sa ligne dans `destinations`. Les actions affichées et leur ordre viennent des lignes actives de `destination_links` : la card en montre au plus trois, la fiche toutes. Le hub propose l’anglais, le vietnamien, le russe, le chinois simplifié, le coréen et le japonais. Après un changement de texte anglais, vérifier les traductions associées avec `bun run i18n:audit` ; une traduction dont le texte source ne correspond plus est écartée au profit du texte anglais courant. Les nouveaux textes ne sont pas traduits automatiquement. Procédure détaillée : [traductions](docs/translations.md).
 
+Chaque niveau peut être découpé en collections courtes. Leur ordre vient de `levels.clusters`, l’appartenance de chaque card de `destinations.cluster`. Une card sans collection reste accessible dans « More » ; l’index « All places » permet d’ouvrir directement chaque lieu. Voir [la gestion des collections](docs/database.md#collections-et-navigation).
+
 Les vidéos YouTube des fiches agrandies viennent de `destination_videos`. La première vidéo est associée à Mi Sol Spa ; toute nouvelle ligne est inactive par défaut. Voir [la procédure de publication](docs/database.md#vidéos-youtube) avant d'activer une autre vidéo.
 
 La [procédure de maintenance de la base](docs/database.md) décrit les protections de publication et les migrations du 23 septembre. Les anciennes colonnes d'URL de `destinations` ne pilotent plus les boutons du Worker ; les modifier ne changera pas les cards. Leur suppression physique est une deuxième étape, à lancer seulement après validation du déploiement compatible.
 
-Les photos des cards, niveaux et galeries sont référencées par URL publique Supabase Storage. Pour remplacer une image, publier un WebP optimisé sous un **nouveau nom**, puis changer son URL dans la ligne concernée. Pour l’image d’accueil seulement, `site_settings.hero_image` peut remplacer l’image de Heaven. Les objets déjà publiés et leur cache sont documentés dans le [guide des images](docs/images.md).
+Les photos des cards, niveaux et galeries sont référencées par URL publique Supabase Storage. Pour remplacer une image, publier un WebP optimisé sous un **nouveau nom**, puis changer son URL dans la ligne concernée. Pour l’image d’accueil seulement, `site_settings.hero_image` peut remplacer l’image locale de secours. Les objets déjà publiés et leur cache sont documentés dans le [guide des images](docs/images.md).
 
 Les contenus publics complets sont conservés brièvement en mémoire et dans le cache Cloudflare du centre de données, pendant deux minutes. Une modification Supabase peut donc prendre environ deux minutes à apparaître sur tous les visiteurs. Si une lecture échoue, le site utilise les données locales de secours ; une réponse réussie mais vide reste vide et ne fait pas réapparaître d’anciens contenus.
 
