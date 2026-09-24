@@ -600,9 +600,7 @@ export const DESTINATIONS: Destination[] = [
     "A quiet lookout above the bay — the resort's highest place to simply sit and breathe.",
     16,
   ),
-
-  // SKY — dining and heritage terrace
-  d("citron", "Citron", "sky", "restaurant", "Vietnamese cuisine in hanging nest pods.", 1, {
+  d("citron", "Citron", "heaven", "restaurant", "Vietnamese cuisine in hanging nest pods.", 17, {
     breakfast_menu_url:
       "https://www.danang.intercontinental.com/wp-content/uploads/2024/06/Citron-Highlights-Breakfast.pdf",
     lunch_menu_url:
@@ -611,6 +609,8 @@ export const DESTINATIONS: Destination[] = [
       "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Citron-Dinner-Menu-Highlights.Feb2026.pdf",
     instagram_spot: true,
   }),
+
+  // SKY — dining and heritage terrace
   d(
     "la-maison-1888",
     "La Maison 1888",
