@@ -22,7 +22,7 @@ export function DestinationDetail({
       title={dest.name}
       onClose={onClose}
       data-level={dest.level}
-      className="level detail-enter fixed inset-0 z-[80] overflow-y-auto overscroll-contain"
+      className="level detail-enter fixed inset-0 z-[80] overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain"
     >
       <div className="relative h-[62svh] w-full overflow-hidden">
         <img
