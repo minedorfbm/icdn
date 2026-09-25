@@ -128,20 +128,16 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
                   : undefined
               }
             >
-              {groups.map((group, i) => (
+              {groups.map((group) => (
                 <button
                   key={group.key}
                   type="button"
                   onClick={() => selectCluster(group.key)}
                   aria-current={group.key === activeCluster ? "true" : undefined}
-                  className={`relative flex min-h-20 ${compactCollections ? "min-w-0" : "min-w-[116px] snap-start"} flex-col items-start justify-center gap-1 text-left transition-opacity ${
+                  className={`relative flex min-h-20 ${compactCollections ? "min-w-0" : "min-w-[116px] snap-start"} flex-col items-start justify-center text-left transition-opacity ${
                     group.key === activeCluster ? "opacity-100" : "opacity-45"
                   }`}
                 >
-                  <span className="text-[9px] tracking-[0.18em] tabular-nums opacity-70">
-                    {String(i + 1).padStart(2, "0")} / {String(groups.length).padStart(2, "0")}
-                    <span className="ml-2">· {group.items.length}</span>
-                  </span>
                   <span
                     className={`font-serif leading-tight tracking-tight ${compactCollections ? "max-w-full text-[clamp(14px,3.6vw,23px)] [overflow-wrap:anywhere]" : "text-[23px]"}`}
                   >
@@ -156,14 +152,11 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
           </nav>
         )}
 
-        <div className="mx-auto mt-8 flex max-w-[740px] items-center justify-between gap-3 px-6">
-          <p className="text-[9px] tracking-[0.24em] opacity-55">
-            {list.length} {t("places")} · {t("swipe_hint")}
-          </p>
+        <div className="mx-auto mt-8 max-w-[740px] px-6">
           <button
             type="button"
             onClick={() => setIndexOpen(true)}
-            className="min-h-11 shrink-0 border-b border-current/45 text-[9px] tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="min-h-11 border-b border-current/45 text-[11px] tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             {t("all_places")}
           </button>
