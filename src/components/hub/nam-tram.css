@@ -1,0 +1,167 @@
+.nam-tram {
+  --tram-ebony: oklch(0.17 0.008 155);
+  --tram-brass: oklch(0.79 0.066 83);
+  color: var(--tram-brass);
+}
+
+.nam-tram-track {
+  border-inline: 1px solid oklch(0.79 0.066 83 / 0.45);
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 23px,
+    oklch(0.79 0.066 83 / 0.2) 23px 24px
+  );
+}
+
+.nam-tram-stop {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: var(--tram-ebony);
+}
+
+.nam-tram-stop[data-active="true"] {
+  background: var(--tram-brass);
+  box-shadow: 0 0 0 3px oklch(0.17 0.008 155 / 0.65);
+}
+
+.nam-tram-cabin {
+  display: block;
+  width: 30px;
+  height: 26px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 2px oklch(0 0 0 / 0.35));
+}
+
+.nam-tram-panel {
+  border-color: oklch(0.79 0.066 83 / 0.38);
+  background:
+    radial-gradient(ellipse at 50% 0, oklch(0.3 0.026 83 / 0.22), transparent 60%),
+    var(--tram-ebony);
+  box-shadow: 0 -12px 64px oklch(0 0 0 / 0.3);
+}
+
+/* Keep the close control comfortable to tap without competing with the artwork. */
+.nam-tram-panel > button {
+  display: grid;
+  place-items: center;
+  top: 8px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--tram-brass);
+}
+
+.nam-tram-panel > button:focus {
+  box-shadow: none;
+}
+
+.nam-tram-panel > button:focus-visible {
+  outline: 1px solid var(--tram-brass);
+  outline-offset: -5px;
+}
+
+.nam-tram-art {
+  margin: 0 auto;
+  width: min(250px, 100%);
+}
+
+.nam-tram-art img {
+  display: block;
+  width: 100%;
+  height: min(180px, 24svh);
+  object-fit: contain;
+  mix-blend-mode: screen;
+}
+
+.nam-tram-heading {
+  align-items: center;
+  margin: 16px 0 20px;
+  color: oklch(0.93 0.025 85);
+}
+
+.nam-tram-heading::after {
+  content: "";
+  width: 40px;
+  height: 1px;
+  margin-top: 16px;
+  background: var(--tram-brass);
+  opacity: 0.55;
+}
+
+.nam-tram-stations {
+  position: relative;
+}
+
+.nam-tram-stations::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  bottom: 28px;
+  left: 11px;
+  width: 8px;
+  border-inline: 1px solid oklch(0.79 0.066 83 / 0.2);
+}
+
+.nam-tram-station {
+  color: oklch(0.82 0.02 85);
+  cursor: pointer;
+  transition: color 200ms;
+}
+
+.nam-tram-station::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50px;
+  right: 0;
+  height: 1px;
+  background: oklch(0.79 0.066 83 / 0.12);
+}
+
+.nam-tram-station:last-child::after {
+  display: none;
+}
+
+.nam-tram-station[aria-current],
+.nam-tram-station:focus-visible {
+  color: var(--tram-brass);
+}
+
+.nam-tram-station-marker {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  flex-shrink: 0;
+}
+
+.nam-tram-station-end {
+  margin-left: auto;
+  margin-right: 4px;
+  width: 5px;
+  height: 5px;
+  border: 1px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.3;
+}
+
+.nam-tram-station[aria-current] .nam-tram-station-end {
+  background: currentColor;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .nam-tram-station:hover {
+    color: var(--tram-brass);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nam-tram-station {
+    transition: none;
+  }
+}
