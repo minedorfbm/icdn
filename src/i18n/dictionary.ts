@@ -43,6 +43,8 @@ export type UIKey =
   | "resort_levels"
   | "photo"
   | "close"
+  | "open_browser"
+  | "page_loading"
   | "hero_image_alt";
 
 export const UI: Record<Lang, Record<UIKey, string>> = {
@@ -77,6 +79,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     resort_levels: "Nam Tram — resort levels",
     photo: "Photo",
     close: "Close",
+    open_browser: "Open in browser",
+    page_loading: "Loading…",
     hero_image_alt: "Flower-filled marble bowl in the resort lobby, overlooking the sea",
   },
   vi: {
@@ -110,6 +114,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     resort_levels: "Nam Tram — các tầng của khu nghỉ dưỡng",
     photo: "Ảnh",
     close: "Đóng",
+    open_browser: "Mở trong trình duyệt",
+    page_loading: "Đang tải…",
     hero_image_alt: "Bát đá cẩm thạch đầy hoa trong sảnh khu nghỉ dưỡng, nhìn ra biển",
   },
   ru: {
@@ -143,6 +149,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     resort_levels: "Nam Tram — уровни курорта",
     photo: "Фото",
     close: "Закрыть",
+    open_browser: "Открыть в браузере",
+    page_loading: "Загрузка…",
     hero_image_alt: "Мраморная чаша с цветами в холле курорта с видом на море",
   },
   zh: {
@@ -176,6 +184,8 @@ export const UI: Record<Lang, Record<UIKey, string>> = {
     resort_levels: "Nam Tram — 度假村层级",
     photo: "照片",
     close: "关闭",
+    open_browser: "在浏览器中打开",
+    page_loading: "正在加载…",
     hero_image_alt: "度假酒店大堂内盛满鲜花的大理石花盆，远处是大海",
   },
   ko: koDict.UI,

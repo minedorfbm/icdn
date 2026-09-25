@@ -5,12 +5,14 @@ export function FullscreenDialog({
   title,
   onClose,
   className,
+  overlayClassName = "fixed inset-0 z-[79] bg-black/30",
   children,
   ...props
 }: Readonly<{
   title: string;
   onClose: () => void;
   className: string;
+  overlayClassName?: string;
   children: ReactNode;
   "data-level"?: string;
 }>) {
@@ -23,7 +25,7 @@ export function FullscreenDialog({
       }}
     >
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[79] bg-black/30" />
+        <Dialog.Overlay className={overlayClassName} />
         <Dialog.Content
           {...props}
           aria-describedby={undefined}
