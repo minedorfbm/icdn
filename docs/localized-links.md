@@ -23,7 +23,7 @@ Les nouvelles pages et les changements du site externe ne sont pas importés aut
 
 ## Déploiement
 
-1. L'intégration Supabase/GitHub applique `20260926120000_localized_discover_links.sql` puis `20260926121000_seed_verified_link_translations.sql` à la fusion, après validation sur la branche de prévisualisation.
+1. L'intégration Supabase/GitHub applique `20260926120000_localized_discover_links.sql` puis `20260926121000_seed_verified_link_translations.sql` à la fusion. Les migrations ont été testées dans une base isolée ; la création automatique de branches de prévisualisation est actuellement désactivée dans ce projet.
 2. Ne pas rejouer l'historique des migrations ni relancer la création des tables. Si l'intégration a déjà appliqué ces fichiers, aucun script manuel n'est nécessaire.
 3. Exécuter au besoin `supabase/manual/verify-localized-links.sql` : le dernier résultat doit être vide.
 4. Tester Discover de Citron/La Maison 1888 et Website en japonais, puis en anglais. Les liens Menu et Book doivent conserver la même adresse.
