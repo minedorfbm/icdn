@@ -2,11 +2,26 @@
 
 ## Collections et navigation
 
-La migration [`20260925150000_funicular_collections.sql`](../supabase/migrations/20260925150000_funicular_collections.sql) regroupe les 47 lieux existants à l'intérieur des quatre niveaux Heaven, Sky, Earth et Sea. Elle modifie seulement `levels.clusters` et `destinations.cluster` ; les identifiants, niveaux, types, traductions, médias et liens des lieux restent identiques. Sur le mobile, chaque collection affiche 2 à 6 cards, un compteur de progression et un accès « All places » vers tous les lieux du niveau. Le rail Nam Tram continue de piloter les quatre niveaux ; leurs identifiants et ceux des lieux sont conservés pour la future carte et une animation de funiculaire.
+Le hub utilise trois collections communes aux quatre niveaux : **DINING**, **WELLNESS** et **EXPERIENCES**, dans cet ordre. Les collections vides ne sont pas affichées. La migration [`20260925180000_three_collections.sql`](../supabase/migrations/20260925180000_three_collections.sql) remplace les anciens regroupements, y compris pour les fiches inactives, et dépublie Reception Lobby et Information Desk sans supprimer leurs contenus.
 
-Pour réorganiser les lieux, modifier d'abord le tableau `levels.clusters` dans l'ordre souhaité, puis affecter à chaque card un `destinations.cluster` présent dans ce tableau. La base refuse une valeur inconnue et la suppression d'une collection encore utilisée. Une card sans collection apparaît dans « More » ; elle ne disparaît donc pas du parcours. Les libellés des collections connues sont traduits dans `src/i18n/dictionary.ts` et les dictionnaires coréen/japonais. Si vous créez une nouvelle clé, ajouter ses six traductions au code avant de la publier ; sinon la clé brute s'affichera. Le catalogue local de secours reprend l'organisation initiale, mais les modifications faites ensuite dans Supabase ne le mettent pas à jour automatiquement.
+- **DINING** : restaurants, bars et Club InterContinental Lounge.
+- **WELLNESS** : spa, soins, sport, yoga, piscines, plages, Relaxation Pavilion et Spa Lagoon Villas.
+- **EXPERIENCES** : art, activités famille, lieux à explorer, événements, offres et IHG One Rewards.
 
-Sur la base de production déjà importée, exécuter uniquement cette migration dans le SQL Editor, après sauvegarde. Il ne faut pas rejouer toutes les migrations historiques du dépôt. Le script est transactionnel et peut être relancé sans dupliquer de contenu. Vérifier ensuite les groupes avec :
+À l'issue de cette répartition, les 43 cards visibles sont réparties ainsi :
+
+| Niveau | DINING | WELLNESS | EXPERIENCES |
+| --- | ---: | ---: | ---: |
+| HEAVEN | 2 | 2 | 9 |
+| SKY | 4 | 0 | 4 |
+| EARTH | 3 | 5 | 5 |
+| SEA | 0 | 7 | 2 |
+
+Pour réorganiser une card, modifier `destinations.cluster` avec l'une des trois clés. La répartition de la migration est ponctuelle : un changement de type ne déplace pas automatiquement une card. `levels.clusters` définit l'ordre des onglets ; la base refuse une collection absente du niveau. Les six langues du hub traduisent les libellés. Les anciennes clés du dictionnaire restent compatibles avec un catalogue encore en cache pendant le déploiement.
+
+Le catalogue local de secours reprend cette répartition et les quatre fiches masquées (`penthouses`, `rooms`, `reception`, `information`). Les modifications éditoriales ultérieures faites dans Supabase ne le mettent pas à jour automatiquement. Les identifiants et les quatre niveaux restent disponibles pour la future carte interactive et le funiculaire.
+
+L'intégration GitHub applique la nouvelle migration à la fusion. Ne pas rejouer l'historique complet sur la production. Pour contrôler la répartition :
 
 ```sql
 SELECT l.id AS niveau, d.cluster AS collection, count(*) AS lieux

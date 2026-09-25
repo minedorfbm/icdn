@@ -9,6 +9,7 @@ import {
   type DestinationRow,
 } from "../src/data/resort";
 import type { HubData } from "../src/lib/hub.functions";
+import { CLUSTER, LANGUAGES } from "../src/i18n/dictionary";
 
 const row: DestinationRow = {
   id: "citron",
@@ -53,6 +54,16 @@ describe("database authority", () => {
   });
   test("unavailable essentials use the offline catalog", () => {
     expect(createHubValue({ ...ready, destinations: null })).toBe(FALLBACK);
+  });
+  test("every offline card has a collection configured on its level and translated in each language", () => {
+    for (const destination of FALLBACK.destinations) {
+      const level = FALLBACK.levels.find((entry) => entry.id === destination.level);
+      expect(destination.cluster).toBeTruthy();
+      expect(level?.clusters).toContain(destination.cluster!);
+      for (const { code } of LANGUAGES) {
+        expect(CLUSTER[code][destination.cluster!]).toBeTruthy();
+      }
+    }
   });
   test("one unavailable collection does not resurrect other deleted content", () => {
     const dest = createHubValue({ ...ready, events: null }).destinations[0]!;
