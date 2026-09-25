@@ -98,9 +98,7 @@ function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClos
           </p>
         </div>
         <div className="flex min-h-10 items-center justify-between gap-3 pl-1">
-          <span role="status" className="text-[11px] opacity-65">
-            {loading ? t("page_loading") : ""}
-          </span>
+          <output className="text-[11px] opacity-65">{loading ? t("page_loading") : ""}</output>
           <a
             href={page.url}
             target="_blank"
