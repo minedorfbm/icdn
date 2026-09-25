@@ -41,6 +41,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
     return configured;
   }, [all, clusters]);
   const activeCluster = groups.some((group) => group.key === cluster) ? cluster : groups[0]?.key;
+  const compactCollections = groups.length <= 3;
   const list = groups.find((group) => group.key === activeCluster)?.items ?? all;
   const activeIndex = Math.min(cardIndex, Math.max(0, list.length - 1));
 
@@ -115,14 +116,25 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
             aria-label={`${title} ${t("collections")}`}
             className="mx-auto mt-10 max-w-[740px] border-y border-current/20"
           >
-            <div className="flex snap-x snap-mandatory scroll-px-6 gap-2 overflow-x-auto px-6 pr-14 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div
+              className={
+                compactCollections
+                  ? "grid gap-2 px-6"
+                  : "flex snap-x snap-mandatory scroll-px-6 gap-2 overflow-x-auto px-6 pr-14 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              }
+              style={
+                compactCollections
+                  ? { gridTemplateColumns: `repeat(${groups.length}, minmax(0, 1fr))` }
+                  : undefined
+              }
+            >
               {groups.map((group, i) => (
                 <button
                   key={group.key}
                   type="button"
                   onClick={() => selectCluster(group.key)}
                   aria-current={group.key === activeCluster ? "true" : undefined}
-                  className={`relative flex min-h-20 min-w-[116px] snap-start flex-col items-start justify-center gap-1 text-left transition-opacity ${
+                  className={`relative flex min-h-20 ${compactCollections ? "min-w-0" : "min-w-[116px] snap-start"} flex-col items-start justify-center gap-1 text-left transition-opacity ${
                     group.key === activeCluster ? "opacity-100" : "opacity-45"
                   }`}
                 >
@@ -130,7 +142,9 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
                     {String(i + 1).padStart(2, "0")} / {String(groups.length).padStart(2, "0")}
                     <span className="ml-2">· {group.items.length}</span>
                   </span>
-                  <span className="font-serif text-[23px] leading-none tracking-tight">
+                  <span
+                    className={`font-serif leading-tight tracking-tight ${compactCollections ? "max-w-full text-[clamp(14px,3.6vw,23px)] [overflow-wrap:anywhere]" : "text-[23px]"}`}
+                  >
                     {clusterLabel(group.key)}
                   </span>
                   {group.key === activeCluster && (
