@@ -6,12 +6,17 @@ import { useI18n } from "@/i18n";
 function YouTubeVideo({ video }: Readonly<{ video: DestinationVideo }>) {
   const { t, lang } = useI18n();
   const [playing, setPlaying] = useState(false);
+  const isShort = video.format === "short";
   const title = video.title_translations[lang] || video.title;
   const label = `${t("play_video")}: ${title}`;
 
   return (
-    <article className="w-full shrink-0 snap-center">
-      <div className="relative aspect-video overflow-hidden rounded-[18px] bg-black">
+    <article
+      className={`shrink-0 snap-center ${isShort ? "w-[min(80vw,320px)] min-w-[200px]" : "w-full"}`}
+    >
+      <div
+        className={`relative overflow-hidden rounded-[18px] bg-black ${isShort ? "aspect-[9/16]" : "aspect-video"}`}
+      >
         {playing ? (
           <iframe
             className="absolute inset-0 size-full"
@@ -59,7 +64,7 @@ export function YouTubeVideos({ videos }: Readonly<{ videos: DestinationVideo[] 
   return (
     <section className="mt-12">
       <h3 className="text-[9px] tracking-[0.42em] opacity-50">{t("videos")}</h3>
-      <div className="-mx-7 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-7 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="-mx-7 mt-5 flex snap-x snap-mandatory items-start gap-4 overflow-x-auto px-7 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {videos.map((video) => (
           <YouTubeVideo key={video.video_id} video={video} />
         ))}
