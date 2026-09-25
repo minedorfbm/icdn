@@ -67,3 +67,5 @@ Les changements fusionnés dans `main` sont construits pour le Worker `icdnd`. N
 - `src/assets/` : images locales de secours ; `tests/` : tests de régression.
 
 Le projet reste connecté à Lovable pour son historique Git. Travailler sur une branche et ouvrir une pull request ; ne pas forcer un push ni réécrire des commits déjà publiés. Le [brief créatif historique](docs/design-brief.md) reste disponible séparément.
+
+Les boutons **Discover** et **Website** peuvent avoir une URL différente selon la langue, gérée dans Supabase avec retour au lien commun si la variante manque. Menus et réservations conservent leurs liens partagés. Voir [la gestion des liens multilingues](docs/localized-links.md).

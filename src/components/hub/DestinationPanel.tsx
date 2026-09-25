@@ -17,8 +17,8 @@ export function DestinationPanel({
   priority: boolean;
   onOpen: () => void;
 }>) {
-  const { t, typeLabel, levelLabel, action, description } = useI18n();
-  const actions = actionsFor(dest, 3);
+  const { lang, t, typeLabel, levelLabel, action, description } = useI18n();
+  const actions = actionsFor(dest, 3, lang);
   const [loaded, setLoaded] = useState(false);
 
   return (

@@ -1,3 +1,4 @@
+import type { DestinationLinkTranslationRow, SiteLinkTranslationRow } from "./localized-links";
 import type {
   EditorialTranslations,
   DescriptionTranslation,
@@ -26,6 +27,8 @@ export interface LevelRow {
 
 export interface HubData {
   editorial?: EditorialTranslations;
+  linkTranslations?: DestinationLinkTranslationRow[] | null;
+  siteLinkTranslations?: SiteLinkTranslationRow[] | null;
   levels: LevelRow[] | null;
   destinations: DestinationRow[] | null;
   photos: DestinationPhotoRow[] | null;
@@ -42,6 +45,8 @@ function isCompleteHubData(data: HubData): boolean {
     data.destinations,
     data.photos,
     data.links,
+    data.linkTranslations ?? null,
+    data.siteLinkTranslations ?? null,
     data.events,
     data.posts,
     data.videos,
@@ -54,7 +59,7 @@ function isCompleteHubData(data: HubData): boolean {
 
 const readCachedHubData = createTimedCache<HubData>(120_000, isCompleteHubData);
 
-const CACHE_URL = "https://icdnd.artdigitaljourney.com/__cache/public-hub-v1";
+const CACHE_URL = "https://icdnd.artdigitaljourney.com/__cache/public-hub-v2";
 const CACHE_SECONDS = 120;
 
 /** Reuse complete public data across Worker instances in the same Cloudflare data center. */
@@ -106,6 +111,8 @@ async function readHubData(): Promise<HubData> {
     destinations: null,
     photos: null,
     links: null,
+    linkTranslations: null,
+    siteLinkTranslations: null,
     events: null,
     posts: null,
     videos: null,
@@ -143,7 +150,17 @@ async function readHubData(): Promise<HubData> {
         .eq("active", true)
         .order("display_order"),
     );
-    const [levels, destinations, photos, links, events, posts, settings] = await Promise.all([
+    const [
+      levels,
+      destinations,
+      photos,
+      links,
+      events,
+      posts,
+      settings,
+      linkTranslations,
+      siteLinkTranslations,
+    ] = await Promise.all([
       supabase
         .from("levels")
         .select("id, title, line, image_key, clusters, display_order")
@@ -162,7 +179,7 @@ async function readHubData(): Promise<HubData> {
         .order("display_order"),
       supabase
         .from("destination_links")
-        .select("destination_id, kind, label, url, display_order")
+        .select("id, destination_id, kind, label, url, display_order")
         .eq("active", true)
         .order("display_order"),
       supabase
@@ -176,6 +193,14 @@ async function readHubData(): Promise<HubData> {
         .eq("active", true)
         .order("display_order"),
       supabase.from("site_settings").select("key, value"),
+      supabase
+        .from("destination_link_translations")
+        .select("link_id, locale, url, source_url")
+        .eq("active", true),
+      supabase
+        .from("site_link_translations")
+        .select("setting_key, locale, url, source_url")
+        .eq("active", true),
     ]);
     const videos = await videosPromise;
 
@@ -188,6 +213,8 @@ async function readHubData(): Promise<HubData> {
       posts,
       videos,
       settings,
+      linkTranslations,
+      siteLinkTranslations,
     })) {
       if (result.error) console.error(`[hub] Unable to read ${table}`, result.error.code);
     }
@@ -200,6 +227,12 @@ async function readHubData(): Promise<HubData> {
       destinations: destinations.error ? null : ((destinations.data ?? []) as DestinationRow[]),
       photos: photos.error ? null : ((photos.data ?? []) as DestinationPhotoRow[]),
       links: links.error ? null : ((links.data ?? []) as DestinationLinkRow[]),
+      linkTranslations: linkTranslations.error
+        ? null
+        : ((linkTranslations.data ?? []) as DestinationLinkTranslationRow[]),
+      siteLinkTranslations: siteLinkTranslations.error
+        ? null
+        : ((siteLinkTranslations.data ?? []) as SiteLinkTranslationRow[]),
       events: events.error ? null : ((events.data ?? []) as DestinationEventRow[]),
       posts: posts.error ? null : ((posts.data ?? []) as DestinationPostRow[]),
       videos: videos.error ? null : ((videos.data ?? []) as DestinationVideoRow[]),

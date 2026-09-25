@@ -1,3 +1,5 @@
+import type { Lang } from "@/i18n/dictionary";
+import { localizedLinkUrl } from "./localized-links";
 import { CTA_BY_TYPE, type Destination } from "@/data/resort";
 
 const ALLOWED_LINK_PROTOCOLS = new Set(["https:", "mailto:", "tel:"]);
@@ -91,11 +93,17 @@ export interface DestinationAction {
 }
 
 /** Database links are authoritative, including an intentionally empty list. */
-export function actionsFor(dest: Destination, limit?: number): DestinationAction[] {
+export function actionsFor(
+  dest: Destination,
+  limit?: number,
+  locale: Lang = "en",
+): DestinationAction[] {
   const actions =
     dest.links !== undefined
       ? dest.links.flatMap((link) => {
-          const url = safeExternalUrl(link.url);
+          const url = safeExternalUrl(
+            localizedLinkUrl(link.kind, link.url, link.translations, locale),
+          );
           return link.kind !== "INSTAGRAM" && url ? [{ ...link, url }] : [];
         })
       : legacyActions(dest).flatMap((kind) => {
