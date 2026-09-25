@@ -149,6 +149,7 @@ export interface DestinationPostRow {
 
 export interface DestinationVideo {
   video_id: string;
+  format: "video" | "short";
   title: string;
   title_translations: Record<string, string>;
 }
@@ -190,6 +191,7 @@ export function groupVideos(rows: DestinationVideoRow[]): Record<string, Destina
     if (!video_id) continue;
     (out[row.destination_id] ??= []).push({
       video_id,
+      format: new URL(row.video_url).pathname.startsWith("/shorts/") ? "short" : "video",
       title: row.title,
       title_translations: row.title_translations ?? {},
     });
