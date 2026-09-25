@@ -71,6 +71,8 @@ export function DestinationDetail({
           {description(dest.id, dest.short_description)}
         </p>
 
+        {dest.videos && dest.videos.length > 0 && <YouTubeVideos videos={dest.videos} />}
+
         <span className="mt-8 block h-px w-10 bg-current/30" aria-hidden />
 
         {actions.length > 0 && (
@@ -129,8 +131,6 @@ export function DestinationDetail({
             </div>
           </section>
         )}
-
-        {dest.videos && dest.videos.length > 0 && <YouTubeVideos videos={dest.videos} />}
 
         {dest.posts && dest.posts.length > 0 ? (
           <InstagramPostCarousel posts={dest.posts} />
