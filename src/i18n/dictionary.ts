@@ -215,6 +215,8 @@ export const LEVEL_LINE: Record<Lang, Record<string, string>> = {
 /** Editorial groups within each resort level. */
 export const CLUSTER: Record<Lang, Record<string, string>> = {
   en: {
+    DINING: "DINING",
+    EXPERIENCES: "EXPERIENCES",
     STAY: "STAY",
     DISCOVER: "DISCOVER",
     GATHER: "GATHER",
@@ -228,6 +230,8 @@ export const CLUSTER: Record<Lang, Record<string, string>> = {
     OTHER: "MORE",
   },
   vi: {
+    DINING: "ẨM THỰC",
+    EXPERIENCES: "TRẢI NGHIỆM",
     STAY: "LƯU TRÚ",
     DISCOVER: "KHÁM PHÁ",
     GATHER: "GẶP GỠ",
@@ -241,6 +245,8 @@ export const CLUSTER: Record<Lang, Record<string, string>> = {
     OTHER: "KHÁC",
   },
   ru: {
+    DINING: "РЕСТОРАНЫ",
+    EXPERIENCES: "ВПЕЧАТЛЕНИЯ",
     STAY: "ПРОЖИВАНИЕ",
     DISCOVER: "ОТКРЫТЬ",
     GATHER: "ВСТРЕЧИ",
@@ -254,6 +260,8 @@ export const CLUSTER: Record<Lang, Record<string, string>> = {
     OTHER: "ДРУГОЕ",
   },
   zh: {
+    DINING: "餐饮",
+    EXPERIENCES: "体验",
     STAY: "住宿",
     DISCOVER: "探索",
     GATHER: "欢聚",

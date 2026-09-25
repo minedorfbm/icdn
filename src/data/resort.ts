@@ -258,28 +258,28 @@ export const LEVELS: {
     title: "HEAVEN",
     line: "Above the bay.",
     image: heavenImg,
-    clusters: ["STAY", "DISCOVER", "GATHER", "WELLNESS"],
+    clusters: ["DINING", "WELLNESS", "EXPERIENCES"],
   },
   {
     id: "sky",
     title: "SKY",
     line: "Where the horizon opens.",
     image: skyImg,
-    clusters: ["DINE", "DISCOVER"],
+    clusters: ["DINING", "WELLNESS", "EXPERIENCES"],
   },
   {
     id: "earth",
     title: "EARTH",
     line: "Where the resort comes alive.",
     image: earthImg,
-    clusters: ["EAT", "MOVE", "FAMILY", "DISCOVER"],
+    clusters: ["DINING", "WELLNESS", "EXPERIENCES"],
   },
   {
     id: "sea",
     title: "SEA",
     line: "Where everything slows down.",
     image: seaImg,
-    clusters: ["WELLNESS", "BEACH", "DISCOVER"],
+    clusters: ["DINING", "WELLNESS", "EXPERIENCES"],
   },
 ];
 
@@ -471,6 +471,57 @@ export function toDestination(
   };
 }
 
+/** Mirrors the editorial collections in the database for offline rendering. */
+const FALLBACK_COLLECTIONS: Record<string, string> = {
+  "enchanted-holiday": "EXPERIENCES",
+  "club-lounge": "DINING",
+  "ihg-one-rewards": "EXPERIENCES",
+  "bensley-package": "EXPERIENCES",
+  penthouses: "EXPERIENCES",
+  rooms: "EXPERIENCES",
+  reception: "EXPERIENCES",
+  "instagram-spots": "EXPERIENCES",
+  "the-summit": "EXPERIENCES",
+  "apec-garden": "EXPERIENCES",
+  "nam-tram": "EXPERIENCES",
+  information: "EXPERIENCES",
+  weddings: "EXPERIENCES",
+  "moulin-rouge": "EXPERIENCES",
+  citron: "DINING",
+  "sports-centre": "WELLNESS",
+  "relaxation-pavilion": "WELLNESS",
+  "la-maison-1888": "DINING",
+  "buffalo-bar": "DINING",
+  "wine-cellar": "DINING",
+  tingara: "DINING",
+  "heritage-village": "EXPERIENCES",
+  "bensley-gallery": "EXPERIENCES",
+  "kate-mccoy": "EXPERIENCES",
+  sammys: "EXPERIENCES",
+  "planet-trekkers": "EXPERIENCES",
+  "family-pool": "WELLNESS",
+  "kids-pool": "WELLNESS",
+  "garden-jacuzzi": "WELLNESS",
+  nursery: "EXPERIENCES",
+  "wall-of-lanterns": "EXPERIENCES",
+  "organic-garden": "EXPERIENCES",
+  "dia-tang": "EXPERIENCES",
+  "mi-sol-spa": "WELLNESS",
+  "nail-hair": "WELLNESS",
+  "spa-lagoon-villas": "WELLNESS",
+  "yoga-pavilion": "WELLNESS",
+  "coconut-beach": "WELLNESS",
+  "family-beach": "WELLNESS",
+  "club-beach": "WELLNESS",
+  "marine-centre": "EXPERIENCES",
+  "sea-experiences": "EXPERIENCES",
+  "terra-mare": "DINING",
+  "b-lounge": "DINING",
+  "long-bar": "DINING",
+  "soar-gym": "WELLNESS",
+  "long-pool": "WELLNESS",
+};
+
 const d = (
   id: string,
   name: string,
@@ -490,6 +541,7 @@ const d = (
   // restaurants surface the resort's Instagram presence
   ...(type === "restaurant" ? { instagram_url: OFFICIAL.instagram } : {}),
   display_order: order,
+  ...(FALLBACK_COLLECTIONS[id] ? { cluster: FALLBACK_COLLECTIONS[id] } : {}),
   active: true,
   ...extra,
 });
@@ -558,7 +610,7 @@ export const DESTINATIONS: Destination[] = [
     "service",
     "Reception Lobby, Concierge and Executive Office — arrival at the highest point of the resort.",
     5,
-    { instagram_spot: true },
+    { instagram_spot: true, active: false },
   ),
   d(
     "instagram-spots",
@@ -606,7 +658,9 @@ export const DESTINATIONS: Destination[] = [
     11,
   ),
   d("nam-tram", "Nam Tram", "heaven", "service", "The funicular between the four worlds.", 12),
-  d("information", "Information Desk", "heaven", "service", "Concierge and guest assistance.", 13),
+  d("information", "Information Desk", "heaven", "service", "Concierge and guest assistance.", 13, {
+    active: false,
+  }),
   d(
     "moulin-rouge",
     "Moulin Rouge Karaoke Club",
@@ -692,20 +746,17 @@ export const DESTINATIONS: Destination[] = [
 
   // EARTH — jungle level, clustered
   d("terra-mare", "Terra Mare", "earth", "restaurant", "Land and sea, all day long.", 1, {
-    cluster: "EAT",
     menu_url:
       "https://www.danang.intercontinental.com/wp-content/uploads/2026/09/Terra-Mare-A-la-carte-Menu.pdf",
   }),
-  d("b-lounge", "B Lounge", "earth", "bar", "Afternoon tea in the trees.", 2, { cluster: "EAT" }),
+  d("b-lounge", "B Lounge", "earth", "bar", "Afternoon tea in the trees.", 2),
   d("long-bar", "L_O_N_G Bar", "earth", "bar", "The long line above the jungle.", 3, {
-    cluster: "EAT",
     menu_url:
       "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Long-Bar-Menu-Highlights.Feb2026.pdf",
     instagram_spot: true,
   }),
-  d("soar-gym", "Soar Gym", "earth", "fitness", "Train inside the canopy.", 4, { cluster: "MOVE" }),
+  d("soar-gym", "Soar Gym", "earth", "fitness", "Train inside the canopy.", 4),
   d("long-pool", "L_O_N_G Pool", "earth", "pool", "Green water, endless length.", 6, {
-    cluster: "MOVE",
     instagram_spot: true,
   }),
   d(
@@ -715,14 +766,9 @@ export const DESTINATIONS: Destination[] = [
     "kids",
     "A world for younger explorers.",
     7,
-    { cluster: "PLAY" },
   ),
-  d("family-pool", "Family Pool", "earth", "pool", "Shallow, shaded, together.", 8, {
-    cluster: "PLAY",
-  }),
-  d("kids-pool", "Kids Pool", "earth", "pool", "Small water for small guests.", 9, {
-    cluster: "PLAY",
-  }),
+  d("family-pool", "Family Pool", "earth", "pool", "Shallow, shaded, together.", 8),
+  d("kids-pool", "Kids Pool", "earth", "pool", "Small water for small guests.", 9),
   d(
     "garden-jacuzzi",
     "Garden Pool & Jacuzzi",
@@ -730,7 +776,7 @@ export const DESTINATIONS: Destination[] = [
     "pool",
     "Warm water in the vegetation.",
     10,
-    { cluster: "PLAY", instagram_spot: true },
+    { instagram_spot: true },
   ),
   d(
     "wall-of-lanterns",
@@ -739,17 +785,11 @@ export const DESTINATIONS: Destination[] = [
     "experience",
     "A glowing wall of Hoi An lanterns on the way down to the pools — one of the resort's signature photo spots.",
     11,
-    { cluster: "PLAY", instagram_spot: true },
+    { instagram_spot: true },
   ),
-  d("nursery", "Nursery", "earth", "kids", "Care for the youngest guests.", 12, {
-    cluster: "PLAY",
-  }),
-  d("organic-garden", "Organic Garden", "earth", "experience", "Where the kitchens begin.", 13, {
-    cluster: "PLAY",
-  }),
-  d("dia-tang", "Spirit House", "earth", "experience", "A pause in the hillside.", 14, {
-    cluster: "PLAY",
-  }),
+  d("nursery", "Nursery", "earth", "kids", "Care for the youngest guests.", 12),
+  d("organic-garden", "Organic Garden", "earth", "experience", "Where the kitchens begin.", 13),
+  d("dia-tang", "Spirit House", "earth", "experience", "A pause in the hillside.", 14),
 
   // SEA — shoreline
   d("mi-sol-spa", "Mi Sol Spa & Wellness", "sea", "spa", "Sound. Stillness. Renewal.", 1, {

@@ -43,52 +43,6 @@ const FALLBACK_LINKS = [
   ["Contact", OFFICIAL.contact],
 ] as [string, string][];
 
-/** Mirrors the editorial collections in the database for offline rendering. */
-const FALLBACK_COLLECTIONS: Record<string, string> = {
-  "enchanted-holiday": "STAY",
-  "club-lounge": "STAY",
-  "ihg-one-rewards": "STAY",
-  "bensley-package": "STAY",
-  penthouses: "STAY",
-  rooms: "STAY",
-  reception: "DISCOVER",
-  "instagram-spots": "DISCOVER",
-  "the-summit": "DISCOVER",
-  "apec-garden": "DISCOVER",
-  "nam-tram": "DISCOVER",
-  information: "DISCOVER",
-  weddings: "GATHER",
-  "moulin-rouge": "GATHER",
-  citron: "GATHER",
-  "sports-centre": "WELLNESS",
-  "relaxation-pavilion": "WELLNESS",
-  "la-maison-1888": "DINE",
-  "buffalo-bar": "DINE",
-  "wine-cellar": "DINE",
-  tingara: "DINE",
-  "heritage-village": "DISCOVER",
-  "bensley-gallery": "DISCOVER",
-  "kate-mccoy": "DISCOVER",
-  sammys: "DISCOVER",
-  "planet-trekkers": "FAMILY",
-  "family-pool": "FAMILY",
-  "kids-pool": "FAMILY",
-  "garden-jacuzzi": "FAMILY",
-  nursery: "FAMILY",
-  "wall-of-lanterns": "DISCOVER",
-  "organic-garden": "DISCOVER",
-  "dia-tang": "DISCOVER",
-  "mi-sol-spa": "WELLNESS",
-  "nail-hair": "WELLNESS",
-  "spa-lagoon-villas": "WELLNESS",
-  "yoga-pavilion": "WELLNESS",
-  "coconut-beach": "BEACH",
-  "family-beach": "BEACH",
-  "club-beach": "BEACH",
-  "marine-centre": "DISCOVER",
-  "sea-experiences": "DISCOVER",
-};
-
 /** Bundled photos and events, used only when the database is unreachable. */
 const withFallbackMedia = (list: Destination[]): Destination[] =>
   list.map((dest) => {
@@ -119,7 +73,6 @@ const withFallbackMedia = (list: Destination[]): Destination[] =>
     const posts = dest.posts ?? inferred;
     return {
       ...dest,
-      ...(FALLBACK_COLLECTIONS[dest.id] ? { cluster: FALLBACK_COLLECTIONS[dest.id] } : {}),
       ...(gallery ? { photos: gallery } : {}),
       ...(events ? { events } : {}),
       ...(posts ? { posts } : {}),
