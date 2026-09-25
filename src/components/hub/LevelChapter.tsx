@@ -100,7 +100,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
         <div className="level-veil absolute inset-0" />
       </div>
 
-      <div className="relative">
+      <div className="relative pr-[var(--hub-rail-gutter)]">
         <header className="mx-auto max-w-[740px] px-6">
           <span className="block h-px w-10 bg-current/40" aria-hidden />
           <h2 className="mt-6 font-serif text-[clamp(56px,21vw,116px)] leading-[0.82] tracking-[-0.03em]">
@@ -119,7 +119,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
             <div
               className={
                 compactCollections
-                  ? "grid gap-2 px-6"
+                  ? "grid gap-1.5 px-6"
                   : "flex snap-x snap-mandatory scroll-px-6 gap-2 overflow-x-auto px-6 pr-14 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               }
               style={
@@ -139,7 +139,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
                   }`}
                 >
                   <span
-                    className={`font-serif leading-tight tracking-tight ${compactCollections ? "max-w-full text-[clamp(14px,3.6vw,23px)] [overflow-wrap:anywhere]" : "text-[23px]"}`}
+                    className={`font-serif leading-tight tracking-tight ${compactCollections ? "max-w-full text-[clamp(12px,3.6vw,23px)] [overflow-wrap:anywhere]" : "text-[23px]"}`}
                   >
                     {clusterLabel(group.key)}
                   </span>
@@ -165,7 +165,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
         <div
           key={activeCluster ?? "all"}
           ref={cardsRef}
-          className="group-enter mt-5 overflow-hidden"
+          className="group-enter mt-5 w-[calc(100%+var(--hub-rail-gutter))] overflow-hidden [clip-path:inset(0_var(--hub-rail-gutter)_0_0)]"
         >
           <CardStack items={list} near={near} index={activeIndex} onIndexChange={setCardIndex} />
         </div>
