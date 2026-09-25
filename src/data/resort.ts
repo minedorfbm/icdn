@@ -576,6 +576,7 @@ export const DESTINATIONS: Destination[] = [
     "accommodation",
     "Panoramic suites at the summit.",
     7,
+    { active: false },
   ),
   d(
     "the-summit",
@@ -585,7 +586,9 @@ export const DESTINATIONS: Destination[] = [
     "The Summit Conference Centre, the Auditorium-Cinema and M Club — gatherings, screenings and celebrations.",
     8,
   ),
-  d("rooms", "Rooms & Villas", "heaven", "accommodation", "Bensley design, level by level.", 9),
+  d("rooms", "Rooms & Villas", "heaven", "accommodation", "Bensley design, level by level.", 9, {
+    active: false,
+  }),
   d(
     "sports-centre",
     "Sports Centre",
