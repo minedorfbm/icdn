@@ -17,13 +17,13 @@ La sélection de langue reste instantanée : les variantes sont chargées avec l
 
 La migration de contenu du 26 septembre 2026 utilise les équivalences `hreflang` annoncées par le site officiel et vérifie les pages correspondantes (réponse HTTP, langue et destination finale). Le site emploie `/vn/` et parfois `lang="vn"` pour le vietnamien ; la base conserve la locale standard `vi`. Les ancres des liens vers les villas sont préservées.
 
-Pour le catalogue public observé : 167 variantes de liens de cards et 5 variantes du Website sont prévues. Certaines pages ne proposent pas toutes les langues ; aucun lien n'est inventé pour combler ces absences. Mi Sol Spa, Nail and Hair Studio et IHG One Rewards gardent notamment leur URL commune. Le contenu lui-même appartient au site externe : ces vérifications ne constituent pas une relecture linguistique de chaque page.
+Le premier import a ajouté 167 variantes de liens de cards et 5 variantes du Website. Le contrôle du contenu a ensuite identifié cinq correspondances incorrectes annoncées par le resort pour Club InterContinental Rate : elles aboutissaient à une autre offre, Book Now, Pay Later. La migration corrective `20260926122000_unpublish_mismatched_club_links.sql` les dépublie. Le catalogue conserve donc **162 variantes de cards et 5 du Website** actives. Certaines pages ne proposent pas toutes les langues ; aucun lien n'est inventé pour combler ces absences. Club InterContinental Lounge, Mi Sol Spa, Nail and Hair Studio et IHG One Rewards gardent notamment leur URL commune. Le contenu lui-même appartient au site externe : ces vérifications ne constituent pas une relecture linguistique de chaque page.
 
 Les nouvelles pages et les changements du site externe ne sont pas importés automatiquement. Ajouter leurs adresses exactes dans Supabase après vérification. Les autres liens de pied de page (Dining, Spa, Resort Map…) restent partagés ; seule l'entrée Website est concernée.
 
 ## Déploiement
 
-1. L'intégration Supabase/GitHub applique `20260926120000_localized_discover_links.sql` puis `20260926121000_seed_verified_link_translations.sql` à la fusion. Les migrations ont été testées dans une base isolée ; la création automatique de branches de prévisualisation est actuellement désactivée dans ce projet.
+1. L'intégration Supabase/GitHub applique `20260926120000_localized_discover_links.sql` puis `20260926121000_seed_verified_link_translations.sql` et la correction `20260926122000_unpublish_mismatched_club_links.sql` à la fusion. Les migrations ont été testées dans une base isolée ; la création automatique de branches de prévisualisation est actuellement désactivée dans ce projet.
 2. Ne pas rejouer l'historique des migrations ni relancer la création des tables. Si l'intégration a déjà appliqué ces fichiers, aucun script manuel n'est nécessaire.
 3. Exécuter au besoin `supabase/manual/verify-localized-links.sql` : le dernier résultat doit être vide.
 4. Tester Discover de Citron/La Maison 1888 et Website en japonais, puis en anglais. Les liens Menu et Book doivent conserver la même adresse.
