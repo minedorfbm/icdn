@@ -8,6 +8,7 @@ import { HubProvider, useHub } from "@/data/hub-context";
 import { getHubData } from "@/lib/hub.functions";
 import { I18nProvider, LanguageSwitch, useI18n } from "@/i18n";
 import { resolveHeroImage } from "@/data/hub-value";
+import { ResortBrowserProvider, ResortLink } from "@/components/hub/ResortBrowser";
 
 export const Route = createFileRoute("/")({
   loader: () => getHubData(),
@@ -39,9 +40,11 @@ function HubRoute() {
   const data = Route.useLoaderData();
   return (
     <I18nProvider editorial={data.editorial}>
-      <HubProvider data={data}>
-        <Hub />
-      </HubProvider>
+      <ResortBrowserProvider>
+        <HubProvider data={data}>
+          <Hub />
+        </HubProvider>
+      </ResortBrowserProvider>
     </I18nProvider>
   );
 }
@@ -174,15 +177,16 @@ function Hub() {
         <ul className="mt-8 flex flex-col divide-y divide-current/10 border-y border-current/10">
           {links.map(({ label, url }) => (
             <li key={label}>
-              <a
+              <ResortLink
                 href={url}
+                pageTitle={linkLabel(label)}
                 target={label === "Contact" ? undefined : "_blank"}
                 rel={label === "Contact" ? undefined : "noreferrer"}
                 className="flex items-center justify-between py-3 text-[11px] tracking-[0.22em]"
               >
                 {linkLabel(label).toUpperCase()}
                 <span className="opacity-40">↗</span>
-              </a>
+              </ResortLink>
             </li>
           ))}
         </ul>

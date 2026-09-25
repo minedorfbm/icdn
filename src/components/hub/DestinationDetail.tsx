@@ -6,6 +6,7 @@ import { InstagramStrip } from "./InstagramStrip";
 import { InstagramPostCarousel } from "./InstagramPostCarousel";
 import { YouTubeVideos } from "./YouTubeVideos";
 import { useI18n } from "@/i18n";
+import { ResortLink } from "./ResortBrowser";
 
 /** Full-screen editorial detail view for one destination. */
 export function DestinationDetail({
@@ -78,18 +79,17 @@ export function DestinationDetail({
         {actions.length > 0 && (
           <div className="mt-8 flex flex-col">
             {actions.map((a, i) => (
-              <a
+              <ResortLink
                 key={`${a.kind}-${i}`}
                 href={a.url}
-                target="_blank"
-                rel="noreferrer"
+                pageTitle={`${dest.name} · ${a.label ?? action(a.kind)}`}
                 className="flex items-center justify-between min-h-12 gap-4 border-b border-current/20 py-4 text-[11px] tracking-[0.3em] transition-opacity hover:opacity-60"
               >
                 {a.label ?? action(a.kind)}
                 <span className="shrink-0 opacity-40" aria-hidden>
                   ↗
                 </span>
-              </a>
+              </ResortLink>
             ))}
           </div>
         )}
@@ -116,15 +116,14 @@ export function DestinationDetail({
                     {ev.description}
                   </p>
                   {ev.url && (
-                    <a
+                    <ResortLink
                       href={ev.url}
-                      target="_blank"
-                      rel="noreferrer"
+                      pageTitle={ev.title}
                       className="mt-5 inline-flex items-center gap-2 text-[10px] tracking-[0.3em] opacity-80 transition-opacity hover:opacity-50"
                     >
                       {t("explore_more")}
                       <span className="opacity-50">↗</span>
-                    </a>
+                    </ResortLink>
                   )}
                 </article>
               ))}

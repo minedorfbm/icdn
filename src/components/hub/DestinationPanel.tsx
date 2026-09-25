@@ -3,6 +3,7 @@ import { Instagram } from "lucide-react";
 import { useI18n } from "@/i18n";
 import type { Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
+import { ResortLink } from "./ResortBrowser";
 
 /** The single universal card used everywhere in the hub. */
 export function DestinationPanel({
@@ -82,16 +83,15 @@ export function DestinationPanel({
 
         <div className="mt-auto flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/25 pt-3">
           {actions.map((a, i) => (
-            <a
+            <ResortLink
               key={`${a.kind}-${i}`}
               href={a.url}
-              target="_blank"
-              rel="noreferrer"
+              pageTitle={`${dest.name} · ${a.label ?? action(a.kind)}`}
               tabIndex={active ? 0 : -1}
               className="inline-flex min-h-11 max-w-full items-center py-2 text-[10px] leading-relaxed tracking-[0.2em] text-white transition-colors hover:text-[#e5d3aa] focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               {a.label ?? action(a.kind)}
-            </a>
+            </ResortLink>
           ))}
           {instagramUrl(dest) && (
             <a
