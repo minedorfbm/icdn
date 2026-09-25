@@ -1,3 +1,4 @@
+import { localizedLinkUrl } from "@/lib/localized-links";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Phone } from "lucide-react";
@@ -55,7 +56,7 @@ function Hub() {
   const [railVisible, setRailVisible] = useState(false);
   const journeyRef = useRef<HTMLDivElement>(null);
   const { levels, links, contact, heroImage } = useHub();
-  const { t, linkLabel } = useI18n();
+  const { lang, t, linkLabel } = useI18n();
 
   useEffect(() => {
     let raf = 0;
@@ -175,10 +176,15 @@ function Hub() {
       <section className="sea-footer px-6 py-24">
         <h2 className="font-serif text-[30px] leading-tight tracking-tight">{t("footer_title")}</h2>
         <ul className="mt-8 flex flex-col divide-y divide-current/10 border-y border-current/10">
-          {links.map(({ label, url }) => (
+          {links.map(({ label, url, translations }) => (
             <li key={label}>
               <ResortLink
-                href={url}
+                href={localizedLinkUrl(
+                  label === "Website" ? "WEBSITE" : label,
+                  url,
+                  translations,
+                  lang,
+                )}
                 pageTitle={linkLabel(label)}
                 target={label === "Contact" ? undefined : "_blank"}
                 rel={label === "Contact" ? undefined : "noreferrer"}

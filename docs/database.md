@@ -39,6 +39,10 @@ Pour préparer une vidéo, créer une ligne dans `destination_videos` avec l'ide
 
 Le projet de production utilise neuf tables `public` dans Supabase. La base importée depuis Lovable ne partage pas nécessairement l'historique des migrations du dépôt : **ne pas exécuter `db push` ni rejouer toutes les migrations historiques sur la production**. Les deux migrations datées du 23 septembre 2026 sont prévues pour ce schéma déjà importé et se lancent une fois chacune, dans l'ordre, après sauvegarde.
 
+## Liens multilingues
+
+`destination_link_translations` ajoute une variante facultative par bouton Discover/Website et par langue. `site_link_translations` couvre uniquement le Website du pied de page. RLS conserve la lecture publique des variantes actives de liens visibles, avec refus des écritures des visiteurs. Modifier le lien commun dépublie ses variantes. Procédure : [liens multilingues](localized-links.md).
+
 ## Source de vérité du contenu
 
 `destinations` contient l'identité, l'ordre, la catégorie, la description et l'image des lieux. `destination_links` contient les boutons et leur ordre. Lorsqu'une lecture de cette table réussit, une liste vide signifie volontairement « aucun bouton ». Le Worker ne lit plus les anciennes colonnes d'URL de `destinations`. Elles restent dans la base le temps de valider ce déploiement et seront retirées dans une migration ultérieure ; **ne plus les modifier**. Le catalogue local conserve ses propres liens uniquement pour le mode de secours hors base.

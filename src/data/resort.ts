@@ -1,3 +1,8 @@
+import {
+  currentLinkTranslations,
+  type DestinationLinkTranslationRow,
+  type LinkTranslations,
+} from "@/lib/localized-links";
 import heavenImg from "@/assets/heaven.webp";
 import skyImg from "@/assets/sky.webp";
 import earthImg from "@/assets/earth.webp";
@@ -86,6 +91,7 @@ export interface Destination {
 
 /** One action link attached to a destination. */
 export interface DestinationLink {
+  translations?: LinkTranslations;
   kind: string;
   label?: string;
   url: string;
@@ -93,6 +99,7 @@ export interface DestinationLink {
 
 /** Row shape returned by the `destination_links` table. */
 export interface DestinationLinkRow {
+  id?: string;
   destination_id: string;
   kind: string;
   label: string | null;
@@ -414,13 +421,20 @@ export interface DestinationRow {
 }
 
 /** Groups link rows by destination, in display order. */
-export function groupLinks(rows: DestinationLinkRow[]): Record<string, DestinationLink[]> {
+export function groupLinks(
+  rows: DestinationLinkRow[],
+  translations: DestinationLinkTranslationRow[] = [],
+): Record<string, DestinationLink[]> {
   const out: Record<string, DestinationLink[]> = {};
   for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
     if (!row.url) continue;
     (out[row.destination_id] ??= []).push({
       kind: row.kind,
       url: row.url,
+      translations: currentLinkTranslations(
+        translations.filter((item) => item.link_id === row.id),
+        row.url,
+      ),
       ...(row.label ? { label: row.label } : {}),
     });
   }

@@ -1,3 +1,4 @@
+import { currentLinkTranslations, type LinkTranslations } from "@/lib/localized-links";
 import {
   DESTINATIONS,
   FALLBACK_PHOTOS,
@@ -29,7 +30,7 @@ export interface HubValue {
   heroImage: string;
   levels: HubLevel[];
   destinations: Destination[];
-  links: { label: string; url: string }[];
+  links: { label: string; url: string; translations?: LinkTranslations }[];
   contact: string;
 }
 
@@ -105,7 +106,7 @@ export function createHubValue(data?: HubData): HubValue {
   }));
 
   const photosByDest = groupPhotos(data.photos ?? []);
-  const linksByDest = groupLinks(data.links ?? []);
+  const linksByDest = groupLinks(data.links ?? [], data.linkTranslations ?? []);
   const eventsByDest = groupEvents(data.events ?? []);
   const postsByDest = groupPosts(data.posts ?? []);
   const videosByDest = groupVideos(data.videos ?? []);
@@ -122,7 +123,18 @@ export function createHubValue(data?: HubData): HubValue {
     ] as [string, string | undefined][]
   )
     .filter((entry): entry is [string, string] => Boolean(entry[1]))
-    .map(([label, url]) => ({ label, url }));
+    .map(([label, url]) => ({
+      label,
+      url,
+      ...(label === "Website"
+        ? {
+            translations: currentLinkTranslations(
+              (data.siteLinkTranslations ?? []).filter((item) => item.setting_key === "website"),
+              url,
+            ),
+          }
+        : {}),
+    }));
 
   return {
     heroImage: resolveHeroImage(data),
