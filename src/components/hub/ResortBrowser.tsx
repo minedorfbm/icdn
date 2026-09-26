@@ -86,34 +86,42 @@ function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClos
       title={page.title}
       onClose={onClose}
       overlayClassName="fixed inset-0 z-[99] bg-black/40"
-      className="fixed inset-0 z-[100] flex h-[100dvh] flex-col overflow-hidden overscroll-none bg-[oklch(0.17_0.008_155)] text-[oklch(0.93_0.025_85)] pb-[env(safe-area-inset-bottom,0px)]"
+      className="fixed inset-0 z-[100] flex h-[100dvh] flex-col overflow-hidden overscroll-none bg-[oklch(0.92_0.015_85)] text-[oklch(0.20_0.02_155)] pb-[env(safe-area-inset-bottom,0px)]"
     >
-      <header className="shrink-0 border-b border-[oklch(0.79_0.066_83/0.3)] px-3 pt-[max(8px,env(safe-area-inset-top))]">
-        <div className="flex min-h-12 items-center gap-3">
+      <header className="relative shrink-0 border-b border-[oklch(0.67_0.055_83/0.4)] bg-[oklch(0.965_0.012_85)] px-3 pt-[env(safe-area-inset-top)]">
+        <div className="grid min-h-14 grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2">
           <button
             type="button"
             onClick={onClose}
             aria-label={t("close")}
-            className="grid size-11 shrink-0 place-items-center rounded-full border border-current/20 text-[oklch(0.79_0.066_83)] focus-visible:outline-2 focus-visible:outline-offset-2"
+            className="grid size-11 place-items-center rounded-full text-[oklch(0.42_0.035_78)] transition-colors hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 active:bg-black/10"
           >
-            <X className="size-5" strokeWidth={1.4} />
+            <X aria-hidden className="size-5" strokeWidth={1.4} />
           </button>
-          <p className="min-w-0 flex-1 truncate font-serif text-[21px]" title={page.title}>
+          <p
+            className="min-w-0 truncate text-center font-serif text-[16px] tracking-[0.025em]"
+            title={page.title}
+          >
             {page.title}
           </p>
-        </div>
-        <div className="flex min-h-10 items-center justify-between gap-3 pl-1">
-          <output className="text-[11px] opacity-65">{loading ? t("page_loading") : ""}</output>
           <a
             href={page.url}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 text-right text-[12px] text-[oklch(0.79_0.066_83)] underline-offset-4 hover:underline focus-visible:outline-2"
+            aria-label={t("open_browser")}
+            title={t("open_browser")}
+            className="grid size-11 place-items-center rounded-full text-[oklch(0.42_0.035_78)] transition-colors hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 active:bg-black/10"
           >
-            {t("open_browser")}
-            <ExternalLink aria-hidden className="size-3.5 shrink-0" strokeWidth={1.5} />
+            <ExternalLink aria-hidden className="size-[19px]" strokeWidth={1.5} />
           </a>
         </div>
+        <output className="sr-only">{loading ? t("page_loading") : ""}</output>
+        {loading && (
+          <div
+            aria-hidden="true"
+            className="absolute bottom-0 left-0 h-px w-1/3 animate-pulse bg-[oklch(0.67_0.08_83)]"
+          />
+        )}
       </header>
       {pdf ? (
         <Suspense fallback={<p className="p-4 text-sm">{t("page_loading")}</p>}>
