@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   createContext,
   useContext,
   useEffect,
@@ -14,6 +16,7 @@ import { useI18n } from "@/i18n";
 
 type ResortPage = Readonly<{ url: string; title: string }>;
 const OpenResortPage = createContext<((page: ResortPage) => void) | null>(null);
+const PdfMenu = lazy(() => import("./PdfMenu"));
 
 /** One on-demand browser, outside the swipe deck and above any open destination detail. */
 export function ResortBrowserProvider({ children }: Readonly<{ children: ReactNode }>) {
@@ -67,14 +70,16 @@ export function ResortLink({
 
 function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClose: () => void }>) {
   const { t } = useI18n();
-  const [loading, setLoading] = useState(true);
+  const pdf = isResortPdf(page.url);
+  const [loading, setLoading] = useState(!pdf);
 
   useEffect(() => {
     // Cross-origin frames do not reliably report failures. Never leave an endless loader;
     // the original-page link remains available whether the embedded page loads or not.
+    if (pdf) return;
     const timer = window.setTimeout(() => setLoading(false), 12_000);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [pdf]);
 
   return (
     <FullscreenDialog
@@ -110,21 +115,21 @@ function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClos
           </a>
         </div>
       </header>
-      <iframe
-        src={page.url}
-        title={page.title}
-        className="min-h-0 w-full flex-1 border-0 bg-white"
-        referrerPolicy="strict-origin-when-cross-origin"
-        // Native PDF viewers are blocked by iframe sandboxing. Limit this exception to
-        // HTTPS PDF files in the resort's public uploads directory.
-        sandbox={
-          isResortPdf(page.url)
-            ? undefined
-            : "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
-        }
-        allow="fullscreen"
-        onLoad={() => setLoading(false)}
-      />
+      {pdf ? (
+        <Suspense fallback={<p className="p-4 text-sm">{t("page_loading")}</p>}>
+          <PdfMenu url={page.url} title={page.title} />
+        </Suspense>
+      ) : (
+        <iframe
+          src={page.url}
+          title={page.title}
+          className="min-h-0 w-full flex-1 border-0 bg-white"
+          referrerPolicy="strict-origin-when-cross-origin"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
+          allow="fullscreen"
+          onLoad={() => setLoading(false)}
+        />
+      )}
     </FullscreenDialog>
   );
 }

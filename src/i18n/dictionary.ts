@@ -46,6 +46,12 @@ export type UIKey =
   | "close"
   | "open_browser"
   | "page_loading"
+  | "pdf_error"
+  | "pdf_page"
+  | "pdf_previous"
+  | "pdf_next"
+  | "pdf_zoom_in"
+  | "pdf_zoom_out"
   | "hero_image_alt";
 
 export const UI: Record<Lang, Record<UIKey, string>> = uiDict;

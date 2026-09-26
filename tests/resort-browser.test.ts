@@ -11,7 +11,7 @@ test("resort pages, documents and identified restaurant bookings can open in the
   for (const url of links) expect(embeddedResortUrl(url)).toBe(url);
 });
 
-test("only published resort PDFs use the native document viewer", () => {
+test("only published resort PDFs use the in-hub PDF reader", () => {
   expect(
     isResortPdf("https://www.danang.intercontinental.com/wp-content/uploads/2025/menu.pdf?v=2"),
   ).toBe(true);
