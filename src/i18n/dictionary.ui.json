@@ -34,8 +34,6 @@
     "page_loading": "Loading…",
     "pdf_error": "This menu could not be displayed. Open it in the browser instead.",
     "pdf_page": "Page",
-    "pdf_previous": "Previous page",
-    "pdf_next": "Next page",
     "pdf_zoom_in": "Zoom in",
     "pdf_zoom_out": "Zoom out",
     "hero_image_alt": "Flower-filled marble bowl in the resort lobby, overlooking the sea"
@@ -75,8 +73,6 @@
     "page_loading": "Đang tải…",
     "pdf_error": "Không thể hiển thị thực đơn này. Vui lòng mở trong trình duyệt.",
     "pdf_page": "Trang",
-    "pdf_previous": "Trang trước",
-    "pdf_next": "Trang sau",
     "pdf_zoom_in": "Phóng to",
     "pdf_zoom_out": "Thu nhỏ",
     "hero_image_alt": "Bát đá cẩm thạch đầy hoa trong sảnh khu nghỉ dưỡng, nhìn ra biển"
@@ -116,8 +112,6 @@
     "page_loading": "Загрузка…",
     "pdf_error": "Не удалось показать меню. Откройте его в браузере.",
     "pdf_page": "Страница",
-    "pdf_previous": "Предыдущая страница",
-    "pdf_next": "Следующая страница",
     "pdf_zoom_in": "Увеличить",
     "pdf_zoom_out": "Уменьшить",
     "hero_image_alt": "Мраморная чаша с цветами в холле курорта с видом на море"
@@ -157,8 +151,6 @@
     "page_loading": "正在加载…",
     "pdf_error": "无法显示此菜单。请在浏览器中打开。",
     "pdf_page": "第",
-    "pdf_previous": "上一页",
-    "pdf_next": "下一页",
     "pdf_zoom_in": "放大",
     "pdf_zoom_out": "缩小",
     "hero_image_alt": "度假酒店大堂内盛满鲜花的大理石花盆，远处是大海"
@@ -199,8 +191,6 @@
     "page_loading": "불러오는 중…",
     "pdf_error": "메뉴를 표시할 수 없습니다. 브라우저에서 열어 주세요.",
     "pdf_page": "페이지",
-    "pdf_previous": "이전 페이지",
-    "pdf_next": "다음 페이지",
     "pdf_zoom_in": "확대",
     "pdf_zoom_out": "축소"
   },
@@ -240,8 +230,6 @@
     "page_loading": "読み込み中…",
     "pdf_error": "メニューを表示できません。ブラウザーで開いてください。",
     "pdf_page": "ページ",
-    "pdf_previous": "前のページ",
-    "pdf_next": "次のページ",
     "pdf_zoom_in": "拡大",
     "pdf_zoom_out": "縮小"
   }
