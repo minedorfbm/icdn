@@ -1,19 +1,42 @@
-import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import workerUrl from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
 import { useI18n } from "@/i18n";
+import { nextPdfZoom, pinchCenter, pinchDistance, type Point } from "@/lib/pdf-zoom";
 
 type LoadedPdf = Readonly<{ document: PDFDocumentProxy; heightRatio: number }>;
+type Pinch = {
+  startDistance: number;
+  startZoom: number;
+  zoom: number;
+  startCenter: Point;
+  center: Point;
+  pageNumber: number;
+  pageX: number;
+  pageY: number;
+};
+
+function touchPoint(touch: Touch): Point {
+  return { x: touch.clientX, y: touch.clientY };
+}
+
+function pageAt(container: HTMLElement, y: number): HTMLElement | undefined {
+  const pages = Array.from(container.querySelectorAll<HTMLElement>("[data-pdf-page]"));
+  return pages.find((page) => page.getBoundingClientRect().bottom > y) ?? pages.at(-1);
+}
 
 export default function PdfMenu({ url, title }: Readonly<{ url: string; title: string }>) {
   const { t } = useI18n();
   const [pdf, setPdf] = useState<LoadedPdf | null>(null);
-  const [zoomed, setZoomed] = useState(false);
+  const [zoom, setZoom] = useState(1);
   const [width, setWidth] = useState(0);
   const [error, setError] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const pagesRef = useRef<HTMLDivElement>(null);
   const anchorPage = useRef(1);
+  const pinchRef = useRef<Pinch | null>(null);
+  const pendingPinchRef = useRef<Pinch | null>(null);
   const showError = useCallback(() => setError(true), []);
 
   useEffect(() => {
@@ -54,29 +77,126 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
     };
   }, [url]);
 
-  const pageWidth = Math.min(Math.max(width - 32, 1), 900) * (zoomed ? 2 : 1);
+  const pageWidth = Math.min(Math.max(width - 32, 1), 900) * zoom;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = scrollRef.current;
     if (!container || !pdf || !width) return;
+    const pendingPinch = pendingPinchRef.current;
+    if (pendingPinch) {
+      pendingPinchRef.current = null;
+      if (pagesRef.current) {
+        pagesRef.current.style.transform = "";
+        pagesRef.current.style.transformOrigin = "";
+        pagesRef.current.style.willChange = "";
+      }
+      const page = container.querySelector<HTMLElement>(
+        `[data-pdf-page="${pendingPinch.pageNumber}"]`,
+      );
+      if (page) {
+        const bounds = page.getBoundingClientRect();
+        container.scrollLeft +=
+          bounds.left + bounds.width * pendingPinch.pageX - pendingPinch.center.x;
+        container.scrollTop +=
+          bounds.top + bounds.height * pendingPinch.pageY - pendingPinch.center.y;
+      }
+      return;
+    }
     const page = container.querySelector<HTMLElement>(`[data-pdf-page="${anchorPage.current}"]`);
     if (page) {
       const top = page.getBoundingClientRect().top - container.getBoundingClientRect().top;
       container.scrollTop += top - 16;
     }
-    container.scrollLeft = zoomed ? (container.scrollWidth - container.clientWidth) / 2 : 0;
-  }, [zoomed, width, pdf]);
+    container.scrollLeft = zoom > 1 ? (container.scrollWidth - container.clientWidth) / 2 : 0;
+  }, [zoom, width, pdf]);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    const pages = pagesRef.current;
+    if (!container || !pages || !pdf) return;
+
+    const clearPreview = () => {
+      pages.style.transform = "";
+      pages.style.transformOrigin = "";
+      pages.style.willChange = "";
+    };
+
+    const startPinch = (event: TouchEvent) => {
+      if (event.touches.length !== 2) return;
+      const first = touchPoint(event.touches[0]!);
+      const second = touchPoint(event.touches[1]!);
+      const center = pinchCenter(first, second);
+      const page = pageAt(container, center.y);
+      if (!page) return;
+      const bounds = page.getBoundingClientRect();
+      const contentBounds = pages.getBoundingClientRect();
+      pinchRef.current = {
+        startDistance: pinchDistance(first, second),
+        startZoom: zoom,
+        zoom,
+        startCenter: center,
+        center,
+        pageNumber: Number(page.dataset["pdfPage"]),
+        pageX: Math.min(1, Math.max(0, (center.x - bounds.left) / bounds.width)),
+        pageY: Math.min(1, Math.max(0, (center.y - bounds.top) / bounds.height)),
+      };
+      pages.style.transformOrigin = `${center.x - contentBounds.left}px ${center.y - contentBounds.top}px`;
+      pages.style.willChange = "transform";
+      event.preventDefault();
+    };
+
+    const movePinch = (event: TouchEvent) => {
+      const pinch = pinchRef.current;
+      if (!pinch || event.touches.length < 2) return;
+      const first = touchPoint(event.touches[0]!);
+      const second = touchPoint(event.touches[1]!);
+      pinch.zoom = nextPdfZoom(pinch.startZoom, pinch.startDistance, pinchDistance(first, second));
+      pinch.center = pinchCenter(first, second);
+      const shiftX = pinch.center.x - pinch.startCenter.x;
+      const shiftY = pinch.center.y - pinch.startCenter.y;
+      pages.style.transform = `translate(${shiftX}px, ${shiftY}px) scale(${pinch.zoom / pinch.startZoom})`;
+      event.preventDefault();
+    };
+
+    const endPinch = (event: TouchEvent) => {
+      const pinch = pinchRef.current;
+      if (!pinch || event.touches.length >= 2) return;
+      pinchRef.current = null;
+      event.preventDefault();
+      if (Math.abs(pinch.zoom - zoom) < 0.01) {
+        clearPreview();
+        return;
+      }
+      pendingPinchRef.current = pinch;
+      setZoom(pinch.zoom);
+    };
+
+    const cancelPinch = () => {
+      pinchRef.current = null;
+      clearPreview();
+    };
+
+    container.addEventListener("touchstart", startPinch, { passive: false });
+    container.addEventListener("touchmove", movePinch, { passive: false });
+    container.addEventListener("touchend", endPinch, { passive: false });
+    container.addEventListener("touchcancel", cancelPinch);
+    return () => {
+      container.removeEventListener("touchstart", startPinch);
+      container.removeEventListener("touchmove", movePinch);
+      container.removeEventListener("touchend", endPinch);
+      container.removeEventListener("touchcancel", cancelPinch);
+      clearPreview();
+    };
+  }, [pdf, zoom]);
 
   const toggleZoom = () => {
     const container = scrollRef.current;
     if (container) {
       const focus = container.getBoundingClientRect().top + container.clientHeight * 0.35;
-      const current = Array.from(container.querySelectorAll<HTMLElement>("[data-pdf-page]")).find(
-        (page) => page.getBoundingClientRect().bottom > focus,
-      );
+      const current = pageAt(container, focus);
       if (current) anchorPage.current = Number(current.dataset["pdfPage"]);
     }
-    setZoomed((value) => !value);
+    setZoom((value) => (value > 1 ? 1 : 2));
   };
 
   return (
@@ -85,11 +205,15 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
         ref={scrollRef}
         className="min-h-0 flex-1 overflow-auto overscroll-contain"
         aria-label={title}
+        style={{ touchAction: "pan-x pan-y" }}
       >
         {error ? (
           <p className="mx-auto max-w-xs px-4 py-16 text-center text-sm">{t("pdf_error")}</p>
         ) : pdf && width ? (
-          <div className="flex min-w-full w-max flex-col items-center gap-6 p-4 pb-20">
+          <div
+            ref={pagesRef}
+            className="flex min-w-full w-max flex-col items-center gap-6 p-4 pb-20"
+          >
             {Array.from({ length: pdf.document.numPages }, (_, index) => (
               <figure key={index + 1} data-pdf-page={index + 1} style={{ width: pageWidth }}>
                 <PdfPage
@@ -116,10 +240,10 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
         <button
           type="button"
           onClick={toggleZoom}
-          aria-label={zoomed ? t("pdf_zoom_out") : t("pdf_zoom_in")}
+          aria-label={zoom > 1 ? t("pdf_zoom_out") : t("pdf_zoom_in")}
           className="absolute bottom-4 right-4 grid size-12 place-items-center rounded-full border border-black/20 bg-[oklch(0.96_0.01_85)] shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2"
         >
-          {zoomed ? (
+          {zoom > 1 ? (
             <ZoomOut aria-hidden className="size-5" />
           ) : (
             <ZoomIn aria-hidden className="size-5" />
