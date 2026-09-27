@@ -55,7 +55,7 @@ const eventPoint = (svg: SVGSVGElement, clientX: number, clientY: number): MapPo
 };
 
 export function useMapCamera() {
-  const [camera, updateCamera] = useState<MapCamera>({ x: 0, y: 0, scale: 1 });
+  const [camera, setCamera] = useState<MapCamera>({ x: 0, y: 0, scale: 1 });
   const pointers = useRef(new Map<number, MapPoint>());
   const lastMidpoint = useRef<MapPoint | null>(null);
   const lastDistance = useRef<number | null>(null);
@@ -69,7 +69,7 @@ export function useMapCamera() {
       if (initialView.current && typeof window !== "undefined" && window.innerWidth <= 600) {
         // Start close enough to read the resort on a phone; the overview control
         // still restores the full plan. This changes only the camera, not geography.
-        updateCamera({
+        setCamera({
           scale: 1.5,
           x: next.x + next.width * 0.5 - 800 * 1.5,
           y: next.y + next.height * 0.46 - 450 * 1.5,
@@ -77,7 +77,7 @@ export function useMapCamera() {
       }
       if (!initialView.current) {
         // Preserve the visible map center when rotating or resizing the viewport.
-        updateCamera((current) =>
+        setCamera((current) =>
           clampCamera(
             {
               ...current,
@@ -90,13 +90,13 @@ export function useMapCamera() {
       }
       initialView.current = false;
     },
-    [updateCamera],
+    [setCamera],
   );
   const constrain = useCallback((next: MapCamera) => clampCamera(next, viewport.current), []);
 
   const zoomAt = useCallback(
     (nextScale: number, anchor: MapPoint) => {
-      updateCamera((current) => {
+      setCamera((current) => {
         const scale = clamp(nextScale, MIN_SCALE, MAX_SCALE);
         const ratio = scale / current.scale;
         return constrain({
@@ -106,12 +106,12 @@ export function useMapCamera() {
         });
       });
     },
-    [constrain, updateCamera],
+    [constrain, setCamera],
   );
 
   const zoomBy = useCallback(
     (amount: number) => {
-      updateCamera((current) => {
+      setCamera((current) => {
         const scale = clamp(current.scale + amount, MIN_SCALE, MAX_SCALE);
         const ratio = scale / current.scale;
         const anchor = { x: MAP_WIDTH / 2, y: MAP_HEIGHT / 2 };
@@ -122,18 +122,18 @@ export function useMapCamera() {
         });
       });
     },
-    [constrain, updateCamera],
+    [constrain, setCamera],
   );
 
   const fit = useCallback(() => {
-    updateCamera({ x: 0, y: 0, scale: 1 });
-  }, [updateCamera]);
+    setCamera({ x: 0, y: 0, scale: 1 });
+  }, [setCamera]);
 
   const focusOn = useCallback(
     (point: MapPoint, scale = 1.8) => {
       const compact = typeof window !== "undefined" && window.innerWidth <= 820;
       const nextScale = clamp(scale * (compact ? 1.45 : 1), MIN_SCALE, MAX_SCALE);
-      updateCamera(
+      setCamera(
         constrain({
           scale: nextScale,
           x:
@@ -147,13 +147,13 @@ export function useMapCamera() {
         }),
       );
     },
-    [constrain, updateCamera],
+    [constrain, setCamera],
   );
 
   const onWheel = useCallback(
     (event: ReactWheelEvent<SVGSVGElement>) => {
       const point = eventPoint(event.currentTarget, event.clientX, event.clientY);
-      updateCamera((current) => {
+      setCamera((current) => {
         const scale = clamp(current.scale * Math.exp(-event.deltaY * 0.0014), MIN_SCALE, MAX_SCALE);
         const ratio = scale / current.scale;
         return constrain({
@@ -163,7 +163,7 @@ export function useMapCamera() {
         });
       });
     },
-    [constrain, updateCamera],
+    [constrain, setCamera],
   );
 
   const onPointerDown = useCallback((event: ReactPointerEvent<SVGSVGElement>) => {
@@ -200,7 +200,7 @@ export function useMapCamera() {
           moved.current = true;
           event.currentTarget.setPointerCapture(event.pointerId);
         }
-        updateCamera((current) =>
+        setCamera((current) =>
           constrain({
             ...current,
             x: current.x + dx,
@@ -217,7 +217,7 @@ export function useMapCamera() {
         const previousMidpoint = lastMidpoint.current;
         const previousDistance = lastDistance.current;
         moved.current = true;
-        updateCamera((current) => {
+        setCamera((current) => {
           const scale = clamp(
             current.scale * (nextDistance / previousDistance),
             MIN_SCALE,
@@ -234,7 +234,7 @@ export function useMapCamera() {
         lastDistance.current = nextDistance;
       }
     },
-    [constrain, updateCamera],
+    [constrain, setCamera],
   );
 
   const onPointerUp = useCallback((event: ReactPointerEvent<SVGSVGElement>) => {
@@ -250,6 +250,12 @@ export function useMapCamera() {
   const onKeyDown = useCallback(
     (event: ReactKeyboardEvent<SVGSVGElement>) => {
       const panStep = 42;
+      const offsets: Record<string, MapPoint> = {
+        ArrowLeft: { x: panStep, y: 0 },
+        ArrowRight: { x: -panStep, y: 0 },
+        ArrowUp: { x: 0, y: panStep },
+        ArrowDown: { x: 0, y: -panStep },
+      };
       if (event.key === "+" || event.key === "=") {
         event.preventDefault();
         zoomBy(0.24);
@@ -261,20 +267,16 @@ export function useMapCamera() {
         fit();
       } else if (event.key.startsWith("Arrow")) {
         event.preventDefault();
-        updateCamera((current) =>
+        setCamera((current) =>
           constrain({
             ...current,
-            x:
-              current.x +
-              (event.key === "ArrowLeft" ? panStep : event.key === "ArrowRight" ? -panStep : 0),
-            y:
-              current.y +
-              (event.key === "ArrowUp" ? panStep : event.key === "ArrowDown" ? -panStep : 0),
+            x: current.x + (offsets[event.key]?.x ?? 0),
+            y: current.y + (offsets[event.key]?.y ?? 0),
           }),
         );
       }
     },
-    [constrain, fit, zoomBy, updateCamera],
+    [constrain, fit, zoomBy, setCamera],
   );
 
   const allowPlaceClick = useCallback(() => {

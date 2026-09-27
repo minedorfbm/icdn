@@ -34,68 +34,49 @@ DO $$ BEGIN
  END IF;
 END $$;
 
-INSERT INTO public.map_places (id, name, level_id, pin, x, y, zoom, active) VALUES
-('sports-centre', 'Sports Centre', 'heaven', 1, 972.9, 854.6, 1.85, true),
-('summit', 'The Summit', 'heaven', 2, 883.5, 670.1, 1.85, true),
-('carpark-apec', 'APEC Sculpture Garden', 'heaven', 3, 829.5, 562.7, 1.72, true),
-('lobby', 'Reception Lobby', 'heaven', 4, 748.2, 522.8, 1.95, true),
-('club-lounge', 'Club InterContinental Lounge', 'heaven', 5, 770.7, 497, 1.72, true),
-('nam-tram', 'Nam Tram', 'heaven', 6, 735, 477.2, 2, true),
-('moulin-rouge', 'Moulin Rouge Karaoke Club', 'heaven', 7, 704.4, 478.7, 1.72, true),
-('citron', 'Citron', 'heaven', 8, 670.8, 477.5, 2.05, true),
-('tingara', 'Tingara', 'sky', 9, 636.9, 462.8, 1.72, true),
-('relaxation-pavilion', 'Relaxation Pavilion', 'heaven', 10, 238.8, 146, 1.8, true),
-('heritage-village', 'BENSLEY Outsider Gallery', 'sky', 11, 707.1, 407.9, 2, true),
-('la-maison-1888', 'La Maison 1888', 'sky', 12, 721.8, 373.7, 2, true),
-('terra-mare', 'Terra Mare', 'earth', 13, 744.9, 297.5, 2, true),
-('garden-pool', 'Garden Pool & Jacuzzi', 'earth', 14, 813.9, 291.5, 1.72, true),
-('nail-hair-studio', 'The Nail & Hair Studio', 'sea', 15, 794.1, 324.2, 1.72, true),
-('mi-sol-reception', 'Mi Sol Spa · Reception', 'sea', 16, 817.8, 330.8, 1.72, true),
-('long-bar', 'L_O_N_G Bar & Pool', 'earth', 17, 882.6, 303.8, 2, true),
-('beach-activity-centre', 'Beach Activity Centre', 'sea', 18, 957.6, 244.7, 1.72, true),
-('yoga-pavilion', 'Yoga Pavilion', 'sea', 19, 996.3, 203.9, 1.72, true),
-('organic-garden', 'Nursery & Organic Garden', 'earth', 20, 953.7, 329.9, 1.72, true),
-('spirit-house', 'Spirit House', 'earth', 21, 990.3, 308, 1.72, true),
-('mi-sol-lagoon', 'Mi Sol Spa & Wellness', 'sea', 22, 1077.9, 379.4, 1.9, true),
-('wall-of-lanterns', 'Wall of Lanterns', 'earth', 23, 808.5, 357.8, 2, true),
-('coconut-beach', 'Coconut Beach', 'sea', 24, 996, 184.4, 1.8, true)
-ON CONFLICT DO NOTHING;
+DO $seed$
+DECLARE
+ places_seed CONSTANT jsonb := $json$
+[
+  {"id":"sports-centre","name":"Sports Centre","level_id":"heaven","pin":1,"x":972.9,"y":854.6,"zoom":1.85,"active":true,"links":[{"destination_id":"sports-centre","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"summit","name":"The Summit","level_id":"heaven","pin":2,"x":883.5,"y":670.1,"zoom":1.85,"active":true,"links":[{"destination_id":"the-summit","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"carpark-apec","name":"APEC Sculpture Garden","level_id":"heaven","pin":3,"x":829.5,"y":562.7,"zoom":1.72,"active":true,"links":[{"destination_id":"apec-garden","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"lobby","name":"Reception Lobby","level_id":"heaven","pin":4,"x":748.2,"y":522.8,"zoom":1.95,"active":true,"links":[{"destination_id":"reception","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"club-lounge","name":"Club InterContinental Lounge","level_id":"heaven","pin":5,"x":770.7,"y":497,"zoom":1.72,"active":true,"links":[{"destination_id":"club-lounge","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"nam-tram","name":"Nam Tram","level_id":"heaven","pin":6,"x":735,"y":477.2,"zoom":2,"active":true,"links":[{"destination_id":"nam-tram","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"moulin-rouge","name":"Moulin Rouge Karaoke Club","level_id":"heaven","pin":7,"x":704.4,"y":478.7,"zoom":1.72,"active":true,"links":[{"destination_id":"moulin-rouge","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"citron","name":"Citron","level_id":"heaven","pin":8,"x":670.8,"y":477.5,"zoom":2.05,"active":true,"links":[{"destination_id":"citron","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"tingara","name":"Tingara","level_id":"sky","pin":9,"x":636.9,"y":462.8,"zoom":1.72,"active":true,"links":[{"destination_id":"tingara","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"relaxation-pavilion","name":"Relaxation Pavilion","level_id":"heaven","pin":10,"x":238.8,"y":146,"zoom":1.8,"active":true,"links":[{"destination_id":"relaxation-pavilion","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"heritage-village","name":"BENSLEY Outsider Gallery","level_id":"sky","pin":11,"x":707.1,"y":407.9,"zoom":2,"active":true,"links":[{"destination_id":"heritage-village","display_order":0,"is_primary":true,"active":true},{"destination_id":"bensley-gallery","display_order":1,"is_primary":true,"active":true},{"destination_id":"sammys","display_order":2,"is_primary":true,"active":true}]},
+  {"id":"la-maison-1888","name":"La Maison 1888","level_id":"sky","pin":12,"x":721.8,"y":373.7,"zoom":2,"active":true,"links":[{"destination_id":"la-maison-1888","display_order":0,"is_primary":true,"active":true},{"destination_id":"buffalo-bar","display_order":1,"is_primary":true,"active":true},{"destination_id":"wine-cellar","display_order":2,"is_primary":true,"active":true}]},
+  {"id":"terra-mare","name":"Terra Mare","level_id":"earth","pin":13,"x":744.9,"y":297.5,"zoom":2,"active":true,"links":[{"destination_id":"terra-mare","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"garden-pool","name":"Garden Pool & Jacuzzi","level_id":"earth","pin":14,"x":813.9,"y":291.5,"zoom":1.72,"active":true,"links":[{"destination_id":"garden-jacuzzi","display_order":0,"is_primary":true,"active":true},{"destination_id":"kids-pool","display_order":1,"is_primary":true,"active":true}]},
+  {"id":"nail-hair-studio","name":"The Nail & Hair Studio","level_id":"sea","pin":15,"x":794.1,"y":324.2,"zoom":1.72,"active":true,"links":[{"destination_id":"nail-hair","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"mi-sol-reception","name":"Mi Sol Spa · Reception","level_id":"sea","pin":16,"x":817.8,"y":330.8,"zoom":1.72,"active":true,"links":[{"destination_id":"mi-sol-spa","display_order":0,"is_primary":false,"active":true}]},
+  {"id":"long-bar","name":"L_O_N_G Bar & Pool","level_id":"earth","pin":17,"x":882.6,"y":303.8,"zoom":2,"active":true,"links":[{"destination_id":"long-bar","display_order":0,"is_primary":true,"active":true},{"destination_id":"long-pool","display_order":1,"is_primary":true,"active":true},{"destination_id":"soar-gym","display_order":2,"is_primary":true,"active":true},{"destination_id":"planet-trekkers","display_order":3,"is_primary":true,"active":true}]},
+  {"id":"beach-activity-centre","name":"Beach Activity Centre","level_id":"sea","pin":18,"x":957.6,"y":244.7,"zoom":1.72,"active":true,"links":[{"destination_id":"marine-centre","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"yoga-pavilion","name":"Yoga Pavilion","level_id":"sea","pin":19,"x":996.3,"y":203.9,"zoom":1.72,"active":true,"links":[{"destination_id":"yoga-pavilion","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"organic-garden","name":"Nursery & Organic Garden","level_id":"earth","pin":20,"x":953.7,"y":329.9,"zoom":1.72,"active":true,"links":[{"destination_id":"organic-garden","display_order":0,"is_primary":true,"active":true},{"destination_id":"nursery","display_order":1,"is_primary":true,"active":true}]},
+  {"id":"spirit-house","name":"Spirit House","level_id":"earth","pin":21,"x":990.3,"y":308,"zoom":1.72,"active":true,"links":[{"destination_id":"dia-tang","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"mi-sol-lagoon","name":"Mi Sol Spa & Wellness","level_id":"sea","pin":22,"x":1077.9,"y":379.4,"zoom":1.9,"active":true,"links":[{"destination_id":"mi-sol-spa","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"wall-of-lanterns","name":"Wall of Lanterns","level_id":"earth","pin":23,"x":808.5,"y":357.8,"zoom":2,"active":true,"links":[{"destination_id":"wall-of-lanterns","display_order":0,"is_primary":true,"active":true}]},
+  {"id":"coconut-beach","name":"Coconut Beach","level_id":"sea","pin":24,"x":996,"y":184.4,"zoom":1.8,"active":true,"links":[{"destination_id":"coconut-beach","display_order":0,"is_primary":true,"active":true}]}
+]
+$json$::jsonb;
+BEGIN
+ INSERT INTO public.map_places (id, name, level_id, pin, x, y, zoom, active)
+ SELECT id, name, level_id, pin, x, y, zoom, active
+ FROM jsonb_to_recordset(places_seed) AS p(id text, name text, level_id text, pin integer, x double precision, y double precision, zoom double precision, active boolean)
+ ON CONFLICT DO NOTHING;
 
-INSERT INTO public.map_destination_links (place_id, destination_id, display_order, is_primary, active) VALUES
-('sports-centre', 'sports-centre', 0, true, true),
-('summit', 'the-summit', 0, true, true),
-('carpark-apec', 'apec-garden', 0, true, true),
-('lobby', 'reception', 0, true, true),
-('club-lounge', 'club-lounge', 0, true, true),
-('nam-tram', 'nam-tram', 0, true, true),
-('moulin-rouge', 'moulin-rouge', 0, true, true),
-('citron', 'citron', 0, true, true),
-('tingara', 'tingara', 0, true, true),
-('relaxation-pavilion', 'relaxation-pavilion', 0, true, true),
-('heritage-village', 'heritage-village', 0, true, true),
-('heritage-village', 'bensley-gallery', 1, true, true),
-('heritage-village', 'sammys', 2, true, true),
-('la-maison-1888', 'la-maison-1888', 0, true, true),
-('la-maison-1888', 'buffalo-bar', 1, true, true),
-('la-maison-1888', 'wine-cellar', 2, true, true),
-('terra-mare', 'terra-mare', 0, true, true),
-('garden-pool', 'garden-jacuzzi', 0, true, true),
-('garden-pool', 'kids-pool', 1, true, true),
-('nail-hair-studio', 'nail-hair', 0, true, true),
-('mi-sol-reception', 'mi-sol-spa', 0, false, true),
-('long-bar', 'long-bar', 0, true, true),
-('long-bar', 'long-pool', 1, true, true),
-('long-bar', 'soar-gym', 2, true, true),
-('long-bar', 'planet-trekkers', 3, true, true),
-('beach-activity-centre', 'marine-centre', 0, true, true),
-('yoga-pavilion', 'yoga-pavilion', 0, true, true),
-('organic-garden', 'organic-garden', 0, true, true),
-('organic-garden', 'nursery', 1, true, true),
-('spirit-house', 'dia-tang', 0, true, true),
-('mi-sol-lagoon', 'mi-sol-spa', 0, true, true),
-('wall-of-lanterns', 'wall-of-lanterns', 0, true, true),
-('coconut-beach', 'coconut-beach', 0, true, true)
-ON CONFLICT DO NOTHING;
+ INSERT INTO public.map_destination_links (place_id, destination_id, display_order, is_primary, active)
+ SELECT p->>'id', l.destination_id, l.display_order, l.is_primary, l.active
+ FROM jsonb_array_elements(places_seed) AS p
+ CROSS JOIN LATERAL jsonb_to_recordset(p->'links') AS l(destination_id text, display_order integer, is_primary boolean, active boolean)
+ ON CONFLICT DO NOTHING;
+END
+$seed$;
 
 COMMENT ON TABLE public.map_places IS 'Illustrated spatial anchors. No GPS or room-level positioning. Editorial content belongs to destinations.';
 COMMENT ON TABLE public.map_destination_links IS 'Explicit many-to-many associations. Hidden destinations are never publicly exposed.';

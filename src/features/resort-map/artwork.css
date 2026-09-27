@@ -1,22 +1,9 @@
-.hub-atlas .resort-art {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  display: block;
-  cursor: grab;
-  outline: none;
-}
 .hub-atlas .resort-art:active {
   cursor: grabbing;
 }
 .hub-atlas .resort-art:focus-visible {
   outline: 1px solid rgba(216, 195, 150, 0.58);
   outline-offset: -3px;
-}
-.hub-atlas .map-scene {
-  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .hub-atlas .resort-art:active .map-scene {
   transition: none;
@@ -67,11 +54,6 @@
 .hub-atlas .map-paths .path-shadow {
   stroke: rgba(0, 0, 0, 0.27);
   stroke-width: 9;
-}
-.hub-atlas .map-paths .path-line {
-  stroke: rgba(239, 227, 200, 0.42);
-  stroke-width: 2;
-  stroke-dasharray: 2 8;
 }
 .hub-atlas .discovery-trail {
   stroke: rgba(84, 144, 148, 0.55);
@@ -180,7 +162,6 @@
   stroke-width: 1.15;
 }
 .hub-atlas .facade-left,
-.hub-atlas .facade-side,
 .hub-atlas .gallery-facade-left,
 .hub-atlas .maison-wing-left {
   fill: url(#architecture-shade);
@@ -502,14 +483,12 @@
   stroke: rgba(179, 222, 214, 0.78);
   stroke-width: 1.2;
 }
-.hub-atlas .spa-lagoon-rim,
 .hub-atlas .garden-pool-rim {
   fill: none;
   stroke: rgba(224, 245, 230, 0.46);
   stroke-width: 0.8;
 }
-.hub-atlas .spa-boardwalk,
-.hub-atlas .spa-bridge {
+.hub-atlas .spa-boardwalk {
   fill: none;
   stroke: #c6a66b;
   stroke-width: 2.5;
@@ -801,11 +780,6 @@
 .hub-atlas .hotspot-hit {
   fill: transparent;
 }
-.hub-atlas .hotspot-v2.is-selected .hotspot-leader {
-  stroke: #f0d58f;
-  stroke-width: 1.2;
-  filter: url(#gold-glow-v2);
-}
 .hub-atlas .hotspot-pulse {
   fill: rgba(198, 162, 92, 0);
   stroke: rgba(216, 195, 150, 0.19);
@@ -913,57 +887,6 @@
     500 12px var(--font-jost),
     sans-serif;
 }
-.hub-atlas .beach-highlights > g {
-  cursor: pointer;
-}
-.hub-atlas .beach-highlights > g > path {
-  fill: none;
-  stroke-width: 9;
-  stroke-opacity: 0.8;
-  vector-effect: non-scaling-stroke;
-  stroke-linecap: round;
-}
-.hub-atlas .beach-highlights rect {
-  fill: #08212cf2;
-  stroke: #ddceaa88;
-  stroke-width: 1;
-}
-.hub-atlas .beach-highlights text {
-  fill: #f0e5cb;
-  font:
-    500 14px var(--font-jost),
-    sans-serif;
-}
-.hub-atlas .beach-highlights .beach-purpose {
-  fill: #b6c6c1;
-  font-size: 11px;
-  font-weight: 400;
-}
-.hub-atlas .beach-leader {
-  stroke: #e4d5b3;
-  stroke-width: 1;
-}
-.hub-atlas .lagoon-villa-highlight {
-  pointer-events: none;
-}
-.hub-atlas .lagoon-villa-highlight path {
-  fill: #a7c36c22;
-  stroke: #bdd887;
-  stroke-width: 2;
-  stroke-dasharray: 4 3;
-}
-.hub-atlas .lagoon-villa-highlight text {
-  fill: #dfedc5;
-  font:
-    12px var(--font-jost),
-    sans-serif;
-  paint-order: stroke;
-  stroke: #07212a;
-  stroke-width: 4px;
-}
-.hub-atlas .photo-mode .station-plaque {
-  opacity: 0.25;
-}
 .hub-atlas .photo-hotspot {
   cursor: pointer;
   outline: none;
@@ -1004,24 +927,21 @@
 .hub-atlas .photo-hotspot.is-selected text {
   fill: #162a30;
 }
-.hub-atlas .photo-directory button.is-selected {
-  background: #dab89916;
-  border-radius: 5px;
-}
-.hub-atlas .photo-directory button.is-selected .photo-letter {
-  color: #1b2d32;
-  background: #e2bd9e;
-}
-.hub-atlas .photo-directory button.is-selected {
-  background: #dab89924;
-}
 .hub-atlas .map-scene {
   transition: none;
 }
 .hub-atlas .resort-art {
+  outline: none;
+  cursor: grab;
+  display: block;
+  z-index: 2;
+  inset: 0;
+  position: absolute;
   width: 100%;
   height: 100%;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .hub-atlas * {

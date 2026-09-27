@@ -168,6 +168,10 @@ export default function ResortMap({
     setOptions(false);
     fit();
   };
+  let previewKicker: string | undefined;
+  if (mode === "photos") previewKicker = `${copy("photos")} ${photoId ?? ""}`;
+  else if (mode === "tour")
+    previewKicker = `${copy("tour")} · ${tourIndex + 1}/${tourStops.length}`;
   const hasPreview = !!selected && !searchOpen;
 
   return (
@@ -182,9 +186,7 @@ export default function ResortMap({
         </button>
       </header>
       {places.length === 0 ? (
-        <div className="atlas-empty" role="status">
-          {copy("unavailable")}
-        </div>
+        <output className="atlas-empty">{copy("unavailable")}</output>
       ) : (
         <>
           <div className="atlas-canvas">
@@ -353,13 +355,7 @@ export default function ResortMap({
                 setSelectedId(null);
                 setPhotoId(null);
               }}
-              kicker={
-                mode === "photos"
-                  ? `${copy("photos")} ${photoId ?? ""}`
-                  : mode === "tour"
-                    ? `${copy("tour")} · ${tourIndex + 1}/${tourStops.length}`
-                    : undefined
-              }
+              kicker={previewKicker}
             >
               {mode === "tour" && (
                 <>

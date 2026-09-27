@@ -19,8 +19,9 @@ export function DestinationDetail({
   const { lang, t, typeLabel, levelLabel, action, description, event } = useI18n();
   const { openMap, locate } = useResortMap();
   const placeId = locate(dest.id);
-  const mapMode =
-    dest.id === "bensley-package" ? "tour" : dest.id === "instagram-spots" ? "photos" : undefined;
+  const mapMode = ({ "bensley-package": "tour", "instagram-spots": "photos" } as const)[
+    dest.id as "bensley-package" | "instagram-spots"
+  ];
   const actions = actionsFor(dest, undefined, lang);
   const events = (dest.events ?? []).map((item) => event(item));
   const instagram = instagramUrl(dest);

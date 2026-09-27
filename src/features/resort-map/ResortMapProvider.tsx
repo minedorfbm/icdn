@@ -40,7 +40,7 @@ export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }
   };
   const message = (text: string) => (
     <div className="flex h-full flex-col items-center justify-center gap-6 p-8 text-center">
-      <p role="status">{text}</p>
+      <output>{text}</output>
       <button onClick={close} className="min-h-11 border-b px-4">
         {t("close")}
       </button>

@@ -108,6 +108,10 @@ export const getHubData = createServerFn({ method: "GET" }).handler(() =>
   readCachedHubData(readEdgeCachedHubData),
 );
 
+function readRows<T>(result: { error: unknown; data: unknown }): T[] | null {
+  return result.error ? null : ((result.data ?? []) as T[]);
+}
+
 async function readHubData(): Promise<HubData> {
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
@@ -248,8 +252,8 @@ async function readHubData(): Promise<HubData> {
 
     return {
       ...(editorial ? { editorial } : {}),
-      mapPlaces: mapPlaces.error ? null : (mapPlaces.data as MapPlaceRow[]),
-      mapLinks: mapLinks.error ? null : (mapLinks.data as MapLinkRow[]),
+      mapPlaces: readRows<MapPlaceRow>(mapPlaces),
+      mapLinks: readRows<MapLinkRow>(mapLinks),
       levels: levels.error ? null : ((levels.data ?? []) as LevelRow[]),
       destinations: destinations.error ? null : ((destinations.data ?? []) as DestinationRow[]),
       photos: photos.error ? null : ((photos.data ?? []) as DestinationPhotoRow[]),
@@ -262,7 +266,7 @@ async function readHubData(): Promise<HubData> {
         : ((siteLinkTranslations.data ?? []) as SiteLinkTranslationRow[]),
       events: events.error ? null : ((events.data ?? []) as DestinationEventRow[]),
       posts: posts.error ? null : ((posts.data ?? []) as DestinationPostRow[]),
-      videos: videos.error ? null : ((videos.data ?? []) as DestinationVideoRow[]),
+      videos: readRows<DestinationVideoRow>(videos),
       settings: settings.error
         ? null
         : Object.fromEntries(

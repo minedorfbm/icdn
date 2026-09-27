@@ -134,7 +134,6 @@ export function MapArtwork({
       ref={svgRef}
       className={`resort-art ${referenceVisible ? "shows-reference" : ""}`}
       viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-      role="group"
       aria-labelledby="map-title map-description"
     >
       <title id="map-title">{mapCopy(lang, "title")}</title>
@@ -311,8 +310,8 @@ export function MapArtwork({
                 <path className="discovery-trail" d={d} />
               </g>
             ))}
-            {levelRoads.map(({ id, d }, index) => (
-              <path key={index} className={`level-road road-${id}`} d={d} />
+            {levelRoads.map(({ id, d }) => (
+              <path key={id} className={`level-road road-${id}`} d={d} />
             ))}
             <path
               className="entry-road"
@@ -413,9 +412,9 @@ export function MapArtwork({
         )}
         {layers.walking && (
           <g className="walking-time-labels" aria-label={mapCopy(lang, "walkNote")}>
-            {walkingTimes.map((time, index) => (
+            {walkingTimes.map((time) => (
               <g
-                key={index}
+                key={`${time.point.x}-${time.point.y}`}
                 transform={`translate(${time.point.x} ${time.point.y}) scale(${pixelScale / camera.scale})`}
               >
                 <title>{time.minutes} min · Nam Tram</title>

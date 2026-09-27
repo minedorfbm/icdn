@@ -25,7 +25,7 @@ type BuildingEntry = {
   tier?: "hero" | "secondary";
 };
 
-function InkPlant({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
+function InkPlant({ x, y, scale = 1 }: Readonly<{ x: number; y: number; scale?: number }>) {
   return (
     <g className="architecture-plant" transform={`translate(${x} ${y}) scale(${scale})`}>
       <path d="M0 13Q-2 3 1-10M1-3Q-8-15-15-8M1-5Q10-17 17-8M0 1Q-12-5-17 3M1 0Q13-6 18 3" />
@@ -42,12 +42,12 @@ function Lantern({
   y,
   color = "amber",
   scale = 1,
-}: {
+}: Readonly<{
   x: number;
   y: number;
   color?: "amber" | "lime" | "coral";
   scale?: number;
-}) {
+}>) {
   return (
     <g
       className={`architecture-lantern lantern-${color}`}
@@ -59,7 +59,7 @@ function Lantern({
   );
 }
 
-function Villa({ variant, mirror }: { variant: number; mirror: boolean }) {
+function Villa({ variant, mirror }: Readonly<{ variant: number; mirror: boolean }>) {
   const flip = mirror ? -1 : 1;
   return (
     <g className={`atlas-villa villa-variant-${variant}`} transform={`scale(${flip} 1)`}>
@@ -257,7 +257,11 @@ function LaMaison() {
   );
 }
 
-function CoastalPavilion({ x, y, mirror = false }: { x: number; y: number; mirror?: boolean }) {
+function CoastalPavilion({
+  x,
+  y,
+  mirror = false,
+}: Readonly<{ x: number; y: number; mirror?: boolean }>) {
   return (
     <g transform={`translate(${x} ${y}) scale(${mirror ? -1 : 1} 1)`}>
       <path className="facade-dark" d="M-30 1 0 16v25L-30 26Z" />
@@ -364,13 +368,13 @@ function SpaHangar({
   rotation,
   scale = 1,
   patina = false,
-}: {
+}: Readonly<{
   x: number;
   y: number;
   rotation: number;
   scale?: number;
   patina?: boolean;
-}) {
+}>) {
   return (
     <g
       className={`spa-hangar ${patina ? "is-patina" : ""}`}
@@ -664,7 +668,9 @@ export const ArchitectureArtwork = memo(function ArchitectureArtwork({
   mode,
 }: Readonly<ArchitectureArtworkProps>) {
   const placeById = useMemo(() => new Map(places.map((p) => [p.id, p])), [places]);
-  const detailClass = cameraScale >= 1.72 ? "is-close" : cameraScale >= 1.32 ? "is-detailed" : "";
+  let detailClass = "";
+  if (cameraScale >= 1.72) detailClass = "is-close";
+  else if (cameraScale >= 1.32) detailClass = "is-detailed";
 
   return (
     <g className={`architecture-layer ${detailClass}`} aria-hidden="true">

@@ -496,8 +496,8 @@ const accommodationRows: readonly (readonly XY[])[] = [
 export const accommodationSites = accommodationRows.flatMap((row, rowIndex) =>
   row.map(([x, y], index) => ({
     ...fromOfficialPlan(x!, y!),
-    rotation: rowIndex === 4 ? -32 : rowIndex === 5 ? -12 : 24,
-    scale: rowIndex === 5 ? 0.37 : rowIndex === 4 ? 0.55 : 0.64,
+    rotation: { 4: -32, 5: -12 }[rowIndex] ?? 24,
+    scale: { 5: 0.37, 4: 0.55 }[rowIndex] ?? 0.64,
     variant: (index + rowIndex) % 4,
     mirror: index % 2 === 0,
   })),
