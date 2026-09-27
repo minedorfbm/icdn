@@ -48,9 +48,11 @@ export function CardStack({
   near,
   index,
   onIndexChange,
+  layout = "journey",
 }: Readonly<{
   items: Destination[];
   near: boolean;
+  layout?: "journey" | "discovery";
   index: number;
   onIndexChange: Dispatch<SetStateAction<number>>;
 }>) {
@@ -202,6 +204,7 @@ export function CardStack({
               data-destination-id={dest.id}
               className={`perspective-card relative col-start-1 row-start-1 h-[90svh] w-[75%] origin-left ${near ? "will-change-transform" : ""}`}
               style={{
+                height: layout === "discovery" ? "var(--discovery-card-height)" : undefined,
                 transform: `translate3d(${(x / 75) * 100}%,0,0) perspective(1200px) rotateY(${rotation}deg) scale(${scale})`,
                 zIndex: z,
                 opacity: Math.max(0, Math.min(1, VISIBLE - pos)),
