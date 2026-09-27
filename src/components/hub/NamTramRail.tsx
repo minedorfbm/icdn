@@ -4,6 +4,7 @@ import { LEVELS, type Level } from "@/data/resort";
 import { useI18n } from "@/i18n";
 import tramIllustration from "@/assets/nam-tram-signature.webp";
 import { NamTramCabin } from "./NamTramCabin";
+import { NamTramStation } from "./NamTramStation";
 import "./nam-tram.css";
 
 interface Props {
@@ -47,10 +48,11 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
               {LEVELS.map((level, index) => (
                 <span
                   key={level.id}
-                  className="nam-tram-stop absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
-                  data-active={level.id === active}
+                  className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
                   style={{ top: `${(index / (LEVELS.length - 1)) * 100}%` }}
-                />
+                >
+                  <NamTramStation active={level.id === active} />
+                </span>
               ))}
               <span className="nam-tram-carriage absolute inset-0">
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -97,7 +99,12 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
               className="nam-tram-station relative flex min-h-14 w-full items-center gap-5 text-left focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               <span aria-hidden className="nam-tram-station-marker">
-                {level.id === active ? <NamTramCabin /> : <span className="nam-tram-stop" />}
+                <NamTramStation active={level.id === active} />
+                {level.id === active && (
+                  <span className="nam-tram-docked-cabin">
+                    <NamTramCabin />
+                  </span>
+                )}
               </span>
               <span className="font-serif text-[23px] tracking-[0.12em]">
                 {levelLabel(level.id)}
