@@ -6,6 +6,8 @@
 
 `map_places` contient uniquement les repères illustrés : identifiant, nom de repère de secours, niveau de repère, numéro, coordonnées x/y, zoom et publication. Les coordonnées correspondent au plan dessiné (pas à des coordonnées GPS). `map_destination_links` relie un repère à une ou plusieurs destinations existantes. `display_order` sélectionne la card principale et ordonne les autres ; `is_primary` choisit la position ouverte depuis une card possédant plusieurs repères, comme Mi Sol Spa.
 
+Les repères publics utilisent une icône de collection issue des cards associées (ou un repère neutre sans collection). Les numéros restent des références internes en base. Les noms apparaissent dans la recherche et dans la fiche après sélection, jamais en étiquettes permanentes sur le dessin. Les boutons conservent leur nom accessible pour les lecteurs d’écran.
+
 ## Modifier un lieu
 
 - Texte, image, traduction, niveau ou collection : modifier les tables habituelles du hub.

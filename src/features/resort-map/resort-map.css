@@ -220,6 +220,9 @@
   padding-right: 28px;
   align-items: center;
 }
+.hub-atlas .atlas-preview-heading > div {
+  min-width: 0;
+}
 .hub-atlas .atlas-preview-heading img {
   width: 56px;
   height: 60px;

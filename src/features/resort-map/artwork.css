@@ -790,39 +790,9 @@
   stroke: rgba(239, 227, 200, 0.82);
   stroke-width: 1.3;
 }
-.hub-atlas .hotspot-number {
-  fill: #f1e4c5;
-  font:
-    500 7px/1 var(--font-jost),
-    sans-serif;
-}
-.hub-atlas .hotspot-v2.is-major .hotspot-medallion {
-  stroke: #d0af66;
-  stroke-width: 2;
-}
-.hub-atlas .hotspot-label-plate {
-  opacity: 0;
-  transform-origin: left center;
-  transition: opacity 0.24s ease;
+.hub-atlas .hotspot-icon {
+  color: #f1e4c5;
   pointer-events: none;
-}
-.hub-atlas .hotspot-label-plate rect {
-  fill: rgba(4, 21, 28, 0.9);
-  stroke: rgba(216, 195, 150, 0.3);
-  stroke-width: 1;
-}
-.hub-atlas .hotspot-label-plate text {
-  fill: rgba(245, 234, 207, 0.92);
-  font:
-    400 9px/1 var(--font-jost),
-    sans-serif;
-  letter-spacing: 0.06em;
-}
-.hub-atlas .hotspot-v2.is-major .hotspot-label-plate,
-.hub-atlas .hotspot-v2:hover .hotspot-label-plate,
-.hub-atlas .hotspot-v2:focus-visible .hotspot-label-plate,
-.hub-atlas .hotspots-v2.is-zoomed .hotspot-v2:not(.is-dimmed) .hotspot-label-plate {
-  opacity: 1;
 }
 .hub-atlas .hotspot-v2.is-selected .hotspot-pulse {
   stroke: #f2d489;
@@ -833,35 +803,16 @@
   fill: #d6b86d;
   stroke: #fff0bd;
 }
-.hub-atlas .hotspot-v2.is-selected .hotspot-number {
-  fill: #06171c;
-}
-.hub-atlas .hotspot-v2.is-selected .hotspot-label-plate rect {
-  fill: #efe3c8;
-  stroke: #fff2cf;
-}
-.hub-atlas .hotspot-v2.is-selected .hotspot-label-plate text {
-  fill: #06171c;
-  font-weight: 500;
+.hub-atlas .hotspot-v2.is-selected .hotspot-icon {
+  color: #06171c;
 }
 .hub-atlas .hotspot-v2.is-dimmed {
   opacity: 0.11;
   pointer-events: none;
 }
-.hub-atlas .hotspot-v2:focus {
-  outline: none;
-}
-.hub-atlas .hotspot-v2.is-major .hotspot-label-plate,
-.hub-atlas .hotspot-v2.is-selected .hotspot-label-plate,
-.hub-atlas .hotspot-v2:hover .hotspot-label-plate,
-.hub-atlas .hotspot-v2:focus-visible .hotspot-label-plate {
-  pointer-events: auto;
-}
-.hub-atlas
-  .hotspots-v2.is-zoomed
-  .hotspot-v2:not(.is-major):not(.is-selected):not(:hover):not(:focus-visible)
-  .hotspot-label-plate {
-  opacity: 0;
+.hub-atlas .hotspot-v2:focus-visible .hotspot-medallion {
+  stroke: #fff0bd;
+  stroke-width: 3;
 }
 .hub-atlas .trail-highlight path {
   fill: none;

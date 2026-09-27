@@ -1,5 +1,6 @@
 /* oxlint-disable jsx-a11y/prefer-tag-over-role -- interactive SVG hotspots cannot be HTML buttons. */
-import { useLayoutEffect, useMemo, useRef, useState, type SVGProps } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type SVGProps, type MouseEvent } from "react";
+import { Compass, MapPin, Sparkles, Utensils } from "lucide-react";
 import { ArchitectureArtwork } from "./ArchitectureArtwork";
 import { bensleyTour } from "./map.data";
 import { useI18n } from "@/i18n";
@@ -25,33 +26,12 @@ import type { PlaceCategory, Place } from "./map.types";
 import type { MapCamera } from "./useMapCamera";
 import { photoSpots, walkingTimes, type LegendLayers } from "./map.legend";
 
-const majorIds = new Set([
-  "lobby",
-  "citron",
-  "nam-tram",
-  "heritage-village",
-  "la-maison-1888",
-  "terra-mare",
-  "long-bar",
-  "summit",
-  "mi-sol-lagoon",
-]);
-
-const labelOffsets: Record<string, { x: number; y: number }> = {
-  lobby: { x: 22, y: 18 },
-  citron: { x: -22, y: 24 },
-  "nam-tram": { x: 23, y: -22 },
-  "heritage-village": { x: -22, y: 10 },
-  "la-maison-1888": { x: -22, y: -14 },
-  "terra-mare": { x: -22, y: -23 },
-  "long-bar": { x: 20, y: -24 },
-  summit: { x: 22, y: 14 },
-  "mi-sol-lagoon": { x: 22, y: 0 },
-  "moulin-rouge": { x: -22, y: -28 },
-  "club-lounge": { x: 22, y: -10 },
-  tingara: { x: -22, y: -6 },
-  "nail-hair-studio": { x: -22, y: 27 },
-  "mi-sol-reception": { x: 22, y: 27 },
+const collectionIcons = {
+  dining: Utensils,
+  wellness: Sparkles,
+  experiences: Compass,
+  beach: MapPin,
+  bensley: Compass,
 };
 
 type MapArtworkProps = {
@@ -121,12 +101,35 @@ export function MapArtwork({
     return () => observer.disconnect();
   }, [onViewportChange]);
 
+  const hotspotsRef = useRef<SVGGElement>(null);
+  const interactivePlaces = useMemo(
+    () =>
+      places.filter(
+        (place) =>
+          visibleIds.has(place.id) &&
+          (activeFilters.size === 0 ||
+            place.categories.some((category) => activeFilters.has(category))) &&
+          (mode !== "tour" || bensleyTour.some((stop) => stop.placeId === place.id)),
+      ),
+    [places, visibleIds, activeFilters, mode],
+  );
+  const selectNearestPlace = (event: MouseEvent<SVGGElement>, fallback: Place) => {
+    const matrix = hotspotsRef.current?.getScreenCTM();
+    if (!matrix) return onSelectPlace(fallback.id);
+    // Overlapping touch targets must prefer the marker nearest the finger.
+    const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
+    const distance = (place: Place) => Math.hypot(place.point.x - point.x, place.point.y - point.y);
+    const nearest = interactivePlaces.reduce(
+      (best, place) => (distance(place) < distance(best) ? place : best),
+      fallback,
+    );
+    onSelectPlace(nearest.id);
+  };
+
   const tramCar = useMemo(() => {
     const index = mode !== "tour" || activeTourIndex <= 2 ? 0 : Math.min(3, activeTourIndex - 2);
     return { ...stations[index], r: -72 };
   }, [activeTourIndex, mode]);
-  const markerScale =
-    pixelScale > 2 ? pixelScale * Math.min(1, 0.56 + (camera.scale - 1) * 0.22) : pixelScale;
 
   return (
     <svg
@@ -349,36 +352,24 @@ export function MapArtwork({
           <g className="level-cartouches" aria-hidden="true">
             <g transform="translate(472 490)">
               <path d="M0 0h126" />
-              <text x="0" y="-10">
-                01
-              </text>
               <text className="level-name" x="29" y="-10">
                 {levelLabel("heaven")}
               </text>
             </g>
             <g transform="translate(445 374)">
               <path d="M0 0h95" />
-              <text x="0" y="-10">
-                02
-              </text>
               <text className="level-name" x="29" y="-10">
                 {levelLabel("sky")}
               </text>
             </g>
             <g transform="translate(498 232)">
               <path d="M0 0h104" />
-              <text x="0" y="-10">
-                03
-              </text>
               <text className="level-name" x="29" y="-10">
                 {levelLabel("earth")}
               </text>
             </g>
             <g transform="translate(880 404)">
               <path d="M0 0h96" />
-              <text x="0" y="-10">
-                04
-              </text>
               <text className="level-name" x="29" y="-10">
                 {levelLabel("sea")}
               </text>
@@ -484,36 +475,27 @@ export function MapArtwork({
         </g>
 
         <g
-          className={`hotspots-v2 ${camera.scale >= 1.45 ? "is-zoomed" : ""}`}
+          ref={hotspotsRef}
+          className="hotspots-v2"
           visibility={photosVisible ? "hidden" : "visible"}
           aria-hidden={photosVisible}
         >
           {places.map((place) => {
-            const matchesFilter =
-              activeFilters.size === 0 ||
-              place.categories.some((category) => activeFilters.has(category));
-            const dimmed =
-              !matchesFilter ||
-              !visibleIds.has(place.id) ||
-              (mode === "tour" && !bensleyTour.some((s) => s.placeId === place.id));
-            const label = place.mapLabel ?? place.name;
-            const labelWidth = Math.min(154, Math.max(70, 26 + label.length * 5.7));
-            const offset = labelOffsets[place.id] ?? { x: place.point.x > 1000 ? -20 : 20, y: 0 };
-            const labelLeft = offset.x < 0;
-            const major = majorIds.has(place.id);
+            const dimmed = !interactivePlaces.includes(place);
+            const Icon = collectionIcons[place.categories[0] ?? "beach"];
             return (
               // SVG groups cannot be HTML buttons; keyboard behavior mirrors one.
               <g
                 key={place.id}
-                className={`hotspot-v2 ${major ? "is-major" : ""} ${place.id === selectedId ? "is-selected" : ""} ${dimmed ? "is-dimmed" : ""}`}
+                className={`hotspot-v2 ${place.id === selectedId ? "is-selected" : ""} ${dimmed ? "is-dimmed" : ""}`}
                 transform={`translate(${place.point.x} ${place.point.y})`}
                 role="button"
                 tabIndex={photosVisible || dimmed ? -1 : 0}
-                aria-label={`${place.pin}. ${place.name} · ${levelLabel(place.level)}`}
+                aria-label={`${place.name} · ${levelLabel(place.level)}`}
                 aria-pressed={place.id === selectedId}
                 aria-disabled={dimmed}
-                onClick={() => {
-                  if (!dimmed) onSelectPlace(place.id);
+                onClick={(event) => {
+                  if (!dimmed) selectNearestPlace(event, place);
                 }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
@@ -522,29 +504,19 @@ export function MapArtwork({
                   }
                 }}
               >
-                <g transform={`scale(${markerScale / camera.scale})`}>
-                  <circle
-                    className="hotspot-hit"
-                    r={Math.max(22, (22 * pixelScale) / markerScale)}
+                <g transform={`scale(${pixelScale / camera.scale})`}>
+                  <circle className="hotspot-hit" r="22" />
+                  <circle className="hotspot-pulse" r="15" />
+                  <circle className="hotspot-medallion" r="12" />
+                  <Icon
+                    className="hotspot-icon"
+                    x={-7}
+                    y={-7}
+                    width={14}
+                    height={14}
+                    strokeWidth={1.6}
+                    aria-hidden="true"
                   />
-                  <circle className="hotspot-pulse" r={major ? 14 : 11} />
-                  <circle className="hotspot-medallion" r={major ? 10 : 8} />
-                  <text className="hotspot-number" textAnchor="middle" y="3.4">
-                    {place.pin}
-                  </text>
-                  <g
-                    className="hotspot-label-plate"
-                    transform={`translate(${labelLeft ? offset.x - labelWidth : offset.x} ${offset.y - 12})`}
-                  >
-                    <rect width={labelWidth} height="24" rx="12" />
-                    <text
-                      x={labelLeft ? labelWidth - 11 : 11}
-                      y="15.5"
-                      textAnchor={labelLeft ? "end" : "start"}
-                    >
-                      {label}
-                    </text>
-                  </g>
                 </g>
               </g>
             );
