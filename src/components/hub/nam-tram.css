@@ -29,10 +29,15 @@
 
 .nam-tram-cabin {
   display: block;
-  width: 30px;
-  height: 26px;
+  width: 38px;
+  max-width: none;
+  height: auto;
   flex-shrink: 0;
-  filter: drop-shadow(0 2px 2px oklch(0 0 0 / 0.35));
+  filter: drop-shadow(0 2px 2px oklch(0 0 0 / 0.4));
+}
+
+.nam-tram-carriage {
+  transform: translateY(calc(var(--tram-progress, 0) * 100%));
 }
 
 .nam-tram-panel {
@@ -75,7 +80,7 @@
   width: 100%;
   height: min(180px, 24svh);
   object-fit: contain;
-  mix-blend-mode: screen;
+  filter: drop-shadow(0 8px 12px oklch(0 0 0 / 0.25));
 }
 
 .nam-tram-heading {

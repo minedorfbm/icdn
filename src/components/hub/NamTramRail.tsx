@@ -8,17 +8,15 @@ import "./nam-tram.css";
 
 interface Props {
   active: Level;
-  progress: number;
   visible?: boolean;
   onJump: (level: Level) => void;
 }
 
 /** A compact journey rail; station names appear only when its selector is opened. */
-export function NamTramRail({ active, progress, visible = true, onJump }: Readonly<Props>) {
+export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const { t, levelLabel } = useI18n();
-  const cabinPct = Math.min(100, Math.max(0, progress * 100));
 
   const selectLevel = (level: Level) => {
     setOpen(false);
@@ -54,10 +52,7 @@ export function NamTramRail({ active, progress, visible = true, onJump }: Readon
                   style={{ top: `${(index / (LEVELS.length - 1)) * 100}%` }}
                 />
               ))}
-              <span
-                className="absolute inset-0 transition-transform duration-500 ease-out motion-reduce:transition-none"
-                style={{ transform: `translate3d(0, ${cabinPct}%, 0)` }}
-              >
+              <span className="nam-tram-carriage absolute inset-0">
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
                   <NamTramCabin />
                 </span>
