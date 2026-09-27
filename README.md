@@ -55,6 +55,12 @@ Les photos des cards, niveaux et galeries sont référencées par URL publique S
 
 Les contenus publics complets sont conservés brièvement en mémoire et dans le cache Cloudflare du centre de données, pendant deux minutes. Une modification Supabase peut donc prendre environ deux minutes à apparaître sur tous les visiteurs. Si une lecture échoue, le site utilise les données locales de secours ; une réponse réussie mais vide reste vide et ne fait pas réapparaître d’anciens contenus.
 
+## Carte interactive
+
+L’atlas plein écran s’ouvre depuis le sélecteur Nam Tram, le pied de page ou « View on map » dans une fiche associée. Il propose recherche, filtres par collection/niveau, zoom et déplacement, repères photo, sentiers et parcours Bensley. Toucher un lieu ouvre les **mêmes cards Supabase** que le hub, avec leurs médias et traductions.
+
+Les positions sont dans `map_places` et les associations dans `map_destination_links`. Le niveau et la collection des destinations du hub font autorité ; aucune copie éditoriale du projet de carte n’est utilisée. Une offre sans position vérifiée ne reçoit pas de repère inventé. Voir [la maintenance de la carte](docs/resort-map.md).
+
 ## Déploiement et structure
 
 Les changements fusionnés dans `main` sont construits pour le Worker `icdnd`. Nitro génère `.output/server/wrangler.json` et `.output/public` ; le site nécessite le rendu serveur et ne se publie pas comme un simple dossier statique. Les paramètres du Worker, des prévisualisations et du domaine sont dans le [guide Cloudflare](docs/cloudflare.md).

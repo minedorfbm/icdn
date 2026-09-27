@@ -1,3 +1,6 @@
+import { Map } from "lucide-react";
+import { useResortMap } from "@/features/resort-map/map-context";
+import { mapCopy } from "@/features/resort-map/map-copy";
 import { useRef, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { LEVELS, type Level } from "@/data/resort";
@@ -17,7 +20,8 @@ interface Props {
 export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const { t, levelLabel } = useI18n();
+  const { openMap } = useResortMap();
+  const { lang, t, levelLabel } = useI18n();
 
   const selectLevel = (level: Level) => {
     setOpen(false);
@@ -113,6 +117,17 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
             </button>
           ))}
         </nav>
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(false);
+            openMap();
+          }}
+          className="mt-5 flex min-h-12 w-full items-center justify-center gap-3 border-t border-current/20 pt-4 text-[13px] tracking-wide"
+        >
+          <Map size={18} />
+          {mapCopy(lang, "open")}
+        </button>
       </SheetContent>
     </Sheet>
   );

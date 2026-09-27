@@ -1,0 +1,1031 @@
+.hub-atlas .resort-art {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  outline: none;
+}
+.hub-atlas .resort-art:active {
+  cursor: grabbing;
+}
+.hub-atlas .resort-art:focus-visible {
+  outline: 1px solid rgba(216, 195, 150, 0.58);
+  outline-offset: -3px;
+}
+.hub-atlas .map-scene {
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hub-atlas .resort-art:active .map-scene {
+  transition: none;
+}
+.hub-atlas .forest-base {
+  filter: drop-shadow(-20px -25px 44px rgba(0, 0, 0, 0.32));
+}
+.hub-atlas .official-plan-layer {
+  pointer-events: none;
+}
+.hub-atlas .nam-tram-axis-v2.on-reference {
+  opacity: 0.45;
+}
+.hub-atlas .level-road {
+  fill: none;
+  stroke-width: 3;
+  opacity: 0.66;
+}
+.hub-atlas .entry-road {
+  stroke: #e9d9b1;
+  stroke-width: 3;
+  opacity: 0.55;
+}
+.hub-atlas .entrance-caption,
+.hub-atlas .lagoon-caption {
+  fill: #e9d9b1;
+  font:
+    400 10px var(--font-jost),
+    sans-serif;
+  letter-spacing: 0.18em;
+  opacity: 0.7;
+}
+.hub-atlas .canopy-texture {
+  opacity: 0.78;
+  filter: saturate(0.85) contrast(0.96) brightness(0.88);
+}
+.hub-atlas .forest-veil {
+  fill: rgba(10, 39, 32, 0.3);
+  stroke: rgba(216, 195, 150, 0.28);
+  stroke-width: 1.5;
+}
+.hub-atlas .terrain-contours path {
+  stroke: rgba(239, 227, 200, 0.15);
+  stroke-width: 1.25;
+  stroke-dasharray: 1 7;
+  stroke-linecap: round;
+}
+.hub-atlas .map-paths .path-shadow {
+  stroke: rgba(0, 0, 0, 0.27);
+  stroke-width: 9;
+}
+.hub-atlas .map-paths .path-line {
+  stroke: rgba(239, 227, 200, 0.42);
+  stroke-width: 2;
+  stroke-dasharray: 2 8;
+}
+.hub-atlas .discovery-trail {
+  stroke: rgba(84, 144, 148, 0.55);
+  stroke-width: 2.5;
+  stroke-dasharray: 5 9;
+}
+.hub-atlas .beach-ribbon-v2 {
+  fill: none;
+  stroke: url(#sand-gradient-v2);
+  stroke-width: 31;
+  stroke-linecap: round;
+  filter: drop-shadow(0 9px 17px rgba(2, 16, 20, 0.34));
+}
+.hub-atlas .shoreline-v2 {
+  fill: none;
+  stroke: rgba(224, 239, 229, 0.52);
+  stroke-width: 2;
+}
+.hub-atlas .shore-foam {
+  fill: none;
+  stroke: rgba(225, 243, 240, 0.24);
+  stroke-width: 5;
+  stroke-dasharray: 2 10;
+  stroke-linecap: round;
+}
+.hub-atlas .architecture-layer :is(path, .hub-atlas rect, .hub-atlas circle, .hub-atlas ellipse) {
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.hub-atlas .architecture-site {
+  opacity: 1;
+  transition:
+    opacity 0.35s ease,
+    filter 0.35s ease;
+}
+.hub-atlas .architecture-site.is-dimmed {
+  opacity: 0.14;
+  filter: saturate(0.25);
+}
+.hub-atlas .architecture-motion {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transition:
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 0.45s ease;
+}
+.hub-atlas .architecture-site.is-selected .architecture-motion {
+  transform: translateY(-3px);
+  filter: brightness(1.12) drop-shadow(0 9px 10px rgba(0, 0, 0, 0.45));
+}
+.hub-atlas .architecture-selection {
+  fill: rgba(213, 183, 109, 0);
+  stroke: rgba(238, 211, 145, 0);
+  stroke-width: 1.2;
+  transition: 0.4s ease;
+}
+.hub-atlas .architecture-site.is-selected .architecture-selection {
+  fill: rgba(213, 183, 109, 0.11);
+  stroke: rgba(238, 211, 145, 0.75);
+  filter: url(#gold-glow-v2);
+}
+.hub-atlas .architecture-detail {
+  opacity: 0.28;
+  transition: opacity 0.4s ease;
+}
+.hub-atlas .architecture-micro {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.hub-atlas .architecture-layer.is-detailed .architecture-detail,
+.hub-atlas .architecture-layer.is-close .architecture-detail,
+.hub-atlas .architecture-layer.is-close .architecture-micro {
+  opacity: 1;
+}
+.hub-atlas .architecture-shadow {
+  fill: rgba(0, 10, 14, 0.48);
+  stroke: none;
+}
+.hub-atlas .architecture-plant {
+  stroke: rgba(178, 199, 166, 0.65);
+  stroke-width: 0.85;
+  fill: rgba(36, 88, 65, 0.86);
+}
+.hub-atlas .architecture-plinth,
+.hub-atlas .villa-terrace,
+.hub-atlas .maison-terrace,
+.hub-atlas .village-court,
+.hub-atlas .summit-court,
+.hub-atlas .pavilion-platform,
+.hub-atlas .tingara-deck,
+.hub-atlas .spa-reception-deck,
+.hub-atlas .yoga-platform,
+.hub-atlas .spirit-lawn,
+.hub-atlas .terra-boardwalk {
+  fill: rgba(199, 181, 137, 0.82);
+  stroke: rgba(246, 230, 193, 0.52);
+  stroke-width: 0.9;
+}
+.hub-atlas .facade-front,
+.hub-atlas .facade-right,
+.hub-atlas .gallery-facade-right,
+.hub-atlas .maison-wing-right {
+  fill: url(#architecture-ivory);
+  stroke: #102a2d;
+  stroke-width: 1.15;
+}
+.hub-atlas .facade-left,
+.hub-atlas .facade-side,
+.hub-atlas .gallery-facade-left,
+.hub-atlas .maison-wing-left {
+  fill: url(#architecture-shade);
+  stroke: #102a2d;
+  stroke-width: 1.15;
+}
+.hub-atlas .facade-dark {
+  fill: url(#architecture-dark);
+  stroke: #07171c;
+  stroke-width: 1.15;
+}
+.hub-atlas .roof-under,
+.hub-atlas .pavilion-roof-under,
+.hub-atlas .yoga-roof-under,
+.hub-atlas .spirit-roof-under,
+.hub-atlas .long-roof-under {
+  fill: #06161b;
+  stroke: rgba(237, 218, 173, 0.4);
+  stroke-width: 1.35;
+}
+.hub-atlas .roof-charcoal-v3,
+.hub-atlas .villa-roof-charcoal,
+.hub-atlas .citron-roof,
+.hub-atlas .club-roof,
+.hub-atlas .tingara-roof,
+.hub-atlas .moulin-roof,
+.hub-atlas .pavilion-roof,
+.hub-atlas .yoga-roof,
+.hub-atlas .spirit-roof,
+.hub-atlas .sports-roof,
+.hub-atlas .studio-roof,
+.hub-atlas .spa-reception-roof,
+.hub-atlas .beach-hut-roof {
+  fill: url(#charcoal-tiles);
+  stroke: rgba(248, 236, 207, 0.78);
+  stroke-width: 1.35;
+}
+.hub-atlas .roof-main,
+.hub-atlas .roof-tier,
+.hub-atlas .gallery-roof,
+.hub-atlas .gallery-roof-tier,
+.hub-atlas .maison-roof,
+.hub-atlas .maison-centre-roof,
+.hub-atlas .summit-roof,
+.hub-atlas .summit-roof-tier {
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.34));
+}
+.hub-atlas .roof-ridge-v3,
+.hub-atlas .long-ridge {
+  fill: none;
+  stroke: rgba(244, 231, 198, 0.7);
+  stroke-width: 0.85;
+}
+.hub-atlas .roof-finial-v3 {
+  fill: #cfad62;
+  stroke: #fff0bb;
+  stroke-width: 0.75;
+}
+.hub-atlas .architecture-stair,
+.hub-atlas .maison-stairs,
+.hub-atlas .summit-stair,
+.hub-atlas .terra-steps {
+  fill: none;
+  stroke: rgba(239, 225, 193, 0.74);
+  stroke-width: 1.1;
+}
+.hub-atlas .column-lacquer,
+.hub-atlas .gallery-column,
+.hub-atlas .coastal-column,
+.hub-atlas .summit-column,
+.hub-atlas .pavilion-column,
+.hub-atlas .yoga-columns path {
+  fill: none;
+  stroke: #16282a;
+  stroke-width: 1.45;
+}
+.hub-atlas .lattice-line,
+.hub-atlas .gallery-lattice,
+.hub-atlas .pavilion-rail,
+.hub-atlas .maison-veranda,
+.hub-atlas .maison-balustrade,
+.hub-atlas .citron-rail {
+  fill: none;
+  stroke: rgba(25, 45, 44, 0.76);
+  stroke-width: 0.8;
+}
+.hub-atlas .architecture-lantern path:first-child {
+  fill: none;
+  stroke: #2b2a21;
+  stroke-width: 0.7;
+}
+.hub-atlas .architecture-lantern path:last-child {
+  stroke-width: 0.65;
+}
+.hub-atlas .reflecting-pool,
+.hub-atlas .club-pool {
+  fill: url(#lagoon-fill);
+  stroke: rgba(190, 226, 217, 0.75);
+  stroke-width: 0.9;
+}
+.hub-atlas .oculus {
+  fill: rgba(8, 31, 36, 0.86);
+  stroke: #dac98f;
+  stroke-width: 1;
+}
+.hub-atlas .tam-quan-wall {
+  fill: #efe3c8;
+  stroke: #10282c;
+  stroke-width: 1;
+}
+.hub-atlas .tam-quan-roof {
+  fill: url(#charcoal-tiles);
+  stroke: #eedeb8;
+  stroke-width: 1.05;
+}
+.hub-atlas .tam-quan path:last-child {
+  fill: none;
+  stroke: #172a2b;
+  stroke-width: 1;
+}
+.hub-atlas .villa-roof-edge {
+  fill: #07161b;
+  stroke: #ddcda6;
+  stroke-width: 1.2;
+}
+.hub-atlas .villa-roof-plane {
+  stroke-width: 0.8;
+}
+.hub-atlas .villa-pavilion {
+  fill: url(#architecture-shade);
+  stroke: #102a2d;
+  stroke-width: 0.9;
+}
+.hub-atlas .villa-pavilion-roof {
+  fill: url(#charcoal-tiles);
+  stroke: #ebdcba;
+  stroke-width: 0.8;
+}
+.hub-atlas .villa-glazing {
+  fill: rgba(21, 49, 50, 0.9);
+  stroke: rgba(238, 214, 157, 0.48);
+  stroke-width: 0.6;
+}
+.hub-atlas .villa-balcony {
+  fill: none;
+  stroke: rgba(32, 50, 47, 0.75);
+  stroke-width: 0.7;
+}
+.hub-atlas .villa-pool {
+  fill: #397f89;
+  stroke: #a8d6d2;
+  stroke-width: 0.8;
+}
+.hub-atlas .villa-pool-shine {
+  fill: none;
+  stroke: rgba(221, 245, 236, 0.7);
+  stroke-width: 0.65;
+}
+.hub-atlas .citron-pool {
+  fill: rgba(53, 118, 124, 0.77);
+  stroke: rgba(194, 229, 218, 0.7);
+  stroke-width: 1;
+}
+.hub-atlas .citron-deck-v3 {
+  fill: #cab98c;
+  stroke: #f0e0b6;
+  stroke-width: 0.95;
+}
+.hub-atlas .citron-roof {
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.38));
+}
+.hub-atlas .citron-glass,
+.hub-atlas .club-glass {
+  fill: rgba(10, 35, 39, 0.9);
+  stroke: rgba(202, 221, 194, 0.48);
+  stroke-width: 0.75;
+}
+.hub-atlas .cave-mark {
+  fill: none;
+  stroke: #c8d457;
+  stroke-width: 0.8;
+}
+.hub-atlas .nonla-shadow-v3 {
+  fill: rgba(0, 0, 0, 0.38);
+  stroke: none;
+}
+.hub-atlas .nonla-bowl {
+  fill: #aeba38;
+  stroke: #edf180;
+  stroke-width: 1.1;
+}
+.hub-atlas .nonla-rim-v3 {
+  fill: #d6d85c;
+  stroke: #fbf1a7;
+  stroke-width: 0.95;
+}
+.hub-atlas .nonla-ribs {
+  fill: none;
+  stroke: rgba(58, 65, 12, 0.7);
+  stroke-width: 0.65;
+}
+.hub-atlas .nonla-post {
+  fill: none;
+  stroke: #182a27;
+  stroke-width: 1.15;
+}
+.hub-atlas .monkey-fountain {
+  fill: #b8734c;
+  stroke: #f1c18c;
+  stroke-width: 0.8;
+}
+.hub-atlas .gallery-clerestory {
+  fill: #e8dcc0;
+  stroke: #12292c;
+  stroke-width: 1;
+}
+.hub-atlas .gallery-art-window {
+  stroke: #f6e6bc;
+  stroke-width: 0.7;
+}
+.hub-atlas .gallery-art-window.art-coral {
+  fill: #be624f;
+}
+.hub-atlas .gallery-art-window.art-lime {
+  fill: #c2ca49;
+}
+.hub-atlas .courtyard-pattern {
+  fill: none;
+  stroke: rgba(245, 225, 181, 0.48);
+  stroke-width: 0.7;
+}
+.hub-atlas .maison-centre {
+  fill: #f1e8d4;
+  stroke: #16292b;
+  stroke-width: 1.2;
+}
+.hub-atlas .maison-arched-window,
+.hub-atlas .maison-door {
+  fill: #193334;
+  stroke: #f2dfb7;
+  stroke-width: 0.75;
+}
+.hub-atlas .buffalo-statue {
+  fill: #ece4d3;
+  stroke: #5d5a4e;
+  stroke-width: 0.7;
+}
+.hub-atlas .coastal-roof {
+  fill: url(#thatch-weave);
+  stroke: #ead5a1;
+  stroke-width: 1.25;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.32));
+}
+.hub-atlas .fishing-net,
+.hub-atlas .terra-pergola,
+.hub-atlas .basket-boat {
+  fill: none;
+  stroke: rgba(235, 210, 160, 0.73);
+  stroke-width: 0.8;
+}
+.hub-atlas .long-pool-v3 {
+  fill: url(#lagoon-fill);
+  stroke: rgba(177, 222, 216, 0.82);
+  stroke-width: 1.15;
+}
+.hub-atlas .long-pool-shine {
+  fill: none;
+  stroke: rgba(227, 247, 236, 0.48);
+  stroke-width: 0.7;
+}
+.hub-atlas .long-floor {
+  fill: #e8ddc5;
+  stroke: #11262a;
+  stroke-width: 1.05;
+}
+.hub-atlas .long-roof-v3 {
+  fill: #0b1d22;
+  stroke: #d9c48f;
+  stroke-width: 1.25;
+}
+.hub-atlas .long-column-v3 {
+  fill: none;
+  stroke: #efe6d4;
+  stroke-width: 2.1;
+}
+.hub-atlas .punkah,
+.hub-atlas .basket-chair {
+  fill: none;
+  stroke: #d0b066;
+  stroke-width: 0.8;
+}
+.hub-atlas .long-floor-pattern {
+  fill: none;
+  stroke: rgba(20, 42, 43, 0.36);
+  stroke-width: 0.65;
+}
+.hub-atlas .summit-court {
+  fill: #bba981;
+}
+.hub-atlas .summit-roof,
+.hub-atlas .summit-roof-tier {
+  fill: url(#charcoal-tiles);
+  stroke: #f0dfb7;
+  stroke-width: 1.45;
+}
+.hub-atlas .summit-window {
+  fill: #152f31;
+  stroke: #d9bd78;
+  stroke-width: 0.65;
+}
+.hub-atlas .summit-portal {
+  fill: #10282c;
+  stroke: #e2cd98;
+  stroke-width: 0.9;
+}
+.hub-atlas .spa-lagoon-v3,
+.hub-atlas .garden-pool-water {
+  fill: url(#lagoon-fill);
+  stroke: rgba(179, 222, 214, 0.78);
+  stroke-width: 1.2;
+}
+.hub-atlas .spa-lagoon-rim,
+.hub-atlas .garden-pool-rim {
+  fill: none;
+  stroke: rgba(224, 245, 230, 0.46);
+  stroke-width: 0.8;
+}
+.hub-atlas .spa-boardwalk,
+.hub-atlas .spa-bridge {
+  fill: none;
+  stroke: #c6a66b;
+  stroke-width: 2.5;
+}
+.hub-atlas .spa-hangar-copper {
+  fill: url(#copper-patina);
+  stroke: #e7bd7a;
+  stroke-width: 1.15;
+}
+.hub-atlas .spa-hangar.is-patina .spa-hangar-copper {
+  filter: saturate(1.2) hue-rotate(12deg);
+}
+.hub-atlas .spa-hangar-door {
+  fill: #071a20;
+  stroke: #b4cfbc;
+  stroke-width: 0.65;
+}
+.hub-atlas .spa-ribs-v3 {
+  fill: none;
+  stroke: rgba(234, 218, 174, 0.7);
+  stroke-width: 0.65;
+}
+.hub-atlas .sports-court-v3 {
+  fill: rgba(59, 116, 106, 0.8);
+  stroke: #d7c68f;
+  stroke-width: 1;
+}
+.hub-atlas .sports-lines-v3 {
+  fill: none;
+  stroke: rgba(240, 235, 205, 0.7);
+  stroke-width: 0.65;
+}
+.hub-atlas .sports-glass {
+  fill: #274c4a;
+  stroke: #c9b982;
+  stroke-width: 0.65;
+}
+.hub-atlas .apec-lawn,
+.hub-atlas .garden-ground {
+  fill: rgba(63, 105, 72, 0.85);
+  stroke: #b6c294;
+  stroke-width: 0.9;
+}
+.hub-atlas .apec-path {
+  fill: none;
+  stroke: #d4c393;
+  stroke-width: 2;
+}
+.hub-atlas .apec-sculptures {
+  fill: #bba56c;
+  stroke: #f1dfab;
+  stroke-width: 0.75;
+}
+.hub-atlas .garden-bed {
+  fill: #78563f;
+  stroke: #c7a36f;
+  stroke-width: 0.65;
+}
+.hub-atlas .nursery-shed,
+.hub-atlas .beach-hut {
+  fill: url(#architecture-ivory);
+  stroke: #152b2d;
+  stroke-width: 0.9;
+}
+.hub-atlas .nursery-roof {
+  fill: url(#thatch-weave);
+  stroke: #ead5a1;
+  stroke-width: 0.85;
+}
+.hub-atlas .garden-sprouts {
+  fill: none;
+  stroke: #a9d08f;
+  stroke-width: 0.7;
+}
+.hub-atlas .garden-pool-water {
+  opacity: 0.9;
+}
+.hub-atlas .pool-cabanas {
+  fill: #e1c97a;
+  stroke: #fff0a8;
+  stroke-width: 0.75;
+}
+.hub-atlas .studio-awning,
+.hub-atlas .moulin-marquee {
+  fill: #b65349;
+  stroke: #f0c5a9;
+  stroke-width: 0.85;
+}
+.hub-atlas .studio-stripes {
+  fill: none;
+  stroke: #f3ddd0;
+  stroke-width: 0.65;
+}
+.hub-atlas .moulin-clock {
+  fill: #ead29c;
+  stroke: #42272a;
+  stroke-width: 0.75;
+}
+.hub-atlas .moulin-clock path {
+  fill: none;
+}
+.hub-atlas .hanging-boats,
+.hub-atlas .basket-boats {
+  fill: #9c744d;
+  stroke: #edcf94;
+  stroke-width: 0.75;
+}
+.hub-atlas .spa-reception-roof {
+  fill: url(#copper-patina);
+}
+.hub-atlas .spa-reception-door {
+  fill: #0d262a;
+  stroke: #deb978;
+  stroke-width: 0.75;
+}
+.hub-atlas .beach-hut-roof {
+  fill: url(#thatch-weave);
+}
+.hub-atlas .yoga-platform {
+  fill: rgba(196, 178, 132, 0.82);
+}
+.hub-atlas .spirit-door {
+  fill: #9b443b;
+  stroke: #e2ba83;
+  stroke-width: 0.75;
+}
+.hub-atlas .spirit-flames {
+  fill: #c06d3e;
+  stroke: #f3c87e;
+  stroke-width: 0.65;
+}
+.hub-atlas .torii {
+  fill: none;
+  stroke: #9a3f36;
+  stroke-width: 1.15;
+}
+.hub-atlas .shoji {
+  fill: rgba(232, 221, 193, 0.88);
+  stroke: #263635;
+  stroke-width: 0.65;
+}
+.hub-atlas .palm-grove-v2 {
+  stroke: rgba(233, 217, 166, 0.55);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+.hub-atlas .tram-glow {
+  fill: none;
+  stroke: rgba(198, 162, 92, 0.22);
+  stroke-width: 19;
+  filter: url(#gold-glow-v2);
+}
+.hub-atlas .tram-rail {
+  fill: none;
+  stroke: #d8bd7b;
+  stroke-width: 2;
+}
+.hub-atlas .tram-ties {
+  fill: none;
+  stroke: #e5c980;
+  stroke-width: 6.5;
+  stroke-dasharray: 1 11;
+  stroke-linecap: butt;
+  opacity: 0.85;
+}
+.hub-atlas .tram-station-v2 .station-outer {
+  fill: #071b21;
+  stroke: #e0c47e;
+  stroke-width: 2;
+}
+.hub-atlas .tram-station-v2 .station-inner {
+  fill: #f0d692;
+  filter: url(#gold-glow-v2);
+}
+.hub-atlas .station-plaque rect {
+  fill: rgba(4, 21, 28, 0.9);
+  stroke: rgba(216, 195, 150, 0.4);
+  stroke-width: 1;
+}
+.hub-atlas .station-plaque text {
+  fill: #e9d49c;
+  font:
+    400 8px/1 var(--font-jost),
+    sans-serif;
+  letter-spacing: 0.12em;
+}
+.hub-atlas .tram-car-v2 {
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  filter: url(#gold-glow-v2);
+}
+.hub-atlas .tram-car-v2 path:first-child {
+  fill: #d6bc72;
+  stroke: #06171c;
+  stroke-width: 1.7;
+}
+.hub-atlas .tram-car-v2 path:last-child {
+  fill: none;
+  stroke: #5b4822;
+  stroke-width: 1.2;
+}
+.hub-atlas .bensley-route-v2 {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+.hub-atlas .bensley-route-v2.is-visible {
+  opacity: 1;
+}
+.hub-atlas .bensley-route-v2 > path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 5;
+  stroke: rgba(239, 227, 200, 0.15);
+  stroke-dasharray: 2 10;
+  transition: 0.5s ease;
+}
+.hub-atlas .bensley-route-v2 > path.tram {
+  stroke: rgba(198, 162, 92, 0.28);
+}
+.hub-atlas .bensley-route-v2 > path.is-complete {
+  stroke: #c6a25c;
+  stroke-opacity: 0.9;
+  stroke-dasharray: none;
+}
+.hub-atlas .bensley-route-v2 > path.is-current {
+  stroke: #f0d796;
+  stroke-width: 7;
+  stroke-opacity: 1;
+  filter: url(#gold-glow-v2);
+  stroke-dasharray: 120 420;
+  animation: draw-route 1.25s ease-out both;
+}
+.hub-atlas .tour-marker-v2 circle {
+  fill: #071b21;
+  stroke: #c6a25c;
+  stroke-width: 1.3;
+  opacity: 0.5;
+}
+.hub-atlas .tour-marker-v2 text {
+  fill: #d9c189;
+  font:
+    500 7px/1 var(--font-jost),
+    sans-serif;
+}
+.hub-atlas .tour-marker-v2.is-complete circle {
+  fill: #c6a25c;
+  opacity: 1;
+}
+.hub-atlas .tour-marker-v2.is-complete text {
+  fill: #06171c;
+}
+.hub-atlas .tour-marker-v2.is-current circle {
+  fill: #f2daa0;
+  stroke: #fff2c4;
+  stroke-width: 2;
+  opacity: 1;
+  filter: url(#gold-glow-v2);
+}
+.hub-atlas .tour-marker-v2.is-current text {
+  fill: #06171c;
+}
+.hub-atlas .level-cartouches path {
+  stroke: rgba(216, 195, 150, 0.3);
+  stroke-width: 1;
+}
+.hub-atlas .level-cartouches text {
+  fill: #c6a25c;
+  font:
+    400 8px/1 var(--font-jost),
+    sans-serif;
+  letter-spacing: 0.17em;
+}
+.hub-atlas .level-cartouches .level-name {
+  fill: rgba(239, 227, 200, 0.82);
+  font-size: 10px;
+}
+.hub-atlas .level-cartouches .bay-title-v2 {
+  fill: rgba(239, 227, 200, 0.38);
+  font:
+    italic 400 22px/1 var(--font-cormorant),
+    Georgia,
+    serif;
+  letter-spacing: 0.12em;
+}
+.hub-atlas .hotspot-v2 {
+  cursor: pointer;
+  transition: opacity 0.28s ease;
+}
+.hub-atlas .hotspot-hit {
+  fill: transparent;
+}
+.hub-atlas .hotspot-v2.is-selected .hotspot-leader {
+  stroke: #f0d58f;
+  stroke-width: 1.2;
+  filter: url(#gold-glow-v2);
+}
+.hub-atlas .hotspot-pulse {
+  fill: rgba(198, 162, 92, 0);
+  stroke: rgba(216, 195, 150, 0.19);
+  stroke-width: 1;
+}
+.hub-atlas .hotspot-medallion {
+  fill: #061920;
+  stroke: rgba(239, 227, 200, 0.82);
+  stroke-width: 1.3;
+}
+.hub-atlas .hotspot-number {
+  fill: #f1e4c5;
+  font:
+    500 7px/1 var(--font-jost),
+    sans-serif;
+}
+.hub-atlas .hotspot-v2.is-major .hotspot-medallion {
+  stroke: #d0af66;
+  stroke-width: 2;
+}
+.hub-atlas .hotspot-label-plate {
+  opacity: 0;
+  transform-origin: left center;
+  transition: opacity 0.24s ease;
+  pointer-events: none;
+}
+.hub-atlas .hotspot-label-plate rect {
+  fill: rgba(4, 21, 28, 0.9);
+  stroke: rgba(216, 195, 150, 0.3);
+  stroke-width: 1;
+}
+.hub-atlas .hotspot-label-plate text {
+  fill: rgba(245, 234, 207, 0.92);
+  font:
+    400 9px/1 var(--font-jost),
+    sans-serif;
+  letter-spacing: 0.06em;
+}
+.hub-atlas .hotspot-v2.is-major .hotspot-label-plate,
+.hub-atlas .hotspot-v2:hover .hotspot-label-plate,
+.hub-atlas .hotspot-v2:focus-visible .hotspot-label-plate,
+.hub-atlas .hotspots-v2.is-zoomed .hotspot-v2:not(.is-dimmed) .hotspot-label-plate {
+  opacity: 1;
+}
+.hub-atlas .hotspot-v2.is-selected .hotspot-pulse {
+  stroke: #f2d489;
+  stroke-width: 2;
+  animation: marker-breathe 2.2s ease-in-out infinite;
+}
+.hub-atlas .hotspot-v2.is-selected .hotspot-medallion {
+  fill: #d6b86d;
+  stroke: #fff0bd;
+}
+.hub-atlas .hotspot-v2.is-selected .hotspot-number {
+  fill: #06171c;
+}
+.hub-atlas .hotspot-v2.is-selected .hotspot-label-plate rect {
+  fill: #efe3c8;
+  stroke: #fff2cf;
+}
+.hub-atlas .hotspot-v2.is-selected .hotspot-label-plate text {
+  fill: #06171c;
+  font-weight: 500;
+}
+.hub-atlas .hotspot-v2.is-dimmed {
+  opacity: 0.11;
+  pointer-events: none;
+}
+.hub-atlas .hotspot-v2:focus {
+  outline: none;
+}
+.hub-atlas .hotspot-v2.is-major .hotspot-label-plate,
+.hub-atlas .hotspot-v2.is-selected .hotspot-label-plate,
+.hub-atlas .hotspot-v2:hover .hotspot-label-plate,
+.hub-atlas .hotspot-v2:focus-visible .hotspot-label-plate {
+  pointer-events: auto;
+}
+.hub-atlas
+  .hotspots-v2.is-zoomed
+  .hotspot-v2:not(.is-major):not(.is-selected):not(:hover):not(:focus-visible)
+  .hotspot-label-plate {
+  opacity: 0;
+}
+.hub-atlas .trail-highlight path {
+  fill: none;
+  stroke: #7dd7e4;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 5 7;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px #7dd7e477);
+  pointer-events: none;
+}
+.hub-atlas .walking-time-labels {
+  pointer-events: none;
+}
+.hub-atlas .walking-time-labels rect {
+  fill: #b95d3b;
+  stroke: #f2c497;
+  stroke-width: 1;
+}
+.hub-atlas .walking-time-labels text {
+  fill: #fff7e9;
+  font:
+    500 12px var(--font-jost),
+    sans-serif;
+}
+.hub-atlas .beach-highlights > g {
+  cursor: pointer;
+}
+.hub-atlas .beach-highlights > g > path {
+  fill: none;
+  stroke-width: 9;
+  stroke-opacity: 0.8;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+}
+.hub-atlas .beach-highlights rect {
+  fill: #08212cf2;
+  stroke: #ddceaa88;
+  stroke-width: 1;
+}
+.hub-atlas .beach-highlights text {
+  fill: #f0e5cb;
+  font:
+    500 14px var(--font-jost),
+    sans-serif;
+}
+.hub-atlas .beach-highlights .beach-purpose {
+  fill: #b6c6c1;
+  font-size: 11px;
+  font-weight: 400;
+}
+.hub-atlas .beach-leader {
+  stroke: #e4d5b3;
+  stroke-width: 1;
+}
+.hub-atlas .lagoon-villa-highlight {
+  pointer-events: none;
+}
+.hub-atlas .lagoon-villa-highlight path {
+  fill: #a7c36c22;
+  stroke: #bdd887;
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+}
+.hub-atlas .lagoon-villa-highlight text {
+  fill: #dfedc5;
+  font:
+    12px var(--font-jost),
+    sans-serif;
+  paint-order: stroke;
+  stroke: #07212a;
+  stroke-width: 4px;
+}
+.hub-atlas .photo-mode .station-plaque {
+  opacity: 0.25;
+}
+.hub-atlas .photo-hotspot {
+  cursor: pointer;
+  outline: none;
+}
+.hub-atlas .photo-leader {
+  stroke: #edc8b8;
+  stroke-width: 1;
+}
+.hub-atlas .photo-anchor {
+  fill: #efc7b4;
+  stroke: #08212c;
+  stroke-width: 1;
+}
+.hub-atlas .photo-hit {
+  fill: transparent;
+}
+.hub-atlas .photo-marker {
+  fill: #263139;
+  stroke: #e3bfa8;
+  stroke-width: 1.4;
+  filter: drop-shadow(0 4px 6px #00101899);
+}
+.hub-atlas .photo-hotspot text {
+  fill: #f2d8c4;
+  font:
+    500 15px var(--font-jost),
+    sans-serif;
+}
+.hub-atlas .photo-hotspot:hover .photo-marker,
+.hub-atlas .photo-hotspot:focus-visible .photo-marker,
+.hub-atlas .photo-hotspot.is-selected .photo-marker {
+  fill: #efcfb7;
+  stroke: #fff2d7;
+  stroke-width: 2;
+}
+.hub-atlas .photo-hotspot:hover text,
+.hub-atlas .photo-hotspot:focus-visible text,
+.hub-atlas .photo-hotspot.is-selected text {
+  fill: #162a30;
+}
+.hub-atlas .photo-directory button.is-selected {
+  background: #dab89916;
+  border-radius: 5px;
+}
+.hub-atlas .photo-directory button.is-selected .photo-letter {
+  color: #1b2d32;
+  background: #e2bd9e;
+}
+.hub-atlas .photo-directory button.is-selected {
+  background: #dab89924;
+}
+.hub-atlas .map-scene {
+  transition: none;
+}
+.hub-atlas .resort-art {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hub-atlas * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
