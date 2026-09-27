@@ -311,7 +311,7 @@ export function MapArtwork({
               </g>
             ))}
             {levelRoads.map(({ id, d }) => (
-              <path key={id} className={`level-road road-${id}`} d={d} />
+              <path key={`${id}-${d}`} className={`level-road road-${id}`} d={d} />
             ))}
             <path
               className="entry-road"
