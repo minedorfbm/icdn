@@ -247,6 +247,36 @@
   transition: opacity 600ms ease;
 }
 
+.journey-backdrop {
+  transform: translateY(var(--journey-scene-y, 0px));
+}
+
+.journey-heading {
+  transform: translateY(var(--journey-heading-y, 0px));
+  opacity: var(--journey-heading-opacity, 1);
+}
+
+.journey-deck {
+  transform: translateY(var(--journey-deck-y, 0px));
+  opacity: var(--journey-deck-opacity, 1);
+}
+
+.level[data-journey-near="true"] .journey-backdrop {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-backdrop,
+  .journey-heading,
+  .journey-deck {
+    transform: none;
+  }
+  .journey-heading,
+  .journey-deck {
+    opacity: 1;
+  }
+}
+
 .level[data-level="heaven"] {
   --level-bg: var(--world-heaven);
   --level-fg: oklch(0.16 0.01 90);

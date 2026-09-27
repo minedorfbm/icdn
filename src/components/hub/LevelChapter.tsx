@@ -95,13 +95,13 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
           decoding="async"
           width={900}
           height={1400}
-          className="level-bg h-full w-full object-cover"
+          className="journey-backdrop level-bg absolute -inset-y-12 left-0 h-[calc(100%+96px)] w-full object-cover"
         />
         <div className="level-veil absolute inset-0" />
       </div>
 
       <div className="relative pr-[var(--hub-rail-gutter)]">
-        <header className="mx-auto max-w-[740px] px-6">
+        <header className="journey-heading mx-auto max-w-[740px] px-6">
           <span className="block h-px w-10 bg-current/40" aria-hidden />
           <h2 className="mt-6 font-serif text-[clamp(56px,21vw,116px)] leading-[0.82] tracking-[-0.03em]">
             {title}
@@ -162,12 +162,14 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
           </button>
         </div>
 
-        <div
-          key={activeCluster ?? "all"}
-          ref={cardsRef}
-          className="group-enter mt-5 w-[calc(100%+var(--hub-rail-gutter))] overflow-hidden [clip-path:inset(0_var(--hub-rail-gutter)_0_0)]"
-        >
-          <CardStack items={list} near={near} index={activeIndex} onIndexChange={setCardIndex} />
+        <div className="journey-deck">
+          <div
+            key={activeCluster ?? "all"}
+            ref={cardsRef}
+            className="group-enter mt-5 w-[calc(100%+var(--hub-rail-gutter))] overflow-hidden [clip-path:inset(0_var(--hub-rail-gutter)_0_0)]"
+          >
+            <CardStack items={list} near={near} index={activeIndex} onIndexChange={setCardIndex} />
+          </div>
         </div>
       </div>
       <DestinationIndex

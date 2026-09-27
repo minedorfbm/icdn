@@ -1,6 +1,7 @@
 import { localizedLinkUrl } from "@/lib/localized-links";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
+import { useJourneyMotion } from "@/lib/use-journey-motion";
 import { Phone } from "lucide-react";
 import { LevelChapter } from "@/components/hub/LevelChapter";
 import { NamTramRail } from "@/components/hub/NamTramRail";
@@ -51,85 +52,23 @@ function HubRoute() {
 }
 
 function Hub() {
-  const [active, setActive] = useState<Level>("heaven");
-  const [progress, setProgress] = useState(0);
-  const [railVisible, setRailVisible] = useState(false);
-  const journeyRef = useRef<HTMLDivElement>(null);
+  const hubRef = useRef<HTMLElement>(null);
   const { levels, links, contact, heroImage } = useHub();
+  const { active, visible } = useJourneyMotion(hubRef, levels);
   const { lang, t, linkLabel } = useI18n();
 
-  useEffect(() => {
-    let raf = 0;
-    let lastProgress = -1;
-    let lastActive: Level | null = null;
-
-    // Section-aware progress: the cabin travels station to station and the
-    // gold fill always lines up exactly with the active level dot.
-    const measure = () => {
-      raf = 0;
-      const el = journeyRef.current;
-      if (!el) return;
-      const probe = window.scrollY + window.innerHeight * 0.5;
-      const sections = levels
-        .map((l) => document.getElementById(l.id))
-        .filter((n): n is HTMLElement => !!n);
-      if (!sections.length) return;
-
-      const first = sections[0]!;
-      const last = sections[sections.length - 1]!;
-      const visible =
-        probe >= first.offsetTop - window.innerHeight * 0.4 &&
-        window.scrollY + window.innerHeight <
-          last.offsetTop + last.offsetHeight + window.innerHeight * 0.4;
-      setRailVisible(visible);
-      if (probe < first.offsetTop) {
-        if (lastProgress !== 0) setProgress((lastProgress = 0));
-        if (lastActive !== levels[0]!.id) setActive((lastActive = levels[0]!.id));
-        return;
-      }
-      if (probe >= last.offsetTop + last.offsetHeight) {
-        if (lastProgress !== 1) setProgress((lastProgress = 1));
-        if (lastActive !== levels[levels.length - 1]!.id)
-          setActive((lastActive = levels[levels.length - 1]!.id));
-        return;
-      }
-
-      for (let i = 0; i < sections.length; i++) {
-        const s = sections[i]!;
-        const top = s.offsetTop;
-        const bottom = top + s.offsetHeight;
-        if (probe >= top && probe < bottom) {
-          const local = (probe - top) / s.offsetHeight;
-          const p = (i + local) / sections.length;
-          if (Math.abs(p - lastProgress) > 0.0005) setProgress((lastProgress = p));
-          const id = levels[i]!.id;
-          if (id !== lastActive) setActive((lastActive = id));
-          return;
-        }
-      }
-    };
-
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(measure);
-    };
-
-    measure();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [levels]);
-
   const jump = (level: Level) =>
-    document.getElementById(level)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById(level)?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
+      block: "start",
+    });
 
   return (
-    <main className="bg-background text-foreground">
+    <main ref={hubRef} className="bg-background text-foreground">
       <LanguageSwitch />
-      <NamTramRail active={active} progress={progress} visible={railVisible} onJump={jump} />
+      <NamTramRail active={active} visible={visible} onJump={jump} />
 
       {/* THRESHOLD */}
       <section className="relative h-[100svh] min-h-[600px] overflow-hidden">
@@ -166,7 +105,7 @@ function Hub() {
       </section>
 
       {/* THE DESCENT */}
-      <div ref={journeyRef}>
+      <div>
         {levels.map((l) => (
           <LevelChapter key={l.id} {...l} />
         ))}
