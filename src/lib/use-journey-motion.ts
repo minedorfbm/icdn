@@ -118,6 +118,8 @@ export function useJourneyMotion(
     };
     const resize = new ResizeObserver(refresh);
     sections.forEach(({ element }) => resize.observe(element));
+    // The translated discovery choices above the levels can also change their offsets.
+    resize.observe(root);
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", refresh);
     reducedMotion.addEventListener("change", refresh);

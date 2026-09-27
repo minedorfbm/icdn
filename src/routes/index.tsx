@@ -1,3 +1,4 @@
+import { DiscoveryPaths } from "@/features/discovery/DiscoveryPaths";
 import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
 import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
@@ -63,8 +64,8 @@ function Hub() {
   const { active, visible } = useJourneyMotion(hubRef, levels);
   const { lang, t, linkLabel } = useI18n();
 
-  const jump = (level: Level) =>
-    document.getElementById(level)?.scrollIntoView({
+  const scrollTo = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
         ? "instant"
         : "smooth",
@@ -74,7 +75,7 @@ function Hub() {
   return (
     <main ref={hubRef} className="bg-background text-foreground">
       <LanguageSwitch />
-      <NamTramRail active={active} visible={visible} onJump={jump} />
+      <NamTramRail active={active} visible={visible} onJump={(level: Level) => scrollTo(level)} />
 
       {/* THRESHOLD */}
       <section className="relative h-[100svh] min-h-[600px] overflow-hidden">
@@ -89,7 +90,7 @@ function Hub() {
         />
 
         <button
-          onClick={() => jump("heaven")}
+          onClick={() => scrollTo("discover")}
           className="absolute inset-x-0 top-[46%] z-10 flex flex-col items-center gap-4 px-5 text-center text-[#102d43] [text-shadow:0_1px_12px_rgba(255,255,255,0.9)]"
         >
           <span className="reveal text-[9px] tracking-[0.36em] [animation-delay:120ms]">
@@ -109,6 +110,8 @@ function Hub() {
           </span>
         </button>
       </section>
+
+      <DiscoveryPaths onJourney={() => scrollTo(levels[0]?.id ?? "heaven")} />
 
       {/* THE DESCENT */}
       <div>
