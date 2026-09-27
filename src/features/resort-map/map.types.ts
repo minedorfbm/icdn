@@ -6,7 +6,6 @@ export type Place = {
   id: string;
   pin: number;
   name: string;
-  mapLabel?: string;
   level: Level;
   categories: PlaceCategory[];
   point: MapPoint;
