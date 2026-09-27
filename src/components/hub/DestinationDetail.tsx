@@ -1,5 +1,7 @@
+import { useResortMap } from "@/features/resort-map/map-context";
+import { mapCopy } from "@/features/resort-map/map-copy";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
-import { ArrowLeft, Instagram, Youtube } from "lucide-react";
+import { ArrowLeft, Instagram, Youtube, MapPin } from "lucide-react";
 import { OFFICIAL, type Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 import { InstagramStrip } from "./InstagramStrip";
@@ -12,8 +14,14 @@ import { ResortLink } from "./ResortBrowser";
 export function DestinationDetail({
   dest,
   onClose,
-}: Readonly<{ dest: Destination; onClose: () => void }>) {
+  aboveMap = false,
+}: Readonly<{ dest: Destination; onClose: () => void; aboveMap?: boolean }>) {
   const { lang, t, typeLabel, levelLabel, action, description, event } = useI18n();
+  const { openMap, locate } = useResortMap();
+  const placeId = locate(dest.id);
+  const mapMode = ({ "bensley-package": "tour", "instagram-spots": "photos" } as const)[
+    dest.id as "bensley-package" | "instagram-spots"
+  ];
   const actions = actionsFor(dest, undefined, lang);
   const events = (dest.events ?? []).map((item) => event(item));
   const instagram = instagramUrl(dest);
@@ -23,7 +31,10 @@ export function DestinationDetail({
       title={dest.name}
       onClose={onClose}
       data-level={dest.level}
-      className="level detail-enter fixed inset-0 z-[80] overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain"
+      overlayClassName={
+        aboveMap ? "fixed inset-0 z-[94] bg-black/30" : "fixed inset-0 z-[79] bg-black/30"
+      }
+      className={`level detail-enter fixed inset-0 ${aboveMap ? "z-[95]" : "z-[80]"} overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain`}
     >
       <div className="relative h-[62svh] w-full overflow-hidden">
         <img
@@ -76,6 +87,18 @@ export function DestinationDetail({
 
         <span className="mt-8 block h-px w-10 bg-current/30" aria-hidden />
 
+        {(placeId || mapMode) && (
+          <button
+            type="button"
+            onClick={() =>
+              openMap({ ...(placeId ? { placeId } : {}), ...(mapMode ? { mode: mapMode } : {}) })
+            }
+            className="mt-8 flex w-full min-h-12 items-center justify-between gap-4 border-b border-current/20 py-4 text-[11px] tracking-[0.15em]"
+          >
+            <span>{mapCopy(lang, placeId ? "locate" : "open")}</span>
+            <MapPin size={17} strokeWidth={1.4} />
+          </button>
+        )}
         {actions.length > 0 && (
           <div className="mt-8 flex flex-col">
             {actions.map((a, i) => (

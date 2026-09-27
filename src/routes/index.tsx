@@ -1,3 +1,6 @@
+import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
+import { useResortMap } from "@/features/resort-map/map-context";
+import { mapCopy } from "@/features/resort-map/map-copy";
 import { localizedLinkUrl } from "@/lib/localized-links";
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
@@ -44,7 +47,9 @@ function HubRoute() {
     <I18nProvider editorial={data.editorial}>
       <ResortBrowserProvider>
         <HubProvider data={data}>
-          <Hub />
+          <ResortMapProvider>
+            <Hub />
+          </ResortMapProvider>
         </HubProvider>
       </ResortBrowserProvider>
     </I18nProvider>
@@ -52,6 +57,7 @@ function HubRoute() {
 }
 
 function Hub() {
+  const { openMap } = useResortMap();
   const hubRef = useRef<HTMLElement>(null);
   const { levels, links, contact, heroImage } = useHub();
   const { active, visible } = useJourneyMotion(hubRef, levels);
@@ -117,21 +123,32 @@ function Hub() {
         <ul className="mt-8 flex flex-col divide-y divide-current/10 border-y border-current/10">
           {links.map(({ label, url, translations }) => (
             <li key={label}>
-              <ResortLink
-                href={localizedLinkUrl(
-                  label === "Website" ? "WEBSITE" : label,
-                  url,
-                  translations,
-                  lang,
-                )}
-                pageTitle={linkLabel(label)}
-                target={label === "Contact" ? undefined : "_blank"}
-                rel={label === "Contact" ? undefined : "noreferrer"}
-                className="flex items-center justify-between py-3 text-[11px] tracking-[0.22em]"
-              >
-                {linkLabel(label).toUpperCase()}
-                <span className="opacity-40">↗</span>
-              </ResortLink>
+              {label === "Resort Map" ? (
+                <button
+                  type="button"
+                  onClick={() => openMap()}
+                  className="flex w-full items-center justify-between py-3 text-[11px] tracking-[0.22em]"
+                >
+                  {mapCopy(lang, "open")}
+                  <span aria-hidden>↗</span>
+                </button>
+              ) : (
+                <ResortLink
+                  href={localizedLinkUrl(
+                    label === "Website" ? "WEBSITE" : label,
+                    url,
+                    translations,
+                    lang,
+                  )}
+                  pageTitle={linkLabel(label)}
+                  target={label === "Contact" ? undefined : "_blank"}
+                  rel={label === "Contact" ? undefined : "noreferrer"}
+                  className="flex items-center justify-between py-3 text-[11px] tracking-[0.22em]"
+                >
+                  {linkLabel(label).toUpperCase()}
+                  <span className="opacity-40">↗</span>
+                </ResortLink>
+              )}
             </li>
           ))}
         </ul>

@@ -1,3 +1,4 @@
+import type { MapPlaceRow, MapLinkRow } from "@/features/resort-map/map.types";
 import type { DestinationLinkTranslationRow, SiteLinkTranslationRow } from "./localized-links";
 import type {
   EditorialTranslations,
@@ -26,6 +27,8 @@ export interface LevelRow {
 }
 
 export interface HubData {
+  mapPlaces?: MapPlaceRow[] | null;
+  mapLinks?: MapLinkRow[] | null;
   editorial?: EditorialTranslations;
   linkTranslations?: DestinationLinkTranslationRow[] | null;
   siteLinkTranslations?: SiteLinkTranslationRow[] | null;
@@ -41,6 +44,8 @@ export interface HubData {
 
 function isCompleteHubData(data: HubData): boolean {
   const publicDataComplete = [
+    data.mapPlaces ?? null,
+    data.mapLinks ?? null,
     data.levels,
     data.destinations,
     data.photos,
@@ -59,7 +64,7 @@ function isCompleteHubData(data: HubData): boolean {
 
 const readCachedHubData = createTimedCache<HubData>(120_000, isCompleteHubData);
 
-const CACHE_URL = "https://icdnd.artdigitaljourney.com/__cache/public-hub-v2";
+const CACHE_URL = "https://icdnd.artdigitaljourney.com/__cache/public-hub-v3";
 const CACHE_SECONDS = 120;
 
 /** Reuse complete public data across Worker instances in the same Cloudflare data center. */
@@ -103,6 +108,10 @@ export const getHubData = createServerFn({ method: "GET" }).handler(() =>
   readCachedHubData(readEdgeCachedHubData),
 );
 
+function readRows<T>(result: { error: unknown; data: unknown }): T[] | null {
+  return result.error ? null : ((result.data ?? []) as T[]);
+}
+
 async function readHubData(): Promise<HubData> {
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
@@ -142,6 +151,20 @@ async function readHubData(): Promise<HubData> {
       },
     });
 
+    const mapPlacesPromise = Promise.resolve(
+      supabase
+        .from("map_places")
+        .select("id,name,level_id,pin,x,y,zoom,active")
+        .eq("active", true)
+        .order("pin"),
+    );
+    const mapLinksPromise = Promise.resolve(
+      supabase
+        .from("map_destination_links")
+        .select("place_id,destination_id,display_order,is_primary,active")
+        .eq("active", true)
+        .order("display_order"),
+    );
     const editorialPromise = readEditorial(supabase);
     const videosPromise = Promise.resolve(
       supabase
@@ -202,9 +225,15 @@ async function readHubData(): Promise<HubData> {
         .select("setting_key, locale, url, source_url")
         .eq("active", true),
     ]);
-    const videos = await videosPromise;
+    const [videos, mapPlaces, mapLinks] = await Promise.all([
+      videosPromise,
+      mapPlacesPromise,
+      mapLinksPromise,
+    ]);
 
     for (const [table, result] of Object.entries({
+      mapPlaces,
+      mapLinks,
       levels,
       destinations,
       photos,
@@ -223,6 +252,8 @@ async function readHubData(): Promise<HubData> {
 
     return {
       ...(editorial ? { editorial } : {}),
+      mapPlaces: readRows<MapPlaceRow>(mapPlaces),
+      mapLinks: readRows<MapLinkRow>(mapLinks),
       levels: levels.error ? null : ((levels.data ?? []) as LevelRow[]),
       destinations: destinations.error ? null : ((destinations.data ?? []) as DestinationRow[]),
       photos: photos.error ? null : ((photos.data ?? []) as DestinationPhotoRow[]),
@@ -235,7 +266,7 @@ async function readHubData(): Promise<HubData> {
         : ((siteLinkTranslations.data ?? []) as SiteLinkTranslationRow[]),
       events: events.error ? null : ((events.data ?? []) as DestinationEventRow[]),
       posts: posts.error ? null : ((posts.data ?? []) as DestinationPostRow[]),
-      videos: videos.error ? null : ((videos.data ?? []) as DestinationVideoRow[]),
+      videos: readRows<DestinationVideoRow>(videos),
       settings: settings.error
         ? null
         : Object.fromEntries(

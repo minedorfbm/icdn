@@ -1,3 +1,4 @@
+import type { MapPlaceRow, MapLinkRow } from "@/features/resort-map/map.types";
 import { currentLinkTranslations, type LinkTranslations } from "@/lib/localized-links";
 import {
   DESTINATIONS,
@@ -27,6 +28,8 @@ export interface HubLevel {
 }
 
 export interface HubValue {
+  mapPlaces: MapPlaceRow[];
+  mapLinks: MapLinkRow[];
   heroImage: string;
   levels: HubLevel[];
   destinations: Destination[];
@@ -81,6 +84,8 @@ const withFallbackMedia = (list: Destination[]): Destination[] =>
   });
 
 export const FALLBACK: HubValue = {
+  mapPlaces: [],
+  mapLinks: [],
   heroImage: receptionHero,
   levels: LEVELS,
   destinations: withFallbackMedia(DESTINATIONS),
@@ -138,6 +143,8 @@ export function createHubValue(data?: HubData): HubValue {
 
   return {
     heroImage: resolveHeroImage(data),
+    mapPlaces: data.mapPlaces ?? [],
+    mapLinks: data.mapLinks ?? [],
     levels,
     destinations: data.destinations.map((row) => {
       const dest = toDestination(
