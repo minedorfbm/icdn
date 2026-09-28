@@ -231,6 +231,8 @@ export const OFFICIAL = {
   instagram: "https://www.instagram.com/intercontinentaldanang/",
   youtube: "https://www.youtube.com/@ICDanang",
   x: "https://x.com/ICdanang",
+  facebook: "https://www.facebook.com/InterContinentalDanang/",
+  linkedin: "https://www.linkedin.com/company/intercontinentaldanang/",
   map: "https://www.danang.intercontinental.com/contact-us/",
   contact: "tel:+842363938888",
   dining: "https://www.danang.intercontinental.com/dining/",
