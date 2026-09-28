@@ -6,7 +6,7 @@ import { OFFICIAL, type Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 import { InstagramStrip } from "./InstagramStrip";
 import { InstagramPostCarousel } from "./InstagramPostCarousel";
-import { YouTubeVideos } from "./YouTubeVideos";
+import { DestinationVideos } from "./DestinationVideos";
 import { useI18n } from "@/i18n";
 import { ResortLink } from "./ResortBrowser";
 
@@ -84,7 +84,9 @@ export function DestinationDetail({
           {description(dest.id, dest.short_description)}
         </p>
 
-        {dest.videos && dest.videos.length > 0 && <YouTubeVideos videos={dest.videos} />}
+        {dest.videos && dest.videos.length > 0 && (
+          <DestinationVideos videos={dest.videos} poster={dest.image} />
+        )}
 
         <span className="mt-8 block h-px w-10 bg-current/30" aria-hidden />
 

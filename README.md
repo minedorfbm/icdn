@@ -51,7 +51,7 @@ La liste des destinations intégrables est centralisée dans `src/lib/resort-bro
 
 Le fil Nam Tram reste compact à droite : quatre points et une cabine indiquent la progression. Un toucher ouvre le sélecteur des quatre niveaux. Une zone dédiée évite le chevauchement avec les collections ; la taille des cards reste inchangée.
 
-Les vidéos YouTube des fiches agrandies viennent de `destination_videos`. La première vidéo est associée à Mi Sol Spa ; toute nouvelle ligne est inactive par défaut. Voir [la procédure de publication](docs/database.md#vidéos-youtube) avant d'activer une autre vidéo.
+Les vidéos YouTube et Facebook des fiches agrandies viennent de `destination_videos`. La première vidéo est associée à Mi Sol Spa ; toute nouvelle ligne est inactive par défaut. Voir [la procédure de publication](docs/database.md#vidéos-youtube-et-facebook) avant d'activer une autre vidéo.
 
 La [procédure de maintenance de la base](docs/database.md) décrit les protections de publication et les migrations du 23 septembre. Les anciennes colonnes d'URL de `destinations` ne pilotent plus les boutons du Worker ; les modifier ne changera pas les cards. Leur suppression physique est une deuxième étape, à lancer seulement après validation du déploiement compatible.
 
