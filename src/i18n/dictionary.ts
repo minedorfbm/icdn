@@ -41,7 +41,6 @@ export type UIKey =
   | "videos"
   | "play_video"
   | "view_on_instagram"
-  | "view_on_facebook"
   | "resort_levels"
   | "photo"
   | "close"

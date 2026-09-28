@@ -114,24 +114,18 @@ describe("curated YouTube videos", () => {
     });
     expect(hub.destinations[0]?.videos).toEqual([
       {
-        provider: "youtube",
-        video_url: "https://www.youtube.com/watch?v=abcdefghijk",
         video_id: "abcdefghijk",
         format: "video",
         title: "Resort film",
         title_translations: { vi: "Phim khu nghỉ dưỡng" },
       },
       {
-        provider: "youtube",
-        video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
         video_id: "dQw4w9WgXcQ",
         format: "video",
         title: "Resort film",
         title_translations: { vi: "Phim khu nghỉ dưỡng" },
       },
       {
-        provider: "youtube",
-        video_url: "https://www.youtube.com/watch?v=shorts12345",
         video_id: "shorts12345",
         format: "short",
         title: "Resort film",
