@@ -86,15 +86,15 @@ function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClos
       title={page.title}
       onClose={onClose}
       overlayClassName="fixed inset-0 z-[99] bg-black/40"
-      className="fixed inset-0 z-[100] flex h-[100dvh] flex-col overflow-hidden overscroll-none bg-[oklch(0.92_0.015_85)] text-[oklch(0.20_0.02_155)] pb-[env(safe-area-inset-bottom,0px)]"
+      className="fixed inset-0 z-[100] flex h-[100dvh] flex-col overflow-hidden overscroll-none brand-ui brand-surface pb-[env(safe-area-inset-bottom,0px)]"
     >
-      <header className="relative shrink-0 border-b border-[oklch(0.67_0.055_83/0.4)] bg-[oklch(0.965_0.012_85)] px-3 pt-[env(safe-area-inset-top)]">
+      <header className="relative shrink-0 border-b brand-header px-3 pt-[env(safe-area-inset-top)]">
         <div className="grid min-h-14 grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2">
           <button
             type="button"
             onClick={onClose}
             aria-label={t("close")}
-            className="grid size-11 place-items-center rounded-full text-[oklch(0.42_0.035_78)] transition-colors hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 active:bg-black/10"
+            className="grid size-11 place-items-center rounded-full text-[var(--brand-ink)] transition-colors hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 active:bg-black/10"
           >
             <X aria-hidden className="size-5" strokeWidth={1.4} />
           </button>
@@ -110,7 +110,7 @@ function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClos
             rel="noreferrer"
             aria-label={t("open_browser")}
             title={t("open_browser")}
-            className="grid size-11 place-items-center rounded-full text-[oklch(0.42_0.035_78)] transition-colors hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 active:bg-black/10"
+            className="grid size-11 place-items-center rounded-full text-[var(--brand-ink)] transition-colors hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 active:bg-black/10"
           >
             <ExternalLink aria-hidden className="size-[19px]" strokeWidth={1.5} />
           </a>
@@ -119,7 +119,7 @@ function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClos
         {loading && (
           <div
             aria-hidden="true"
-            className="absolute bottom-0 left-0 h-px w-1/3 animate-pulse bg-[oklch(0.67_0.08_83)]"
+            className="absolute bottom-0 left-0 h-px w-1/3 animate-pulse bg-[var(--brand-accent)]"
           />
         )}
       </header>

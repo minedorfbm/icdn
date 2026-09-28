@@ -15,7 +15,8 @@ export function DestinationDetail({
   dest,
   onClose,
   aboveMap = false,
-}: Readonly<{ dest: Destination; onClose: () => void; aboveMap?: boolean }>) {
+  neutral = false,
+}: Readonly<{ dest: Destination; onClose: () => void; aboveMap?: boolean; neutral?: boolean }>) {
   const { lang, t, typeLabel, levelLabel, action, description, event } = useI18n();
   const { openMap, locate } = useResortMap();
   const placeId = locate(dest.id);
@@ -34,7 +35,7 @@ export function DestinationDetail({
       overlayClassName={
         aboveMap ? "fixed inset-0 z-[94] bg-black/30" : "fixed inset-0 z-[79] bg-black/30"
       }
-      className={`level detail-enter fixed inset-0 ${aboveMap ? "z-[95]" : "z-[80]"} overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain`}
+      className={`level ${neutral ? "brand-ui brand-detail" : ""} detail-enter fixed inset-0 ${aboveMap ? "z-[95]" : "z-[80]"} overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain`}
     >
       <div className="relative h-[62svh] w-full overflow-hidden">
         <img

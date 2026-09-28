@@ -54,7 +54,7 @@ export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }
           title={mapCopy(lang, "title")}
           onClose={close}
           overlayClassName="fixed inset-0 z-[89] bg-black/40"
-          className="fixed inset-0 z-[90] h-dvh overflow-hidden bg-[#071e25] text-[#efe3c8]"
+          className="fixed inset-0 z-[90] h-dvh overflow-hidden brand-ui brand-surface"
         >
           <MapBoundary fallback={message(mapCopy(lang, "unavailable"))}>
             <Suspense fallback={message(mapCopy(lang, "loading"))}>
@@ -63,7 +63,9 @@ export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }
           </MapBoundary>
         </FullscreenDialog>
       )}
-      {detail && <DestinationDetail dest={detail} onClose={() => setDetailId(null)} aboveMap />}
+      {detail && (
+        <DestinationDetail dest={detail} onClose={() => setDetailId(null)} aboveMap neutral />
+      )}
     </MapContext.Provider>
   );
 }

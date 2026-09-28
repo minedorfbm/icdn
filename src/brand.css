@@ -1,0 +1,64 @@
+/* Public InterContinental Danang site palette, observed 2026-09-28.
+   Keep this UI theme separate from the four immersive Journey worlds. */
+:root {
+  --brand-white: #ffffff;
+  --brand-paper: #f3f3f1;
+  --brand-ink: #3d3935;
+  --brand-muted: #6b625b;
+  --brand-sand: #d8bdb4;
+  --brand-accent: #d3b5a3;
+  --brand-border: #e6e6e6;
+  --brand-serif: Baskerville, "Baskerville Old Face", Georgia, serif;
+  --brand-sans: "Gill Sans", "Gill Sans MT", Arial, sans-serif;
+}
+.brand-ui,
+.discovery-paths,
+.surprise-discovery,
+.hub-atlas {
+  --font-serif: var(--brand-serif);
+  --font-sans: var(--brand-sans);
+  font-family: var(--brand-sans);
+  font-weight: 400;
+}
+.brand-ui {
+  color: var(--brand-ink);
+}
+.brand-surface {
+  background: var(--brand-paper);
+  color: var(--brand-ink);
+}
+.brand-header {
+  background: var(--brand-white);
+  border-color: var(--brand-border);
+}
+.brand-floating {
+  background: var(--brand-white);
+  color: var(--brand-ink);
+  border: 1px solid var(--brand-sand);
+  box-shadow: 0 2px 12px #3d393512;
+}
+.brand-floating:hover {
+  background: var(--brand-paper);
+}
+.brand-language-sheet {
+  max-height: 90dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+  background: var(--brand-white);
+  border-color: var(--brand-sand);
+  color: var(--brand-ink);
+}
+.brand-language-option:hover {
+  background: var(--brand-paper);
+}
+.brand-language-option[aria-current="true"] {
+  background: var(--brand-sand);
+}
+/* Details reached from Explore/Surprise use the neutral interface theme. */
+.level.brand-detail[data-level] {
+  --level-bg: var(--brand-paper);
+  --level-fg: var(--brand-ink);
+  background: var(--level-bg);
+  color: var(--level-fg);
+}
