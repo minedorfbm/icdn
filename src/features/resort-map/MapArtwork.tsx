@@ -1,6 +1,6 @@
 /* oxlint-disable jsx-a11y/prefer-tag-over-role -- interactive SVG hotspots cannot be HTML buttons. */
 import { useLayoutEffect, useMemo, useRef, useState, type SVGProps, type MouseEvent } from "react";
-import { Compass, MapPin, Sparkles, Utensils } from "lucide-react";
+import { ArrowLeft, ArrowRight, Compass, MapPin, Sparkles, Utensils } from "lucide-react";
 import { ArchitectureArtwork } from "./ArchitectureArtwork";
 import { bensleyTour } from "./map.data";
 import { useI18n } from "@/i18n";
@@ -410,10 +410,14 @@ export function MapArtwork({
               >
                 <title>{time.minutes} min · Nam Tram</title>
                 <rect x="-30" y="-11" width="60" height="22" rx="11" />
-                <text textAnchor="middle" y="4">
-                  {time.direction === "←" ? "← " : ""}
-                  {time.minutes} min{time.direction === "→" ? " →" : ""}
+                <text textAnchor="middle" x={time.direction === "left" ? 7 : -7} y="4">
+                  {time.minutes} min
                 </text>
+                {time.direction === "left" ? (
+                  <ArrowLeft x={-26} y={-6} width={12} height={12} strokeWidth={1.3} aria-hidden />
+                ) : (
+                  <ArrowRight x={14} y={-6} width={12} height={12} strokeWidth={1.3} aria-hidden />
+                )}
               </g>
             ))}
           </g>

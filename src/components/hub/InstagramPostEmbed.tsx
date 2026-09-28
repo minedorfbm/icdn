@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Instagram } from "lucide-react";
+import { ArrowUpRight, Instagram } from "lucide-react";
 import type { DestinationPost } from "@/data/resort";
 import { useI18n } from "@/i18n";
 
@@ -168,7 +168,7 @@ function PostCard({ post, handle }: { post: DestinationPost; handle: string | nu
         className="flex items-center justify-between px-4 pb-4 pt-3 text-[10px] tracking-[0.3em] opacity-70 transition-opacity hover:opacity-100"
       >
         {t("view_on_instagram")}
-        <span className="opacity-50">↗</span>
+        <ArrowUpRight className="size-4 shrink-0 opacity-50" strokeWidth={1.3} aria-hidden />
       </a>
     </article>
   );

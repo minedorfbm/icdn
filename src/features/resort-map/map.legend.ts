@@ -66,13 +66,13 @@ export const photoSpots: PhotoSpot[] = [
 ];
 
 export const walkingTimes = [
-  { x: 488, y: 322.5, minutes: 8, direction: "→" },
-  { x: 907.5, y: 443.5, minutes: 5, direction: "→" },
-  { x: 696.5, y: 508.5, minutes: 6, direction: "→" },
-  { x: 1214, y: 551, minutes: 2, direction: "→" },
-  { x: 1024, y: 622, minutes: 3, direction: "→" },
-  { x: 940.5, y: 671.5, minutes: 3, direction: "→" },
-  { x: 1484, y: 1086.5, minutes: 5, direction: "←" },
+  { x: 488, y: 322.5, minutes: 8, direction: "right" },
+  { x: 907.5, y: 443.5, minutes: 5, direction: "right" },
+  { x: 696.5, y: 508.5, minutes: 6, direction: "right" },
+  { x: 1214, y: 551, minutes: 2, direction: "right" },
+  { x: 1024, y: 622, minutes: 3, direction: "right" },
+  { x: 940.5, y: 671.5, minutes: 3, direction: "right" },
+  { x: 1484, y: 1086.5, minutes: 5, direction: "left" },
 ].map(({ x, y, ...rest }) => ({ ...rest, point: fromOfficialPlan(x, y) }));
 
 export type LegendLayers = { trail: boolean; walking: boolean };

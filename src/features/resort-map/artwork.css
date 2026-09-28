@@ -826,6 +826,7 @@
 }
 .hub-atlas .walking-time-labels {
   pointer-events: none;
+  color: #fff7e9;
 }
 .hub-atlas .walking-time-labels rect {
   fill: #b95d3b;
