@@ -93,7 +93,7 @@ function SearchDialog({ onClose }: Readonly<{ onClose: () => void }>) {
           items: results.filter((entry) =>
             key
               ? entry.collection === key
-              : !SEARCH_COLLECTIONS.some((c) => c === entry.collection),
+              : !(SEARCH_COLLECTIONS as readonly string[]).includes(entry.collection),
           ),
         }))
         .filter((group) => group.items.length > 0);
