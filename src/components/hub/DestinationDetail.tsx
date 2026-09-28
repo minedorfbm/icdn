@@ -1,7 +1,7 @@
 import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
-import { ArrowLeft, Instagram, Youtube, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Instagram, Youtube, MapPin } from "lucide-react";
 import { OFFICIAL, type Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 import { InstagramStrip } from "./InstagramStrip";
@@ -110,9 +110,11 @@ export function DestinationDetail({
                 className="flex items-center justify-between min-h-12 gap-4 border-b border-current/20 py-4 text-[11px] tracking-[0.3em] transition-opacity hover:opacity-60"
               >
                 {a.label ?? action(a.kind)}
-                <span className="shrink-0 opacity-40" aria-hidden>
-                  ↗
-                </span>
+                <ArrowUpRight
+                  className="size-4 shrink-0 opacity-50"
+                  strokeWidth={1.3}
+                  aria-hidden
+                />
               </ResortLink>
             ))}
           </div>
@@ -146,7 +148,11 @@ export function DestinationDetail({
                       className="mt-5 inline-flex items-center gap-2 text-[10px] tracking-[0.3em] opacity-80 transition-opacity hover:opacity-50"
                     >
                       {t("explore_more")}
-                      <span className="opacity-50">↗</span>
+                      <ArrowUpRight
+                        className="size-4 shrink-0 opacity-50"
+                        strokeWidth={1.3}
+                        aria-hidden
+                      />
                     </ResortLink>
                   )}
                 </article>
@@ -197,9 +203,10 @@ export function DestinationDetail({
 
         <button
           onClick={onClose}
-          className="mt-14 text-[10px] tracking-[0.32em] opacity-55 transition-opacity hover:opacity-90"
+          className="mt-14 inline-flex items-center gap-2 text-[10px] tracking-[0.32em] opacity-55 transition-opacity hover:opacity-90"
         >
-          ← {t("back_journey")}
+          <ArrowLeft className="size-4 shrink-0" strokeWidth={1.3} aria-hidden />
+          {t("back_journey")}
         </button>
       </div>
     </FullscreenDialog>
