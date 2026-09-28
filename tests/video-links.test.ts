@@ -12,11 +12,8 @@ test("Facebook page videos, watch links and reels use safe canonical URLs", () =
     expect(video?.provider).toBe("facebook");
     expect(video?.video_id).toBe("2019955602291134");
     expect(video?.format).toBe(path.startsWith("reel/") ? "short" : "video");
-    const embed = new URL(videoEmbedUrl(video!));
-    expect(embed.origin + embed.pathname).toBe("https://www.facebook.com/plugins/video.php");
-    expect(embed.searchParams.get("href")).toBe(
-      "https://www.facebook.com/watch/?v=2019955602291134",
-    );
+    expect(video?.video_url).toBe("https://www.facebook.com/watch/?v=2019955602291134");
+    expect(videoEmbedUrl(video!)).toBeUndefined();
   }
 });
 

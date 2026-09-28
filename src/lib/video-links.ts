@@ -57,14 +57,8 @@ export function parseVideoSource(value: string): VideoSource | null {
   }
 }
 
-export function videoEmbedUrl(video: VideoSource): string {
-  if (video.provider === "youtube")
-    return `https://www.youtube-nocookie.com/embed/${video.video_id}?autoplay=1`;
-  const params = new URLSearchParams({
-    href: video.video_url,
-    show_text: "false",
-    autoplay: "true",
-    width: video.format === "short" ? "320" : "560",
-  });
-  return `https://www.facebook.com/plugins/video.php?${params}`;
+/** Facebook embeds are not reliable for signed-out visitors; render an external link. */
+export function videoEmbedUrl(video: VideoSource): string | undefined {
+  if (video.provider !== "youtube") return undefined;
+  return `https://www.youtube-nocookie.com/embed/${video.video_id}?autoplay=1`;
 }
