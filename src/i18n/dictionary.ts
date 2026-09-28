@@ -45,6 +45,8 @@ export type UIKey =
   | "photo"
   | "close"
   | "open_browser"
+  | "content_unavailable"
+  | "retry"
   | "page_loading"
   | "pdf_error"
   | "pdf_page"

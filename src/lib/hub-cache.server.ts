@@ -1,6 +1,8 @@
 import { hubDataSchema, type HubData } from "./hub-schema";
 
-const CACHE_URL = "https://icdn.artdigitaljourney.com/__cache/public-hub-v4";
+import type { z } from "zod";
+
+const CACHE_ROOT = "https://icdn.artdigitaljourney.com/__cache/";
 const TTL_MS = 120_000;
 type PublicCache = Pick<Cache, "match" | "put">;
 
@@ -16,29 +18,33 @@ function complete(data: HubData): boolean {
   );
 }
 
-/** One cache, a hard expiry, and no stale fallback: fresh successful collections always win. */
-export async function readHubSnapshot(
-  load: () => Promise<HubData>,
+/** Public data only, independently keyed, with the same hard two-minute expiry. */
+export async function readPublicSnapshot<T>(
+  key: string,
+  schema: z.ZodType<T>,
+  isComplete: (data: T) => boolean,
+  load: () => Promise<T>,
   cache?: PublicCache,
   now = Date.now(),
-): Promise<HubData> {
+): Promise<T> {
+  const url = CACHE_ROOT + key;
   if (cache) {
     try {
-      const response = await cache.match(CACHE_URL);
+      const response = await cache.match(url);
       const expires = Number(response?.headers.get("x-hub-expires"));
       if (response?.ok && expires > now && expires <= now + TTL_MS) {
-        const parsed = hubDataSchema.safeParse(await response.json());
-        if (parsed.success && complete(parsed.data)) return parsed.data;
+        const parsed = schema.safeParse(await response.json());
+        if (parsed.success && isComplete(parsed.data)) return parsed.data;
       }
     } catch {
       /* The database remains available when cache storage fails. */
     }
   }
   const data = await load();
-  if (cache && complete(data)) {
+  if (cache && isComplete(data)) {
     try {
       await cache.put(
-        CACHE_URL,
+        url,
         new Response(JSON.stringify(data), {
           headers: {
             "content-type": "application/json",
@@ -48,8 +54,21 @@ export async function readHubSnapshot(
         }),
       );
     } catch {
-      /* Caching is optional. Never replace fresh data with an older response. */
+      /* Caching is optional. Never substitute an expired response. */
     }
   }
   return data;
+}
+
+export function readHubSnapshot(
+  load: () => Promise<HubData>,
+  cache?: PublicCache,
+  now = Date.now(),
+): Promise<HubData> {
+  return readPublicSnapshot("catalogue-v5", hubDataSchema, complete, load, cache, now);
+}
+
+export function publicCache() {
+  return (globalThis as typeof globalThis & { caches?: CacheStorage & { default?: Cache } }).caches
+    ?.default;
 }

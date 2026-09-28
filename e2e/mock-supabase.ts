@@ -42,14 +42,51 @@ const tables: Record<string, unknown[]> = {
       source_description: destinations[0]!.short_description,
     },
   ],
+  destination_videos: [
+    {
+      destination_id: "citron",
+      video_url: "https://www.youtube.com/watch?v=PVN005yvGpY",
+      title: "Test video",
+      title_translations: {},
+      display_order: 0,
+    },
+  ],
   site_settings: [{ key: "hero_image", value: "/intercontinental-touch-icon.png" }],
 };
+let delay = 0;
+let failCatalogue = false;
+let failMediaOnce = false;
+const reads: string[] = [];
 serve({
   hostname: "127.0.0.1",
   port: 54329,
-  fetch(request) {
+  async fetch(request) {
+    const url = new URL(request.url);
+    if (url.pathname === "/control") {
+      if (request.method === "POST") {
+        const config = await request.json();
+        delay = config.delay ?? 0;
+        failCatalogue = config.failCatalogue ?? false;
+        failMediaOnce = config.failMediaOnce ?? false;
+      }
+      return Response.json({ reads });
+    }
+    reads.push(url.pathname + url.search);
+
     const table = new URL(request.url).pathname.split("/").at(-1)!;
-    const rows = tables[table] ?? [];
+    if (table === "destinations" && delay) await Bun.sleep(delay);
+    if (table === "destinations" && failCatalogue)
+      return Response.json({ message: "test offline" }, { status: 503 });
+    if (table === "destination_videos" && failMediaOnce) {
+      failMediaOnce = false;
+      return Response.json({ message: "test media offline" }, { status: 503 });
+    }
+    let rows = tables[table] ?? [];
+    for (const column of ["destination_id", "id"]) {
+      const filter = url.searchParams.get(column);
+      if (filter?.startsWith("eq."))
+        rows = rows.filter((row) => (row as Record<string, unknown>)[column] === filter.slice(3));
+    }
     return Response.json(rows, {
       headers: { "content-range": `0-${Math.max(0, rows.length - 1)}/${rows.length}` },
     });

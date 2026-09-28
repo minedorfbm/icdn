@@ -10,11 +10,13 @@ export function DestinationPanel({
   dest,
   active,
   priority,
+  near = true,
   onOpen,
 }: Readonly<{
   dest: Destination;
   active: boolean;
   priority: boolean;
+  near?: boolean;
   onOpen: () => void;
 }>) {
   const { lang, t, typeLabel, levelLabel, action, description } = useI18n();
@@ -28,14 +30,14 @@ export function DestinationPanel({
       className="relative h-full min-h-[inherit] w-full overflow-hidden rounded-[18px] border border-[#e5d3aa]/65 bg-[oklch(0.18_0.02_250)] shadow-[10px_24px_36px_-18px_rgba(0,0,0,0.7)]"
     >
       <img
-        src={dest.image}
+        src={near ? dest.image : undefined}
         alt={dest.name}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
         {...(priority ? { fetchPriority: "high" as const } : {})}
         onLoad={() => setLoaded(true)}
         ref={(el) => {
-          if (el?.complete) setLoaded(true);
+          if (el?.complete && el.naturalWidth > 0) setLoaded(true);
         }}
         draggable={false}
         width={768}

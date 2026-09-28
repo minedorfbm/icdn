@@ -1,3 +1,9 @@
+.hub-search-tool {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  right: 100px;
+  z-index: 50;
+}
 .hub-tools {
   position: fixed;
   top: max(12px, env(safe-area-inset-top));

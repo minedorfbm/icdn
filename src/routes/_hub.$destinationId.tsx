@@ -1,3 +1,4 @@
+import { getHubData } from "@/lib/hub.functions";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { createHubValue } from "@/data/hub-value";
 import { DestinationDetail } from "@/components/hub/DestinationDetail";
@@ -7,8 +8,12 @@ import { findPublicDestination } from "@/lib/destination-route";
 export const Route = createFileRoute("/_hub/$destinationId")({
   loader: async ({ params, parentMatchPromise }) => {
     const parent = await parentMatchPromise;
+    const catalogue = parent.loaderData?.catalogue ?? (await getHubData());
     const destination = findPublicDestination(
-      createHubValue(parent.loaderData).destinations,
+      createHubValue({
+        ...catalogue,
+        settings: parent.loaderData?.settings ?? null,
+      }).destinations,
       params.destinationId,
     );
     if (!destination) throw notFound();

@@ -72,3 +72,28 @@ test("a malformed database collection is unavailable, while intentional emptines
   ).toBeNull();
   expect(readRows({ error: {}, data: [] }, destinationRow)).toBeNull();
 });
+
+test("public cache keys isolate settings, catalogue and individual card media", async () => {
+  const { readPublicSnapshot } = await import("../src/lib/hub-cache.server");
+  const { z } = await import("zod");
+  const entries = new Map<string, Response>();
+  const cache = {
+    match: async (key: RequestInfo | URL) => entries.get(String(key))?.clone(),
+    put: async (key: RequestInfo | URL, response: Response) => {
+      entries.set(String(key), response);
+    },
+  };
+  const schema = z.object({ value: z.string().nullable() });
+  const complete = (data: { value: string | null }) => data.value !== null;
+  const read = (key: string, value: string | null, now: number) =>
+    readPublicSnapshot(key, schema, complete, async () => ({ value }), cache, now);
+  await read("settings-v1", "hero", 0);
+  await read("media-v1/citron", "Citron", 0);
+  await read("media-v1/tingara", "TINGARA", 0);
+  expect(await read("media-v1/citron", "changed", 1)).toEqual({ value: "Citron" });
+  expect(await read("settings-v1", "changed", 1)).toEqual({ value: "hero" });
+  expect(await read("media-v1/citron", null, 120_000)).toEqual({ value: null });
+  expect(await read("media-v1/citron", "new publication", 120_001)).toEqual({
+    value: "new publication",
+  });
+});
