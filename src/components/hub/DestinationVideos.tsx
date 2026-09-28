@@ -14,6 +14,38 @@ function DestinationVideoPlayer({
   const title = video.title_translations[lang] || video.title;
   const label = `${t("play_video")}: ${title}`;
 
+  // Facebook can refuse public embeds for signed-out visitors, including iOS.
+  // Keep the video available through an explicit external link instead.
+  if (video.provider === "facebook") {
+    return (
+      <article className="w-full shrink-0 snap-center">
+        <a
+          href={video.video_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${t("view_on_facebook")}: ${title}`}
+          className="group relative block aspect-video overflow-hidden rounded-[18px] bg-black text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+        >
+          <img
+            src={poster}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            width={480}
+            height={270}
+            className="size-full object-cover"
+          />
+          <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+          <span className="absolute inset-x-5 bottom-5 flex items-center justify-between gap-3 text-[10px] tracking-[0.16em]">
+            {t("view_on_facebook")}
+            <ArrowUpRight className="size-5 shrink-0" strokeWidth={1.3} aria-hidden />
+          </span>
+        </a>
+        <h4 className="mt-3 font-serif text-[18px] leading-snug">{title}</h4>
+      </article>
+    );
+  }
+
   return (
     <article
       className={`shrink-0 snap-center ${isShort ? "w-[min(80vw,320px)] min-w-[200px]" : "w-full"}`}
@@ -39,11 +71,7 @@ function DestinationVideoPlayer({
             className="group absolute inset-0 size-full text-white focus-visible:outline-2 focus-visible:outline-offset-[-4px]"
           >
             <img
-              src={
-                video.provider === "youtube"
-                  ? `https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`
-                  : poster
-              }
+              src={`https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`}
               alt=""
               loading="lazy"
               decoding="async"
@@ -61,17 +89,6 @@ function DestinationVideoPlayer({
         )}
       </div>
       <h4 className="mt-3 font-serif text-[18px] leading-snug">{title}</h4>
-      {video.provider === "facebook" && (
-        <a
-          href={video.video_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 inline-flex items-center gap-2 text-[10px] tracking-[0.16em] opacity-70 hover:opacity-100"
-        >
-          {t("view_on_facebook")}
-          <ArrowUpRight className="size-4 shrink-0" strokeWidth={1.3} aria-hidden />
-        </a>
-      )}
     </article>
   );
 }
