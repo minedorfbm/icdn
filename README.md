@@ -92,7 +92,11 @@ This theme covers the welcome/discovery interface, map controls, Surprise me,
 language menu, concierge button, footer and embedded browser/PDF chrome.
 Destination details opened from the map or Surprise me use the neutral theme;
 those opened in the Journey retain their level's palette. The four Journey
-worlds, Nam Tram and illustrated map artwork keep their own visual identity.
+worlds, Nam Tram and illustrated map artwork keep their colors and visual identity.
+All hub typography, including the Journey and its cards, uses the shared brand font stacks.
+The footer social URLs are configured by `site_settings.youtube` and `site_settings.x`;
+Dining and Spa remain in settings but are not displayed in the footer.
+The favicon and Apple touch icon use the official resort website’s InterContinental mark.
 
 Typography uses locally available Baskerville/Georgia and Gill Sans/Arial.
 The site's proprietary New Baskerville/Gill Sans webfont files are not bundled;

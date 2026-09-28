@@ -145,8 +145,8 @@
 }
 
 @theme inline {
-  --font-serif: "Cormorant Garamond", Georgia, serif;
-  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--brand-serif);
+  --font-sans: var(--brand-sans);
 }
 
 @layer base {
@@ -162,7 +162,7 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    font-weight: 300;
+    font-weight: 400;
     letter-spacing: 0.01em;
     overflow-x: hidden;
   }

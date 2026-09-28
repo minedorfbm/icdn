@@ -40,8 +40,8 @@ export interface HubValue {
 const FALLBACK_LINKS = [
   ["Website", OFFICIAL.website],
   ["Instagram", OFFICIAL.instagram],
-  ["Dining", OFFICIAL.dining],
-  ["Spa", OFFICIAL.spa],
+  ["YouTube", OFFICIAL.youtube],
+  ["X", OFFICIAL.x],
   ["IHG One Rewards", OFFICIAL.ihg],
   ["Resort Map", OFFICIAL.map],
   ["Contact", OFFICIAL.contact],
@@ -120,8 +120,8 @@ export function createHubValue(data?: HubData): HubValue {
     [
       ["Website", s["website"]],
       ["Instagram", s["instagram"]],
-      ["Dining", s["dining"]],
-      ["Spa", s["spa"]],
+      ["YouTube", s["youtube"]],
+      ["X", s["x"]],
       ["IHG One Rewards", s["ihg"]],
       ["Resort Map", s["map"]],
       ["Contact", s["contact"]],

@@ -230,6 +230,7 @@ export const OFFICIAL = {
   ihg: "https://www.ihg.com/onerewards/content/us/en/home",
   instagram: "https://www.instagram.com/intercontinentaldanang/",
   youtube: "https://www.youtube.com/@ICDanang",
+  x: "https://x.com/ICdanang",
   map: "https://www.danang.intercontinental.com/contact-us/",
   contact: "tel:+842363938888",
   dining: "https://www.danang.intercontinental.com/dining/",
