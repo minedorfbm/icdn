@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
@@ -17,8 +18,8 @@ export default defineConfig({
       reuseExistingServer: false,
       env: {
         WRANGLER_SEND_METRICS: "false",
-        XDG_CONFIG_HOME: "/tmp/icdn-e2e-config",
-        WRANGLER_LOG_PATH: "/tmp/icdn-e2e-wrangler.log",
+        XDG_CONFIG_HOME: resolve(".wrangler/e2e/config"),
+        WRANGLER_LOG_PATH: resolve(".wrangler/e2e/wrangler.log"),
         SUPABASE_URL: "http://127.0.0.1:54329",
         SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test",
       },

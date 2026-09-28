@@ -199,6 +199,33 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
     setZoom((value) => (value > 1 ? 1 : 2));
   };
 
+  const renderDocument = () => {
+    if (error)
+      return <p className="mx-auto max-w-xs px-4 py-16 text-center text-sm">{t("pdf_error")}</p>;
+    if (!pdf || !width) return <p className="py-16 text-center text-sm">{t("page_loading")}</p>;
+    return (
+      <div ref={pagesRef} className="flex min-w-full w-max flex-col items-center gap-6 p-4 pb-20">
+        {Array.from({ length: pdf.document.numPages }, (_, index) => (
+          <figure key={index + 1} data-pdf-page={index + 1} style={{ width: pageWidth }}>
+            <PdfPage
+              key={pageWidth}
+              document={pdf.document}
+              pageNumber={index + 1}
+              width={pageWidth}
+              estimatedHeight={pageWidth * pdf.heightRatio}
+              title={title}
+              scrollRef={scrollRef}
+              onError={showError}
+            />
+            <figcaption className="pt-3 text-center text-xs opacity-65">
+              {t("pdf_page")} {index + 1} / {pdf.document.numPages}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="relative flex min-h-0 flex-1 flex-col brand-surface">
       <div
@@ -207,34 +234,7 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
         aria-label={title}
         style={{ touchAction: "pan-x pan-y" }}
       >
-        {error ? (
-          <p className="mx-auto max-w-xs px-4 py-16 text-center text-sm">{t("pdf_error")}</p>
-        ) : pdf && width ? (
-          <div
-            ref={pagesRef}
-            className="flex min-w-full w-max flex-col items-center gap-6 p-4 pb-20"
-          >
-            {Array.from({ length: pdf.document.numPages }, (_, index) => (
-              <figure key={index + 1} data-pdf-page={index + 1} style={{ width: pageWidth }}>
-                <PdfPage
-                  key={pageWidth}
-                  document={pdf.document}
-                  pageNumber={index + 1}
-                  width={pageWidth}
-                  estimatedHeight={pageWidth * pdf.heightRatio}
-                  title={title}
-                  scrollRef={scrollRef}
-                  onError={showError}
-                />
-                <figcaption className="pt-3 text-center text-xs opacity-65">
-                  {t("pdf_page")} {index + 1} / {pdf.document.numPages}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        ) : (
-          <p className="py-16 text-center text-sm">{t("page_loading")}</p>
-        )}
+        {renderDocument()}
       </div>
       {pdf && !error && (
         <button
@@ -333,12 +333,9 @@ function PdfPage({
   return (
     <div ref={slotRef} style={{ height }} className="bg-white shadow-xl">
       {visible && (
-        <canvas
-          ref={canvasRef}
-          role="img"
-          aria-label={`${title} — ${pageNumber}`}
-          className="block"
-        />
+        <canvas ref={canvasRef} aria-label={`${title} — ${pageNumber}`} className="block">
+          {title} — {pageNumber}
+        </canvas>
       )}
     </div>
   );
