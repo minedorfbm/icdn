@@ -88,7 +88,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <img
-          src={image}
+          src={near ? image : undefined}
           alt=""
           aria-hidden
           loading="lazy"

@@ -1,3 +1,5 @@
+import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
+import { HubHero } from "@/components/hub/HubHero";
 import { HubSearch } from "@/features/search/HubSearch";
 import { DiscoveryPaths } from "@/features/discovery/DiscoveryPaths";
 import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
@@ -5,20 +7,28 @@ import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
 import { localizedLinkUrl } from "@/lib/localized-links";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useJourneyMotion } from "@/lib/use-journey-motion";
 import { ArrowUpRight, Phone } from "lucide-react";
 import { LevelChapter } from "@/components/hub/LevelChapter";
 import { NamTramRail } from "@/components/hub/NamTramRail";
 import { type Level } from "@/data/resort";
 import { HubProvider, useHub } from "@/data/hub-context";
-import { getHubData } from "@/lib/hub.functions";
+import { getHubData, getHubSettings, type HubData } from "@/lib/hub.functions";
 import { I18nProvider, LanguageSwitch, useI18n } from "@/i18n";
 import { resolveHeroImage } from "@/data/hub-value";
 import { ResortBrowserProvider, ResortLink } from "@/components/hub/ResortBrowser";
 
 export const Route = createFileRoute("/_hub")({
-  loader: () => getHubData(),
+  loader: async ({ location }) => {
+    // Complete the homepage HTML before requesting its catalogue. Some mobile
+    // browsers buffer streamed documents; direct card URLs retain their SSR metadata.
+    const [settings, catalogue] = await Promise.all([
+      getHubSettings(),
+      location.pathname === "/" ? Promise.resolve(null) : getHubData(),
+    ]);
+    return { settings, catalogue };
+  },
   staleTime: 0,
   head: ({ loaderData }) => ({
     links: [
@@ -45,77 +55,93 @@ export const Route = createFileRoute("/_hub")({
 });
 
 function HubRoute() {
-  const data = Route.useLoaderData();
+  const { settings, catalogue } = Route.useLoaderData();
+  const [result, setResult] = useState<{ data: HubData | null; failed: boolean }>({
+    data: catalogue,
+    failed: false,
+  });
+  const [attempt, setAttempt] = useState(0);
+  const data = catalogue ?? result.data;
+  useEffect(() => {
+    if (catalogue) {
+      setResult({ data: catalogue, failed: false });
+      return;
+    }
+    if (result.data) return;
+    let current = true;
+    setResult({ data: null, failed: false });
+    getHubData().then(
+      (data) => {
+        if (current) setResult({ data, failed: false });
+      },
+      () => {
+        if (current) setResult({ data: null, failed: true });
+      },
+    );
+    return () => {
+      current = false;
+    };
+  }, [catalogue, attempt, result.data]);
   return (
-    <I18nProvider editorial={data.editorial}>
-      <ResortBrowserProvider>
-        <HubProvider data={data}>
-          <ResortMapProvider>
-            <Hub />
-            <Outlet />
-          </ResortMapProvider>
-        </HubProvider>
-      </ResortBrowserProvider>
+    <I18nProvider editorial={data?.editorial}>
+      <main className="bg-background text-foreground">
+        <div className="hub-tools">
+          <LanguageSwitch />
+        </div>
+        <HubHero image={resolveHeroImage({ settings })} />
+        {data ? (
+          <ResortBrowserProvider>
+            <HubProvider data={{ ...data, settings }}>
+              <ResortMapProvider>
+                <Hub />
+                <Outlet />
+              </ResortMapProvider>
+            </HubProvider>
+          </ResortBrowserProvider>
+        ) : (
+          <CatalogueStatus failed={result.failed} onRetry={() => setAttempt((n) => n + 1)} />
+        )}
+      </main>
     </I18nProvider>
+  );
+}
+
+function CatalogueStatus({
+  failed = false,
+  onRetry,
+}: Readonly<{ failed?: boolean; onRetry?: () => void }>) {
+  const { t } = useI18n();
+  return (
+    <section
+      id="discover"
+      className="brand-ui grid min-h-[50svh] place-content-center gap-5 px-7 text-center"
+      aria-busy={!failed}
+    >
+      <p role="status">{t(failed ? "content_unavailable" : "page_loading")}</p>
+      {failed && (
+        <button className="min-h-11 border-b" onClick={onRetry}>
+          {t("retry")}
+        </button>
+      )}
+    </section>
   );
 }
 
 function Hub() {
   const { openMap } = useResortMap();
-  const hubRef = useRef<HTMLElement>(null);
-  const { levels, links, contact, heroImage } = useHub();
+  const hubRef = useRef<HTMLDivElement>(null);
+  const { levels, links, contact } = useHub();
   const { active, visible } = useJourneyMotion(hubRef, levels);
   const { lang, t, linkLabel } = useI18n();
 
-  const scrollTo = (id: string) =>
-    document.getElementById(id)?.scrollIntoView({
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
-      block: "start",
-    });
+  const scrollTo = scrollToHubSection;
 
   return (
-    <main ref={hubRef} className="bg-background text-foreground">
-      <div className="hub-tools">
+    <div ref={hubRef} className="bg-background text-foreground">
+      <div className="hub-search-tool">
         <HubSearch />
-        <LanguageSwitch />
       </div>
       <NamTramRail active={active} visible={visible} onJump={(level: Level) => scrollTo(level)} />
-
-      {/* THRESHOLD */}
-      <section className="brand-ui relative h-[100svh] min-h-[600px] overflow-hidden">
-        <img
-          src={heroImage}
-          alt={t("hero_image_alt")}
-          width={1170}
-          height={2532}
-          fetchPriority="high"
-          decoding="async"
-          className="threshold-img absolute inset-0 h-full w-full object-cover"
-        />
-
-        <button
-          onClick={() => scrollTo("discover")}
-          className="absolute inset-x-0 top-[46%] z-10 flex flex-col items-center gap-4 px-5 text-center text-[var(--brand-ink)] [text-shadow:0_1px_12px_rgba(255,255,255,0.9)]"
-        >
-          <span className="reveal text-[9px] tracking-[0.36em] [animation-delay:120ms]">
-            {t("hero_kicker")}
-          </span>
-          <h1 className="reveal max-w-[90vw] font-serif text-[clamp(36px,10vw,60px)] leading-[0.94] tracking-[-0.02em] [animation-delay:260ms]">
-            {t("hero_title_1")}
-            <br />
-            {t("hero_title_2")}
-          </h1>
-          <span
-            className="reveal line-drop h-12 w-px bg-current/60 [animation-delay:520ms]"
-            aria-hidden
-          />
-          <span className="reveal text-[9px] tracking-[0.32em] [animation-delay:680ms]">
-            {t("hero_sub")}
-          </span>
-        </button>
-      </section>
 
       <DiscoveryPaths onJourney={() => scrollTo(levels[0]?.id ?? "heaven")} />
 
@@ -173,6 +199,6 @@ function Hub() {
       >
         <Phone size={14} strokeWidth={1.3} />
       </a>
-    </main>
+    </div>
   );
 }

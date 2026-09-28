@@ -36,7 +36,9 @@
     "pdf_page": "Page",
     "pdf_zoom_in": "Zoom in",
     "pdf_zoom_out": "Zoom out",
-    "hero_image_alt": "Flower-filled marble bowl in the resort lobby, overlooking the sea"
+    "hero_image_alt": "Flower-filled marble bowl in the resort lobby, overlooking the sea",
+    "content_unavailable": "Content is temporarily unavailable.",
+    "retry": "Try again"
   },
   "vi": {
     "hero_kicker": "BÁN ĐẢO SƠN TRÀ · ĐÀ NẴNG",
@@ -75,7 +77,9 @@
     "pdf_page": "Trang",
     "pdf_zoom_in": "Phóng to",
     "pdf_zoom_out": "Thu nhỏ",
-    "hero_image_alt": "Bát đá cẩm thạch đầy hoa trong sảnh khu nghỉ dưỡng, nhìn ra biển"
+    "hero_image_alt": "Bát đá cẩm thạch đầy hoa trong sảnh khu nghỉ dưỡng, nhìn ra biển",
+    "content_unavailable": "Nội dung tạm thời không khả dụng.",
+    "retry": "Thử lại"
   },
   "ru": {
     "hero_kicker": "ПОЛУОСТРОВ ШОНЧА · ДАНАНГ",
@@ -114,7 +118,9 @@
     "pdf_page": "Страница",
     "pdf_zoom_in": "Увеличить",
     "pdf_zoom_out": "Уменьшить",
-    "hero_image_alt": "Мраморная чаша с цветами в холле курорта с видом на море"
+    "hero_image_alt": "Мраморная чаша с цветами в холле курорта с видом на море",
+    "content_unavailable": "Содержимое временно недоступно.",
+    "retry": "Попробовать снова"
   },
   "zh": {
     "hero_kicker": "山茶半岛 · 岘港",
@@ -153,7 +159,9 @@
     "pdf_page": "第",
     "pdf_zoom_in": "放大",
     "pdf_zoom_out": "缩小",
-    "hero_image_alt": "度假酒店大堂内盛满鲜花的大理石花盆，远处是大海"
+    "hero_image_alt": "度假酒店大堂内盛满鲜花的大理石花盆，远处是大海",
+    "content_unavailable": "内容暂时无法加载。",
+    "retry": "重试"
   },
   "ko": {
     "hero_kicker": "선짜 반도 · 다낭",
@@ -192,7 +200,9 @@
     "pdf_error": "메뉴를 표시할 수 없습니다. 브라우저에서 열어 주세요.",
     "pdf_page": "페이지",
     "pdf_zoom_in": "확대",
-    "pdf_zoom_out": "축소"
+    "pdf_zoom_out": "축소",
+    "content_unavailable": "콘텐츠를 일시적으로 불러올 수 없습니다.",
+    "retry": "다시 시도"
   },
   "ja": {
     "hero_kicker": "ソンチャ半島 · ダナン",
@@ -231,6 +241,8 @@
     "pdf_error": "メニューを表示できません。ブラウザーで開いてください。",
     "pdf_page": "ページ",
     "pdf_zoom_in": "拡大",
-    "pdf_zoom_out": "縮小"
+    "pdf_zoom_out": "縮小",
+    "content_unavailable": "コンテンツを一時的に読み込めません。",
+    "retry": "再試行"
   }
 }

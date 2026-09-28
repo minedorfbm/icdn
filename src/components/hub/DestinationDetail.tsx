@@ -1,3 +1,4 @@
+import { useDestinationMedia } from "@/lib/use-destination-media";
 import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
@@ -12,11 +13,13 @@ import { ResortLink } from "./ResortBrowser";
 
 /** Full-screen editorial detail view for one destination. */
 export function DestinationDetail({
-  dest,
+  dest: summary,
   onClose,
   aboveMap = false,
   neutral = false,
 }: Readonly<{ dest: Destination; onClose: () => void; aboveMap?: boolean; neutral?: boolean }>) {
+  const { media, pending, failed, retry } = useDestinationMedia(summary.id);
+  const dest = { ...summary, ...media };
   const { lang, t, typeLabel, levelLabel, action, description, event } = useI18n();
   const { openMap, locate } = useResortMap();
   const placeId = locate(dest.id);
@@ -84,6 +87,16 @@ export function DestinationDetail({
           {description(dest.id, dest.short_description)}
         </p>
 
+        {(pending || failed) && (
+          <div className="mt-6 text-sm opacity-70" aria-busy={pending}>
+            <p role="status">{t(failed ? "content_unavailable" : "page_loading")}</p>
+            {failed && (
+              <button type="button" onClick={retry} className="mt-2 min-h-11 border-b">
+                {t("retry")}
+              </button>
+            )}
+          </div>
+        )}
         {dest.videos && dest.videos.length > 0 && <YouTubeVideos videos={dest.videos} />}
 
         <span className="mt-8 block h-px w-10 bg-current/30" aria-hidden />

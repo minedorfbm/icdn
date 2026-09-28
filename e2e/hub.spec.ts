@@ -23,6 +23,65 @@ function menuPdf() {
   return pdf;
 }
 
+test("the hero displays before a slow catalogue and media waits for an opened card", async ({
+  page,
+  request,
+}) => {
+  await request.post("http://127.0.0.1:54329/control", {
+    data: { delay: 3500, failCatalogue: true },
+  });
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  const start = Date.now();
+  await page.goto("/", { waitUntil: "commit" });
+  await expect(page.locator(".threshold-img")).toBeVisible();
+  console.log(`Hero visible after ${Date.now() - start}ms with catalogue delayed by 3500ms`);
+  await expect(page.locator("#heaven")).toHaveCount(0);
+  await expect(page.locator('#discover[aria-busy="true"]')).toBeVisible();
+  await page.getByRole("button", { name: "Language", exact: true }).click();
+  await page.getByRole("button", { name: /日本語/ }).click();
+  await expect(page.getByRole("button", { name: "再試行", exact: true })).toBeVisible({
+    timeout: 15000,
+  });
+  await request.post("http://127.0.0.1:54329/control", { data: { delay: 0 } });
+  await page.getByRole("button", { name: "再試行", exact: true }).click();
+  await expect(page.locator("#heaven")).toHaveCount(1);
+  await expect(page.locator("html")).toHaveAttribute("lang", "ja");
+  const before = await (await request.get("http://127.0.0.1:54329/control")).json();
+  expect(
+    before.reads.filter((read: string) => /destination_(photos|posts|videos)/.test(read)),
+  ).toEqual([]);
+  // Offscreen card and backdrop images do not compete with the hero.
+  await expect(page.locator("#sea img[src]")).toHaveCount(0);
+  await page.locator("#heaven").getByRole("button", { name: "Citron", exact: true }).click();
+  const card = page.getByRole("dialog", { name: "Citron", exact: true });
+  await expect(card).toBeVisible();
+  await expect(card.getByRole("button", { name: /Test video/ })).toBeVisible();
+  const after = await (await request.get("http://127.0.0.1:54329/control")).json();
+  for (const table of ["destination_photos", "destination_posts", "destination_videos"]) {
+    expect(
+      after.reads.some(
+        (read: string) => read.includes(table) && read.includes("destination_id=eq.citron"),
+      ),
+    ).toBe(true);
+  }
+  expect(errors).toEqual([]);
+  await request.post("http://127.0.0.1:54329/control", { data: { delay: 0 } });
+});
+
+test("a failed card media request can be retried without losing the card", async ({
+  page,
+  request,
+}) => {
+  await request.post("http://127.0.0.1:54329/control", { data: { failMediaOnce: true } });
+  await page.goto("/tingara");
+  const card = page.getByRole("dialog", { name: "TINGARA", exact: true });
+  await expect(card).toBeVisible();
+  await card.getByRole("button", { name: "Try again", exact: true }).click();
+  await expect(card.getByRole("status")).toHaveCount(0);
+  await expect(card).toBeVisible();
+});
+
 test("direct card, two-page PDF, zoom and return preserve navigation", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -62,7 +121,7 @@ test("language and search remain usable when browser storage is denied", async (
   await page.locator(".hub-tools button").last().click();
   await page.getByRole("button", { name: /日本語/ }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
-  await page.locator(".hub-tools button").first().click();
+  await page.locator(".hub-search-tool button").first().click();
   await page.getByRole("searchbox").fill("Citron");
   await page.locator(".hub-search-results button").filter({ hasText: "Citron" }).click();
   await expect(page).toHaveURL("/citron");

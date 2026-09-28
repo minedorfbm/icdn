@@ -19,7 +19,7 @@ Le site et les prévisualisations utilisent `SUPABASE_URL` et `SUPABASE_PUBLISHA
 
 ## Vérifier une publication
 
-Après un déploiement, ouvrir le domaine de production et contrôler les quatre niveaux, le swipe dans les deux sens, l’ouverture d’une fiche, ses liens et les traductions. Vérifier également qu’aucune erreur `[hub]` ne signale une lecture Supabase indisponible dans les logs du Worker. Une modification du contenu en base peut prendre environ deux minutes à se refléter, car les données publiques sont mises en cache dans un seul cache du centre de données Cloudflare, sans prolongation en cas de panne. Recharger un onglet déjà ouvert pour vérifier la nouvelle publication.
+Après un déploiement, ouvrir le domaine de production et contrôler les quatre niveaux, le swipe dans les deux sens, l’ouverture d’une fiche, ses liens et les traductions. Vérifier également qu’aucune erreur `[hub]` ne signale une lecture Supabase indisponible dans les logs du Worker. Une modification du contenu en base peut prendre environ deux minutes à se refléter, car les données publiques sont mises en cache dans le cache du centre de données Cloudflare, avec des clés distinctes pour les réglages, le catalogue et les médias de chaque card, sans prolongation en cas de panne. Recharger un onglet déjà ouvert pour vérifier la nouvelle publication.
 
 Le domaine personnalisé est configuré dans Cloudflare et n’est pas recréé par `wrangler.json`. Le DNS du domaine racine et les enregistrements de messagerie OVH (MX, SPF, DKIM, DMARC) ne sont pas modifiés par ce dépôt.
 

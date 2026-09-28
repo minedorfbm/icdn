@@ -35,7 +35,7 @@ export interface HubValue {
 }
 
 /** Use the same CMS image for the hero and its preload. */
-export function resolveHeroImage(data?: HubData): string {
+export function resolveHeroImage(data?: Pick<HubData, "settings">): string {
   const reference = data?.settings?.["hero_image"];
   return resolveImage(reference ?? "") || receptionHero;
 }

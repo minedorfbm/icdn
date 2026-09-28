@@ -12,9 +12,8 @@ export default defineConfig({
   webServer: [
     { command: "bun e2e/mock-supabase.ts", port: 54329, reuseExistingServer: false },
     {
-      command:
-        "bun run preview:cloudflare --ip 127.0.0.1 --port 4173 --var SUPABASE_URL:http://127.0.0.1:54329 --var SUPABASE_PUBLISHABLE_KEY:sb_publishable_test",
-      url: "http://127.0.0.1:4173",
+      command: `bun run preview:cloudflare --persist-to .wrangler/e2e/state-${process.pid} --ip 127.0.0.1 --port 4173 --var SUPABASE_URL:http://127.0.0.1:54329 --var SUPABASE_PUBLISHABLE_KEY:sb_publishable_test`,
+      url: "http://127.0.0.1:4173/intercontinental-favicon.png",
       reuseExistingServer: false,
       env: {
         WRANGLER_SEND_METRICS: "false",

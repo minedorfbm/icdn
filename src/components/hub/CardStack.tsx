@@ -87,6 +87,25 @@ export function CardStack({
   }, [items]);
 
   // Keep images, text and links out of the per-frame drag renders.
+  // Decode adjacent images at low priority before either swipe direction needs them.
+  useEffect(() => {
+    if (!near) return;
+    const neighbours = [items[index - 1], items[index + 1]].filter(Boolean);
+    const images = neighbours.map((item) => {
+      const image = new Image();
+      image.fetchPriority = "low";
+      image.decoding = "async";
+      image.src = item!.image;
+      void image.decode().catch(() => {});
+      return image;
+    });
+    return () => {
+      images.forEach((image) => {
+        image.removeAttribute("src");
+      });
+    };
+  }, [items, index, near]);
+
   const panels = useMemo(
     () =>
       items.map((dest, i) => (
@@ -95,6 +114,7 @@ export function CardStack({
           dest={dest}
           active={i === index}
           priority={near && i === index}
+          near={near}
           onOpen={() =>
             i === index ? openDestination(dest.id, layout === "discovery") : onIndexChange(i)
           }
