@@ -17,7 +17,7 @@ export function youtubeVideoId(value: string): string | null {
     } else if (host === "youtube.com" || host === "www.youtube.com" || host === "m.youtube.com") {
       if (url.pathname === "/watch") id = url.searchParams.get("v");
       else {
-        const match = url.pathname.match(/^\/(?:shorts|live|embed)\/([^/]+)\/?$/);
+        const match = /^\/(?:shorts|live|embed)\/([^/]+)\/?$/.exec(url.pathname);
         id = match?.[1] ?? null;
       }
     }
@@ -41,11 +41,11 @@ export function parseVideoSource(value: string): VideoSource | null {
         format: url.pathname.startsWith("/shorts/") ? "short" : "video",
       };
     if (!["facebook.com", "www.facebook.com", "m.facebook.com"].includes(url.hostname)) return null;
-    const match = url.pathname.match(/^\/(?:reel|(?:[A-Za-z0-9._-]+\/)?videos)\/([0-9]+)\/?$/);
+    const match = /^\/(?:reel|(?:[A-Za-z0-9._-]+\/)?videos)\/(\d+)\/?$/.exec(url.pathname);
     const id =
       match?.[1] ??
       (url.pathname === "/watch/" || url.pathname === "/watch" ? url.searchParams.get("v") : null);
-    if (!id || !/^[0-9]{5,30}$/.test(id)) return null;
+    if (!id || !/^\d{5,30}$/.test(id)) return null;
     return {
       provider: "facebook",
       video_id: id,
