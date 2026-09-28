@@ -111,7 +111,7 @@ export function LanguageSwitch() {
       <SheetTrigger asChild>
         <button
           aria-label={t("language")}
-          className="fixed right-3 top-3 z-50 flex items-center gap-1 rounded-full border border-[oklch(0.78_0.11_85/0.2)] bg-[oklch(0.16_0.03_250/0.32)] px-2.5 py-1.5 text-[oklch(0.86_0.1_85)] backdrop-blur-md transition-all hover:border-[oklch(0.78_0.11_85/0.35)] hover:bg-[oklch(0.16_0.03_250/0.45)] active:scale-95 max-[360px]:right-2"
+          className="brand-ui brand-floating fixed right-3 top-3 z-50 flex min-h-11 items-center gap-2 rounded-sm px-3 py-2 transition-transform active:scale-95 max-[360px]:right-2"
         >
           <span className="text-[10px] tracking-[0.18em]">{current.label}</span>
           <ChevronDown size={10} strokeWidth={1.5} className="opacity-60" />
@@ -120,10 +120,10 @@ export function LanguageSwitch() {
 
       <SheetContent
         side="bottom"
-        className="z-[60] rounded-t-2xl border-t border-[oklch(0.78_0.11_85/0.18)] bg-[oklch(0.16_0.03_250/0.96)] px-5 pb-8 pt-5 shadow-[0_-8px_32px_oklch(0.16_0.03_250/0.24)]"
+        className="brand-ui brand-language-sheet z-[60] border-t px-5 pb-8 pt-5"
       >
         <SheetHeader className="mb-5 items-center">
-          <SheetTitle className="text-[11px] font-normal uppercase tracking-[0.3em] text-[oklch(0.86_0.1_85)]">
+          <SheetTitle className="text-[11px] font-normal uppercase tracking-[0.3em] text-[var(--brand-ink)]">
             {t("language")}
           </SheetTitle>
         </SheetHeader>
@@ -136,18 +136,14 @@ export function LanguageSwitch() {
                 key={code}
                 onClick={() => select(code)}
                 aria-current={active}
-                className={`flex items-center justify-between rounded-xl px-4 py-3.5 text-left transition-all ${
-                  active
-                    ? "bg-[oklch(0.78_0.11_85/0.14)] text-[oklch(0.92_0.01_90)]"
-                    : "text-[oklch(0.86_0.1_85/0.72)] hover:bg-[oklch(0.78_0.11_85/0.08)] hover:text-[oklch(0.92_0.01_90)]"
-                }`}
+                className="brand-language-option flex items-center justify-between rounded-sm px-4 py-3.5 text-left transition-colors"
               >
                 <span className="flex items-baseline gap-3">
                   <span className="w-8 text-[12px] tracking-[0.12em]">{label}</span>
                   <span className="text-[13px] font-light tracking-wide opacity-80">{name}</span>
                 </span>
                 {active && (
-                  <Check size={16} strokeWidth={1.5} className="text-[oklch(0.86_0.1_85)]" />
+                  <Check size={16} strokeWidth={1.5} className="text-[var(--brand-ink)]" />
                 )}
               </button>
             );

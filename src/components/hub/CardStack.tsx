@@ -257,7 +257,13 @@ export function CardStack({
         </div>
       </div>
 
-      {open && <DestinationDetail dest={open} onClose={() => setOpen(null)} />}
+      {open && (
+        <DestinationDetail
+          dest={open}
+          onClose={() => setOpen(null)}
+          neutral={layout === "discovery"}
+        />
+      )}
     </div>
   );
 }

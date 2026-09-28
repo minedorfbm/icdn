@@ -200,7 +200,7 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
   };
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col bg-[oklch(0.92_0.015_85)] text-[oklch(0.17_0.008_155)]">
+    <div className="relative flex min-h-0 flex-1 flex-col brand-surface">
       <div
         ref={scrollRef}
         className="min-h-0 flex-1 overflow-auto overscroll-contain"
@@ -241,7 +241,7 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
           type="button"
           onClick={toggleZoom}
           aria-label={zoom > 1 ? t("pdf_zoom_out") : t("pdf_zoom_in")}
-          className="absolute bottom-4 right-4 grid size-12 place-items-center rounded-full border border-black/20 bg-[oklch(0.96_0.01_85)] shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2"
+          className="absolute bottom-4 right-4 grid size-12 place-items-center rounded-full brand-floating focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           {zoom > 1 ? (
             <ZoomOut aria-hidden className="size-5" />

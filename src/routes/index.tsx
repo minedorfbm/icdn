@@ -78,7 +78,7 @@ function Hub() {
       <NamTramRail active={active} visible={visible} onJump={(level: Level) => scrollTo(level)} />
 
       {/* THRESHOLD */}
-      <section className="relative h-[100svh] min-h-[600px] overflow-hidden">
+      <section className="brand-ui relative h-[100svh] min-h-[600px] overflow-hidden">
         <img
           src={heroImage}
           alt={t("hero_image_alt")}
@@ -91,7 +91,7 @@ function Hub() {
 
         <button
           onClick={() => scrollTo("discover")}
-          className="absolute inset-x-0 top-[46%] z-10 flex flex-col items-center gap-4 px-5 text-center text-[#102d43] [text-shadow:0_1px_12px_rgba(255,255,255,0.9)]"
+          className="absolute inset-x-0 top-[46%] z-10 flex flex-col items-center gap-4 px-5 text-center text-[var(--brand-ink)] [text-shadow:0_1px_12px_rgba(255,255,255,0.9)]"
         >
           <span className="reveal text-[9px] tracking-[0.36em] [animation-delay:120ms]">
             {t("hero_kicker")}
@@ -121,7 +121,7 @@ function Hub() {
       </div>
 
       {/* END OF JOURNEY */}
-      <section className="sea-footer px-6 py-24">
+      <section className="brand-ui sea-footer px-6 py-24">
         <h2 className="font-serif text-[30px] leading-tight tracking-tight">{t("footer_title")}</h2>
         <ul className="mt-8 flex flex-col divide-y divide-current/10 border-y border-current/10">
           {links.map(({ label, url, translations }) => (
@@ -163,7 +163,7 @@ function Hub() {
       <a
         href={contact}
         aria-label={t("concierge")}
-        className="fixed bottom-4 right-4 z-50 flex h-9 w-9 items-center justify-center rounded-full border border-[oklch(0.78_0.11_85/0.22)] bg-[oklch(0.16_0.03_250/0.35)] pb-0 text-[oklch(0.78_0.11_85/0.55)] shadow-[0_2px_8px_oklch(0.16_0.03_250/0.14)] backdrop-blur-md transition-all duration-300 ease-out hover:scale-105 hover:border-[oklch(0.78_0.11_85/0.42)] hover:bg-[oklch(0.16_0.03_250/0.5)] hover:text-[oklch(0.78_0.11_85/0.75)] active:scale-95"
+        className="brand-floating fixed bottom-4 right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-95"
       >
         <Phone size={14} strokeWidth={1.3} />
       </a>

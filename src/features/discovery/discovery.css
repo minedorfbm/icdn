@@ -2,9 +2,9 @@
   position: relative;
   isolation: isolate;
   padding: 64px 22px 72px;
-  color: #eee3cb;
-  background: radial-gradient(ellipse at 100% 30%, #213a36 0%, transparent 65%), #0c2023;
-  border-block: 1px solid #cdb58030;
+  color: var(--brand-ink);
+  background: var(--brand-white);
+  border-block: 1px solid var(--brand-border);
 }
 .discovery-inner {
   max-width: 740px;
@@ -15,9 +15,9 @@
 }
 .discovery-heading p,
 .surprise-heading p {
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.22em;
-  color: #cdb580;
+  color: var(--brand-muted);
   line-height: 1.7;
 }
 .discovery-heading h2 {
@@ -42,21 +42,21 @@
   overflow: hidden;
   text-align: left;
   padding: 22px 20px;
-  border: 1px solid #cdb58045;
-  border-radius: 4px 22px 4px 22px;
-  background: linear-gradient(120deg, #ffffff08, #ffffff00);
+  border: 1px solid var(--brand-sand);
+  border-radius: 2px;
+  background: var(--brand-paper);
   color: inherit;
   transition:
     border-color 0.3s,
     background-color 0.3s;
 }
 .discovery-choice:focus-visible {
-  outline: 2px solid #e5ca90;
+  outline: 2px solid var(--brand-ink);
   outline-offset: 4px;
 }
 .discovery-choice:hover {
-  border-color: #cdb580aa;
-  background-color: #ffffff06;
+  border-color: var(--brand-accent);
+  background-color: var(--brand-white);
 }
 .discovery-choice-text {
   position: relative;
@@ -67,7 +67,7 @@
   min-width: 0;
 }
 .discovery-choice-text > svg {
-  color: #cdb580;
+  color: var(--brand-muted);
   margin-bottom: 2px;
 }
 .discovery-choice-title {
@@ -78,17 +78,17 @@
   overflow-wrap: anywhere;
 }
 .discovery-choice-note {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
   letter-spacing: 0.035em;
-  color: #eee3cbaf;
+  color: var(--brand-muted);
 }
 .discovery-arrow {
   position: absolute;
   right: 14px;
   bottom: 16px;
   z-index: 3;
-  color: #d6bd8b;
+  color: var(--brand-ink);
 }
 .discovery-art {
   position: absolute;
@@ -115,7 +115,7 @@
   top: -25%;
   height: 150%;
   width: 3px;
-  background: linear-gradient(transparent, #cdb58075, transparent);
+  background: linear-gradient(transparent, #d8bdb475, transparent);
   transform: rotate(25deg);
 }
 .discovery-map-art {
@@ -146,7 +146,7 @@
   width: 65%;
   height: 70%;
   object-fit: cover;
-  border: 1px solid #cdb580aa;
+  border: 1px solid var(--brand-accent);
   border-radius: 7px;
   box-shadow: 0 8px 18px #0007;
 }
@@ -165,8 +165,8 @@
   filter: brightness(0.4);
 }
 .surprise-discovery {
-  background: radial-gradient(ellipse at 80% 25%, #28423b, #0c2023 70%);
-  color: #eee3cb;
+  background: var(--brand-paper);
+  color: var(--brand-ink);
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: max(18px, env(safe-area-inset-bottom, 0px));
 }
@@ -197,9 +197,9 @@
   flex-shrink: 0;
   width: 44px;
   height: 44px;
-  border: 1px solid #cdb58055;
+  border: 1px solid var(--brand-sand);
   border-radius: 50%;
-  color: #e5ca90;
+  color: var(--brand-ink);
 }
 .surprise-heading button:focus-visible,
 .surprise-controls button:focus-visible {
@@ -208,10 +208,10 @@
 }
 .surprise-hint {
   padding: 4px 22px 0;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
   letter-spacing: 0.04em;
-  color: #e7d8b5b0;
+  color: var(--brand-muted);
   max-width: 740px;
   margin: auto;
 }
@@ -236,7 +236,7 @@
     italic 16px/1.25 var(--font-serif),
     Georgia,
     serif;
-  color: #eee3cbb0;
+  color: var(--brand-muted);
 }
 .surprise-controls button:disabled {
   opacity: 0.25;

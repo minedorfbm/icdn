@@ -79,3 +79,22 @@ Les changements fusionnés dans `main` sont construits pour le Worker `icdnd`. N
 Le projet reste connecté à Lovable pour son historique Git. Travailler sur une branche et ouvrir une pull request ; ne pas forcer un push ni réécrire des commits déjà publiés. Le [brief créatif historique](docs/design-brief.md) reste disponible séparément.
 
 Les boutons **Discover** et **Website** peuvent avoir une URL différente selon la langue, gérée dans Supabase avec retour au lien commun si la variante manque. Menus et réservations conservent leurs liens partagés. Voir [la gestion des liens multilingues](docs/localized-links.md).
+
+### Interface palette
+
+`src/brand.css` centralizes the neutral interface theme, based on the public
+[InterContinental Danang website](https://www.danang.intercontinental.com/)
+observed on 28 September 2026: white `#ffffff`, off-white `#f3f3f1`, charcoal
+`#3d3935`, rose sand `#d8bdb4` and accent `#d3b5a3`. Darker neutral text keeps
+small controls readable; sand is used for backgrounds and borders.
+
+This theme covers the welcome/discovery interface, map controls, Surprise me,
+language menu, concierge button, footer and embedded browser/PDF chrome.
+Destination details opened from the map or Surprise me use the neutral theme;
+those opened in the Journey retain their level's palette. The four Journey
+worlds, Nam Tram and illustrated map artwork keep their own visual identity.
+
+Typography uses locally available Baskerville/Georgia and Gill Sans/Arial.
+The site's proprietary New Baskerville/Gill Sans webfont files are not bundled;
+exact brand typography would require approved, licensed font assets. This is
+alignment with the public site's visual language, not a certified group brand kit.
