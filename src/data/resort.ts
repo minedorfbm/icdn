@@ -1,3 +1,12 @@
+import type { z } from "zod";
+import type {
+  linkRow,
+  eventRow,
+  photoRow,
+  postRow,
+  videoRow,
+  destinationRow,
+} from "@/lib/hub-schema";
 import {
   currentLinkTranslations,
   type DestinationLinkTranslationRow,
@@ -33,11 +42,7 @@ import type { DestinationEvent } from "@/data/events";
 
 export type { DestinationEvent };
 
-/**
- * CMS-ready data layer.
- * Every field below maps 1:1 to a future database column so the frontend can be
- * switched to a CMS without touching components.
- */
+/** Public catalogue shapes and image resolution. Editorial content lives in Supabase. */
 
 export type Level = "heaven" | "sky" | "earth" | "sea";
 
@@ -64,16 +69,6 @@ export interface Destination {
   type: DestinationType;
   short_description: string;
   image: string;
-  discover_url?: string;
-  menu_url?: string;
-  price_list_url?: string;
-  vegetarian_menu_url?: string;
-  breakfast_menu_url?: string;
-  vegan_menu_url?: string;
-  lunch_menu_url?: string;
-  dinner_menu_url?: string;
-  booking_url?: string;
-  instagram_url?: string;
   /** Marked as one of the resort's official Instagram photo spots. */
   instagram_spot?: boolean;
   photos?: DestinationPhoto[];
@@ -98,25 +93,10 @@ export interface DestinationLink {
 }
 
 /** Row shape returned by the `destination_links` table. */
-export interface DestinationLinkRow {
-  id?: string;
-  destination_id: string;
-  kind: string;
-  label: string | null;
-  url: string;
-  display_order: number;
-}
+export type DestinationLinkRow = z.infer<typeof linkRow>;
 
 /** Row shape returned by the `destination_events` table. */
-export interface DestinationEventRow {
-  id?: string;
-  destination_id: string;
-  title: string;
-  schedule: string[];
-  description: string;
-  url: string | null;
-  display_order: number;
-}
+export type DestinationEventRow = z.infer<typeof eventRow>;
 
 /** One curated gallery photo shown inside a destination detail sheet. */
 export interface DestinationPhoto {
@@ -126,13 +106,7 @@ export interface DestinationPhoto {
 }
 
 /** Row shape returned by the `destination_photos` table. */
-export interface DestinationPhotoRow {
-  destination_id: string;
-  image_url: string;
-  caption: string | null;
-  post_url: string | null;
-  display_order: number;
-}
+export type DestinationPhotoRow = z.infer<typeof photoRow>;
 
 /** One featured Instagram post shown inside a destination detail sheet. */
 export interface DestinationPost {
@@ -144,15 +118,7 @@ export interface DestinationPost {
 }
 
 /** Row shape returned by the `destination_posts` table. */
-export interface DestinationPostRow {
-  destination_id: string;
-  post_url: string;
-  account: string | null;
-  caption: string | null;
-  image_url: string | null;
-  posted_at: string | null;
-  display_order: number;
-}
+export type DestinationPostRow = z.infer<typeof postRow>;
 
 export interface DestinationVideo {
   video_id: string;
@@ -161,13 +127,7 @@ export interface DestinationVideo {
   title_translations: Record<string, string>;
 }
 
-export interface DestinationVideoRow {
-  destination_id: string;
-  video_url: string;
-  title: string;
-  title_translations: Record<string, string> | null;
-  display_order: number;
-}
+export type DestinationVideoRow = z.infer<typeof videoRow>;
 
 /** Accept only video IDs from known YouTube URL formats before building an embed URL. */
 export function youtubeVideoId(value: string): string | null {
@@ -223,39 +183,13 @@ export function groupPosts(rows: DestinationPostRow[]): Record<string, Destinati
   return out;
 }
 
-/** Official resort channels — configurable, no invented accounts. */
+/** Essential public channels also used outside the footer. */
 export const OFFICIAL = {
-  website: "https://www.danang.intercontinental.com/",
-
-  ihg: "https://www.ihg.com/onerewards/content/us/en/home",
-  instagram: "https://www.instagram.com/intercontinentaldanang/",
   youtube: "https://www.youtube.com/@ICDanang",
-  x: "https://x.com/ICdanang",
-  facebook: "https://www.facebook.com/InterContinentalDanang/",
-  linkedin: "https://www.linkedin.com/company/intercontinentaldanang/",
-  map: "https://www.danang.intercontinental.com/contact-us/",
   contact: "tel:+842363938888",
-  dining: "https://www.danang.intercontinental.com/dining/",
-  spa: "https://www.danang.intercontinental.com/spa-and-wellbeing/",
 } as const;
 
-/** Action sets by content type. */
-export const CTA_BY_TYPE: Record<DestinationType, string[]> = {
-  restaurant: ["DISCOVER", "MENU", "BOOK"],
-  bar: ["DISCOVER", "MENU"],
-  spa: ["DISCOVER", "TREATMENTS", "BOOK"],
-  fitness: ["DISCOVER", "HOURS"],
-  kids: ["DISCOVER", "ACTIVITIES"],
-  pool: ["INFO", "HOURS"],
-  experience: ["DISCOVER", "DETAILS", "BOOK"],
-  retail: ["DISCOVER", "VISIT"],
-  gallery: ["DISCOVER", "VISIT"],
-  accommodation: ["DISCOVER", "DETAILS"],
-  service: ["INFO", "BOOK"],
-  beach: ["INFO"],
-  recreation: ["DISCOVER", "DETAILS"],
-};
-
+/** The four fixed navigation stations and their default artwork. */
 export const LEVELS: {
   id: Level;
   title: string;
@@ -293,8 +227,6 @@ export const LEVELS: {
   },
 ];
 
-const w = OFFICIAL.website;
-
 /** Default photography per content type. */
 const TYPE_IMAGE: Record<DestinationType, string> = {
   restaurant: dFrenchDining,
@@ -310,31 +242,6 @@ const TYPE_IMAGE: Record<DestinationType, string> = {
   service: dVilla,
   beach: dBeach,
   recreation: dBeach,
-};
-
-/** Specific photography overrides by destination id. */
-const IMAGE_BY_ID: Record<string, string> = {
-  "enchanted-holiday": offerEnchanted,
-  "bensley-package": offerBensley,
-  "ihg-one-rewards": ihgRewards,
-  weddings: offerWedding,
-  citron: dCitron,
-  "wine-cellar": dWine,
-  tingara: dCitron,
-  "nam-tram": dTram,
-  "the-summit": dTram,
-  "apec-garden": dGallery,
-  "bensley-gallery": dBensleyGallery,
-  "organic-garden": dGallery,
-  "dia-tang": dGallery,
-  "yoga-pavilion": dSpa,
-  nursery: dSpa,
-  "terra-mare": dFrenchDining,
-  "nail-hair": dNailStudio,
-  "moulin-rouge": dBar,
-  "relaxation-pavilion": gTerraceDetail,
-  "instagram-spots": gTerraceDetail,
-  "wall-of-lanterns": gArchitectureDetail,
 };
 
 /** Asset registry — maps a CMS `image_key` to the bundled photography. */
@@ -373,27 +280,6 @@ export function resolveImage(ref: string): string {
   return ASSET_BY_KEY[ref] ?? "";
 }
 
-/**
- * Bundled fallback galleries, used when the database is unreachable.
- * Placeholder photography in the resort's visual style — to be replaced by the
- * resort's own Instagram imagery.
- */
-const DINING_SET = ["g-dining-detail", "g-terrace-detail", "g-architecture-detail"];
-const BAR_SET = ["g-bar-detail", "d-bar", "g-terrace-detail", "g-architecture-detail"];
-
-export const FALLBACK_PHOTOS: Record<string, string[]> = {
-  "terra-mare": ["d-french-dining", ...DINING_SET],
-  citron: ["d-citron", ...DINING_SET],
-  "la-maison-1888": ["d-french-dining", ...DINING_SET],
-  "b-lounge": BAR_SET,
-  "long-bar": BAR_SET,
-  "buffalo-bar": BAR_SET,
-  "wine-cellar": ["d-wine", "g-bar-detail", "g-dining-detail", "g-architecture-detail"],
-  tingara: ["d-citron", ...BAR_SET.slice(0, 3)],
-  "bensley-package": ["offer-bensley", "g-architecture-detail", "d-gallery", "d-villa"],
-  weddings: ["offer-wedding", "g-terrace-detail", "d-beach", "g-dining-detail"],
-};
-
 /** Groups photo rows by destination, ready to attach to a destination. */
 export function groupPhotos(rows: DestinationPhotoRow[]): Record<string, DestinationPhoto[]> {
   const out: Record<string, DestinationPhoto[]> = {};
@@ -410,18 +296,7 @@ export function groupPhotos(rows: DestinationPhotoRow[]): Record<string, Destina
 }
 
 /** Row shape returned by the database (see the `destinations` table). */
-export interface DestinationRow {
-  id: string;
-  name: string;
-  level_id: string;
-  cluster: string | null;
-  type: string;
-  short_description: string;
-  image_key: string | null;
-  instagram_spot?: boolean | null;
-  display_order: number;
-  active: boolean;
-}
+export type DestinationRow = z.infer<typeof destinationRow>;
 
 /** Groups link rows by destination, in display order. */
 export function groupLinks(
@@ -468,11 +343,11 @@ export function toDestination(
   posts?: DestinationPost[],
   videos?: DestinationVideo[],
 ): Destination {
-  const type = row.type as DestinationType;
+  const type = row.type;
   return {
     id: row.id,
     name: row.name,
-    level: row.level_id as Level,
+    level: row.level_id,
     ...(row.cluster ? { cluster: row.cluster } : {}),
     type,
     short_description: row.short_description,
@@ -487,378 +362,3 @@ export function toDestination(
     active: row.active,
   };
 }
-
-/** Mirrors the editorial collections in the database for offline rendering. */
-const FALLBACK_COLLECTIONS: Record<string, string> = {
-  "enchanted-holiday": "EXPERIENCES",
-  "club-lounge": "DINING",
-  "ihg-one-rewards": "EXPERIENCES",
-  "bensley-package": "EXPERIENCES",
-  penthouses: "EXPERIENCES",
-  rooms: "EXPERIENCES",
-  reception: "EXPERIENCES",
-  "instagram-spots": "EXPERIENCES",
-  "the-summit": "EXPERIENCES",
-  "apec-garden": "EXPERIENCES",
-  "nam-tram": "EXPERIENCES",
-  information: "EXPERIENCES",
-  weddings: "EXPERIENCES",
-  "moulin-rouge": "EXPERIENCES",
-  citron: "DINING",
-  "sports-centre": "WELLNESS",
-  "relaxation-pavilion": "WELLNESS",
-  "la-maison-1888": "DINING",
-  "buffalo-bar": "DINING",
-  "wine-cellar": "DINING",
-  tingara: "DINING",
-  "heritage-village": "EXPERIENCES",
-  "bensley-gallery": "EXPERIENCES",
-  "kate-mccoy": "EXPERIENCES",
-  sammys: "EXPERIENCES",
-  "planet-trekkers": "EXPERIENCES",
-  "family-pool": "WELLNESS",
-  "kids-pool": "WELLNESS",
-  "garden-jacuzzi": "WELLNESS",
-  nursery: "EXPERIENCES",
-  "wall-of-lanterns": "EXPERIENCES",
-  "organic-garden": "EXPERIENCES",
-  "dia-tang": "EXPERIENCES",
-  "mi-sol-spa": "WELLNESS",
-  "nail-hair": "WELLNESS",
-  "spa-lagoon-villas": "WELLNESS",
-  "yoga-pavilion": "WELLNESS",
-  "coconut-beach": "WELLNESS",
-  "family-beach": "WELLNESS",
-  "club-beach": "WELLNESS",
-  "marine-centre": "EXPERIENCES",
-  "sea-experiences": "EXPERIENCES",
-  "terra-mare": "DINING",
-  "b-lounge": "DINING",
-  "long-bar": "DINING",
-  "soar-gym": "WELLNESS",
-  "long-pool": "WELLNESS",
-};
-
-const d = (
-  id: string,
-  name: string,
-  level: Level,
-  type: DestinationType,
-  short_description: string,
-  order: number,
-  extra: Partial<Destination> = {},
-): Destination => ({
-  id,
-  name,
-  level,
-  type,
-  short_description,
-  image: IMAGE_BY_ID[id] ?? TYPE_IMAGE[type],
-  discover_url: w,
-  // restaurants surface the resort's Instagram presence
-  ...(type === "restaurant" ? { instagram_url: OFFICIAL.instagram } : {}),
-  display_order: order,
-  ...(FALLBACK_COLLECTIONS[id] ? { cluster: FALLBACK_COLLECTIONS[id] } : {}),
-  active: true,
-  ...extra,
-});
-
-export const DESTINATIONS: Destination[] = [
-  // HEAVEN — summit of the resort
-  d(
-    "enchanted-holiday",
-    "Enchanted Holiday Escape",
-    "heaven",
-    "experience",
-    "Christmas 2026 — a festive stay with daily breakfast, Afternoon Tea, celebratory drinks and Charles's nature discovery trail.",
-    0,
-    {
-      discover_url:
-        "https://www.danang.intercontinental.com/offers/enchanted-holiday-escape-offer-2/",
-    },
-  ),
-  d(
-    "club-lounge",
-    "Club InterContinental Lounge",
-    "heaven",
-    "service",
-    "Private lounge above the bay.",
-    1,
-  ),
-  d(
-    "ihg-one-rewards",
-    "IHG One Rewards",
-    "heaven",
-    "service",
-    "The loyalty programme of IHG Hotels & Resorts — earn and enjoy worldwide.",
-    2,
-    { discover_url: OFFICIAL.ihg },
-  ),
-  d(
-    "bensley-package",
-    "The Bensley Design Discovery Package",
-    "heaven",
-    "experience",
-    "Two nights in the Heavenly Penthouse, a private Design Tour, Champagne art viewing at the Bensley Outsider Gallery and Heavenly Afternoon Tea.",
-    3,
-    {
-      discover_url: "https://www.danang.intercontinental.com/offers/bensley-design-package/",
-      instagram_url: "https://www.instagram.com/billbensley/",
-    },
-  ),
-  d(
-    "weddings",
-    "Weddings & Celebrations",
-    "heaven",
-    "experience",
-    "Say 'I do' above the bay — beachfront ceremonies, bespoke receptions and honeymoon moments crafted by our wedding specialists.",
-    4,
-    {
-      discover_url: "https://www.danang.intercontinental.com/weddings/",
-      menu_url:
-        "https://www.danang.intercontinental.com/wp-content/uploads/2026/06/InterContinental-Danang-Wedding-Brochure.pdf",
-      instagram_url: "https://www.instagram.com/p/Db-zN6-Gorb/",
-    },
-  ),
-  d(
-    "reception",
-    "Reception Lobby",
-    "heaven",
-    "service",
-    "Reception Lobby, Concierge and Executive Office — arrival at the highest point of the resort.",
-    5,
-    { instagram_spot: true, active: false },
-  ),
-  d(
-    "instagram-spots",
-    "Top 9 Instagram Spots",
-    "heaven",
-    "experience",
-    "The nine most photographed places of the resort, from the Reception Hall to Coconut Beach.",
-    6,
-    { instagram_spot: true },
-  ),
-  d(
-    "penthouses",
-    "Heavenly Penthouses",
-    "heaven",
-    "accommodation",
-    "Panoramic suites at the summit.",
-    7,
-    { active: false },
-  ),
-  d(
-    "the-summit",
-    "The Summit",
-    "heaven",
-    "experience",
-    "The Summit Conference Centre, the Auditorium-Cinema and M Club — gatherings, screenings and celebrations.",
-    8,
-  ),
-  d("rooms", "Rooms & Villas", "heaven", "accommodation", "Bensley design, level by level.", 9, {
-    active: false,
-  }),
-  d(
-    "sports-centre",
-    "Sports Centre",
-    "heaven",
-    "fitness",
-    "Tennis and pickleball courts, football pitch and mountaintop play.",
-    10,
-  ),
-  d(
-    "apec-garden",
-    "APEC 2017 Sculpture Garden",
-    "heaven",
-    "gallery",
-    "Sculpture along the ridge.",
-    11,
-  ),
-  d("nam-tram", "Nam Tram", "heaven", "service", "The funicular between the four worlds.", 12),
-  d("information", "Information Desk", "heaven", "service", "Concierge and guest assistance.", 13, {
-    active: false,
-  }),
-  d(
-    "moulin-rouge",
-    "Moulin Rouge Karaoke Club",
-    "heaven",
-    "experience",
-    "Sing the night away with family and friends in a playful private club.",
-    15,
-  ),
-  d(
-    "relaxation-pavilion",
-    "Relaxation Pavilion",
-    "heaven",
-    "experience",
-    "A quiet lookout above the bay — the resort's highest place to simply sit and breathe.",
-    16,
-  ),
-  d("citron", "Citron", "heaven", "restaurant", "Vietnamese cuisine in hanging nest pods.", 17, {
-    breakfast_menu_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2024/06/Citron-Highlights-Breakfast.pdf",
-    lunch_menu_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Citron-Lunch-Menu-Highlights.Feb2026.pdf",
-    dinner_menu_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Citron-Dinner-Menu-Highlights.Feb2026.pdf",
-    instagram_spot: true,
-  }),
-
-  // SKY — dining and heritage terrace
-  d(
-    "la-maison-1888",
-    "La Maison 1888",
-    "sky",
-    "restaurant",
-    "MICHELIN-recognised French dining.",
-    2,
-    {
-      instagram_url: "https://www.instagram.com/lamaison1888",
-      booking_url:
-        "https://www.tablecheck.com/fr/intercontinental-danang-la-maison/reserve/landing",
-      menu_url:
-        "https://www.danang.intercontinental.com/wp-content/uploads/2026/07/La-Maison-1888-Michelin-Dinner-Menu-Q3.26.pdf",
-      vegetarian_menu_url:
-        "https://www.danang.intercontinental.com/wp-content/uploads/2025/05/La-Maison-1888-Michelin-Vegetarian-Dinner-Menu-Q3.26.pdf",
-      vegan_menu_url:
-        "https://www.danang.intercontinental.com/wp-content/uploads/2025/05/La-Maison-1888-Michelin-Vegan-Dinner-Menu-Q3.26.pdf",
-      instagram_spot: true,
-    },
-  ),
-  d("buffalo-bar", "Buffalo Bar", "sky", "bar", "Cocktails beneath the Heritage Village.", 3, {
-    menu_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2023/11/Buffalo-bar-Menu-Highlight.pdf",
-  }),
-  d("wine-cellar", "The Wine Cellar", "sky", "bar", "Rare vintages in a hidden room.", 4),
-  d("tingara", "Tingara", "sky", "restaurant", "Japanese Omakase, Teppanyaki and Sushi.", 5, {
-    instagram_url: "https://www.instagram.com/tingara_modern_teppanyaki",
-    booking_url: "https://www.tablecheck.com/fr/intercontinental-danang-tingara/reserve/landing",
-    lunch_menu_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Lunch-Summer-Menu.pdf",
-    dinner_menu_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Dinner-Summer-Menu.pdf",
-  }),
-  d(
-    "heritage-village",
-    "Heritage Village",
-    "sky",
-    "experience",
-    "Vietnamese craft and architecture.",
-    6,
-  ),
-  d(
-    "bensley-gallery",
-    "Bensley Outsider Gallery",
-    "sky",
-    "gallery",
-    "Bold, colourful paintings by Bill Bensley, the architect behind the resort — with Kate McCoy's high-end diamond jewelry. Open Wed–Sun.",
-    7,
-    {
-      discover_url: "https://www.danang.intercontinental.com/amenities/bensley-outsider-gallery/",
-      instagram_url: "https://www.instagram.com/billbensley/",
-    },
-  ),
-  d("kate-mccoy", "Kate McCoy", "sky", "retail", "Contemporary resort wear.", 8),
-  d("sammys", "Sammy's Boutique", "sky", "retail", "Curated pieces and keepsakes.", 9),
-
-  // EARTH — jungle level, clustered
-  d("terra-mare", "Terra Mare", "earth", "restaurant", "Land and sea, all day long.", 1, {
-    menu_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2026/09/Terra-Mare-A-la-carte-Menu.pdf",
-  }),
-  d("b-lounge", "B Lounge", "earth", "bar", "Afternoon tea in the trees.", 2),
-  d("long-bar", "L_O_N_G Bar", "earth", "bar", "The long line above the jungle.", 3, {
-    menu_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/Long-Bar-Menu-Highlights.Feb2026.pdf",
-    instagram_spot: true,
-  }),
-  d("soar-gym", "Soar Gym", "earth", "fitness", "Train inside the canopy.", 4),
-  d("long-pool", "L_O_N_G Pool", "earth", "pool", "Green water, endless length.", 6, {
-    instagram_spot: true,
-  }),
-  d(
-    "planet-trekkers",
-    "Planet Trekkers - Kids Club",
-    "earth",
-    "kids",
-    "A world for younger explorers.",
-    7,
-  ),
-  d("family-pool", "Family Pool", "earth", "pool", "Shallow, shaded, together.", 8),
-  d("kids-pool", "Kids Pool", "earth", "pool", "Small water for small guests.", 9),
-  d(
-    "garden-jacuzzi",
-    "Garden Pool & Jacuzzi",
-    "earth",
-    "pool",
-    "Warm water in the vegetation.",
-    10,
-    { instagram_spot: true },
-  ),
-  d(
-    "wall-of-lanterns",
-    "Wall of Lanterns",
-    "earth",
-    "experience",
-    "A glowing wall of Hoi An lanterns on the way down to the pools — one of the resort's signature photo spots.",
-    11,
-    { instagram_spot: true },
-  ),
-  d("nursery", "Nursery", "earth", "kids", "Care for the youngest guests.", 12),
-  d("organic-garden", "Organic Garden", "earth", "experience", "Where the kitchens begin.", 13),
-  d("dia-tang", "Spirit House", "earth", "experience", "A pause in the hillside.", 14),
-
-  // SEA — shoreline
-  d("mi-sol-spa", "Mi Sol Spa & Wellness", "sea", "spa", "Sound. Stillness. Renewal.", 1, {
-    menu_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2025/05/Mi-Sol-Spa-menu.pdf",
-    price_list_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2025/12/TREATMENT-PRICE-LIST-Mi-Sol-Spa.pdf",
-    booking_url: "https://www.danang.intercontinental.com/spas/mi-sol-spa/",
-  }),
-  d("nail-hair", "The Nail & Hair Studio", "sea", "service", "Quiet care between swims.", 2, {
-    discover_url: "https://www.danang.intercontinental.com/spas/nail-and-hair-studio/",
-    menu_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2025/01/The-Nail-Hair-Studio-Brochure.pdf",
-    price_list_url:
-      "https://www.danang.intercontinental.com/wp-content/uploads/2025/07/The-Nail-Hair-Studio-Price-List.Jul2025.pdf",
-    booking_url: "https://www.danang.intercontinental.com/spas/nail-and-hair-studio/",
-  }),
-  d(
-    "marine-centre",
-    "Beach Activity Centre",
-    "sea",
-    "recreation",
-    "Water sports and guided activities along the shoreline.",
-    3,
-  ),
-  d("coconut-beach", "Coconut Beach", "sea", "beach", "At the edge of Son Tra.", 4, {
-    instagram_spot: true,
-  }),
-  d("yoga-pavilion", "Yoga Pavilion", "sea", "experience", "Breath beside the shoreline.", 9),
-  d("family-beach", "Family Beach", "sea", "beach", "Soft sand, calm water.", 5),
-  d(
-    "club-beach",
-    "Club InterContinental Beach",
-    "sea",
-    "beach",
-    "Private shoreline for Club guests.",
-    6,
-  ),
-  d(
-    "spa-lagoon-villas",
-    "Spa Lagoon Villas",
-    "sea",
-    "accommodation",
-    "Sleep beside still water.",
-    7,
-  ),
-  d(
-    "sea-experiences",
-    "Seaside Experiences",
-    "sea",
-    "experience",
-    "Sunrise sailing and quiet dives.",
-    8,
-  ),
-];

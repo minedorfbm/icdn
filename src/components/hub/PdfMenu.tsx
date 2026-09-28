@@ -58,7 +58,7 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
         loadingTask = pdfjs.getDocument({
           url: `/api/resort-pdf?url=${encodeURIComponent(url)}`,
           disableRange: true,
-          disableStream: true,
+          disableStream: false,
         });
         return loadingTask.promise;
       })

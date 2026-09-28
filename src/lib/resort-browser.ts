@@ -16,7 +16,7 @@ export function embeddedResortUrl(value: string): string | undefined {
   return undefined;
 }
 
-/** Published resort PDFs use the browser's document viewer, which cannot run in a sandbox. */
+/** Published resort PDFs are served through the restricted proxy and rendered with PDF.js. */
 export function isResortPdf(value: string): boolean {
   const allowed = embeddedResortUrl(value);
   if (!allowed) return false;

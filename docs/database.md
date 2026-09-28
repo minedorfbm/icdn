@@ -19,7 +19,7 @@ Le hub utilise trois collections communes aux quatre niveaux : **DINING**, **WEL
 
 Pour réorganiser une card, modifier `destinations.cluster` avec l'une des trois clés. La répartition de la migration est ponctuelle : un changement de type ne déplace pas automatiquement une card. `levels.clusters` définit l'ordre des onglets ; la base refuse une collection absente du niveau. Les six langues du hub traduisent les libellés. Les anciennes clés du dictionnaire restent compatibles avec un catalogue encore en cache pendant le déploiement.
 
-Le catalogue local de secours reprend cette répartition et les quatre fiches masquées (`penthouses`, `rooms`, `reception`, `information`). Les modifications éditoriales ultérieures faites dans Supabase ne le mettent pas à jour automatiquement. Les identifiants et les quatre niveaux restent disponibles pour la future carte interactive et le funiculaire.
+Le catalogue local de secours a été supprimé. Seules les lignes publiées dans Supabase alimentent les cards. Les identifiants et les quatre niveaux restent disponibles pour la future carte interactive et le funiculaire.
 
 L'intégration GitHub applique la nouvelle migration à la fusion. Ne pas rejouer l'historique complet sur la production. Pour contrôler la répartition :
 
@@ -47,13 +47,13 @@ La prise en charge Facebook a été annulée. Le hub ignore les URL Facebook et 
 
 ## Source de vérité du contenu
 
-`destinations` contient l'identité, l'ordre, la catégorie, la description et l'image des lieux. `destination_links` contient les boutons et leur ordre. Lorsqu'une lecture de cette table réussit, une liste vide signifie volontairement « aucun bouton ». Le Worker ne lit plus les anciennes colonnes d'URL de `destinations`. Elles restent dans la base le temps de valider ce déploiement et seront retirées dans une migration ultérieure ; **ne plus les modifier**. Le catalogue local conserve ses propres liens uniquement pour le mode de secours hors base.
+`destinations` contient l'identité, l'ordre, la catégorie, la description et l'image des lieux. `destination_links` contient les boutons et leur ordre. Lorsqu'une lecture de cette table réussit, une liste vide signifie volontairement « aucun bouton ». Le Worker ne lit plus les anciennes colonnes d'URL de `destinations`. Leur retrait est décrit par la migration historique `20260924120000_retire_legacy_action_columns.sql` ; vérifier l’état installé avant toute intervention. Aucun lien de catalogue local n’est utilisé.
 
 Huit lieux possèdent un ancien `booking_message` sans bouton `BOOK` correspondant. Ces textes et les réglages `booking_channel` / `booking_destination` sont des vestiges d'un canal WhatsApp non activé. **Aucun bouton de réservation n'est créé à partir de ces champs.** Un bouton `BOOK` apparaît seulement lorsqu'un véritable lien approuvé est ajouté à `destination_links`. Les anciens messages restent en base comme archive, sans contrôler le site.
 
 `levels.clusters` définit les catégories affichées sur un niveau. La valeur `destinations.cluster` doit figurer dans la liste du même niveau ; les nouvelles protections refusent une faute de frappe ou la suppression d'une catégorie encore utilisée. Pour masquer un lieu, mettre `destinations.active = false`. Les liens, photos, événements, posts et traductions publiées associés ne sont alors plus lisibles publiquement. Les clés de `site_settings` sont publiques : n'y enregistrer aucun mot de passe ni secret.
 
-Les fiches `penthouses` (« Heavenly Penthouses ») et `rooms` (« Rooms & Villas ») sont conservées en base mais dépubliées par `20260925170000_unpublish_rooms_and_penthouses.sql`. Le catalogue local de secours les garde aussi inactives. Pour les réafficher plus tard, repasser explicitement leur colonne `active` à `true` et mettre à jour le catalogue de secours. La fiche distincte `spa-lagoon-villas` reste publiée.
+Les fiches `penthouses` (« Heavenly Penthouses ») et `rooms` (« Rooms & Villas ») sont conservées en base mais dépubliées par `20260925170000_unpublish_rooms_and_penthouses.sql`. Pour les réafficher plus tard, repasser explicitement leur colonne `active` à `true`. La fiche distincte `spa-lagoon-villas` reste publiée.
 
 Les descriptions des lieux et les textes des événements ont une traduction par langue (`vi`, `ru`, `zh`). Une modification du texte anglais dépublie automatiquement les anciennes traductions correspondantes. Le site montre alors le texte anglais actuel jusqu'à la relecture et republication des traductions. Les colonnes `source_*` doivent être mises à jour seulement après vérification de chaque traduction. Les nouvelles colonnes `created_at` et `updated_at` sont initialisées lors de la migration pour les lignes existantes ; elles ne reconstituent pas leur historique antérieur.
 

@@ -5,11 +5,12 @@ import {
   shuffledIds,
 } from "../src/features/discovery/surprise-order";
 import { discoveryCopy, type DiscoveryCopyKey } from "../src/features/discovery/discovery-copy";
-import { DESTINATIONS, type Destination } from "../src/data/resort";
+import { destination } from "./fixtures/destination";
+import { type Destination } from "../src/data/resort";
 import { LANGUAGES } from "../src/i18n/dictionary";
 
 const cards: Destination[] = ["a", "b", "c"].map((id) => ({
-  ...DESTINATIONS[0]!,
+  ...destination,
   id,
   active: true,
 }));

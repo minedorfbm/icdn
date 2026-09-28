@@ -1,29 +1,17 @@
 import { describe, expect, test } from "bun:test";
 import { translatedDescription, translatedEvent } from "../src/i18n/editorial";
-import sources from "../src/i18n/sources.json";
-import eventSources from "../src/i18n/event-sources.json";
+import sources from "../scripts/translation-snapshot/sources.json";
+import eventSources from "../scripts/translation-snapshot/event-sources.json";
 import { LANGUAGES, UI } from "../src/i18n/dictionary";
 
 describe("editorial translation authority", () => {
-  test("Korean and Japanese cover the current catalogue and can be selected", () => {
-    for (const lang of ["ko", "ja"] as const) {
-      expect(LANGUAGES.some((option) => option.code === lang)).toBe(true);
-      expect(UI[lang].language).toBeTruthy();
-      for (const [id, source] of Object.entries(sources)) {
-        expect(translatedDescription(lang, id, source, null)).not.toBe(source);
-      }
-      for (const event of eventSources) {
-        expect(translatedEvent(lang, event, null).title).not.toBe(event.title);
-      }
+  test("all supported languages have UI labels and never resurrect archived descriptions", () => {
+    for (const { code } of LANGUAGES) {
+      expect(UI[code].language).toBeTruthy();
+      expect(translatedDescription(code, "citron", sources.citron, null)).toBe(sources.citron);
     }
   });
-  test("newly covered destinations translate, but changed English is never hidden by old text", () => {
-    expect(translatedDescription("vi", "moulin-rouge", sources["moulin-rouge"])).not.toBe(
-      sources["moulin-rouge"],
-    );
-    expect(translatedDescription("vi", "moulin-rouge", "New information")).toBe("New information");
-  });
-  test("published database text overrides bundled text; missing rows remain missing", () => {
+  test("published database text is authoritative; missing rows remain missing", () => {
     const rows = [
       {
         destination_id: "citron",
@@ -52,17 +40,29 @@ describe("editorial translation authority", () => {
       ]),
     ).toBe(sources.citron);
   });
-  test("an unavailable collection can use a source-matched snapshot", () => {
-    expect(translatedDescription("ru", "citron", sources.citron, null)).not.toBe(sources.citron);
+  test("an unavailable collection shows current source text", () => {
+    expect(translatedDescription("ru", "citron", sources.citron, null)).toBe(sources.citron);
   });
   test("events preserve their booking URL and reject outdated schedules", () => {
     const event = { ...eventSources[0]!, url: "https://example.com/booking" };
-    const translated = translatedEvent("zh", event);
+    const rows = [
+      {
+        event_id: event.id,
+        locale: "zh",
+        title: "Translated title",
+        schedule: ["Translated hours"],
+        description: "Translated description",
+        source_title: event.title,
+        source_schedule: event.schedule,
+        source_description: event.description,
+      },
+    ];
+    const translated = translatedEvent("zh", event, rows);
     expect(translated.title).not.toBe(event.title);
     expect(translated.schedule).not.toEqual(event.schedule);
     expect(translated.url).toBe(event.url);
     const changed = { ...event, schedule: ["NEW HOURS"] };
-    expect(translatedEvent("zh", changed)).toEqual(changed);
+    expect(translatedEvent("zh", changed, rows)).toEqual(changed);
     expect(translatedEvent("zh", event, [])).toEqual(event);
   });
   test("event database identity survives a renamed title and rejects stale descriptions", () => {

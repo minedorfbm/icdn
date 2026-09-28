@@ -19,7 +19,7 @@ import { ResortBrowserProvider, ResortLink } from "@/components/hub/ResortBrowse
 
 export const Route = createFileRoute("/_hub")({
   loader: () => getHubData(),
-  staleTime: 120_000,
+  staleTime: 0,
   head: ({ loaderData }) => ({
     links: [
       { rel: "preload", as: "image", href: resolveHeroImage(loaderData), fetchPriority: "high" },

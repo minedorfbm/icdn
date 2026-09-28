@@ -28,4 +28,6 @@ jobs:
       - run: bun run typecheck
       - run: bun run lint
       - run: bun run build
+      - run: bun run test:mobile:install
+      - run: bun run test:mobile
       - run: bun run deploy:check

@@ -1,5 +1,5 @@
 import type { DestinationEvent } from "@/data/events";
-import type { Lang } from "./dictionary";
+import type { Lang } from "../../src/i18n/dictionary";
 import translations from "./events.json";
 import korean from "./events.ko.json";
 import japanese from "./events.ja.json";

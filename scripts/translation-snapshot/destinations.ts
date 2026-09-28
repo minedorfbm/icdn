@@ -1,4 +1,4 @@
-import type { Lang } from "./dictionary";
+import type { Lang } from "../../src/i18n/dictionary";
 import translations from "./destinations.json";
 import korean from "./destinations.ko.json";
 import japanese from "./destinations.ja.json";

@@ -39,3 +39,7 @@ translation-audit.json
 
 # Generated image migration audit
 image-audit.json
+
+# Browser regression artifacts
+playwright-report/
+test-results/

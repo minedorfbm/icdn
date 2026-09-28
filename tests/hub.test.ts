@@ -1,15 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createHubValue, FALLBACK, resolveHeroImage } from "../src/data/hub-value";
+import { createHubValue, resolveHeroImage } from "../src/data/hub-value";
 import { actionsFor, instagramUrl, safeExternalUrl } from "../src/lib/destination-actions";
-import {
-  DESTINATIONS,
-  LEVELS,
-  toDestination,
-  youtubeVideoId,
-  type DestinationRow,
-} from "../src/data/resort";
+import { LEVELS, toDestination, youtubeVideoId, type DestinationRow } from "../src/data/resort";
 import type { HubData } from "../src/lib/hub.functions";
-import { CLUSTER, LANGUAGES } from "../src/i18n/dictionary";
 
 const row: DestinationRow = {
   id: "citron",
@@ -52,22 +45,17 @@ describe("database authority", () => {
     expect(actionsFor(dest)).toEqual([]);
     expect(instagramUrl(dest)).toBeUndefined();
   });
-  test("unavailable essentials use the offline catalog", () => {
-    expect(createHubValue({ ...ready, destinations: null })).toBe(FALLBACK);
-  });
-  test("every offline card has a collection configured on its level and translated in each language", () => {
-    for (const destination of FALLBACK.destinations) {
-      const level = FALLBACK.levels.find((entry) => entry.id === destination.level);
-      expect(destination.cluster).toBeTruthy();
-      expect(level?.clusters).toContain(destination.cluster!);
-      for (const { code } of LANGUAGES) {
-        expect(CLUSTER[code][destination.cluster!]).toBeTruthy();
-      }
-    }
+  test("unavailable essentials cannot resurrect an offline catalogue", () => {
+    expect(() => createHubValue({ ...ready, destinations: null })).toThrow(
+      "Catalogue temporarily unavailable",
+    );
+    expect(() => createHubValue({ ...ready, levels: null })).toThrow(
+      "Catalogue temporarily unavailable",
+    );
   });
   test("one unavailable collection does not resurrect other deleted content", () => {
     const dest = createHubValue({ ...ready, events: null }).destinations[0]!;
-    expect(dest.events?.length).toBeGreaterThan(0);
+    expect(dest.events).toEqual([]);
     expect(dest.photos).toEqual([]);
     expect(dest.posts).toEqual([]);
     expect(actionsFor(dest)).toEqual([]);
@@ -153,8 +141,7 @@ describe("configured actions", () => {
     expect(actionsFor(dest)).toEqual(links);
   });
   test("service type does not fabricate a booking link", () => {
-    const dest = { ...DESTINATIONS[0]!, type: "service" as const };
-    delete dest.booking_url;
+    const dest = { ...toDestination(row), type: "service" as const };
     expect(actionsFor(dest).some((a) => a.kind === "BOOK")).toBe(false);
   });
   test("an unused booking message cannot generate a WhatsApp button", () => {
@@ -174,45 +161,6 @@ describe("configured actions", () => {
       ],
     );
     expect(actionsFor(dest)).toEqual([{ kind: "MENU", url: "https://example.com/menu" }]);
-  });
-});
-
-describe("legacy actions", () => {
-  test("meal menus replace the generic menu and retain booking and dietary links", () => {
-    const dest = {
-      ...toDestination(row),
-      discover_url: "https://example.com/discover",
-      menu_url: "https://example.com/old-menu",
-      breakfast_menu_url: "https://example.com/breakfast",
-      dinner_menu_url: "https://example.com/dinner",
-      booking_url: "https://example.com/book",
-      vegetarian_menu_url: "https://example.com/vegetarian",
-      vegan_menu_url: "https://example.com/vegan",
-      price_list_url: "https://example.com/prices",
-    };
-    expect(actionsFor(dest).map((a) => a.kind)).toEqual([
-      "DISCOVER",
-      "BREAKFAST_MENU",
-      "DINNER_MENU",
-      "BOOK",
-      "PRICE_LIST",
-      "VEGETARIAN_MENU",
-      "VEGAN_MENU",
-    ]);
-  });
-  test("accommodation details become a brochure and explicit booking is appended", () => {
-    const dest = {
-      ...toDestination(row),
-      type: "accommodation" as const,
-      discover_url: "https://example.com/discover",
-      menu_url: "https://example.com/old-menu",
-      booking_url: "https://example.com/book",
-    };
-    expect(actionsFor(dest)).toEqual([
-      { kind: "DISCOVER", url: "https://example.com/discover" },
-      { kind: "BROCHURE", url: "https://example.com/old-menu" },
-      { kind: "BOOK", url: "https://example.com/book" },
-    ]);
   });
 });
 
@@ -239,8 +187,8 @@ describe("CMS image URLs", () => {
         ...ready,
         levels: [{ ...ready.levels![0]!, id: "heaven", image_key: image }],
       }),
-    ).toBe(FALLBACK.heroImage);
-    expect(resolveHeroImage()).toBe(FALLBACK.heroImage);
+    ).toBe(resolveHeroImage());
+    expect(resolveHeroImage()).toBeTruthy();
   });
   test("legacy keys continue to work before storage migration", () => {
     expect(toDestination({ ...row, image_key: "d-citron" }).image).toBeTruthy();
