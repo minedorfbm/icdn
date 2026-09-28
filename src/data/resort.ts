@@ -1,5 +1,3 @@
-import { parseVideoSource, type VideoSource } from "@/lib/video-links";
-export { youtubeVideoId } from "@/lib/video-links";
 import {
   currentLinkTranslations,
   type DestinationLinkTranslationRow,
@@ -81,7 +79,7 @@ export interface Destination {
   photos?: DestinationPhoto[];
   /** Featured Instagram posts rendered as real embeds inside the detail sheet. */
   posts?: DestinationPost[];
-  /** Curated YouTube and Facebook videos shown only when published for this destination. */
+  /** Curated YouTube videos shown only when published for this destination. */
   videos?: DestinationVideo[];
   /** Flexible link list from the database (menus, brochures, price lists…). */
   links?: DestinationLink[];
@@ -156,7 +154,9 @@ export interface DestinationPostRow {
   display_order: number;
 }
 
-export interface DestinationVideo extends VideoSource {
+export interface DestinationVideo {
+  video_id: string;
+  format: "video" | "short";
   title: string;
   title_translations: Record<string, string>;
 }
@@ -169,13 +169,36 @@ export interface DestinationVideoRow {
   display_order: number;
 }
 
+/** Accept only video IDs from known YouTube URL formats before building an embed URL. */
+export function youtubeVideoId(value: string): string | null {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:") return null;
+    const host = url.hostname.toLowerCase();
+    let id: string | null = null;
+    if (host === "youtu.be") {
+      id = url.pathname.slice(1);
+    } else if (host === "youtube.com" || host === "www.youtube.com" || host === "m.youtube.com") {
+      if (url.pathname === "/watch") id = url.searchParams.get("v");
+      else {
+        const match = url.pathname.match(/^\/(?:shorts|live|embed)\/([^/]+)\/?$/);
+        id = match?.[1] ?? null;
+      }
+    }
+    return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? id : null;
+  } catch {
+    return null;
+  }
+}
+
 export function groupVideos(rows: DestinationVideoRow[]): Record<string, DestinationVideo[]> {
   const out: Record<string, DestinationVideo[]> = {};
   for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
-    const source = parseVideoSource(row.video_url);
-    if (!source) continue;
+    const video_id = youtubeVideoId(row.video_url);
+    if (!video_id) continue;
     (out[row.destination_id] ??= []).push({
-      ...source,
+      video_id,
+      format: new URL(row.video_url).pathname.startsWith("/shorts/") ? "short" : "video",
       title: row.title,
       title_translations: row.title_translations ?? {},
     });

@@ -31,17 +31,15 @@ GROUP BY l.id, l.display_order, d.cluster
 ORDER BY l.display_order, d.cluster;
 ```
 
-## Vidéos YouTube et Facebook
+## Vidéos YouTube
 
 La migration [`20260925130000_destination_videos.sql`](../supabase/migrations/20260925130000_destination_videos.sql) ajoute la table `destination_videos` au projet `cxcffaegqyvbhrpzpowa` et publie la vidéo officielle fournie pour `mi-sol-spa`. Elle a été appliquée au projet de production le 25 septembre 2026 ; la requête de contrôle a confirmé une seule ligne active pour `mi-sol-spa`. **Ne pas rejouer l'historique complet des migrations** sur cette base. Le fichier est réexécutable sans dupliquer cette vidéo si l'intégration GitHub le reprend. La table active RLS et n'autorise la lecture publique que pour une vidéo active appartenant à un lieu actif.
 
-Pour préparer une vidéo, créer une ligne dans `destination_videos` avec l'identifiant exact de la card dans `destination_id`, l'URL officielle YouTube ou Facebook en HTTPS dans `video_url`, un `title` et, si souhaité, un objet `title_translations` avec les clés `vi`, `ru`, `zh`, `ko` et `ja`. Régler `display_order` pour l'ordre d'affichage. Laisser `active = false` pendant la préparation, puis le passer à `true` pour publier. Une URL non reconnue est ignorée par le hub ; formats acceptés : `youtube.com/watch?v=…`, `youtu.be/…`, `youtube.com/shorts/…` et `youtube.com/live/…`. Utiliser le lien `/shorts/…` pour obtenir le lecteur vertical 9:16 ; un lien `/watch?v=…` reste affiché en 16:9, même s'il désigne le même Short. Vérifier que le propriétaire de la vidéo autorise l'intégration. Une modification peut mettre environ deux minutes à apparaître à cause du cache.
-
-Les liens Facebook acceptés sont `facebook.com/<page>/videos/<id>/`, `facebook.com/watch/?v=<id>` et `facebook.com/reel/<id>/` (également `www` et `m`). Le format Reel est conservé dans les données, mais les vidéos Facebook s’affichent désormais sous forme d’aperçu compact ouvrant Facebook. Les liens de partage abrégés `/share/` doivent être remplacés par le lien direct. Le hub déduit la plateforme de l'URL : aucune colonne supplémentaire ni table distincte n'est nécessaire.
-
-Le lecteur YouTube ne se charge qu’après un appui sur Lecture. Facebook utilise la photo de la destination comme aperçu avec une action explicite « Voir sur Facebook ». Le lecteur intégré Facebook a été retiré après reproduction de « Video Unavailable » sans connexion Facebook, notamment signalé sur iPhone. Le lien reste géré par Supabase ; une lecture dans le hub indépendante de Facebook nécessite une source vidéo différente. La migration `20260928120000_terra_mare_facebook_video.sql` ajoute uniquement le Reel officiel de Terra Mare, sans modifier les autres vidéos ni les droits d'accès.
+Pour préparer une vidéo, créer une ligne dans `destination_videos` avec l'identifiant exact de la card dans `destination_id`, l'URL officielle YouTube en HTTPS dans `video_url`, un `title` et, si souhaité, un objet `title_translations` avec les clés `vi`, `ru`, `zh`, `ko` et `ja`. Régler `display_order` pour l'ordre d'affichage. Laisser `active = false` pendant la préparation, puis le passer à `true` pour publier. Une URL non reconnue est ignorée par le hub ; formats acceptés : `youtube.com/watch?v=…`, `youtu.be/…`, `youtube.com/shorts/…` et `youtube.com/live/…`. Utiliser le lien `/shorts/…` pour obtenir le lecteur vertical 9:16 ; un lien `/watch?v=…` reste affiché en 16:9, même s'il désigne le même Short. Vérifier que le propriétaire de la vidéo autorise l'intégration. Une modification peut mettre environ deux minutes à apparaître à cause du cache.
 
 Le projet de production utilise neuf tables `public` dans Supabase. La base importée depuis Lovable ne partage pas nécessairement l'historique des migrations du dépôt : **ne pas exécuter `db push` ni rejouer toutes les migrations historiques sur la production**. Les deux migrations datées du 23 septembre 2026 sont prévues pour ce schéma déjà importé et se lancent une fois chacune, dans l'ordre, après sauvegarde.
+
+La prise en charge Facebook a été annulée. Le hub ignore les URL Facebook et ne génère plus de lecteur ni d’aperçu. La migration `20260928140000_unpublish_terra_mare_facebook.sql` désactive la ligne Terra Mare concernée sans la supprimer ; les migrations précédentes sont conservées pour la traçabilité.
 
 ## Liens multilingues
 
