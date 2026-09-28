@@ -1,32 +1,16 @@
+import type { z } from "zod";
+import type { descriptionRow, eventTranslationRow } from "@/lib/hub-schema";
 import type { DestinationEvent } from "@/data/events";
-import { DESTINATION_DESCRIPTION } from "./destinations";
-import { EVENT_TRANSLATIONS } from "./events";
-import sources from "./sources.json";
-import eventSources from "./event-sources.json";
 import type { Lang } from "./dictionary";
 
-export interface DescriptionTranslation {
-  destination_id: string;
-  locale: string;
-  description: string;
-  source_description: string;
-}
-export interface EventTranslation {
-  event_id: string;
-  locale: string;
-  title: string;
-  schedule: string[];
-  description: string;
-  source_title: string;
-  source_schedule: string[];
-  source_description: string;
-}
+export type DescriptionTranslation = z.infer<typeof descriptionRow>;
+export type EventTranslation = z.infer<typeof eventTranslationRow>;
 export interface EditorialTranslations {
   descriptions: DescriptionTranslation[] | null;
   events: EventTranslation[] | null;
 }
 
-/** A successful empty collection is authoritative; unavailable collections use the snapshot. */
+/** Only current published translations can override the source text. */
 export function translatedDescription(
   lang: Lang,
   id: string,
@@ -38,8 +22,7 @@ export function translatedDescription(
     const row = rows.find((r) => r.destination_id === id && r.locale === lang);
     return row?.source_description === source && row.description.trim() ? row.description : source;
   }
-  const original = (sources as Record<string, string>)[id];
-  return original === source ? (DESTINATION_DESCRIPTION[lang][id] ?? source) : source;
+  return source;
 }
 
 export function sameEventSource(
@@ -72,10 +55,5 @@ export function translatedEvent(
       return event;
     return { ...event, title: row.title, schedule: row.schedule, description: row.description };
   }
-  const source = eventSources.find((s) =>
-    event.id ? s.id === event.id : sameEventSource(event, s),
-  );
-  if (!source || !sameEventSource(event, source)) return event;
-  const translation = EVENT_TRANSLATIONS[lang][source.title];
-  return translation ? { ...event, ...translation } : event;
+  return event;
 }

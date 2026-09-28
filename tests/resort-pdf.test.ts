@@ -35,3 +35,74 @@ test("PDF proxy streams a valid document without following off-site redirects", 
   expect(await response.text()).toBe("%PDF-1.4");
   expect(fetched).toEqual([source]);
 });
+
+test("oversized PDFs are rejected before streaming, even with a valid MIME type", async () => {
+  let cancelled = false;
+  const response = new Response(
+    new ReadableStream({
+      cancel() {
+        cancelled = true;
+      },
+    }),
+    {
+      headers: { "content-type": "application/pdf", "content-length": String(33 * 1024 * 1024) },
+    },
+  );
+  const result = await serveResortPdf(proxy(source), (async () => response) as typeof fetch);
+  expect(result.status).toBe(413);
+  expect(cancelled).toBe(true);
+});
+
+test("chunked PDFs cannot bypass the byte limit", async () => {
+  let cancelled = false;
+  const body = new ReadableStream<Uint8Array>({
+    pull(controller) {
+      controller.enqueue(new Uint8Array(1024 * 1024));
+    },
+    cancel() {
+      cancelled = true;
+    },
+  });
+  const result = await serveResortPdf(
+    proxy(source),
+    (async () =>
+      new Response(body, { headers: { "content-type": "application/pdf" } })) as typeof fetch,
+  );
+  await expect(result.arrayBuffer()).rejects.toThrow("PDF exceeds");
+  expect(cancelled).toBe(true);
+});
+
+test("leaving the viewer aborts the upstream request and releases the response stream", async () => {
+  const controller = new AbortController();
+  let cancelled = false;
+  let fetchSignal: AbortSignal | null | undefined;
+  const result = await serveResortPdf(
+    new Request(proxy(source), { signal: controller.signal }),
+    (async (_input, init) => {
+      fetchSignal = init?.signal;
+      return new Response(
+        new ReadableStream({
+          cancel() {
+            cancelled = true;
+          },
+        }),
+        { headers: { "content-type": "application/pdf" } },
+      );
+    }) as typeof fetch,
+  );
+  controller.abort();
+  await expect(result.arrayBuffer()).rejects.toThrow();
+  expect(fetchSignal?.aborted).toBe(true);
+  expect(cancelled).toBe(true);
+});
+
+test("HTML and redirects are rejected instead of being proxied as documents", async () => {
+  for (const upstream of [
+    new Response("<html>oops</html>", { headers: { "content-type": "text/html" } }),
+    Response.redirect("https://example.com/menu.pdf"),
+  ]) {
+    expect(
+      (await serveResortPdf(proxy(source), (async () => upstream) as typeof fetch)).status,
+    ).toBe(502);
+  }
+});

@@ -1,5 +1,6 @@
+import { destination } from "./fixtures/destination";
 import { describe, expect, test } from "bun:test";
-import { groupLinks, DESTINATIONS } from "../src/data/resort";
+import { groupLinks } from "../src/data/resort";
 import { createHubValue } from "../src/data/hub-value";
 import { actionsFor } from "../src/lib/destination-actions";
 import { currentLinkTranslations, localizedLinkUrl } from "../src/lib/localized-links";
@@ -26,7 +27,7 @@ const row = {
 describe("language-specific discovery links", () => {
   test("both card and full detail resolve the selected language without duplicating actions", () => {
     const links = groupLinks([row], [translated])["citron"]!;
-    const dest = { ...DESTINATIONS.find((d) => d.id === "citron")!, links };
+    const dest = { ...destination, links };
     expect(actionsFor(dest, 3, "ja")).toEqual(actionsFor(dest, undefined, "ja"));
     expect(actionsFor(dest, undefined, "ja")[0]?.url).toBe(japanese);
     for (const { code } of LANGUAGES.filter((l) => l.code !== "ja")) {

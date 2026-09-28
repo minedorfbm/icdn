@@ -15,12 +15,16 @@ Pour reproduire la configuration du build Cloudflare :
 
 Le workflow GitHub Actions valide les pull requests et `main`. `bun run deploy:check` vérifie le paquet local sans le publier. `bun run preview:cloudflare` démarre le Worker construit dans le moteur local de Cloudflare.
 
-Le site et les prévisualisations utilisent `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` et `HUB_TRANSLATIONS_FROM_DATABASE` définis dans `wrangler.json`. La clé est **publique** et les lectures restent limitées par les politiques RLS. Ne jamais ajouter de clé secrète Supabase au Worker ou au dépôt. Les fichiers `.env.local` ne concernent que le développement local.
+Le site et les prévisualisations utilisent `SUPABASE_URL` et `SUPABASE_PUBLISHABLE_KEY` définis dans `wrangler.json`. La clé est **publique** et les lectures restent limitées par les politiques RLS. Ne jamais ajouter de clé secrète Supabase au Worker ou au dépôt. Les fichiers `.env.local` ne concernent que le développement local.
 
 ## Vérifier une publication
 
-Après un déploiement, ouvrir le domaine de production et contrôler les quatre niveaux, le swipe dans les deux sens, l’ouverture d’une fiche, ses liens et les traductions. Vérifier également qu’aucune erreur `[hub]` ne signale une lecture Supabase indisponible dans les logs du Worker. Une modification du contenu en base peut prendre environ deux minutes à se refléter, car les données publiques sont mises en cache brièvement dans les instances et dans le centre de données Cloudflare.
+Après un déploiement, ouvrir le domaine de production et contrôler les quatre niveaux, le swipe dans les deux sens, l’ouverture d’une fiche, ses liens et les traductions. Vérifier également qu’aucune erreur `[hub]` ne signale une lecture Supabase indisponible dans les logs du Worker. Une modification du contenu en base peut prendre environ deux minutes à se refléter, car les données publiques sont mises en cache dans un seul cache du centre de données Cloudflare, sans prolongation en cas de panne. Recharger un onglet déjà ouvert pour vérifier la nouvelle publication.
 
 Le domaine personnalisé est configuré dans Cloudflare et n’est pas recréé par `wrangler.json`. Le DNS du domaine racine et les enregistrements de messagerie OVH (MX, SPF, DKIM, DMARC) ne sont pas modifiés par ce dépôt.
 
 Le preset Nitro est `cloudflare-module`. `@lovable.dev/vite-tanstack-config` reste une dépendance de compilation, mais l’exécution du site ne dépend plus de l’hébergement Lovable.
+
+## Dépendances de construction
+
+`@lovable.dev/vite-tanstack-config` compose Vite, React, Tailwind, TanStack Start et Nitro. Nitro cible `cloudflare-module` ; sa version beta est verrouillée par `bun.lock`. Cette configuration est active, pas du code mort : ne pas doubler ses plugins. Une extraction future doit être une migration dédiée, validée par le build Worker et les tests WebKit. Aucun changement de moteur de construction n’est nécessaire pour le nettoyage actuel.

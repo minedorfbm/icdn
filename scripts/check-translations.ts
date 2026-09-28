@@ -9,10 +9,10 @@ import {
   TYPE_LABEL,
   UI,
 } from "../src/i18n/dictionary";
-import { DESTINATION_DESCRIPTION } from "../src/i18n/destinations";
-import { EVENT_TRANSLATIONS } from "../src/i18n/events";
-import sources from "../src/i18n/sources.json";
-import eventSources from "../src/i18n/event-sources.json";
+import { DESTINATION_DESCRIPTION } from "./translation-snapshot/destinations";
+import { EVENT_TRANSLATIONS } from "./translation-snapshot/events";
+import sources from "./translation-snapshot/sources.json";
+import eventSources from "./translation-snapshot/event-sources.json";
 import {
   sameEventSource,
   type DescriptionTranslation,

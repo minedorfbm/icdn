@@ -1,118 +1,33 @@
-import type { MapPlaceRow, MapLinkRow } from "@/features/resort-map/map.types";
-import type { DestinationLinkTranslationRow, SiteLinkTranslationRow } from "./localized-links";
-import type {
-  EditorialTranslations,
-  DescriptionTranslation,
-  EventTranslation,
-} from "@/i18n/editorial";
 import { createServerFn } from "@tanstack/react-start";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { createTimedCache } from "./timed-cache";
-import type {
-  DestinationEventRow,
-  DestinationLinkRow,
-  DestinationPhotoRow,
-  DestinationPostRow,
-  DestinationVideoRow,
-  DestinationRow,
-} from "@/data/resort";
+import { createClient } from "@supabase/supabase-js";
+import { readHubSnapshot } from "./hub-cache.server";
+import {
+  readRows,
+  levelRow,
+  destinationRow,
+  photoRow,
+  linkRow,
+  eventRow,
+  postRow,
+  videoRow,
+  mapPlaceRow,
+  mapLinkRow,
+  linkTranslationRow,
+  siteLinkTranslationRow,
+  descriptionRow,
+  eventTranslationRow,
+  settingRow,
+  type HubData,
+} from "./hub-schema";
+export type { HubData, LevelRow } from "./hub-schema";
 
-export interface LevelRow {
-  id: string;
-  title: string;
-  line: string;
-  image_key: string | null;
-  clusters: string[];
-  display_order: number;
-}
+export const getHubData = createServerFn({ method: "GET" }).handler(() => {
+  const cache = (globalThis as typeof globalThis & { caches?: CacheStorage & { default?: Cache } })
+    .caches?.default;
+  return readHubSnapshot(readHubData, cache);
+});
 
-export interface HubData {
-  mapPlaces?: MapPlaceRow[] | null;
-  mapLinks?: MapLinkRow[] | null;
-  editorial?: EditorialTranslations;
-  linkTranslations?: DestinationLinkTranslationRow[] | null;
-  siteLinkTranslations?: SiteLinkTranslationRow[] | null;
-  levels: LevelRow[] | null;
-  destinations: DestinationRow[] | null;
-  photos: DestinationPhotoRow[] | null;
-  links: DestinationLinkRow[] | null;
-  events: DestinationEventRow[] | null;
-  posts: DestinationPostRow[] | null;
-  videos: DestinationVideoRow[] | null;
-  settings: Record<string, string> | null;
-}
-
-function isCompleteHubData(data: HubData): boolean {
-  const publicDataComplete = [
-    data.mapPlaces ?? null,
-    data.mapLinks ?? null,
-    data.levels,
-    data.destinations,
-    data.photos,
-    data.links,
-    data.linkTranslations ?? null,
-    data.siteLinkTranslations ?? null,
-    data.events,
-    data.posts,
-    data.videos,
-    data.settings,
-  ].every((collection) => collection !== null);
-  const editorialComplete =
-    !data.editorial || (data.editorial.descriptions !== null && data.editorial.events !== null);
-  return publicDataComplete && editorialComplete;
-}
-
-const readCachedHubData = createTimedCache<HubData>(120_000, isCompleteHubData);
-
-const CACHE_URL = "https://icdnd.artdigitaljourney.com/__cache/public-hub-v3";
-const CACHE_SECONDS = 120;
-
-/** Reuse complete public data across Worker instances in the same Cloudflare data center. */
-async function readEdgeCachedHubData(): Promise<HubData> {
-  const edgeCache = (
-    globalThis as typeof globalThis & { caches?: CacheStorage & { default?: Cache } }
-  ).caches?.default;
-  if (edgeCache) {
-    try {
-      const response = await edgeCache.match(CACHE_URL);
-      if (response?.ok) return (await response.json()) as HubData;
-    } catch {
-      // Local previews and cache outages still use the database directly.
-    }
-  }
-
-  const data = await readHubData();
-  if (edgeCache && isCompleteHubData(data)) {
-    try {
-      await edgeCache.put(
-        CACHE_URL,
-        new Response(JSON.stringify(data), {
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": `public, max-age=${CACHE_SECONDS}`,
-          },
-        }),
-      );
-    } catch {
-      // Cache storage is an optimization, never a prerequisite for serving the hub.
-    }
-  }
-  return data;
-}
-
-/**
- * Public, read-only hub content. Anonymous read policies cover every table
- * queried here — the experience is opened by scanning a QR code, with no login.
- */
-export const getHubData = createServerFn({ method: "GET" }).handler(() =>
-  readCachedHubData(readEdgeCachedHubData),
-);
-
-function readRows<T>(result: { error: unknown; data: unknown }): T[] | null {
-  return result.error ? null : ((result.data ?? []) as T[]);
-}
-
-async function readHubData(): Promise<HubData> {
+export async function readHubData(): Promise<HubData> {
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
   const unavailable: HubData = {
@@ -128,7 +43,7 @@ async function readHubData(): Promise<HubData> {
     settings: null,
   };
   if (!url || !key) {
-    console.warn("[hub] Supabase configuration missing; using bundled content.");
+    console.warn("[hub] Supabase configuration missing; catalogue unavailable.");
     return unavailable;
   }
 
@@ -151,89 +66,24 @@ async function readHubData(): Promise<HubData> {
       },
     });
 
-    const mapPlacesPromise = Promise.resolve(
-      supabase
-        .from("map_places")
-        .select("id,name,level_id,pin,x,y,zoom,active")
-        .eq("active", true)
-        .order("pin"),
-    );
-    const mapLinksPromise = Promise.resolve(
-      supabase
-        .from("map_destination_links")
-        .select("place_id,destination_id,display_order,is_primary,active")
-        .eq("active", true)
-        .order("display_order"),
-    );
-    const editorialPromise = readEditorial(supabase);
-    const videosPromise = Promise.resolve(
-      supabase
-        .from("destination_videos")
-        .select("destination_id, video_url, title, title_translations, display_order")
-        .eq("active", true)
-        .order("display_order"),
-    );
+    const read = async <T extends import("zod").z.ZodRawShape>(
+      table: string,
+      schema: import("zod").z.ZodObject<T>,
+      filter?: "active" | "published",
+      order?: string,
+    ) => {
+      let query = supabase.from(table).select(schema.keyof().options.join(","), { count: "exact" });
+      if (filter) query = query.eq(filter, true);
+      if (order) query = query.order(order);
+      const result = await query;
+      // PostgREST may cap responses. A truncated catalogue must not look like a valid publication.
+      if (result.error || (result.count != null && result.count > (result.data?.length ?? 0))) {
+        console.error("[hub] Collection unavailable or truncated", { table });
+        return null;
+      }
+      return readRows(result, schema);
+    };
     const [
-      levels,
-      destinations,
-      photos,
-      links,
-      events,
-      posts,
-      settings,
-      linkTranslations,
-      siteLinkTranslations,
-    ] = await Promise.all([
-      supabase
-        .from("levels")
-        .select("id, title, line, image_key, clusters, display_order")
-        .order("display_order"),
-      supabase
-        .from("destinations")
-        .select(
-          "id, name, level_id, cluster, type, short_description, image_key, instagram_spot, display_order, active",
-        )
-        .eq("active", true)
-        .order("display_order"),
-      supabase
-        .from("destination_photos")
-        .select("destination_id, image_url, caption, post_url, display_order")
-        .eq("active", true)
-        .order("display_order"),
-      supabase
-        .from("destination_links")
-        .select("id, destination_id, kind, label, url, display_order")
-        .eq("active", true)
-        .order("display_order"),
-      supabase
-        .from("destination_events")
-        .select("id, destination_id, title, schedule, description, url, display_order")
-        .eq("active", true)
-        .order("display_order"),
-      supabase
-        .from("destination_posts")
-        .select("destination_id, post_url, account, caption, image_url, posted_at, display_order")
-        .eq("active", true)
-        .order("display_order"),
-      supabase.from("site_settings").select("key, value"),
-      supabase
-        .from("destination_link_translations")
-        .select("link_id, locale, url, source_url")
-        .eq("active", true),
-      supabase
-        .from("site_link_translations")
-        .select("setting_key, locale, url, source_url")
-        .eq("active", true),
-    ]);
-    const [videos, mapPlaces, mapLinks] = await Promise.all([
-      videosPromise,
-      mapPlacesPromise,
-      mapLinksPromise,
-    ]);
-
-    for (const [table, result] of Object.entries({
-      mapPlaces,
-      mapLinks,
       levels,
       destinations,
       photos,
@@ -242,69 +92,46 @@ async function readHubData(): Promise<HubData> {
       posts,
       videos,
       settings,
+      mapPlaces,
+      mapLinks,
       linkTranslations,
       siteLinkTranslations,
-    })) {
-      if (result.error) console.error(`[hub] Unable to read ${table}`, result.error.code);
-    }
-
-    const editorial = await editorialPromise;
-
+      descriptions,
+      translatedEvents,
+    ] = await Promise.all([
+      read("levels", levelRow, undefined, "display_order"),
+      read("destinations", destinationRow, "active", "display_order"),
+      read("destination_photos", photoRow, "active", "display_order"),
+      read("destination_links", linkRow, "active", "display_order"),
+      read("destination_events", eventRow, "active", "display_order"),
+      read("destination_posts", postRow, "active", "display_order"),
+      read("destination_videos", videoRow, "active", "display_order"),
+      read("site_settings", settingRow),
+      read("map_places", mapPlaceRow, "active", "pin"),
+      read("map_destination_links", mapLinkRow, "active", "display_order"),
+      read("destination_link_translations", linkTranslationRow, "active"),
+      read("site_link_translations", siteLinkTranslationRow, "active"),
+      read("destination_translations", descriptionRow, "published"),
+      read("event_translations", eventTranslationRow, "published"),
+    ]);
     return {
-      ...(editorial ? { editorial } : {}),
-      mapPlaces: readRows<MapPlaceRow>(mapPlaces),
-      mapLinks: readRows<MapLinkRow>(mapLinks),
-      levels: levels.error ? null : ((levels.data ?? []) as LevelRow[]),
-      destinations: destinations.error ? null : ((destinations.data ?? []) as DestinationRow[]),
-      photos: photos.error ? null : ((photos.data ?? []) as DestinationPhotoRow[]),
-      links: links.error ? null : ((links.data ?? []) as DestinationLinkRow[]),
-      linkTranslations: linkTranslations.error
-        ? null
-        : ((linkTranslations.data ?? []) as DestinationLinkTranslationRow[]),
-      siteLinkTranslations: siteLinkTranslations.error
-        ? null
-        : ((siteLinkTranslations.data ?? []) as SiteLinkTranslationRow[]),
-      events: events.error ? null : ((events.data ?? []) as DestinationEventRow[]),
-      posts: posts.error ? null : ((posts.data ?? []) as DestinationPostRow[]),
-      videos: readRows<DestinationVideoRow>(videos),
-      settings: settings.error
-        ? null
-        : Object.fromEntries(
-            ((settings.data ?? []) as { key: string; value: string }[]).map((s) => [
-              s.key,
-              s.value,
-            ]),
-          ),
+      levels,
+      destinations,
+      photos,
+      links,
+      events,
+      posts,
+      videos,
+      mapPlaces,
+      mapLinks,
+      linkTranslations,
+      siteLinkTranslations,
+      editorial: { descriptions, events: translatedEvents },
+      settings:
+        settings === null ? null : Object.fromEntries(settings.map((s) => [s.key, s.value])),
     };
   } catch {
-    console.error("[hub] Content request failed; using bundled content.");
+    console.error("[hub] Content request failed; catalogue unavailable.");
     return unavailable;
   }
-}
-
-async function readEditorial(supabase: SupabaseClient): Promise<EditorialTranslations | undefined> {
-  if (process.env["HUB_TRANSLATIONS_FROM_DATABASE"] !== "true") return undefined;
-  const [descriptions, eventTranslations] = await Promise.all([
-    supabase
-      .from("destination_translations")
-      .select("destination_id, locale, description, source_description")
-      .eq("published", true),
-    supabase
-      .from("event_translations")
-      .select(
-        "event_id, locale, title, schedule, description, source_title, source_schedule, source_description",
-      )
-      .eq("published", true),
-  ]);
-  if (descriptions.error || eventTranslations.error) {
-    console.error(
-      "[hub] Translation storage unavailable; using source-checked bundled translations.",
-    );
-  }
-  return {
-    descriptions: descriptions.error
-      ? null
-      : ((descriptions.data ?? []) as DescriptionTranslation[]),
-    events: eventTranslations.error ? null : ((eventTranslations.data ?? []) as EventTranslation[]),
-  };
 }

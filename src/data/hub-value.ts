@@ -1,8 +1,6 @@
 import type { MapPlaceRow, MapLinkRow } from "@/features/resort-map/map.types";
 import { currentLinkTranslations, type LinkTranslations } from "@/lib/localized-links";
 import {
-  DESTINATIONS,
-  FALLBACK_PHOTOS,
   groupEvents,
   groupLinks,
   groupPhotos,
@@ -15,7 +13,6 @@ import {
   type Destination,
   type Level,
 } from "@/data/resort";
-import { EVENTS_BY_DESTINATION } from "@/data/events";
 import receptionHero from "@/assets/hero-reception-20260925.webp";
 import type { HubData } from "@/lib/hub.functions";
 
@@ -37,75 +34,17 @@ export interface HubValue {
   contact: string;
 }
 
-const FALLBACK_LINKS = [
-  ["Website", OFFICIAL.website],
-  ["Instagram", OFFICIAL.instagram],
-  ["YouTube", OFFICIAL.youtube],
-  ["X", OFFICIAL.x],
-  ["Facebook", OFFICIAL.facebook],
-  ["LinkedIn", OFFICIAL.linkedin],
-  ["IHG One Rewards", OFFICIAL.ihg],
-  ["Resort Map", OFFICIAL.map],
-  ["Contact", OFFICIAL.contact],
-] as [string, string][];
-
-/** Bundled photos and events, used only when the database is unreachable. */
-const withFallbackMedia = (list: Destination[]): Destination[] =>
-  list.map((dest) => {
-    const photos = (FALLBACK_PHOTOS[dest.id] ?? [])
-      .map((key) => resolveImage(key))
-      .filter(Boolean)
-      .map((image) => ({ image }));
-    const events = dest.events ?? EVENTS_BY_DESTINATION[dest.id];
-    const gallery = dest.photos ?? (photos.length > 0 ? photos : undefined);
-    // A destination whose Instagram link already points at a single post gets a
-    // featured post automatically, even before an entry exists in the database.
-    const handleMatch = dest.instagram_url?.match(/instagram\.com\/([^/?]+)/);
-    const handle =
-      handleMatch && !["p", "reel", "reels"].includes(handleMatch[1] ?? "")
-        ? handleMatch[1]
-        : undefined;
-    const inferred =
-      dest.instagram_url && /instagram\.com\//.test(dest.instagram_url)
-        ? [
-            {
-              post_url: dest.instagram_url,
-              account: handle ?? "intercontinentaldanang",
-              ...(gallery?.[0]?.image ? { image: gallery[0].image } : {}),
-              caption: dest.short_description,
-            },
-          ]
-        : undefined;
-    const posts = dest.posts ?? inferred;
-    return {
-      ...dest,
-      ...(gallery ? { photos: gallery } : {}),
-      ...(events ? { events } : {}),
-      ...(posts ? { posts } : {}),
-    };
-  });
-
-export const FALLBACK: HubValue = {
-  mapPlaces: [],
-  mapLinks: [],
-  heroImage: receptionHero,
-  levels: LEVELS,
-  destinations: withFallbackMedia(DESTINATIONS),
-  links: FALLBACK_LINKS.map(([label, url]) => ({ label, url })),
-  contact: OFFICIAL.contact,
-};
-
 /** Use the same CMS image for the hero and its preload. */
 export function resolveHeroImage(data?: HubData): string {
   const reference = data?.settings?.["hero_image"];
-  return resolveImage(reference ?? "") || FALLBACK.heroImage;
+  return resolveImage(reference ?? "") || receptionHero;
 }
 
 export function createHubValue(data?: HubData): HubValue {
-  if (!data?.levels || data.destinations === null) return FALLBACK;
+  if (!data?.levels || !data.destinations) throw new Error("Catalogue temporarily unavailable");
 
   const levels: HubLevel[] = data.levels.map((l) => ({
-    id: l.id as Level,
+    id: l.id,
     title: l.title,
     line: l.line,
     image: resolveImage(l.image_key ?? "") || LEVELS.find((x) => x.id === l.id)?.image || "",
@@ -154,21 +93,14 @@ export function createHubValue(data?: HubData): HubValue {
       const dest = toDestination(
         row,
         photosByDest[row.id] ?? [],
-        data.links === null ? undefined : (linksByDest[row.id] ?? []),
+        linksByDest[row.id] ?? [],
         eventsByDest[row.id] ?? [],
         postsByDest[row.id] ?? [],
         videosByDest[row.id] ?? [],
       );
-      if (data.photos !== null && data.events !== null && data.posts !== null) return dest;
-      const fallback = withFallbackMedia([toDestination(row)])[0]!;
-      return {
-        ...dest,
-        photos: data.photos === null ? (fallback.photos ?? []) : (dest.photos ?? []),
-        events: data.events === null ? (fallback.events ?? []) : (dest.events ?? []),
-        posts: data.posts === null ? (fallback.posts ?? []) : (dest.posts ?? []),
-      };
+      return dest;
     }),
-    links: data.settings === null ? FALLBACK.links : links,
+    links,
     contact: s["contact"] ?? OFFICIAL.contact,
   };
 }

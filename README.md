@@ -14,7 +14,7 @@ bun install --frozen-lockfile --ignore-scripts
 bun run dev
 ```
 
-Renseigner dans `.env.local` l’URL du projet Supabase et sa **clé publiable**. Ce fichier est ignoré par Git. Les mêmes valeurs publiques de production et de prévisualisation sont déclarées dans `wrangler.json` ; modifier `.env.local` ne modifie pas le Worker déployé. `HUB_TRANSLATIONS_FROM_DATABASE=true` active les traductions publiées dans Supabase.
+Renseigner dans `.env.local` l’URL du projet Supabase et sa **clé publiable**. Ce fichier est ignoré par Git. Les mêmes valeurs publiques de production et de prévisualisation sont déclarées dans `wrangler.json` ; modifier `.env.local` ne modifie pas le Worker déployé. Les traductions éditoriales publiées sont toujours lues dans Supabase ; aucun mode de contenu embarqué n’est utilisé.
 
 Le site ne demande ni compte utilisateur ni clé secrète pour lire le contenu. Les politiques RLS limitent les lectures publiques aux lignes autorisées et aucune écriture publique n’est accordée. Une clé secrète Supabase sert uniquement à une opération d’administration locale, par exemple la mise à jour du cache des images ; elle ne doit jamais être ajoutée au dépôt ni aux variables du Worker.
 
@@ -25,9 +25,11 @@ bun run security:audit
 bun run i18n:check
 bun run images:check
 bun run test
+bun run test:mobile:install # une fois, pour installer WebKit
+bun run build
+bun run test:mobile
 bun run typecheck
 bun run lint
-bun run build
 bun run deploy:check
 ```
 
@@ -47,17 +49,23 @@ Chaque card active dispose d’une adresse directe basée sur son `destinations.
 
 Les pages HTTPS du site InterContinental (avec ou sans `www`), leurs documents et les réservations TableCheck de La Maison 1888/Tingara s’ouvrent dans une fenêtre plein écran du hub. La croix revient à la card et à sa position de lecture ; « Ouvrir dans le navigateur » garde un accès direct à l’URL d’origine. Les autres destinations et les clics avec une touche de modification conservent leur ouverture habituelle. Les URL et leur ordre restent gérés dans Supabase, sans nouvelle migration.
 
-La liste des destinations intégrables est centralisée dans `src/lib/resort-browser.ts`. Une seule fenêtre est montée à la demande, hors du gestionnaire de swipe. Les pages web sont isolées par un `sandbox` ; seuls les PDF HTTPS du dossier public `/wp-content/uploads/` du resort utilisent le lecteur natif sans cette restriction, nécessaire pour permettre leur affichage. Le navigateur reste responsable du lecteur PDF et des cookies des sites intégrés ; valider les menus et les parcours de réservation sur iPhone après toute évolution. Une restriction d’intégration côté site externe ne peut pas être détectée de façon fiable par `iframe.onload` : le lien d’ouverture externe reste toujours disponible.
+La liste des destinations intégrables est centralisée dans `src/lib/resort-browser.ts`. Les pages web sont isolées par un `sandbox`. Les PDF sont affichés avec PDF.js : pages successives, zoom tactile et rendu des pages proches de l’écran. Le proxy n’accepte que les hôtes HTTPS du resort et leurs fichiers PDF publics, sans suivre les redirections. Le téléchargement est interrompu après 30 secondes, au-delà de 32 Mio ou quand le visiteur ferme la requête. Le streaming est activé ; les requêtes partielles restent désactivées. Une restriction d’intégration d’un site externe ne peut pas être détectée de façon fiable par `iframe.onload` : l’ouverture externe reste disponible.
 
 Le fil Nam Tram reste compact à droite : quatre points et une cabine indiquent la progression. Un toucher ouvre le sélecteur des quatre niveaux. Une zone dédiée évite le chevauchement avec les collections ; la taille des cards reste inchangée.
 
 Les vidéos YouTube des fiches agrandies viennent de `destination_videos`. La première vidéo est associée à Mi Sol Spa ; toute nouvelle ligne est inactive par défaut. Voir [la procédure de publication](docs/database.md#vidéos-youtube) avant d'activer une autre vidéo.
 
-La [procédure de maintenance de la base](docs/database.md) décrit les protections de publication et les migrations du 23 septembre. Les anciennes colonnes d'URL de `destinations` ne pilotent plus les boutons du Worker ; les modifier ne changera pas les cards. Leur suppression physique est une deuxième étape, à lancer seulement après validation du déploiement compatible.
+La [procédure de maintenance de la base](docs/database.md) décrit les protections de publication. Les boutons utilisent uniquement `destination_links`. La migration historique `20260924120000_retire_legacy_action_columns.sql` retire les anciennes colonnes d’URL ; ne pas la rejouer sans vérifier l’état de la base.
 
 Les photos des cards, niveaux et galeries sont référencées par URL publique Supabase Storage. Pour remplacer une image, publier un WebP optimisé sous un **nouveau nom**, puis changer son URL dans la ligne concernée. Pour l’image d’accueil seulement, `site_settings.hero_image` peut remplacer l’image locale de secours. Les objets déjà publiés et leur cache sont documentés dans le [guide des images](docs/images.md).
 
-Les contenus publics complets sont conservés brièvement en mémoire et dans le cache Cloudflare du centre de données, pendant deux minutes. Une modification Supabase peut donc prendre environ deux minutes à apparaître sur tous les visiteurs. Si une lecture échoue, le site utilise les données locales de secours ; une réponse réussie mais vide reste vide et ne fait pas réapparaître d’anciens contenus.
+Un seul cache Cloudflare conserve un état complet pendant au maximum deux minutes à partir du début de sa lecture. À expiration, aucune ancienne réponse n’est réutilisée en cas de panne. Une collection secondaire indisponible est omise ; les collections lues avec succès restent applicables, y compris une liste vide ou une dépublication. Si les destinations ou les niveaux sont indisponibles, le hub affiche une erreur avec possibilité de réessayer. Aucun catalogue local ne peut réintroduire une card. Un onglet déjà ouvert doit être rechargé pour garantir une nouvelle lecture.
+
+Les formes des données publiques sont validées côté serveur dans `src/lib/hub-schema.ts` et servent aussi à inférer les types TypeScript. Une réponse mal formée ou tronquée par la limite Supabase est considérée indisponible. Ce contrat décrit les champs lus par le hub ; il ne remplace pas un export administrateur du schéma SQL complet.
+
+Les tests WebKit utilisent un profil iPhone 13 et une API locale fictive : aucune clé de production n’est nécessaire. Ils couvrent l’ouverture directe, le PDF multipage et le zoom, le retour, les gestes de navigation, ainsi que la recherche et les langues avec stockage navigateur refusé. La sensation tactile et les médias tiers nécessitent toujours une vérification sur appareil réel.
+
+Les réponses du Worker interdisent l’encadrement par une origine tierce (`frame-ancestors 'self'`), les objets intégrés et les changements de base d’URL externes. Une politique de ressources CSP est évaluée en mode rapport : les violations apparaissent dans la console du navigateur, sans collecte serveur. Valider les médias et réservations tiers avant de l’activer en mode bloquant.
 
 ## Découvertes après le hero
 
@@ -77,9 +85,10 @@ Les changements fusionnés dans `main` sont construits pour le Worker `icdnd`. N
 - `src/routes/_hub.$destinationId.tsx` : fiches partageables par identifiant Supabase.
 - `src/components/hub/` : cards, fiches, images et navigation.
 - `src/lib/hub.functions.ts` : lectures et cache des données Supabase côté serveur.
-- `src/data/hub-value.ts` : préparation du contenu et données de secours.
-- `src/i18n/` : interface et traductions éditoriales de secours.
-- `src/assets/` : images locales de secours ; `tests/` : tests de régression.
+- `src/data/hub-value.ts` : préparation du contenu Supabase, sans catalogue de secours.
+- `src/i18n/` : libellés de l’interface et résolution des traductions Supabase.
+- `src/assets/` : images locales de remplacement pour les références historiques ; `tests/` : tests unitaires ; `e2e/` : parcours mobiles.
+- `scripts/translation-snapshot/` : archive des traductions initiales pour audit/export, jamais chargée par le site.
 
 Le projet reste connecté à Lovable pour son historique Git. Travailler sur une branche et ouvrir une pull request ; ne pas forcer un push ni réécrire des commits déjà publiés. Le [brief créatif historique](docs/design-brief.md) reste disponible séparément.
 

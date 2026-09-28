@@ -1,8 +1,8 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { createHubValue, FALLBACK } from "./hub-value";
+import { createHubValue, type HubValue } from "./hub-value";
 import type { HubData } from "@/lib/hub.functions";
 
-const HubContext = createContext(FALLBACK);
+const HubContext = createContext<HubValue | null>(null);
 
 export function HubProvider({ data, children }: { data?: HubData; children: ReactNode }) {
   const value = useMemo(() => createHubValue(data), [data]);
@@ -10,5 +10,7 @@ export function HubProvider({ data, children }: { data?: HubData; children: Reac
 }
 
 export function useHub() {
-  return useContext(HubContext);
+  const hub = useContext(HubContext);
+  if (!hub) throw new Error("HubProvider is required");
+  return hub;
 }

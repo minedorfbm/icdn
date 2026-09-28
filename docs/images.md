@@ -4,7 +4,7 @@
 
 Le site accepte les URL publiques dans `destinations.image_key`, `levels.image_key`, `destination_photos.image_url` et `destination_posts.image_url`. Les anciennes clés locales fonctionnent toujours. La page d’accueil utilise par défaut la photo de la vasque fleurie dans le hall, intégrée au site. Une valeur `hero_image` dans `site_settings` peut la remplacer sans déploiement. Son préchargement utilise exactement la même URL.
 
-Le bucket `hub-images` est public et les références du hub ont été basculées vers Supabase Storage. Les 26 images initiales (2,2 Mo) et leurs empreintes sont décrites dans `scripts/storage-manifest.json`. Les fichiers locaux restent disponibles pour le mode de secours lorsque les données essentielles Supabase sont indisponibles ; une URL distante qui renvoie 404 n’est pas remplacée automatiquement.
+Le bucket `hub-images` est public et les références du hub ont été basculées vers Supabase Storage. Les 26 images initiales (2,2 Mo) et leurs empreintes sont décrites dans `scripts/storage-manifest.json`. Les fichiers locaux restent disponibles pour résoudre les anciennes clés d’image et les images absentes d’une ligne publiée ; une URL distante qui renvoie 404 n’est pas remplacée automatiquement.
 
 Les images du catalogue déjà publiées ont été vérifiées après l’import. La migration est terminée : **ne pas relancer** `activate-images.sql` ni les anciennes migrations SQL sur la production. Le script `bun run images:audit` vérifie uniquement les 26 fichiers initiaux du manifeste ; il ne couvre pas les nouvelles images ajoutées ensuite.
 

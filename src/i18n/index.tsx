@@ -47,7 +47,12 @@ export function I18nProvider({
 
   // English by default; a previous choice or the device language is restored after hydration.
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(STORAGE_KEY);
+    } catch {
+      /* Persistence is optional. */
+    }
     if (isLang(stored)) {
       setLangState(stored);
       return;
@@ -63,7 +68,11 @@ export function I18nProvider({
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
-    localStorage.setItem(STORAGE_KEY, l);
+    try {
+      localStorage.setItem(STORAGE_KEY, l);
+    } catch {
+      /* Keep the in-memory language. */
+    }
   }, []);
 
   const value = useMemo<I18nValue>(
@@ -119,6 +128,7 @@ export function LanguageSwitch() {
       </SheetTrigger>
 
       <SheetContent
+        closeLabel={t("close")}
         side="bottom"
         className="brand-ui brand-language-sheet z-[60] border-t px-5 pb-8 pt-5"
       >
