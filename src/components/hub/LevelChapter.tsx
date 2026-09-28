@@ -103,7 +103,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Props) {
       <div className="relative pr-[var(--hub-rail-gutter)]">
         <header className="journey-heading mx-auto max-w-[740px] px-6">
           <span className="block h-px w-10 bg-current/40" aria-hidden />
-          <h2 className="mt-6 font-serif text-[clamp(56px,21vw,116px)] leading-[0.82] tracking-[-0.03em]">
+          <h2 className="mt-6 font-serif text-[clamp(48px,18vw,104px)] leading-[0.82] tracking-[-0.03em]">
             {title}
           </h2>
           <p className="mt-5 text-[12px] tracking-[0.24em] opacity-55">

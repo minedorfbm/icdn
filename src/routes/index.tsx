@@ -6,7 +6,7 @@ import { localizedLinkUrl } from "@/lib/localized-links";
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 import { useJourneyMotion } from "@/lib/use-journey-motion";
-import { Phone } from "lucide-react";
+import { ArrowUpRight, Phone } from "lucide-react";
 import { LevelChapter } from "@/components/hub/LevelChapter";
 import { NamTramRail } from "@/components/hub/NamTramRail";
 import { type Level } from "@/data/resort";
@@ -132,8 +132,8 @@ function Hub() {
                   onClick={() => openMap()}
                   className="flex w-full items-center justify-between py-3 text-[11px] tracking-[0.22em]"
                 >
-                  {mapCopy(lang, "open")}
-                  <span aria-hidden>↗</span>
+                  {mapCopy(lang, "open").toUpperCase()}
+                  <ArrowUpRight aria-hidden className="size-4 shrink-0" strokeWidth={1.3} />
                 </button>
               ) : (
                 <ResortLink
@@ -149,7 +149,7 @@ function Hub() {
                   className="flex items-center justify-between py-3 text-[11px] tracking-[0.22em]"
                 >
                   {linkLabel(label).toUpperCase()}
-                  <span className="opacity-40">↗</span>
+                  <ArrowUpRight aria-hidden className="size-4 shrink-0" strokeWidth={1.3} />
                 </ResortLink>
               )}
             </li>
