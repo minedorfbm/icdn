@@ -3,7 +3,7 @@ import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
 import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
 import { localizedLinkUrl } from "@/lib/localized-links";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useRef } from "react";
 import { useJourneyMotion } from "@/lib/use-journey-motion";
 import { ArrowUpRight, Phone } from "lucide-react";
@@ -16,8 +16,9 @@ import { I18nProvider, LanguageSwitch, useI18n } from "@/i18n";
 import { resolveHeroImage } from "@/data/hub-value";
 import { ResortBrowserProvider, ResortLink } from "@/components/hub/ResortBrowser";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_hub")({
   loader: () => getHubData(),
+  staleTime: 120_000,
   head: ({ loaderData }) => ({
     links: [
       { rel: "preload", as: "image", href: resolveHeroImage(loaderData), fetchPriority: "high" },
@@ -50,6 +51,7 @@ function HubRoute() {
         <HubProvider data={data}>
           <ResortMapProvider>
             <Hub />
+            <Outlet />
           </ResortMapProvider>
         </HubProvider>
       </ResortBrowserProvider>

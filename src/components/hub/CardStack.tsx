@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { DestinationPanel } from "./DestinationPanel";
-import { DestinationDetail } from "./DestinationDetail";
+import { useDestinationNavigation } from "@/lib/use-destination-navigation";
 import type { Destination } from "@/data/resort";
 import { cardPosition, swipeStep } from "@/lib/card-swipe";
 
@@ -58,7 +58,7 @@ export function CardStack({
 }>) {
   const [drag, setDrag] = useState(0); // px, negative = pulling next card in
   const [dragging, setDragging] = useState(false);
-  const [open, setOpen] = useState<Destination | null>(null);
+  const { openDestination } = useDestinationNavigation();
   const moved = useRef(false);
   const frame = useRef<number | null>(null);
   const pendingDrag = useRef(0);
@@ -95,10 +95,12 @@ export function CardStack({
           dest={dest}
           active={i === index}
           priority={near && i === index}
-          onOpen={() => (i === index ? setOpen(dest) : onIndexChange(i))}
+          onOpen={() =>
+            i === index ? openDestination(dest.id, layout === "discovery") : onIndexChange(i)
+          }
         />
       )),
-    [items, index, near, onIndexChange],
+    [items, index, near, onIndexChange, openDestination, layout],
   );
 
   if (items.length === 0) return null;
@@ -224,7 +226,7 @@ export function CardStack({
                   e.currentTarget
                     .querySelector<HTMLButtonElement>("h3 button")
                     ?.focus({ preventScroll: true });
-                  setOpen(dest);
+                  openDestination(dest.id, layout === "discovery");
                 } else onIndexChange(i);
               }}
             >
@@ -256,14 +258,6 @@ export function CardStack({
           />
         </div>
       </div>
-
-      {open && (
-        <DestinationDetail
-          dest={open}
-          onClose={() => setOpen(null)}
-          neutral={layout === "discovery"}
-        />
-      )}
     </div>
   );
 }

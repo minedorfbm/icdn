@@ -9,13 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as HubRouteImport } from './routes/_hub'
+import { Route as HubIndexRouteImport } from './routes/_hub.index'
+import { Route as HubDestinationIdRouteImport } from './routes/_hub.$destinationId'
 import { Route as ApiResortPdfRouteImport } from './routes/api/resort-pdf'
 
-const IndexRoute = IndexRouteImport.update({
+const HubRoute = HubRouteImport.update({
+  id: '/_hub',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HubIndexRoute = HubIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => HubRoute,
+} as any)
+const HubDestinationIdRoute = HubDestinationIdRouteImport.update({
+  id: '/$destinationId',
+  path: '/$destinationId',
+  getParentRoute: () => HubRoute,
 } as any)
 const ApiResortPdfRoute = ApiResortPdfRouteImport.update({
   id: '/api/resort-pdf',
@@ -24,39 +35,58 @@ const ApiResortPdfRoute = ApiResortPdfRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof HubIndexRoute
+  '/$destinationId': typeof HubDestinationIdRoute
   '/api/resort-pdf': typeof ApiResortPdfRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/$destinationId': typeof HubDestinationIdRoute
   '/api/resort-pdf': typeof ApiResortPdfRoute
+  '/': typeof HubIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_hub': typeof HubRouteWithChildren
+  '/_hub/$destinationId': typeof HubDestinationIdRoute
   '/api/resort-pdf': typeof ApiResortPdfRoute
+  '/_hub/': typeof HubIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/resort-pdf'
+  fullPaths: '/' | '/$destinationId' | '/api/resort-pdf'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/resort-pdf'
-  id: '__root__' | '/' | '/api/resort-pdf'
+  to: '/$destinationId' | '/api/resort-pdf' | '/'
+  id:
+    '__root__' | '/_hub' | '/_hub/$destinationId' | '/api/resort-pdf' | '/_hub/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  HubRoute: typeof HubRouteWithChildren
   ApiResortPdfRoute: typeof ApiResortPdfRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_hub': {
+      id: '/_hub'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof HubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_hub/': {
+      id: '/_hub/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof HubIndexRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/_hub/$destinationId': {
+      id: '/_hub/$destinationId'
+      path: '/$destinationId'
+      fullPath: '/$destinationId'
+      preLoaderRoute: typeof HubDestinationIdRouteImport
+      parentRoute: typeof HubRoute
     }
     '/api/resort-pdf': {
       id: '/api/resort-pdf'
@@ -68,8 +98,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface HubRouteChildren {
+  HubDestinationIdRoute: typeof HubDestinationIdRoute
+  HubIndexRoute: typeof HubIndexRoute
+}
+
+const HubRouteChildren: HubRouteChildren = {
+  HubDestinationIdRoute: HubDestinationIdRoute,
+  HubIndexRoute: HubIndexRoute,
+}
+
+const HubRouteWithChildren = HubRoute._addFileChildren(HubRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  HubRoute: HubRouteWithChildren,
   ApiResortPdfRoute: ApiResortPdfRoute,
 }
 export const routeTree = rootRouteImport

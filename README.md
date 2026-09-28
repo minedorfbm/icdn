@@ -41,6 +41,8 @@ Pour modifier une card, mettre à jour sa ligne dans `destinations`. Les actions
 
 Les quatre niveaux partagent trois collections : **DINING · WELLNESS · EXPERIENCES**. Seules les collections contenant des cards publiées sont affichées. Leur ordre vient de `levels.clusters`, l’appartenance de chaque card de `destinations.cluster`. Une card sans collection reste accessible dans « More » ; l’index « All places » permet d’ouvrir directement chaque lieu. Voir [la gestion des collections](docs/database.md#collections-et-navigation).
 
+Chaque card active dispose d’une adresse directe basée sur son `destinations.id` : `/tingara`, `/citron`, `/la-maison-1888`, `/mi-sol-spa`, etc. L’ouverture depuis Journey, Surprise me ou l’atlas met à jour l’adresse ; Retour restaure le contexte de navigation. Un lien ouvert directement ou rechargé affiche la fiche correspondante avec ses données Supabase et les traductions du hub. Les identifiants doivent rester stables pour préserver les liens et QR codes. Une adresse inconnue ou une card dépubliée renvoie une page 404 ; aucune migration de base n’est nécessaire.
+
 Les pages HTTPS du site InterContinental (avec ou sans `www`), leurs documents et les réservations TableCheck de La Maison 1888/Tingara s’ouvrent dans une fenêtre plein écran du hub. La croix revient à la card et à sa position de lecture ; « Ouvrir dans le navigateur » garde un accès direct à l’URL d’origine. Les autres destinations et les clics avec une touche de modification conservent leur ouverture habituelle. Les URL et leur ordre restent gérés dans Supabase, sans nouvelle migration.
 
 La liste des destinations intégrables est centralisée dans `src/lib/resort-browser.ts`. Une seule fenêtre est montée à la demande, hors du gestionnaire de swipe. Les pages web sont isolées par un `sandbox` ; seuls les PDF HTTPS du dossier public `/wp-content/uploads/` du resort utilisent le lecteur natif sans cette restriction, nécessaire pour permettre leur affichage. Le navigateur reste responsable du lecteur PDF et des cookies des sites intégrés ; valider les menus et les parcours de réservation sur iPhone après toute évolution. Une restriction d’intégration côté site externe ne peut pas être détectée de façon fiable par `iframe.onload` : le lien d’ouverture externe reste toujours disponible.
@@ -69,7 +71,8 @@ Les positions sont dans `map_places` et les associations dans `map_destination_l
 
 Les changements fusionnés dans `main` sont construits pour le Worker `icdnd`. Nitro génère `.output/server/wrangler.json` et `.output/public` ; le site nécessite le rendu serveur et ne se publie pas comme un simple dossier statique. Les paramètres du Worker, des prévisualisations et du domaine sont dans le [guide Cloudflare](docs/cloudflare.md).
 
-- `src/routes/index.tsx` : parcours et progression Nam Tram.
+- `src/routes/_hub.tsx` : parcours persistant et progression Nam Tram.
+- `src/routes/_hub.$destinationId.tsx` : fiches partageables par identifiant Supabase.
 - `src/components/hub/` : cards, fiches, images et navigation.
 - `src/lib/hub.functions.ts` : lectures et cache des données Supabase côté serveur.
 - `src/data/hub-value.ts` : préparation du contenu et données de secours.

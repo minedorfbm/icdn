@@ -2,7 +2,7 @@ import { Component, lazy, Suspense, useCallback, useMemo, useState, type ReactNo
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
-import { DestinationDetail } from "@/components/hub/DestinationDetail";
+import { useDestinationNavigation } from "@/lib/use-destination-navigation";
 import { MapContext, type MapRequest } from "./map-context";
 import { destinationPlace } from "./map-links";
 import { mapCopy } from "./map-copy";
@@ -21,22 +21,23 @@ class MapBoundary extends Component<
 }
 
 export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const { mapPlaces, mapLinks, destinations } = useHub();
+  const { mapPlaces, mapLinks } = useHub();
+  const { openDestination, closeDestination, isDestination } = useDestinationNavigation();
   const { lang, t } = useI18n();
   const [request, setRequest] = useState<(MapRequest & { revision: number }) | null>(null);
-  const [detailId, setDetailId] = useState<string | null>(null);
-  const openMap = useCallback((next: MapRequest = {}) => {
-    setDetailId(null);
-    setRequest((prev) => ({ ...next, revision: (prev?.revision ?? 0) + 1 }));
-  }, []);
+  const openMap = useCallback(
+    (next: MapRequest = {}) => {
+      if (isDestination) closeDestination();
+      setRequest((prev) => ({ ...next, revision: (prev?.revision ?? 0) + 1 }));
+    },
+    [isDestination, closeDestination],
+  );
   const value = useMemo(
     () => ({ openMap, locate: (id: string) => destinationPlace(id, mapLinks, mapPlaces) }),
     [openMap, mapLinks, mapPlaces],
   );
-  const detail = destinations.find((d) => d.id === detailId && d.active);
   const close = () => {
     setRequest(null);
-    setDetailId(null);
   };
   const message = (text: string) => (
     <div className="flex h-full flex-col items-center justify-center gap-6 p-8 text-center">
@@ -58,13 +59,14 @@ export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }
         >
           <MapBoundary fallback={message(mapCopy(lang, "unavailable"))}>
             <Suspense fallback={message(mapCopy(lang, "loading"))}>
-              <ResortMap request={request} onClose={close} onDestination={setDetailId} />
+              <ResortMap
+                request={request}
+                onClose={close}
+                onDestination={(id) => openDestination(id, true)}
+              />
             </Suspense>
           </MapBoundary>
         </FullscreenDialog>
-      )}
-      {detail && (
-        <DestinationDetail dest={detail} onClose={() => setDetailId(null)} aboveMap neutral />
       )}
     </MapContext.Provider>
   );
