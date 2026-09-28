@@ -93,7 +93,7 @@ export function useI18n() {
   return ctx;
 }
 
-/** Discreet language selector, fixed at the top-right of the journey.
+/** Discreet language selector inside the shared top-right hub toolbar.
  *  Tapping the current language opens a bottom sheet with all options.
  */
 export function LanguageSwitch() {
@@ -111,7 +111,7 @@ export function LanguageSwitch() {
       <SheetTrigger asChild>
         <button
           aria-label={t("language")}
-          className="brand-ui brand-floating fixed right-3 top-3 z-50 flex min-h-11 items-center gap-2 rounded-sm px-3 py-2 transition-transform active:scale-95 max-[360px]:right-2"
+          className="brand-ui brand-floating flex min-h-11 items-center gap-2 rounded-sm px-3 py-2 transition-transform active:scale-95"
         >
           <span className="text-[10px] tracking-[0.18em]">{current.label}</span>
           <ChevronDown size={10} strokeWidth={1.5} className="opacity-60" />

@@ -1,3 +1,4 @@
+import { HubSearch } from "@/features/search/HubSearch";
 import { DiscoveryPaths } from "@/features/discovery/DiscoveryPaths";
 import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
 import { useResortMap } from "@/features/resort-map/map-context";
@@ -76,7 +77,10 @@ function Hub() {
 
   return (
     <main ref={hubRef} className="bg-background text-foreground">
-      <LanguageSwitch />
+      <div className="hub-tools">
+        <HubSearch />
+        <LanguageSwitch />
+      </div>
       <NamTramRail active={active} visible={visible} onJump={(level: Level) => scrollTo(level)} />
 
       {/* THRESHOLD */}
