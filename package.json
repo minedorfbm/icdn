@@ -28,7 +28,8 @@
     "test:mobile:install": "node node_modules/@playwright/test/cli.js install --with-deps webkit"
   },
   "overrides": {
-    "rolldown": "1.2.1"
+    "rolldown": "1.2.1",
+    "undici": "7.29.1"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",
