@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
+import { destinationSlug } from "@/lib/destination-route";
 
 declare module "@tanstack/react-router" {
   interface HistoryState {
@@ -18,7 +19,7 @@ export function useDestinationNavigation() {
     (destinationId: string, neutral = false) => {
       void navigate({
         to: "/$destinationId",
-        params: { destinationId },
+        params: { destinationId: destinationSlug(destinationId) },
         state: { hubCard: true, hubCardNeutral: neutral },
         resetScroll: false,
       });
