@@ -357,7 +357,7 @@
 }
 
 .sea-footer {
-  background: var(--brand-paper);
+  background: var(--brand-white);
   color: var(--brand-ink);
   border-top: 1px solid var(--brand-border);
 }

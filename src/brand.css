@@ -1,13 +1,12 @@
-/* Public InterContinental Danang site palette, observed 2026-09-28.
-   Keep this UI theme separate from the four immersive Journey worlds. */
+/* Editorial interface palette inspired by the resort's white, charcoal and grey UI.
+   Keep the four immersive Journey worlds on their own level palettes. */
 :root {
   --brand-white: #ffffff;
-  --brand-paper: #f3f3f1;
-  --brand-ink: #3d3935;
-  --brand-muted: #6b625b;
-  --brand-sand: #d8bdb4;
-  --brand-accent: #d3b5a3;
-  --brand-border: #e6e6e6;
+  --brand-paper: #f7f7f6;
+  --brand-ink: #292827;
+  --brand-muted: #777674;
+  --brand-accent: #cba99a;
+  --brand-border: #e4e4e1;
   --brand-serif: Baskerville, "Baskerville Old Face", Georgia, serif;
   --brand-sans: "Gill Sans", "Gill Sans MT", Arial, sans-serif;
 }
@@ -24,7 +23,7 @@
   color: var(--brand-ink);
 }
 .brand-surface {
-  background: var(--brand-paper);
+  background: var(--brand-white);
   color: var(--brand-ink);
 }
 .brand-header {
@@ -34,8 +33,8 @@
 .brand-floating {
   background: var(--brand-white);
   color: var(--brand-ink);
-  border: 1px solid var(--brand-sand);
-  box-shadow: 0 2px 12px #3d393512;
+  border: 1px solid var(--brand-border);
+  box-shadow: 0 2px 12px #29282712;
 }
 .brand-floating:hover {
   background: var(--brand-paper);
@@ -46,18 +45,19 @@
   overscroll-behavior: contain;
   padding-bottom: max(32px, env(safe-area-inset-bottom));
   background: var(--brand-white);
-  border-color: var(--brand-sand);
+  border-color: var(--brand-border);
   color: var(--brand-ink);
 }
 .brand-language-option:hover {
   background: var(--brand-paper);
 }
 .brand-language-option[aria-current="true"] {
-  background: var(--brand-sand);
+  box-shadow: inset 2px 0 var(--brand-accent);
+  background: var(--brand-paper);
 }
 /* Details reached from Explore/Surprise use the neutral interface theme. */
 .level.brand-detail[data-level] {
-  --level-bg: var(--brand-paper);
+  --level-bg: var(--brand-white);
   --level-fg: var(--brand-ink);
   background: var(--level-bg);
   color: var(--level-fg);
