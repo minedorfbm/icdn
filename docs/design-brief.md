@@ -201,7 +201,7 @@ Heavenly Penthouses
 
 The Summit
 
-Conference / Cinema / M-Club
+Conference Centre / Summit Auditorium / M Club
 
 Sports Centre
 
