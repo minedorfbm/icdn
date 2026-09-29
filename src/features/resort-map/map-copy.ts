@@ -2,7 +2,7 @@ import type { Lang } from "@/i18n/dictionary";
 const languageIndex: Record<Lang, number> = { en: 0, vi: 1, ru: 2, zh: 3, ko: 4, ja: 5 };
 const copy = {
   title: [
-    "Resort atlas",
+    "Resort map",
     "Bản đồ khu nghỉ dưỡng",
     "Карта курорта",
     "度假村地图",
@@ -25,7 +25,6 @@ const copy = {
     "지도에서 보기",
     "地図で見る",
   ],
-  search: ["Find a place", "Tìm địa điểm", "Найти место", "查找地点", "장소 검색", "場所を検索"],
   all: ["All places", "Tất cả địa điểm", "Все места", "所有地点", "모든 장소", "すべての場所"],
   explore: ["Explore", "Khám phá", "Обзор", "探索", "둘러보기", "探索"],
   photos: ["Photo spots", "Điểm chụp ảnh", "Фотоместа", "拍照点", "포토 스폿", "撮影スポット"],
@@ -89,14 +88,6 @@ const copy = {
     "일러스트 지도",
     "イラストマップ",
   ],
-  noResults: [
-    "No matching places",
-    "Không tìm thấy địa điểm",
-    "Места не найдены",
-    "未找到地点",
-    "검색 결과가 없습니다",
-    "該当する場所がありません",
-  ],
   unavailable: [
     "The map is temporarily unavailable. Please try again later.",
     "Bản đồ tạm thời không khả dụng. Vui lòng thử lại sau.",
@@ -106,7 +97,7 @@ const copy = {
     "現在マップを表示できません。しばらくしてからお試しください。",
   ],
   loading: [
-    "Opening the atlas…",
+    "Opening the map…",
     "Đang mở bản đồ…",
     "Открываем карту…",
     "正在打开地图…",

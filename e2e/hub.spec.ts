@@ -131,6 +131,26 @@ test("language and search remain usable when browser storage is denied", async (
   expect(errors).toEqual([]);
 });
 
+test("the compact map uses the home search and locates a matching place", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Explore the resort map/ }).click();
+  const map = page.getByRole("dialog", { name: "Resort map" });
+  await expect(map).toBeVisible();
+  await expect(map.locator(".atlas-header")).toContainText("Resort map");
+  await expect(map.locator(".atlas-header")).not.toContainText("INTERCONTINENTAL DANANG");
+  await expect
+    .poll(() => map.locator(".atlas-header").evaluate((el) => el.getBoundingClientRect().height))
+    .toBeLessThan(80);
+
+  await map.locator(".atlas-tools").getByRole("button", { name: "Search" }).click();
+  const search = page.getByRole("dialog", { name: "Search" });
+  await expect(search.getByRole("heading", { name: "Find your next discovery" })).toBeVisible();
+  await search.getByRole("searchbox").fill("Citron");
+  await search.getByRole("button", { name: /Citron/ }).click();
+  await expect(search).toHaveCount(0);
+  await expect(map.locator(".atlas-preview")).toContainText("Citron");
+});
+
 test("the card deck advances and returns after horizontal pointer gestures", async ({ page }) => {
   await page.goto("/");
   const stage = page.locator("#heaven .touch-pan-y").first();
