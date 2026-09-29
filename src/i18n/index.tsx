@@ -120,7 +120,7 @@ export function LanguageSwitch() {
       <SheetTrigger asChild>
         <button
           aria-label={t("language")}
-          className="brand-ui brand-floating flex min-h-11 items-center gap-2 rounded-sm px-3 py-2 transition-transform active:scale-95"
+          className="brand-ui brand-floating brand-control flex min-h-11 items-center gap-2 px-3 py-2 transition-transform active:scale-95"
         >
           <span className="text-[10px] tracking-[0.18em]">{current.label}</span>
           <ChevronDown size={10} strokeWidth={1.5} className="opacity-60" />
@@ -146,7 +146,7 @@ export function LanguageSwitch() {
                 key={code}
                 onClick={() => select(code)}
                 aria-current={active}
-                className="brand-language-option flex items-center justify-between rounded-sm px-4 py-3.5 text-left transition-colors"
+                className="brand-language-option brand-control flex items-center justify-between px-4 py-3.5 text-left transition-colors"
               >
                 <span className="flex items-baseline gap-3">
                   <span className="w-8 text-[12px] tracking-[0.12em]">{label}</span>

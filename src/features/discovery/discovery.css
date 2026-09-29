@@ -43,7 +43,7 @@
   text-align: left;
   padding: 22px 20px;
   border: 1px solid var(--brand-border);
-  border-radius: 2px;
+  border-radius: var(--brand-radius);
   background: var(--brand-white);
   color: inherit;
   transition:
@@ -147,7 +147,7 @@
   height: 70%;
   object-fit: cover;
   border: 1px solid var(--brand-accent);
-  border-radius: 7px;
+  border-radius: var(--brand-radius);
   box-shadow: 0 8px 18px #0007;
 }
 .discovery-mini-deck img:nth-child(1) {
