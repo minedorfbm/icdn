@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowUpRight,
   Camera,
@@ -11,16 +11,16 @@ import {
   LocateFixed,
   Minus,
   Plus,
-  Search,
   Sparkles,
   X,
 } from "lucide-react";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
+import { SearchDialog, SearchTrigger } from "@/features/search/HubSearch";
 import { LEVELS, type Destination, type Level } from "@/data/resort";
 import { MapArtwork } from "./MapArtwork";
 import { useMapCamera } from "./useMapCamera";
-import { linkedDestinations, liveMapPlaces } from "./map-links";
+import { destinationPlace, linkedDestinations, liveMapPlaces } from "./map-links";
 import { photoSpots } from "./map.legend";
 import { bensleyTour } from "./map.data";
 import { mapCopy } from "./map-copy";
@@ -30,11 +30,6 @@ import "./artwork.css";
 import "./resort-map.css";
 
 const photoParent = (id: string) => photoSpots.find((p) => p.id === id)?.parentId;
-const normalized = (text: string) =>
-  text
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase();
 const modes = [
   { id: "explore", Icon: Compass },
   { id: "photos", Icon: Camera },
@@ -62,13 +57,11 @@ export default function ResortMap({
   const [mode, setMode] = useState<MapMode>(request.mode ?? "explore");
   const [photoId, setPhotoId] = useState<string | null>(null);
   const [tourIndex, setTourIndex] = useState(0);
-  const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [options, setOptions] = useState(false);
   const [reference, setReference] = useState(false);
   const [collection, setCollection] = useState<PlaceCategory | null>(null);
   const [level, setLevel] = useState<Level | null>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
   const { camera, onViewportChange, focusOn, zoomBy, fit, allowPlaceClick, handlers } =
     useMapCamera();
   const selected = places.find((p) => p.id === selectedId);
@@ -96,21 +89,6 @@ export default function ResortMap({
     () => new Set<PlaceCategory>(collection ? [collection] : []),
     [collection],
   );
-  const results = useMemo(() => {
-    const term = normalized(query.trim());
-    return filtered.flatMap((place) => {
-      const cards = linkedDestinations(place.id, mapLinks, destinations);
-      const entries = cards.length
-        ? cards.map((d) => ({
-            placeId: place.id,
-            destinationId: d.id,
-            name: d.name,
-            level: d.level,
-          }))
-        : [{ placeId: place.id, destinationId: "", name: place.name, level: place.level }];
-      return entries.filter((item) => !term || normalized(item.name).includes(term));
-    });
-  }, [query, filtered, mapLinks, destinations]);
   const select = useCallback(
     (id: string) => {
       const place = places.find((p) => p.id === id);
@@ -118,7 +96,6 @@ export default function ResortMap({
       setSelectedId(id);
       setSearchOpen(false);
       setOptions(false);
-      setQuery("");
       focusOn(place.focus, place.focus.zoom);
     },
     [places, focusOn],
@@ -173,16 +150,32 @@ export default function ResortMap({
   else if (mode === "tour")
     previewKicker = `${copy("tour")} · ${tourIndex + 1}/${tourStops.length}`;
   const hasPreview = !!selected && !searchOpen;
+  const chooseSearchResult = (destination: Destination) => {
+    const placeId = destinationPlace(destination.id, mapLinks, mapPlaces);
+    if (!placeId) {
+      onDestination(destination.id);
+      return;
+    }
+    setMode("explore");
+    setCollection(null);
+    setLevel(null);
+    select(placeId);
+  };
 
   return (
     <div className="hub-atlas" data-detail={hasPreview}>
       <header className="atlas-header">
-        <div>
-          <span>INTERCONTINENTAL DANANG</span>
-          <h2>{copy("title")}</h2>
-        </div>
         <button type="button" onClick={onClose} aria-label={copy("close")}>
-          <X size={20} />
+          <X size={20} strokeWidth={1.4} aria-hidden />
+        </button>
+        <h2>{copy("title")}</h2>
+        <button
+          type="button"
+          aria-label={copy("layers")}
+          aria-expanded={options}
+          onClick={() => setOptions((current) => !current)}
+        >
+          <Layers size={19} strokeWidth={1.4} aria-hidden />
         </button>
       </header>
       {places.length === 0 ? (
@@ -220,54 +213,11 @@ export default function ResortMap({
               interactionProps={{ ...handlers, tabIndex: 0, "aria-label": copy("gestures") }}
             />
           </div>
-          <div className="atlas-tools">
-            <div className="atlas-search">
-              <Search size={18} />
-              <input
-                ref={searchRef}
-                aria-label={copy("search")}
-                placeholder={copy("search")}
-                value={query}
-                onFocus={() => {
-                  setSearchOpen(true);
-                  setOptions(false);
-                }}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") {
-                    e.stopPropagation();
-                    setSearchOpen(false);
-                    searchRef.current?.blur();
-                  }
-                }}
-              />
-              {searchOpen && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchOpen(false);
-                    setQuery("");
-                    searchRef.current?.blur();
-                  }}
-                  aria-label={t("close")}
-                >
-                  <X size={17} />
-                </button>
-              )}
+          {!options && (
+            <div className="atlas-tools">
+              <SearchTrigger onOpen={() => setSearchOpen(true)} />
             </div>
-            <button
-              className="atlas-tool"
-              type="button"
-              aria-label={copy("layers")}
-              aria-expanded={options}
-              onClick={() => {
-                setOptions(!options);
-                setSearchOpen(false);
-              }}
-            >
-              <Layers size={19} />
-            </button>
-          </div>
+          )}
           {options && (
             <section className="atlas-options" aria-label={copy("layers")}>
               <button
@@ -292,31 +242,6 @@ export default function ResortMap({
                   </button>
                 ))}
               </div>
-            </section>
-          )}
-          {searchOpen && (
-            <section className="atlas-results" aria-label={copy("search")}>
-              <p aria-live="polite">
-                {results.length} · {copy("all")}
-              </p>
-              {results.map((r) => (
-                <button
-                  type="button"
-                  key={`${r.placeId}/${r.destinationId}`}
-                  onClick={() => {
-                    searchRef.current?.blur();
-                    setMode("explore");
-                    select(r.placeId);
-                  }}
-                >
-                  <span>
-                    {r.name}
-                    <small>{levelLabel(r.level)}</small>
-                  </span>
-                  <ChevronRight size={16} />
-                </button>
-              ))}
-              {results.length === 0 && <p>{copy("noResults")}</p>}
             </section>
           )}
           <div className="atlas-zoom">
@@ -416,6 +341,13 @@ export default function ResortMap({
           </div>
           <p className="atlas-footnote">{copy("note")}</p>
         </>
+      )}
+      {searchOpen && (
+        <SearchDialog
+          aboveMap
+          onClose={() => setSearchOpen(false)}
+          onSelectDestination={chooseSearchResult}
+        />
       )}
     </div>
   );

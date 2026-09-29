@@ -82,7 +82,6 @@ describe("Supabase map associations", () => {
       for (const key of [
         "open",
         "locate",
-        "search",
         "discover",
         "unavailable",
         "walkNote",

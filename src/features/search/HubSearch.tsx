@@ -4,6 +4,7 @@ import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { useDestinationNavigation } from "@/lib/use-destination-navigation";
+import type { Destination } from "@/data/resort";
 import { SEARCH_COLLECTIONS, searchEntries, type SearchCollection } from "./search";
 import { searchCopy } from "./search-copy";
 import "./search.css";
@@ -18,7 +19,7 @@ export function HubSearch() {
   );
 }
 
-function SearchTrigger({ onOpen }: Readonly<{ onOpen: () => void }>) {
+export function SearchTrigger({ onOpen }: Readonly<{ onOpen: () => void }>) {
   const { lang } = useI18n();
   return (
     <button
@@ -33,7 +34,15 @@ function SearchTrigger({ onOpen }: Readonly<{ onOpen: () => void }>) {
   );
 }
 
-function SearchDialog({ onClose }: Readonly<{ onClose: () => void }>) {
+export function SearchDialog({
+  onClose,
+  onSelectDestination,
+  aboveMap = false,
+}: Readonly<{
+  onClose: () => void;
+  onSelectDestination?: (destination: Destination) => void;
+  aboveMap?: boolean;
+}>) {
   const [query, setQuery] = useState("");
   const resultsRef = useRef<HTMLDivElement>(null);
   const [collection, setCollection] = useState<SearchCollection | "">("");
@@ -78,6 +87,11 @@ function SearchDialog({ onClose }: Readonly<{ onClose: () => void }>) {
     setQuery("");
     setCollection("");
   };
+  const selectDestination = (destination: Destination) => {
+    onClose();
+    if (onSelectDestination) onSelectDestination(destination);
+    else openDestination(destination.id, true);
+  };
   const categoryNotes = {
     DINING: "dining",
     WELLNESS: "wellness",
@@ -101,8 +115,8 @@ function SearchDialog({ onClose }: Readonly<{ onClose: () => void }>) {
     <FullscreenDialog
       title={copy("search")}
       onClose={onClose}
-      overlayClassName="fixed inset-0 z-[74] bg-black/30"
-      className="brand-ui brand-surface hub-search-dialog fixed inset-0 z-[75]"
+      overlayClassName={`fixed inset-0 bg-black/30 ${aboveMap ? "z-[96]" : "z-[74]"}`}
+      className={`brand-ui brand-surface hub-search-dialog fixed inset-0 ${aboveMap ? "z-[97]" : "z-[75]"}`}
     >
       <div className="hub-search-shell">
         <header className="hub-search-header">
@@ -163,7 +177,7 @@ function SearchDialog({ onClose }: Readonly<{ onClose: () => void }>) {
                     key={d.id}
                     type="button"
                     className="hub-search-result"
-                    onClick={() => openDestination(d.id, true)}
+                    onClick={() => selectDestination(d)}
                   >
                     <img
                       src={d.image}

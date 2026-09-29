@@ -24,6 +24,27 @@ const destinations = ["citron", "tingara"].map((id, display_order) => ({
 const tables: Record<string, unknown[]> = {
   levels,
   destinations,
+  map_places: [
+    {
+      id: "citron",
+      name: "Citron",
+      level_id: "heaven",
+      pin: 8,
+      x: 600,
+      y: 420,
+      zoom: 2,
+      active: true,
+    },
+  ],
+  map_destination_links: [
+    {
+      place_id: "citron",
+      destination_id: "citron",
+      display_order: 0,
+      is_primary: true,
+      active: true,
+    },
+  ],
   destination_links: [
     {
       id: "test-menu",
