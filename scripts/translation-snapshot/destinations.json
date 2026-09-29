@@ -52,7 +52,10 @@
     "daycation": "Tận hưởng một ngày tại khu nghỉ dưỡng với bãi biển, hồ bơi và lựa chọn trải nghiệm ẩm thực hoặc chăm sóc sức khỏe.",
     "things-to-do": "Khám phá các hoạt động giải trí tại khu nghỉ dưỡng và xem lịch hoạt động hằng ngày mới nhất.",
     "destination-experiences": "Khám phá Hội An, Đà Nẵng và các di sản văn hóa miền Trung qua gợi ý của đội ngũ concierge khu nghỉ dưỡng.",
-    "nature-experiences": "Khám phá rừng Sơn Trà, động vật hoang dã và những trải nghiệm thiên nhiên có hướng dẫn quanh khu nghỉ dưỡng."
+    "nature-experiences": "Khám phá rừng Sơn Trà, động vật hoang dã và những trải nghiệm thiên nhiên có hướng dẫn quanh khu nghỉ dưỡng.",
+    "summit-conference-centre": "Không gian trên đỉnh đồi dành cho các cuộc họp và lễ kỷ niệm, với những đại sảnh sang trọng và khu vực tổ chức sự kiện linh hoạt.",
+    "summit-cinema": "Khán phòng ghế da tại The Summit dành cho phim ảnh, thuyết trình và các buổi chiếu riêng tư.",
+    "m-club": "Không gian giải trí đêm đầy màu sắc cho các buổi tiệc riêng, với sân khấu, quầy bar và khu tổ chức sự kiện M Privé liền kề."
   },
   "ru": {
     "enchanted-holiday": "Рождество 2026 — праздничное проживание с ежедневным завтраком, послеобеденным чаем, торжественными напитками и природной тропой Чарльза.",
@@ -107,7 +110,10 @@
     "daycation": "Проведите день на курорте: пляж, бассейны и выбор гастрономических или оздоровительных впечатлений.",
     "things-to-do": "Откройте для себя развлечения курорта и узнайте актуальное расписание мероприятий на день.",
     "destination-experiences": "Откройте для себя Хойан, Дананг и культурные достопримечательности Центрального Вьетнама с советами консьержа курорта.",
-    "nature-experiences": "Откройте для себя лес Шонча, его дикую природу и прогулки с гидом вокруг курорта."
+    "nature-experiences": "Откройте для себя лес Шонча, его дикую природу и прогулки с гидом вокруг курорта.",
+    "summit-conference-centre": "Пространство на вершине холма для встреч и торжеств с элегантными залами и площадками для разных мероприятий.",
+    "summit-cinema": "Зал с кожаными креслами в The Summit для фильмов, презентаций и частных кинопоказов.",
+    "m-club": "Яркий ночной клуб для частных торжеств со сценой, баром и прилегающим пространством M Privé."
   },
   "zh": {
     "enchanted-holiday": "2026 圣诞 — 节庆住宿，含每日早餐、下午茶、庆祝饮品，以及 Charles 的自然探索之旅。",
@@ -162,6 +168,9 @@
     "daycation": "在度假村度过美好一天，畅享海滩、泳池，并选择餐饮或康养体验。",
     "things-to-do": "探索度假村的休闲活动，并查看最新每日活动安排。",
     "destination-experiences": "跟随度假村礼宾团队的推荐，探索会安、岘港及越南中部的文化名胜。",
-    "nature-experiences": "探索山茶半岛的森林、野生动物，以及度假村周边的导览自然体验。"
+    "nature-experiences": "探索山茶半岛的森林、野生动物，以及度假村周边的导览自然体验。",
+    "summit-conference-centre": "坐落于山顶的会议与庆典场所，设有典雅大厅及灵活多样的活动空间。",
+    "summit-cinema": "The Summit 的皮革座椅礼堂，适合电影放映、演讲和私人观影。",
+    "m-club": "充满趣味的夜间俱乐部，设有舞台、酒吧及相邻的 M Privé 活动空间，适合私人庆典。"
   }
 }
