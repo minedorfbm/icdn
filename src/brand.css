@@ -94,14 +94,11 @@
 }
 .detail-back:focus-visible {
   outline: 2px solid var(--detail-back-fg);
-  outline-offset: 3px;
-  box-shadow:
-    0 0 0 5px var(--detail-back-bg),
-    0 8px 24px oklch(0 0 0 / 0.24);
+  outline-offset: 2px;
 }
 .level[data-level="heaven"] .detail-back {
-  --detail-back-bg: var(--world-heaven);
-  --detail-back-fg: oklch(0.2 0.02 85);
+  --detail-back-bg: oklch(0.35 0.06 65);
+  --detail-back-fg: var(--world-heaven);
 }
 .level[data-level="sky"] .detail-back {
   --detail-back-bg: var(--world-sky);
@@ -112,6 +109,6 @@
   --detail-back-fg: oklch(0.98 0.01 90);
 }
 .level[data-level="sea"] .detail-back {
-  --detail-back-bg: var(--world-sea);
-  --detail-back-fg: var(--world-sea-foreground);
+  --detail-back-bg: oklch(0.34 0.075 230);
+  --detail-back-fg: oklch(0.98 0.01 90);
 }
