@@ -42,7 +42,7 @@ export function DestinationDetail({
     >
       <div className="relative h-[62svh] w-full overflow-hidden">
         <img
-          src={dest.image}
+          src={dest.detailImage}
           alt={dest.name}
           className="h-full w-full object-cover"
           width={900}

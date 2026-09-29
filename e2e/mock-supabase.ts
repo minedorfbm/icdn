@@ -17,10 +17,21 @@ const destinations = ["citron", "tingara"].map((id, display_order) => ({
   type: "restaurant",
   short_description: "A restaurant overlooking the sea.",
   image_key: "/intercontinental-touch-icon.png",
+  detail_image_key: "/intercontinental-touch-icon.png",
+  content_kind: "place",
   instagram_spot: false,
   display_order,
   active: true,
 }));
+destinations.push({
+  ...destinations[0]!,
+  id: "enchanted-holiday",
+  name: "Enchanted Holiday Escape",
+  cluster: "EXPERIENCES",
+  type: "experience",
+  content_kind: "offer",
+  display_order: 2,
+});
 const tables: Record<string, unknown[]> = {
   levels,
   destinations,

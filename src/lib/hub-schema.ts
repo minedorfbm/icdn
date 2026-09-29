@@ -36,6 +36,8 @@ export const destinationRow = z.object({
   type: destinationType,
   short_description: text,
   image_key: optionalText,
+  detail_image_key: optionalText.optional(),
+  content_kind: z.enum(["place", "offer"]).optional(),
   instagram_spot: z.boolean().nullable().optional(),
   display_order: order,
   active: z.boolean(),
