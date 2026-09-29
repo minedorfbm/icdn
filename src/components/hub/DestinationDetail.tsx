@@ -59,8 +59,9 @@ export function DestinationDetail({
         />
 
         <button
+          type="button"
           onClick={onClose}
-          className="absolute left-5 top-6 flex items-center gap-2 rounded-full border border-foreground/15 bg-background/90 px-4 py-2 text-[9px] text-foreground shadow-lg tracking-[0.32em] backdrop-blur-md transition-colors hover:bg-background"
+          className="detail-back absolute left-5 top-6 flex items-center gap-2 px-4 py-2 text-[9px] tracking-[0.32em]"
         >
           <ArrowLeft className="size-3" strokeWidth={1.5} />
           {t("back")}
