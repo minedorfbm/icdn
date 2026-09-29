@@ -2,7 +2,7 @@
 
 ## Fonctionnement actuel
 
-Le site accepte les URL publiques dans `destinations.image_key`, `levels.image_key`, `destination_photos.image_url` et `destination_posts.image_url`. Les anciennes clés locales fonctionnent toujours. La page d’accueil utilise par défaut la photo de la vasque fleurie dans le hall, intégrée au site. Une valeur `hero_image` dans `site_settings` peut la remplacer sans déploiement. Son préchargement utilise exactement la même URL.
+Le site accepte les URL publiques dans `destinations.image_key` (card d’accueil), `destinations.detail_image_key` (card agrandie), `levels.image_key`, `destination_photos.image_url` et `destination_posts.image_url`. Les anciennes clés locales fonctionnent toujours. La page d’accueil utilise par défaut la photo de la vasque fleurie dans le hall, intégrée au site. Une valeur `hero_image` dans `site_settings` peut la remplacer sans déploiement. Son préchargement utilise exactement la même URL.
 
 Le bucket `hub-images` est public et les références du hub ont été basculées vers Supabase Storage. Les 26 images initiales (2,2 Mo) et leurs empreintes sont décrites dans `scripts/storage-manifest.json`. Les fichiers locaux restent disponibles pour résoudre les anciennes clés d’image et les images absentes d’une ligne publiée ; une URL distante qui renvoie 404 n’est pas remplacée automatiquement.
 
@@ -14,7 +14,7 @@ Les objets du bucket sont lisibles publiquement, mais l’écriture reste réser
 
 - Ajouter une nouvelle image WebP optimisée dans `hub-images` avec un **nouveau nom** pour éviter qu’un cache conserve l’ancienne photo. Conserver l’ancienne image tant qu’elle est référencée.
 - Lors du téléversement, régler le cache navigateur sur `31536000` secondes (un an). Les noms versionnés changent avec le contenu, ce qui permet ce cache long. Le réglage se fait avec l’option `cacheControl` de l’API Storage.
-- Copier son URL **publique**, sans expiration, dans le champ correspondant à la card, au niveau ou à la galerie. Malgré son nom historique, `image_key` accepte maintenant cette URL complète.
+- Copier son URL **publique**, sans expiration, dans le champ correspondant. `destinations.image_key` pilote la card d’accueil, la recherche et les aperçus ; `destinations.detail_image_key` pilote uniquement la couverture agrandie. Après la migration, les deux champs contiennent la même référence initiale ; modifier l’un n’altère pas l’autre. Si `detail_image_key` est vide, le site utilise `image_key`. Malgré leur nom historique, ces champs acceptent une URL complète.
 - Pour changer seulement l’image d’accueil, ajouter/modifier `site_settings` : `key = hero_image`, `value = URL publique` de la nouvelle image dans `hub-images`. Sans ce réglage, l’accueil utilise la photo de la vasque intégrée au site.
 - Vérifier l’affichage après rechargement. Aucun déploiement ni changement de traduction n’est nécessaire pour remplacer une image.
 

@@ -145,6 +145,8 @@ test("the compact map uses the home search and locates a matching place", async 
   await map.locator(".atlas-tools").getByRole("button", { name: "Search" }).click();
   const search = page.getByRole("dialog", { name: "Search" });
   await expect(search.getByRole("heading", { name: "Find your next discovery" })).toBeVisible();
+  await search.getByRole("searchbox").fill("Enchanted Holiday");
+  await expect(search.getByRole("button", { name: /Enchanted Holiday Escape/ })).toHaveCount(0);
   await search.getByRole("searchbox").fill("Citron");
   await search.getByRole("button", { name: /Citron/ }).click();
   await expect(search).toHaveCount(0);

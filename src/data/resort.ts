@@ -61,6 +61,8 @@ export type DestinationType =
   | "beach"
   | "recreation";
 
+export type DestinationContentKind = "place" | "offer";
+
 export interface Destination {
   id: string;
   name: string;
@@ -68,7 +70,11 @@ export interface Destination {
   cluster?: string;
   type: DestinationType;
   short_description: string;
+  contentKind: DestinationContentKind;
+  /** Photography used by cards, search results and previews. */
   image: string;
+  /** Independent cover photography for the expanded destination page. */
+  detailImage: string;
   /** Marked as one of the resort's official Instagram photo spots. */
   instagram_spot?: boolean;
   photos?: DestinationPhoto[];
@@ -344,6 +350,7 @@ export function toDestination(
   videos?: DestinationVideo[],
 ): Destination {
   const type = row.type;
+  const image = resolveImage(row.image_key ?? "") || TYPE_IMAGE[type];
   return {
     id: row.id,
     name: row.name,
@@ -351,7 +358,9 @@ export function toDestination(
     ...(row.cluster ? { cluster: row.cluster } : {}),
     type,
     short_description: row.short_description,
-    image: resolveImage(row.image_key ?? "") || TYPE_IMAGE[type],
+    contentKind: row.content_kind ?? "place",
+    image,
+    detailImage: resolveImage(row.detail_image_key ?? "") || image,
     ...(row.instagram_spot ? { instagram_spot: true } : {}),
     ...(photos !== undefined ? { photos } : {}),
     ...(posts !== undefined ? { posts } : {}),

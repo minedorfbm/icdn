@@ -12,6 +12,8 @@ const row: DestinationRow = {
   type: "restaurant",
   short_description: "Current database description",
   image_key: null,
+  detail_image_key: null,
+  content_kind: "place",
   instagram_spot: false,
   display_order: 0,
   active: true,
@@ -28,6 +30,19 @@ const ready: HubData = {
 };
 
 describe("database authority", () => {
+  test("expanded image is independent while an unset value keeps the card image", () => {
+    const card = toDestination({ ...row, image_key: "d-citron" });
+    expect(card.detailImage).toBe(card.image);
+    const updated = toDestination({
+      ...row,
+      image_key: "d-citron",
+      detail_image_key: "d-spa",
+      content_kind: "offer",
+    });
+    expect(updated.image).toBe(card.image);
+    expect(updated.detailImage).not.toBe(updated.image);
+    expect(updated.contentKind).toBe("offer");
+  });
   test("intentional empty catalog does not resurrect bundled destinations", () => {
     expect(createHubValue({ ...ready, destinations: [] }).destinations).toEqual([]);
     expect(createHubValue({ ...ready, levels: [] }).levels).toEqual([]);

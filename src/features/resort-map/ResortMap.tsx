@@ -345,6 +345,7 @@ export default function ResortMap({
       {searchOpen && (
         <SearchDialog
           aboveMap
+          placesOnly
           onClose={() => setSearchOpen(false)}
           onSelectDestination={chooseSearchResult}
         />

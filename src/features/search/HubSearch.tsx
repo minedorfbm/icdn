@@ -38,10 +38,12 @@ export function SearchDialog({
   onClose,
   onSelectDestination,
   aboveMap = false,
+  placesOnly = false,
 }: Readonly<{
   onClose: () => void;
   onSelectDestination?: (destination: Destination) => void;
   aboveMap?: boolean;
+  placesOnly?: boolean;
 }>) {
   const [query, setQuery] = useState("");
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -56,7 +58,7 @@ export function SearchDialog({
   const entries = useMemo(
     () =>
       destinations
-        .filter((d) => d.active)
+        .filter((d) => d.active && (!placesOnly || d.contentKind === "place"))
         .map((d) => ({
           item: d,
           name: d.name,
@@ -77,7 +79,7 @@ export function SearchDialog({
             }),
           ].join(" "),
         })),
-    [destinations, description, typeLabel, levelLabel, cluster, event],
+    [destinations, placesOnly, description, typeLabel, levelLabel, cluster, event],
   );
   const results = useMemo(
     () => searchEntries(entries, query, collection),
