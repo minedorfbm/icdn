@@ -90,7 +90,7 @@ export function DestinationDetail({
 
         {(pending || failed) && (
           <div className="mt-6 text-sm opacity-70" aria-busy={pending}>
-            <p role="status">{t(failed ? "content_unavailable" : "page_loading")}</p>
+            <output>{t(failed ? "content_unavailable" : "page_loading")}</output>
             {failed && (
               <button type="button" onClick={retry} className="mt-2 min-h-11 border-b">
                 {t("retry")}
