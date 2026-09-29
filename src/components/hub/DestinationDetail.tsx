@@ -59,8 +59,9 @@ export function DestinationDetail({
         />
 
         <button
+          type="button"
           onClick={onClose}
-          className="absolute left-5 top-6 flex items-center gap-2 rounded-full border border-foreground/15 bg-background/90 px-4 py-2 text-[9px] text-foreground shadow-lg tracking-[0.32em] backdrop-blur-md transition-colors hover:bg-background"
+          className="detail-back absolute left-5 top-6 flex items-center gap-2 px-4 py-2 text-[9px] tracking-[0.32em]"
         >
           <ArrowLeft className="size-3" strokeWidth={1.5} />
           {t("back")}
@@ -89,7 +90,7 @@ export function DestinationDetail({
 
         {(pending || failed) && (
           <div className="mt-6 text-sm opacity-70" aria-busy={pending}>
-            <p role="status">{t(failed ? "content_unavailable" : "page_loading")}</p>
+            <output>{t(failed ? "content_unavailable" : "page_loading")}</output>
             {failed && (
               <button type="button" onClick={retry} className="mt-2 min-h-11 border-b">
                 {t("retry")}
