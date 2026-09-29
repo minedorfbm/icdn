@@ -57,7 +57,8 @@
     "INFO": "안내",
     "DETAILS": "상세 정보",
     "VISIT": "방문하기",
-    "BROCHURE": "브로슈어"
+    "BROCHURE": "브로슈어",
+    "DAILY_SCHEDULE": "일일 일정"
   },
   "LINK_LABEL": {
     "Website": "공식 웹사이트",

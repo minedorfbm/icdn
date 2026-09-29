@@ -46,7 +46,11 @@
     "moulin-rouge": "Hát hết mình cùng gia đình và bạn bè trong một câu lạc bộ riêng đầy vui nhộn.",
     "relaxation-pavilion": "Một góc ngắm cảnh yên tĩnh phía trên vịnh — nơi cao nhất của khu nghỉ dưỡng để ngồi thư giãn và hít thở.",
     "instagram-spots": "Chín địa điểm được chụp ảnh nhiều nhất tại khu nghỉ dưỡng, từ Sảnh Đón Tiếp đến Bãi biển Coconut.",
-    "wall-of-lanterns": "Bức tường đèn lồng Hội An rực sáng trên lối xuống các hồ bơi — một trong những điểm chụp ảnh đặc trưng của khu nghỉ dưỡng."
+    "wall-of-lanterns": "Bức tường đèn lồng Hội An rực sáng trên lối xuống các hồ bơi — một trong những điểm chụp ảnh đặc trưng của khu nghỉ dưỡng.",
+    "hoi-an-digital-tour": "Khám phá phố cổ Hội An qua hành trình số có hướng dẫn, giữa những con phố lịch sử và di sản sống.",
+    "nature-discovery-guide": "Tìm hiểu động vật hoang dã và thực vật bản địa Sơn Trà qua cẩm nang khám phá thiên nhiên của khu nghỉ dưỡng.",
+    "daycation": "Tận hưởng một ngày tại khu nghỉ dưỡng với bãi biển, hồ bơi và lựa chọn trải nghiệm ẩm thực hoặc chăm sóc sức khỏe.",
+    "things-to-do": "Khám phá các hoạt động giải trí tại khu nghỉ dưỡng và xem lịch hoạt động hằng ngày mới nhất."
   },
   "ru": {
     "enchanted-holiday": "Рождество 2026 — праздничное проживание с ежедневным завтраком, послеобеденным чаем, торжественными напитками и природной тропой Чарльза.",
@@ -95,7 +99,11 @@
     "moulin-rouge": "Пойте весь вечер с семьёй и друзьями в уютном частном клубе с весёлой атмосферой.",
     "relaxation-pavilion": "Тихая смотровая площадка над заливом — самая высокая точка курорта, где можно просто посидеть и спокойно подышать.",
     "instagram-spots": "Девять самых фотографируемых мест курорта — от вестибюля до пляжа Coconut.",
-    "wall-of-lanterns": "Сияющая стена фонарей Хойана по пути к бассейнам — одно из самых узнаваемых мест курорта для фотографий."
+    "wall-of-lanterns": "Сияющая стена фонарей Хойана по пути к бассейнам — одно из самых узнаваемых мест курорта для фотографий.",
+    "hoi-an-digital-tour": "Откройте для себя старый город Хойана во время цифровой экскурсии по историческим улицам и живому наследию.",
+    "nature-discovery-guide": "Познакомьтесь с дикой природой и местными растениями полуострова Шонча в путеводителе курорта по природе.",
+    "daycation": "Проведите день на курорте: пляж, бассейны и выбор гастрономических или оздоровительных впечатлений.",
+    "things-to-do": "Откройте для себя развлечения курорта и узнайте актуальное расписание мероприятий на день."
   },
   "zh": {
     "enchanted-holiday": "2026 圣诞 — 节庆住宿，含每日早餐、下午茶、庆祝饮品，以及 Charles 的自然探索之旅。",
@@ -144,6 +152,10 @@
     "moulin-rouge": "在充满欢乐的私人俱乐部，与家人朋友尽情欢唱一整晚。",
     "relaxation-pavilion": "海湾上方宁静的观景处——在度假村的最高处静坐、放松呼吸。",
     "instagram-spots": "度假村最受欢迎的九处摄影地点，从接待大厅到 Coconut 海滩。",
-    "wall-of-lanterns": "通往泳池的路上，一面璀璨的会安灯笼墙——度假村标志性的摄影地点之一。"
+    "wall-of-lanterns": "通往泳池的路上，一面璀璨的会安灯笼墙——度假村标志性的摄影地点之一。",
+    "hoi-an-digital-tour": "通过导览式数字之旅，探索会安古城的历史街巷与鲜活文化遗产。",
+    "nature-discovery-guide": "通过度假村的自然探索指南，认识山茶半岛的野生动物与本地植物。",
+    "daycation": "在度假村度过美好一天，畅享海滩、泳池，并选择餐饮或康养体验。",
+    "things-to-do": "探索度假村的休闲活动，并查看最新每日活动安排。"
   }
 }
