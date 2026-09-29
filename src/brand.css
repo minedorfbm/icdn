@@ -7,6 +7,7 @@
   --brand-muted: #777674;
   --brand-accent: #cba99a;
   --brand-border: #e4e4e1;
+  --brand-radius: 14px;
   --brand-serif: Baskerville, "Baskerville Old Face", Georgia, serif;
   --brand-sans: "Gill Sans", "Gill Sans MT", Arial, sans-serif;
 }
@@ -38,6 +39,9 @@
 }
 .brand-floating:hover {
   background: var(--brand-paper);
+}
+.brand-control {
+  border-radius: var(--brand-radius);
 }
 .brand-language-sheet {
   max-height: 90dvh;
