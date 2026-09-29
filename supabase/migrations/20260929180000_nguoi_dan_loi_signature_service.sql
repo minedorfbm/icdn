@@ -26,6 +26,21 @@ WHERE EXISTS (SELECT 1 FROM public.destinations WHERE id = 'nguoi-dan-loi')
       AND url = 'https://www.danang.intercontinental.com/amenities/nguoi-dan-loi/'
   );
 
+-- All five URLs are declared as alternates by the official page.
+INSERT INTO public.destination_link_translations (link_id, locale, url, active)
+SELECT l.id, variants.locale, variants.url, true
+FROM (VALUES
+  ('vi', 'https://www.danang.intercontinental.com/vn/amenities/nguoi-dan-loi/'),
+  ('ru', 'https://www.danang.intercontinental.com/ru/amenities/nguoi-dan-loi/'),
+  ('zh', 'https://www.danang.intercontinental.com/zh/amenities/nguoi-dan-loi/'),
+  ('ko', 'https://www.danang.intercontinental.com/ko/amenities/nguoi-dan-loi/'),
+  ('ja', 'https://www.danang.intercontinental.com/ja/amenities/nguoi-dan-loi/')
+) AS variants(locale, url)
+JOIN public.destination_links l ON l.destination_id = 'nguoi-dan-loi'
+  AND l.kind = 'DISCOVER'::public.destination_link_type
+  AND l.url = 'https://www.danang.intercontinental.com/amenities/nguoi-dan-loi/'
+ON CONFLICT (link_id, locale) DO NOTHING;
+
 INSERT INTO public.destination_translations (
   destination_id, locale, description, source_description, published
 )
