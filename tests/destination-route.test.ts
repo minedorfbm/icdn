@@ -22,3 +22,11 @@ test("the auditorium uses its official slug without breaking the old URL", () =>
     findPublicDestination([{ ...auditorium, active: false }], "summit-auditorium"),
   ).toBeUndefined();
 });
+
+test("the Nature card also answers the former guide URL", () => {
+  const nature = { id: "nature-experiences", active: true };
+  expect(findPublicDestination([nature], "nature-discovery-guide")).toBe(nature);
+  expect(
+    findPublicDestination([{ ...nature, active: false }], "nature-discovery-guide"),
+  ).toBeUndefined();
+});
