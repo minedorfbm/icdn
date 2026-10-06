@@ -65,7 +65,7 @@ export function readHubSnapshot(
   cache?: PublicCache,
   now = Date.now(),
 ): Promise<HubData> {
-  return readPublicSnapshot("catalogue-v6", hubDataSchema, complete, load, cache, now);
+  return readPublicSnapshot("catalogue-v7", hubDataSchema, complete, load, cache, now);
 }
 
 export function publicCache() {

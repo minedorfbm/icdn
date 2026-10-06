@@ -28,7 +28,8 @@ export function DestinationDetail({
 }>) {
   const { media, pending, failed, retry } = useDestinationMedia(summary.id);
   const dest = { ...summary, ...media };
-  const { lang, t, typeLabel, levelLabel, action, description, event } = useI18n();
+  const { lang, t, typeLabel, levelLabel, action, description, detailDescription, event } =
+    useI18n();
   const { openMap, locate } = useResortMap();
   const placeId = locate(dest.id);
   const mapMode = ({ "bensley-package": "tour", "instagram-spots": "photos" } as const)[
@@ -93,8 +94,10 @@ export function DestinationDetail({
       </div>
 
       <div className="px-7 pb-24 pt-8">
-        <p className="max-w-[38ch] font-serif text-[18px] italic leading-relaxed opacity-85">
-          {description(dest.id, dest.short_description)}
+        <p className="max-w-[52ch] font-serif text-[16px] leading-[1.65] opacity-85">
+          {dest.detail_description
+            ? detailDescription(dest.id, dest.detail_description)
+            : description(dest.id, dest.short_description)}
         </p>
 
         <OpeningHours hours={media.hours} />

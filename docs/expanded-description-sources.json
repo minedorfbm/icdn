@@ -1,0 +1,404 @@
+[
+  {
+    "id": "citron",
+    "source_urls": ["https://www.danang.intercontinental.com/dining/citron/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "terra-mare",
+    "source_urls": ["https://www.danang.intercontinental.com/dining/terra-mare/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "tingara",
+    "source_urls": ["https://www.danang.intercontinental.com/dining/tingara/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "la-maison-1888",
+    "source_urls": ["https://www.danang.intercontinental.com/dining/la-maison-1888/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "buffalo-bar",
+    "source_urls": ["https://www.danang.intercontinental.com/dining/buffalo-bar/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "long-bar",
+    "source_urls": ["https://www.danang.intercontinental.com/dining/the-l_o_n_g-bar/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "wine-cellar",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/one-and-only-wine-experiences-in-vietnam/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "club-lounge",
+    "source_urls": ["https://www.danang.intercontinental.com/offers/club-intercontinental-rate/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "nam-tram-dining",
+    "source_urls": ["https://www.danang.intercontinental.com/dining/nam-tram-dining-journey/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "mi-sol-spa",
+    "source_urls": ["https://www.danang.intercontinental.com/spas/mi-sol-spa/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "nail-hair",
+    "source_urls": ["https://www.danang.intercontinental.com/spas/nail-and-hair-studio/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "yoga-pavilion",
+    "source_urls": ["https://www.danang.intercontinental.com/spas/wellness/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "soar-gym",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/active-sports/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "long-pool",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/swimming-pools/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "garden-jacuzzi",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/swimming-pools/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "kids-pool",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/swimming-pools/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "family-pool",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/swimming-pools/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "marine-centre",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/beach-water-sports/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "coconut-beach",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/beach-water-sports/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "family-beach",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/beach-water-sports/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "club-beach",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/beach-water-sports/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "sea-experiences",
+    "source_urls": ["https://www.danang.intercontinental.com/experiences/nature/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "sports-centre",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/active-sports/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "planet-trekkers",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/made-for-kids/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "shuttle",
+    "source_urls": ["https://www.danang.intercontinental.com/amenities/transportation/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "airport-lounge",
+    "source_urls": ["https://www.danang.intercontinental.com/amenities/airport-lounges/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "club-intercontinental",
+    "source_urls": ["https://www.danang.intercontinental.com/amenities/club-intercontinental/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "nguoi-dan-loi",
+    "source_urls": ["https://www.danang.intercontinental.com/amenities/nguoi-dan-loi/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "experience-more",
+    "source_urls": ["https://www.danang.intercontinental.com/offers/experience-more-offer/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "enchanted-holiday",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/offers/enchanted-holiday-escape-offer-2/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "weddings",
+    "source_urls": ["https://www.danang.intercontinental.com/weddings/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "bensley-package",
+    "source_urls": ["https://www.danang.intercontinental.com/offers/bensley-design-package/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "daycation",
+    "source_urls": ["https://www.danang.intercontinental.com/experiences/daycation/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "ihg-one-rewards",
+    "source_urls": ["https://www.ihg.com/onerewards/content/us/en/home"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "things-to-do",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "culinary-activities",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/culinary-activities/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "organic-garden",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/culinary-activities/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "nature-experiences",
+    "source_urls": ["https://www.danang.intercontinental.com/experiences/nature/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "destination-experiences",
+    "source_urls": ["https://www.danang.intercontinental.com/experiences/destination/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "hoi-an-digital-tour",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/hoi-an-digital-tour/#section_158f05f1"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "design-digital-tour",
+    "source_urls": ["https://www.danang.intercontinental.com/bensley-digital-design-tour/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "nam-tram",
+    "source_urls": ["https://www.danang.intercontinental.com/experiences/the-resort/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "heritage-village",
+    "source_urls": ["https://www.danang.intercontinental.com/experiences/the-resort/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "bensley-gallery",
+    "source_urls": ["https://www.danang.intercontinental.com/amenities/bensley-outsider-gallery/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "apec-garden",
+    "source_urls": ["https://www.danang.intercontinental.com/experiences/the-resort/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "instagram-spots",
+    "source_urls": [],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "wall-of-lanterns",
+    "source_urls": [],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "relaxation-pavilion",
+    "source_urls": [],
+    "basis": "Existing public hub catalogue; no sufficiently detailed dedicated official page found. Conservative copy, confirm service details with the resort.",
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "dia-tang",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/cultural-activities/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "rooms",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/resort-classic-room-oceanview/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "resort-classic-panoramic-room-oceanview",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/resort-classic-panoramic-room-oceanview/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "club-panoramic-room-oceanview",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/club-panoramic-room-oceanview/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "resort-terrace-suite-oceanview",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/resort-terrace-suite-oceanview/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "club-terrace-suite-panoramic-oceanview",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/club-terrace-suite-panoramic-oceanview/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "penthouses",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/one-bedroom-heavenly-penthouse/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "one-bedroom-seaside-villa-by-the-beach",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/one-bedroom-seaside-villa-by-the-beach/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "one-bedroom-seaside-villa-on-the-rocks",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/one-bedroom-seaside-villa-on-the-rocks/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "spa-lagoon-villas",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/one-bedroom-spa-lagoon-villa/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "two-bedroom-seaside-villa-on-the-rocks",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/two-bedroom-seaside-villa-on-the-rocks/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "two-bedroom-royal-residence-by-the-sea",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/two-bedroom-royal-residence-by-the-sea/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "two-bedroom-sun-peninsula-residence",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/two-bedroom-sun-peninsula-residence/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "three-bedroom-sun-peninsula-residence",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/three-bedroom-sun-peninsula-residence/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "three-bedroom-bai-bac-bay-villa",
+    "source_urls": [
+      "https://www.danang.intercontinental.com/room-suites/three-bedroom-bai-bac-bay-villa/"
+    ],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "four-bedroom-pool-villa",
+    "source_urls": ["https://www.danang.intercontinental.com/room-suites/four-bedroom-pool-villa/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "nursery",
+    "source_urls": ["https://www.danang.intercontinental.com/recreation/made-for-kids/"],
+    "basis": "Existing public hub catalogue; no sufficiently detailed dedicated official page found. Conservative copy, confirm service details with the resort.",
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "moulin-rouge",
+    "source_urls": [],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "b-lounge",
+    "source_urls": ["https://www.danang.intercontinental.com/dining/"],
+    "basis": "Existing public hub catalogue; no sufficiently detailed dedicated official page found. Conservative copy, confirm service details with the resort.",
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "the-summit",
+    "source_urls": ["https://www.danang.intercontinental.com/experiences/the-resort/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "summit-conference-centre",
+    "source_urls": ["https://www.danang.intercontinental.com/meetings/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "summit-cinema",
+    "source_urls": ["https://www.danang.intercontinental.com/venues/summit-auditorium/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "m-club",
+    "source_urls": ["https://www.danang.intercontinental.com/venues/m-club/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "kate-mccoy",
+    "source_urls": ["https://www.danang.intercontinental.com/experiences/the-resort/"],
+    "verified_on": "2026-10-06"
+  },
+  {
+    "id": "sammys",
+    "source_urls": ["https://www.danang.intercontinental.com/experiences/the-resort/"],
+    "verified_on": "2026-10-06"
+  }
+]

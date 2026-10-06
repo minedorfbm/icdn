@@ -1,10 +1,39 @@
 import { describe, expect, test } from "bun:test";
-import { translatedDescription, translatedEvent } from "../src/i18n/editorial";
+import {
+  translatedDescription,
+  translatedDetailDescription,
+  translatedEvent,
+} from "../src/i18n/editorial";
 import sources from "../scripts/translation-snapshot/sources.json";
 import eventSources from "../scripts/translation-snapshot/event-sources.json";
 import { LANGUAGES, UI } from "../src/i18n/dictionary";
 
 describe("editorial translation authority", () => {
+  test("expanded copy rejects stale translations independently of the short intro", () => {
+    const row = {
+      destination_id: "citron",
+      locale: "vi",
+      description: "Short intro",
+      source_description: "Current intro",
+      detail_description: "Expanded translation",
+      source_detail_description: "Current detail",
+    };
+    expect(translatedDetailDescription("vi", "citron", "Current detail", [row])).toBe(
+      "Expanded translation",
+    );
+    expect(translatedDetailDescription("vi", "citron", "Edited detail", [row])).toBe(
+      "Edited detail",
+    );
+    expect(translatedDescription("vi", "citron", "Current intro", [row])).toBe("Short intro");
+    expect(translatedDetailDescription("en", "citron", "Current detail", [row])).toBe(
+      "Current detail",
+    );
+    expect(
+      translatedDetailDescription("vi", "citron", "Current detail", [
+        { ...row, detail_description: " " },
+      ]),
+    ).toBe("Current detail");
+  });
   test("all supported languages have UI labels and never resurrect archived descriptions", () => {
     for (const { code } of LANGUAGES) {
       expect(UI[code].language).toBeTruthy();

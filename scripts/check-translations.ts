@@ -34,11 +34,15 @@ async function readTable<T>(table: string, query: string): Promise<T[]> {
   return response.json();
 }
 const destinations = live
-  ? await readTable<{ id: string; short_description: string }>(
+  ? await readTable<{ id: string; short_description: string; detail_description?: string | null }>(
       "destinations",
-      "select=id,short_description&active=eq.true",
+      "select=id,short_description,detail_description&active=eq.true",
     )
-  : Object.entries(sources).map(([id, short_description]) => ({ id, short_description }));
+  : Object.entries(sources).map(([id, short_description]) => ({
+      id,
+      short_description,
+      detail_description: null,
+    }));
 const events = live
   ? await readTable<(typeof eventSources)[number]>(
       "destination_events",
@@ -74,6 +78,12 @@ for (const { code } of LANGUAGES) {
     if (!text?.trim()) issues.push(`${code}: missing description ${item.id}`);
     else if (source !== item.short_description)
       issues.push(`${code}: stale description ${item.id}`);
+    if (database && item.detail_description) {
+      if (!row?.detail_description?.trim())
+        issues.push(`${code}: missing expanded description ${item.id}`);
+      else if (row.source_detail_description !== item.detail_description)
+        issues.push(`${code}: stale expanded description ${item.id}`);
+    }
   }
   for (const item of events) {
     const row = translatedEvents?.find((r) => r.event_id === item.id && r.locale === code);

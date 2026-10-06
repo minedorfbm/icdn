@@ -35,6 +35,7 @@ export const destinationRow = z.object({
   cluster: optionalText,
   type: destinationType,
   short_description: text,
+  detail_description: optionalText.optional(),
   image_key: optionalText,
   detail_image_key: optionalText.optional(),
   // Binary classification retained only for rolling-deployment compatibility.
@@ -123,6 +124,8 @@ export const descriptionRow = z.object({
   locale: text,
   description: text,
   source_description: text,
+  detail_description: optionalText.optional(),
+  source_detail_description: optionalText.optional(),
 });
 export const eventTranslationRow = z.object({
   event_id: text,
