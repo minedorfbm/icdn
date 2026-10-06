@@ -25,6 +25,20 @@ export function translatedDescription(
   return source;
 }
 
+/** The expanded copy has its own source check; editing an intro cannot stale it. */
+export function translatedDetailDescription(
+  lang: Lang,
+  id: string,
+  source: string,
+  rows?: DescriptionTranslation[] | null,
+): string {
+  if (lang === "en") return source;
+  const row = rows?.find((r) => r.destination_id === id && r.locale === lang);
+  return row?.source_detail_description === source && row.detail_description?.trim()
+    ? row.detail_description
+    : source;
+}
+
 export function sameEventSource(
   event: DestinationEvent,
   source: Pick<DestinationEvent, "title" | "schedule" | "description">,

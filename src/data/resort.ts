@@ -71,6 +71,7 @@ export interface Destination {
   cluster?: string;
   type: DestinationType;
   short_description: string;
+  detail_description?: string;
   contentFamily: DestinationContentFamily;
   audienceTags: DestinationAudience[];
   offerDuration?: "limited" | "ongoing";
@@ -366,6 +367,7 @@ export function toDestination(
     ...(row.cluster ? { cluster: row.cluster } : {}),
     type,
     short_description: row.short_description,
+    ...(row.detail_description ? { detail_description: row.detail_description } : {}),
     contentFamily: row.content_family ?? (row.content_kind === "offer" ? "offer" : "resort"),
     audienceTags: row.audience_tags ?? ["all"],
     ...(row.offer_duration ? { offerDuration: row.offer_duration } : {}),

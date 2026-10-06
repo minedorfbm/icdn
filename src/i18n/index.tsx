@@ -14,7 +14,12 @@ import {
   type Lang,
   type UIKey,
 } from "./dictionary";
-import { translatedDescription, translatedEvent, type EditorialTranslations } from "./editorial";
+import {
+  translatedDescription,
+  translatedDetailDescription,
+  translatedEvent,
+  type EditorialTranslations,
+} from "./editorial";
 import type { DestinationEvent } from "@/data/events";
 
 const STORAGE_KEY = "adj-lang";
@@ -30,6 +35,7 @@ interface I18nValue {
   action: (a: string) => string;
   linkLabel: (l: string) => string;
   description: (id: string, fallback: string) => string;
+  detailDescription: (id: string, fallback: string) => string;
   event: (event: DestinationEvent) => DestinationEvent;
 }
 
@@ -88,6 +94,8 @@ export function I18nProvider({
       linkLabel: (l) => LINK_LABEL[lang][l] ?? l,
       description: (id, fallback) =>
         translatedDescription(lang, id, fallback, editorial?.descriptions),
+      detailDescription: (id, fallback) =>
+        translatedDetailDescription(lang, id, fallback, editorial?.descriptions),
       event: (event) => translatedEvent(lang, event, editorial?.events),
     }),
     [lang, setLang, editorial],
