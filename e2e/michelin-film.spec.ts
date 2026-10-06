@@ -15,7 +15,8 @@ window.YT = { Player: class {
     setTimeout(() => options.events.onReady({ target: this }), 0);
   }
   getIframe() { return this.frame; }
-  mute() { this.frame.dataset.muted = 'true'; }
+  unMute() { this.frame.dataset.muted = 'false'; }
+  setVolume(value) { this.frame.dataset.volume = String(value); }
   playVideo() { this.frame.dataset.playing = 'true'; }
   destroy() { window.removeEventListener('message', this.ended); this.frame.remove(); }
 }};
@@ -47,7 +48,8 @@ test("first Michelin opening starts after the portal mounts; manual and ended cl
   const frame = dialog.locator("iframe");
   await expect(frame).toBeVisible();
   await expect(frame).toHaveAttribute("data-playing", "true");
-  await expect(frame).toHaveAttribute("data-muted", "true");
+  await expect(frame).toHaveAttribute("data-muted", "false");
+  await expect(frame).toHaveAttribute("data-volume", "20");
   await expect(dialog.getByRole("status")).toHaveCount(0);
   await dialog.getByRole("button", { name: "Close", exact: true }).click();
   await expect(dialog).toHaveCount(0);
