@@ -125,3 +125,5 @@ Typography uses locally available Baskerville/Georgia and Gill Sans/Arial.
 The site's proprietary New Baskerville/Gill Sans webfont files are not bundled;
 exact brand typography would require approved, licensed font assets. This is
 alignment with the public site's visual language, not a certified group brand kit.
+
+Le [complément du catalogue officiel du 6 octobre 2026](docs/official-catalogue-completion.md) distingue Club et lounge, ajoute les dernières expériences et publie les quinze catégories d’hébergement en conservant les identifiants existants.
