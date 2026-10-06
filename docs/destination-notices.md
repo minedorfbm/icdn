@@ -4,6 +4,8 @@ Les descriptions présentent le lieu et son expérience. Les travaux, fermetures
 
 ## Gestion marketing
 
+Les actualités restent synthétiques : un titre court et une seule phrase factuelle (environ 15 mots), sans répéter la description ni ajouter de détails promotionnels.
+
 `destination_notices` contient une ligne par actualité : `id`, `destination_id`, `kind` (`information`, `relocation`, `closure`), `title`, `body`, `starts_at`, `ends_at`, `published`, `display_order`, `source_url`, `verified_on` et `updated_at`.
 
 - Une card peut avoir plusieurs actualités, sans nouvelle card ni modification de sa description.
@@ -25,7 +27,7 @@ La migration a été appliquée en production le 6 octobre 2026. La migration co
 
 Deux annonces vérifiées le 6 octobre 2026 sont initialisées, chacune avec ses cinq traductions :
 
-- La Maison 1888 : service temporaire au niveau Heaven, menu cinq services du Chef Christian Le Squer, réservation recommandée. [Source officielle](https://www.danang.intercontinental.com/dining/la-maison-1888/).
-- Buffalo Bar : indisponible pendant les travaux de La Maison 1888 ; aucune date de réouverture annoncée. [Source officielle](https://www.danang.intercontinental.com/dining/buffalo-bar/).
+- La Maison 1888 : dîner temporairement servi au niveau Heaven. [Source officielle](https://www.danang.intercontinental.com/dining/la-maison-1888/).
+- Buffalo Bar : fermeture temporaire pendant les travaux de La Maison 1888. [Source officielle](https://www.danang.intercontinental.com/dining/buffalo-bar/).
 
 La migration remplace également les trois descriptions longues de La Maison 1888, Buffalo Bar et The Wine Cellar par des textes pérennes, avec leurs traductions. Aucune fermeture de la cave n’est déduite sans annonce officielle. L’accroche courte reste inchangée.
