@@ -17,6 +17,7 @@ import {
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { SearchDialog, SearchTrigger } from "@/features/search/HubSearch";
+import { ConciergeContact } from "@/components/hub/ConciergeContact";
 import { LEVELS, type Destination, type Level } from "@/data/resort";
 import { MapArtwork } from "./MapArtwork";
 import { useMapCamera } from "./useMapCamera";
@@ -169,6 +170,8 @@ export default function ResortMap({
           <X size={20} strokeWidth={1.4} aria-hidden />
         </button>
         <h2>{copy("title")}</h2>
+        <SearchTrigger compact onOpen={() => setSearchOpen(true)} />
+        <ConciergeContact className="relative" />
         <button
           type="button"
           aria-label={copy("layers")}
@@ -213,11 +216,6 @@ export default function ResortMap({
               interactionProps={{ ...handlers, tabIndex: 0, "aria-label": copy("gestures") }}
             />
           </div>
-          {!options && (
-            <div className="atlas-tools">
-              <SearchTrigger onOpen={() => setSearchOpen(true)} />
-            </div>
-          )}
           {options && (
             <section className="atlas-options" aria-label={copy("layers")}>
               <button
@@ -344,7 +342,6 @@ export default function ResortMap({
       )}
       {searchOpen && (
         <SearchDialog
-          aboveMap
           placesOnly
           onClose={() => setSearchOpen(false)}
           onSelectDestination={chooseSearchResult}

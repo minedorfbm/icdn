@@ -33,7 +33,7 @@
 .hub-atlas .atlas-header {
   z-index: 3;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  grid-template-columns: 44px minmax(0, 1fr) 44px 44px 44px;
   align-items: center;
   gap: 8px;
   min-height: calc(56px + env(safe-area-inset-top));
@@ -67,12 +67,6 @@
   min-height: 0;
   position: relative;
   overflow: hidden;
-}
-.hub-atlas .atlas-tools {
-  position: absolute;
-  z-index: 4;
-  top: calc(68px + env(safe-area-inset-top));
-  left: 14px;
 }
 .hub-atlas .atlas-zoom {
   position: absolute;
@@ -346,10 +340,6 @@
   .hub-atlas .atlas-header {
     padding-inline: 28px;
   }
-  .hub-atlas .atlas-tools {
-    left: 24px;
-    top: calc(68px + env(safe-area-inset-top));
-  }
   .hub-atlas .atlas-options {
     width: 390px;
     left: 24px;
@@ -404,9 +394,6 @@
 @media (max-height: 560px) {
   .hub-atlas .atlas-header {
     min-height: calc(48px + env(safe-area-inset-top));
-  }
-  .hub-atlas .atlas-tools {
-    top: calc(56px + env(safe-area-inset-top));
   }
   .hub-atlas .atlas-zoom {
     top: calc(56px + env(safe-area-inset-top));

@@ -7,29 +7,37 @@ import { useDestinationNavigation } from "@/lib/use-destination-navigation";
 import type { Destination } from "@/data/resort";
 import { SEARCH_COLLECTIONS, searchEntries, type SearchCollection } from "./search";
 import { searchCopy } from "./search-copy";
+import { ConciergeContact } from "@/components/hub/ConciergeContact";
 import "./search.css";
 
-export function HubSearch() {
+export function HubSearch({
+  compact = false,
+  onNavigate,
+}: Readonly<{ compact?: boolean; onNavigate?: () => void }>) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <SearchTrigger onOpen={() => setOpen(true)} />
-      {open && <SearchDialog onClose={() => setOpen(false)} />}
+      <SearchTrigger compact={compact} onOpen={() => setOpen(true)} />
+      {open && <SearchDialog onClose={() => setOpen(false)} onBeforeNavigate={onNavigate} />}
     </>
   );
 }
 
-export function SearchTrigger({ onOpen }: Readonly<{ onOpen: () => void }>) {
+export function SearchTrigger({
+  onOpen,
+  compact = false,
+}: Readonly<{ onOpen: () => void; compact?: boolean }>) {
   const { lang } = useI18n();
   return (
     <button
       type="button"
       onClick={onOpen}
-      className="brand-ui brand-floating hub-search-trigger"
+      className={`brand-ui brand-floating hub-search-trigger ${compact ? "hub-search-compact" : ""}`}
       aria-haspopup="dialog"
+      aria-label={searchCopy(lang, "search")}
     >
       <Search size={16} strokeWidth={1.4} aria-hidden />
-      <span>{searchCopy(lang, "search")}</span>
+      {!compact && <span>{searchCopy(lang, "search")}</span>}
     </button>
   );
 }
@@ -37,13 +45,13 @@ export function SearchTrigger({ onOpen }: Readonly<{ onOpen: () => void }>) {
 export function SearchDialog({
   onClose,
   onSelectDestination,
-  aboveMap = false,
   placesOnly = false,
+  onBeforeNavigate,
 }: Readonly<{
   onClose: () => void;
   onSelectDestination?: (destination: Destination) => void;
-  aboveMap?: boolean;
   placesOnly?: boolean;
+  onBeforeNavigate?: (() => void) | undefined;
 }>) {
   const [query, setQuery] = useState("");
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -91,6 +99,7 @@ export function SearchDialog({
   };
   const selectDestination = (destination: Destination) => {
     onClose();
+    onBeforeNavigate?.();
     if (onSelectDestination) onSelectDestination(destination);
     else openDestination(destination.id, true);
   };
@@ -117,9 +126,10 @@ export function SearchDialog({
     <FullscreenDialog
       title={copy("search")}
       onClose={onClose}
-      overlayClassName={`fixed inset-0 bg-black/30 ${aboveMap ? "z-[96]" : "z-[74]"}`}
-      className={`brand-ui brand-surface hub-search-dialog fixed inset-0 ${aboveMap ? "z-[97]" : "z-[75]"}`}
+      overlayClassName="fixed inset-0 bg-black/30 z-[118]"
+      className="brand-ui brand-surface hub-search-dialog fixed inset-0 z-[119]"
     >
+      <ConciergeContact />
       <div className="hub-search-shell">
         <header className="hub-search-header">
           <div className="hub-search-heading">

@@ -12,6 +12,8 @@ import { OpeningHours } from "./OpeningHours";
 import { YouTubeVideos } from "./YouTubeVideos";
 import { useI18n } from "@/i18n";
 import { ResortLink } from "./ResortBrowser";
+import { HubSearch } from "@/features/search/HubSearch";
+import { ConciergeContact } from "./ConciergeContact";
 
 /** Full-screen editorial detail view for one destination. */
 export function DestinationDetail({
@@ -51,6 +53,10 @@ export function DestinationDetail({
       }
       className={`level ${neutral ? "brand-ui brand-detail" : ""} detail-enter fixed inset-0 ${aboveMap ? "z-[95]" : "z-[80]"} overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain`}
     >
+      <div className="fixed right-5 top-[max(24px,env(safe-area-inset-top))] z-10">
+        <HubSearch compact />
+      </div>
+      <ConciergeContact />
       <div className="relative h-[62svh] w-full overflow-hidden">
         <img
           src={dest.detailImage}
