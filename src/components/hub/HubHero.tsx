@@ -1,11 +1,12 @@
 import { useI18n } from "@/i18n";
+import { ArrowDown } from "lucide-react";
 
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 
 export function HubHero({ image }: Readonly<{ image: string }>) {
   const { t } = useI18n();
   return (
-    <section className="brand-ui relative h-[100svh] min-h-[600px] overflow-hidden">
+    <section className="brand-ui hub-hero relative h-[100svh] min-h-[540px] overflow-hidden">
       <img
         src={image}
         alt={t("hero_image_alt")}
@@ -16,25 +17,25 @@ export function HubHero({ image }: Readonly<{ image: string }>) {
         className="threshold-img absolute inset-0 h-full w-full object-cover"
       />
 
-      <button
-        onClick={() => scrollToHubSection("discover")}
-        className="absolute inset-x-0 top-[46%] z-10 flex flex-col items-center gap-4 px-5 text-center text-[var(--brand-ink)] [text-shadow:0_1px_12px_rgba(255,255,255,0.9)]"
-      >
-        <span className="reveal text-[9px] tracking-[0.36em] [animation-delay:120ms]">
-          {t("hero_kicker")}
-        </span>
-        <h1 className="reveal max-w-[90vw] font-serif text-[clamp(36px,10vw,60px)] leading-[0.94] tracking-[-0.02em] [animation-delay:260ms]">
+      <div className="hero-welcome">
+        <img
+          src="/intercontinental-touch-icon.png"
+          alt="InterContinental"
+          width={180}
+          height={180}
+          className="hero-crest"
+        />
+        <h1 className="font-serif">{t("hero_welcome")}</h1>
+      </div>
+
+      <button onClick={() => scrollToHubSection("discover")} className="hero-invitation">
+        <span className="hero-invitation-title font-serif">
           {t("hero_title_1")}
           <br />
           {t("hero_title_2")}
-        </h1>
-        <span
-          className="reveal line-drop h-12 w-px bg-current/60 [animation-delay:520ms]"
-          aria-hidden
-        />
-        <span className="reveal text-[9px] tracking-[0.32em] [animation-delay:680ms]">
-          {t("hero_sub")}
         </span>
+        <span className="hero-invitation-caption">{t("hero_sub")}</span>
+        <ArrowDown className="size-4" strokeWidth={1.2} aria-hidden />
       </button>
     </section>
   );
