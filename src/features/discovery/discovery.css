@@ -167,8 +167,18 @@
 .surprise-discovery {
   background: var(--brand-white);
   color: var(--brand-ink);
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: max(18px, env(safe-area-inset-bottom, 0px));
+}
+.surprise-scroll {
+  padding-top: calc(max(24px, env(safe-area-inset-top, 0px)) + 52px);
+  padding-bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 64px);
+}
+.surprise-tools {
+  position: absolute;
+  top: max(24px, env(safe-area-inset-top, 0px));
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  gap: 12px;
 }
 .surprise-heading {
   display: flex;
@@ -190,7 +200,7 @@
     serif;
   overflow-wrap: anywhere;
 }
-.surprise-heading button,
+.surprise-tools button,
 .surprise-controls button {
   display: grid;
   place-items: center;
@@ -200,8 +210,9 @@
   border: 1px solid var(--brand-border);
   border-radius: 50%;
   color: var(--brand-ink);
+  background: var(--brand-white);
 }
-.surprise-heading button:focus-visible,
+.surprise-tools button:focus-visible,
 .surprise-controls button:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 3px;
