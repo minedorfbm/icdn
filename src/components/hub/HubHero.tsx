@@ -26,6 +26,7 @@ export function HubHero({ image }: Readonly<{ image: string }>) {
           className="hero-crest"
         />
         <h1 className="font-serif">{t("hero_welcome")}</h1>
+        <p className="hero-resort-name">DANANG SUN PENINSULA RESORT</p>
       </div>
 
       <button onClick={() => scrollToHubSection("discover")} className="hero-invitation">
