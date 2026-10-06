@@ -14,6 +14,18 @@ export const LANGUAGES = [
 export type Lang = (typeof LANGUAGES)[number]["code"];
 
 export type UIKey =
+  | "opening_hours"
+  | "hours_opening"
+  | "hours_breakfast"
+  | "hours_lunch"
+  | "hours_afternoon_tea"
+  | "hours_dinner"
+  | "hours_drinks"
+  | "hours_food"
+  | "hours_24"
+  | "hours_daily"
+  | "hours_last_order"
+  | "hours_local"
   | "hero_welcome"
   | "hero_kicker"
   | "hero_title_1"

@@ -29,6 +29,7 @@ export function useDestinationMedia(id: string) {
       photos: groupPhotos(data?.photos ?? [])[id] ?? [],
       posts: groupPosts(data?.posts ?? [])[id] ?? [],
       videos: groupVideos(data?.videos ?? [])[id] ?? [],
+      hours: data?.hours ?? [],
     }),
     [data, id],
   );

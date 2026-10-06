@@ -7,6 +7,7 @@ import { OFFICIAL, type Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 import { InstagramStrip } from "./InstagramStrip";
 import { InstagramPostCarousel } from "./InstagramPostCarousel";
+import { OpeningHours } from "./OpeningHours";
 import { YouTubeVideos } from "./YouTubeVideos";
 import { useI18n } from "@/i18n";
 import { ResortLink } from "./ResortBrowser";
@@ -95,6 +96,8 @@ export function DestinationDetail({
         <p className="max-w-[38ch] font-serif text-[18px] italic leading-relaxed opacity-85">
           {description(dest.id, dest.short_description)}
         </p>
+
+        <OpeningHours hours={media.hours} />
 
         {(pending || failed) && (
           <div className="mt-6 text-sm opacity-70" aria-busy={pending}>

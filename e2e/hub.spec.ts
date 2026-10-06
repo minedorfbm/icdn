@@ -49,7 +49,9 @@ test("the hero displays before a slow catalogue and media waits for an opened ca
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
   const before = await (await request.get("http://127.0.0.1:54329/control")).json();
   expect(
-    before.reads.filter((read: string) => /destination_(photos|posts|videos)/.test(read)),
+    before.reads.filter((read: string) =>
+      /destination_(photos|posts|videos|opening_hours)/.test(read),
+    ),
   ).toEqual([]);
   // Offscreen card and backdrop images do not compete with the hero.
   await expect(page.locator("#sea img[src]")).toHaveCount(0);
@@ -58,7 +60,12 @@ test("the hero displays before a slow catalogue and media waits for an opened ca
   await expect(card).toBeVisible();
   await expect(card.getByRole("button", { name: /Test video/ })).toBeVisible();
   const after = await (await request.get("http://127.0.0.1:54329/control")).json();
-  for (const table of ["destination_photos", "destination_posts", "destination_videos"]) {
+  for (const table of [
+    "destination_photos",
+    "destination_posts",
+    "destination_videos",
+    "destination_opening_hours",
+  ]) {
     expect(
       after.reads.some(
         (read: string) => read.includes(table) && read.includes("destination_id=eq.citron"),
@@ -220,4 +227,17 @@ test("the card deck advances and returns after horizontal pointer gestures", asy
   await expect(active).toContainText("TINGARA");
   await swipe(50, 300);
   await expect(active).toContainText("Citron");
+});
+
+test("expanded cards show localized hours and service days below the description", async ({
+  page,
+}) => {
+  await page.goto("/tingara");
+  const card = page.getByRole("dialog", { name: "TINGARA", exact: true });
+  const hours = card.getByRole("region", { name: "OPENING HOURS", exact: true });
+  await expect(hours).toContainText("17:30 – 22:00");
+  await expect(hours).toContainText("Tue–Sun");
+  await expect(hours).toContainText("Last order 21:45");
+  const description = card.getByText("A restaurant overlooking the sea.", { exact: true });
+  expect((await hours.boundingBox())!.y).toBeGreaterThan((await description.boundingBox())!.y);
 });
