@@ -7,7 +7,8 @@ import { loadYouTubePlayer, type YouTubePlayer } from "@/lib/youtube-player";
 const FILM_ID = "dLBRyZ0SIdg";
 const FILM_URL = `https://www.youtube.com/shorts/${FILM_ID}`;
 
-export default function MichelinFilm({ onClose }: Readonly<{ onClose: () => void }>) {
+// Mount inside the dialog portal: the player container must exist before its effect runs.
+function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
@@ -80,33 +81,40 @@ export default function MichelinFilm({ onClose }: Readonly<{ onClose: () => void
   }, [onClose]);
 
   return (
+    <div className="relative h-full w-full max-w-[calc(100dvh*9/16)]">
+      <div ref={host} className="absolute inset-0 [&_iframe]:size-full [&_iframe]:border-0" />
+      {loading && (
+        <p
+          role="status"
+          className="pointer-events-none absolute inset-0 grid place-items-center text-sm"
+        >
+          {t("page_loading")}
+        </p>
+      )}
+      {failed && (
+        <a
+          href={FILM_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="absolute inset-0 flex items-center justify-center gap-3 bg-black text-sm underline underline-offset-4"
+        >
+          {t("play_video")} <ExternalLink className="size-4" aria-hidden />
+        </a>
+      )}
+    </div>
+  );
+}
+
+export default function MichelinFilm({ onClose }: Readonly<{ onClose: () => void }>) {
+  const { t } = useI18n();
+  return (
     <FullscreenDialog
       title="One MICHELIN Key — InterContinental Danang"
       onClose={onClose}
       overlayClassName="fixed inset-0 z-[109] bg-black"
       className="fixed inset-0 z-[110] flex h-[100dvh] items-center justify-center overflow-hidden bg-black text-white"
     >
-      <div className="relative h-full w-full max-w-[calc(100dvh*9/16)]">
-        <div ref={host} className="absolute inset-0 [&_iframe]:size-full [&_iframe]:border-0" />
-        {loading && (
-          <p
-            role="status"
-            className="pointer-events-none absolute inset-0 grid place-items-center text-sm"
-          >
-            {t("page_loading")}
-          </p>
-        )}
-        {failed && (
-          <a
-            href={FILM_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="absolute inset-0 flex items-center justify-center gap-3 bg-black text-sm underline underline-offset-4"
-          >
-            {t("play_video")} <ExternalLink className="size-4" aria-hidden />
-          </a>
-        )}
-      </div>
+      <MichelinPlayer onClose={onClose} />
       <button
         type="button"
         onClick={onClose}
