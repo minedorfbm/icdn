@@ -1,7 +1,7 @@
 // Enforce non-executable boundaries now; trial resource restrictions without breaking embeds.
 const RESOURCE_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.instagram.com",
+  "script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.youtube.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' https://fonts.gstatic.com",
