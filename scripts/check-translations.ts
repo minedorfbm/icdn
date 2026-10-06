@@ -19,6 +19,8 @@ import {
   type EventTranslation,
 } from "../src/i18n/editorial";
 
+import type { DestinationNotice } from "../src/lib/destination-notices";
+
 const live = process.argv.includes("--live");
 const database = process.argv.includes("--database");
 if (database && !live) throw new Error("--database requires --live");
@@ -58,6 +60,10 @@ const descriptions = database
 const translatedEvents = database
   ? await readTable<EventTranslation>("event_translations", "select=*&published=eq.true")
   : null;
+const notices =
+  live && database
+    ? await readTable<DestinationNotice>("published_destination_notices", "select=*")
+    : [];
 const issues: string[] = [];
 const labelGroups = { UI, ACTION, CLUSTER, LEVEL_LABEL, LEVEL_LINE, LINK_LABEL, TYPE_LABEL };
 for (const { code } of LANGUAGES) {
@@ -84,6 +90,13 @@ for (const { code } of LANGUAGES) {
       else if (row.source_detail_description !== item.detail_description)
         issues.push(`${code}: stale expanded description ${item.id}`);
     }
+  }
+  for (const notice of notices) {
+    const row = notice.translations.find((r) => r.locale === code);
+    if (!row?.title?.trim() || !row.body?.trim())
+      issues.push(`${code}: missing notice ${notice.id}`);
+    else if (row.source_title !== notice.title || row.source_body !== notice.body)
+      issues.push(`${code}: stale notice ${notice.id}`);
   }
   for (const item of events) {
     const row = translatedEvents?.find((r) => r.event_id === item.id && r.locale === code);

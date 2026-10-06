@@ -14,6 +14,7 @@ export const LANGUAGES = [
 export type Lang = (typeof LANGUAGES)[number]["code"];
 
 export type UIKey =
+  | "destination_updates"
   | "opening_hours"
   | "hours_opening"
   | "hours_breakfast"

@@ -7,6 +7,7 @@ import { OFFICIAL, type Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 import { InstagramStrip } from "./InstagramStrip";
 import { InstagramPostCarousel } from "./InstagramPostCarousel";
+import { DestinationNotices } from "./DestinationNotices";
 import { OpeningHours } from "./OpeningHours";
 import { YouTubeVideos } from "./YouTubeVideos";
 import { useI18n } from "@/i18n";
@@ -100,6 +101,7 @@ export function DestinationDetail({
             : description(dest.id, dest.short_description)}
         </p>
 
+        <DestinationNotices notices={media.notices} />
         <OpeningHours hours={media.hours} />
 
         {(pending || failed) && (

@@ -30,6 +30,7 @@ export function useDestinationMedia(id: string) {
       posts: groupPosts(data?.posts ?? [])[id] ?? [],
       videos: groupVideos(data?.videos ?? [])[id] ?? [],
       hours: data?.hours ?? [],
+      notices: data?.notices ?? [],
     }),
     [data, id],
   );

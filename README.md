@@ -43,6 +43,8 @@ Les horaires des fiches sont liés à `destinations.id` dans `destination_openin
 
 Les fiches agrandies utilisent `destinations.detail_description`, tandis que les cards à swiper conservent `short_description`. Les textes longs et leurs cinq traductions ont été ajoutés aux 73 cards publiques le 6 octobre 2026. Voir [la gestion des descriptions enrichies](docs/expanded-descriptions.md).
 
+Les actualités temporaires sont séparées dans `destination_notices` et leurs traductions dans `destination_notice_translations`. Publication et dates contrôlent l’encart de la fiche sans changer sa description. Voir [la gestion des actualités](docs/destination-notices.md).
+
 Les familles éditoriales sont `resort`, `offer` et `storytelling`, avec audiences, durée des offres et sujet du storytelling. Trois vues marketing séparent leur gestion sans dupliquer les cards. La recherche de la map conserve uniquement les lieux du resort. Voir [la classification éditoriale](docs/editorial-taxonomy.md).
 
 Pour modifier une card, mettre à jour sa ligne dans `destinations`. Les actions affichées et leur ordre viennent des lignes actives de `destination_links` : la card en montre au plus trois, la fiche toutes. Le hub propose l’anglais, le vietnamien, le russe, le chinois simplifié, le coréen et le japonais. Après un changement de texte anglais, vérifier les traductions associées avec `bun run i18n:audit` ; une traduction dont le texte source ne correspond plus est écartée au profit du texte anglais courant. Les nouveaux textes ne sont pas traduits automatiquement. Procédure détaillée : [traductions](docs/translations.md).

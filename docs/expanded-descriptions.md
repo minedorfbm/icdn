@@ -9,7 +9,7 @@
 
 La migration `20261006170000_expanded_card_descriptions.sql` a été appliquée en production le 6 octobre 2026 : 73 fiches publiques, 365 traductions longues (VI, RU, ZH, KO, JA). Elle est transactionnelle, ne supprime aucune card et ne modifie aucun droit. Ne pas rejouer les migrations historiques sur cette base.
 
-Les paragraphes anglais comportent 29 à 39 mots et 198 à 271 caractères. L’objectif est environ quatre lignes sur mobile ; le nombre réel dépend de la largeur et de la langue. Le texte reste intégral, sans limite de lignes ni points de suspension. Il utilise une taille de 16 px et un interligne de 1,65.
+Les paragraphes anglais comportent environ 30 à 40 mots. L’objectif est environ quatre lignes sur mobile ; le nombre réel dépend de la largeur et de la langue. Le texte reste intégral, sans limite de lignes ni points de suspension. Il utilise une taille de 16 px et un interligne de 1,65.
 
 Les accroches sont conservées, sauf deux corrections factuelles : Tingara est un restaurant japonais de teppanyaki et Kate McCoy propose de la joaillerie, pas des vêtements.
 
@@ -27,6 +27,6 @@ Les nouveaux champs sont lus avec le catalogue public existant : aucune requête
 
 Les descriptions sont originales, basées sur les pages officielles vérifiées le 6 octobre 2026 et les informations existantes du catalogue. Le [registre des sources par card](expanded-description-sources.json) conserve les liens de référence. Les horaires, tarifs et conditions détaillées restent dans leurs données dédiées ou sur le site officiel.
 
-Les textes de La Maison 1888, du Buffalo Bar et de la cave mentionnent les travaux et les modalités temporaires annoncées sur le site officiel. Cela ne change pas les positions permanentes de la carte. Revoir ces paragraphes à la fin des travaux, ainsi que les dates de l’offre Enchanted Holiday à son expiration.
+Les informations temporaires de La Maison 1888 et Buffalo Bar sont séparées des descriptions dans [les actualités des destinations](destination-notices.md). Cela ne change pas les positions permanentes de la carte. Revoir les dates de l’offre Enchanted Holiday à son expiration.
 
 Pour B Lounge, Nursery, Spirit House et Relaxation Pavilion, aucune page officielle dédiée suffisamment détaillée n’a été trouvée : les textes restent prudents, fondés sur le catalogue, et invitent à confirmer les modalités avec l’équipe. Ils n’inventent pas d’horaires, de prestations garanties ou de capacités.

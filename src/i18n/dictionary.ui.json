@@ -51,7 +51,8 @@
     "hours_24": "24 hours",
     "hours_daily": "Daily",
     "hours_last_order": "Last order",
-    "hours_local": "Local time in Danang (UTC+7)"
+    "hours_local": "Local time in Danang (UTC+7)",
+    "destination_updates": "LATEST UPDATES"
   },
   "vi": {
     "hero_welcome": "Chào mừng",
@@ -105,7 +106,8 @@
     "hours_24": "24 giờ",
     "hours_daily": "Hằng ngày",
     "hours_last_order": "Gọi món cuối cùng",
-    "hours_local": "Giờ địa phương tại Đà Nẵng (UTC+7)"
+    "hours_local": "Giờ địa phương tại Đà Nẵng (UTC+7)",
+    "destination_updates": "THÔNG TIN MỚI NHẤT"
   },
   "ru": {
     "hero_welcome": "Добро пожаловать",
@@ -159,7 +161,8 @@
     "hours_24": "Круглосуточно",
     "hours_daily": "Ежедневно",
     "hours_last_order": "Последний заказ",
-    "hours_local": "Местное время в Дананге (UTC+7)"
+    "hours_local": "Местное время в Дананге (UTC+7)",
+    "destination_updates": "АКТУАЛЬНАЯ ИНФОРМАЦИЯ"
   },
   "zh": {
     "hero_welcome": "欢迎",
@@ -213,7 +216,8 @@
     "hours_24": "24小时",
     "hours_daily": "每天",
     "hours_last_order": "最后点餐",
-    "hours_local": "岘港当地时间（UTC+7）"
+    "hours_local": "岘港当地时间（UTC+7）",
+    "destination_updates": "最新资讯"
   },
   "ko": {
     "hero_welcome": "환영합니다",
@@ -267,7 +271,8 @@
     "hours_24": "24시간",
     "hours_daily": "매일",
     "hours_last_order": "마지막 주문",
-    "hours_local": "다낭 현지 시간 (UTC+7)"
+    "hours_local": "다낭 현지 시간 (UTC+7)",
+    "destination_updates": "최신 안내"
   },
   "ja": {
     "hero_welcome": "ようこそ",
@@ -321,6 +326,7 @@
     "hours_24": "24時間",
     "hours_daily": "毎日",
     "hours_last_order": "ラストオーダー",
-    "hours_local": "ダナン現地時間（UTC+7）"
+    "hours_local": "ダナン現地時間（UTC+7）",
+    "destination_updates": "最新のお知らせ"
   }
 }
