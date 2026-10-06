@@ -14,7 +14,7 @@ Au total : 18 nouvelles lignes et 3 fiches précisées. Chaque fiche traitée re
 
 | ID stable                               | Nom                                     | Famille      | Source officielle                                                                                             |
 | --------------------------------------- | --------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------- |
-| shuttle                                 | Shuttle to Hoi An                       | resort       | [Page](https://www.danang.intercontinental.com/wp-content/uploads/2025/12/Shuttle-Bus-Schedule-to-Hoi-An.pdf) |
+| shuttle                                 | Shuttle                       | resort       | [Page](https://www.danang.intercontinental.com/wp-content/uploads/2025/12/Shuttle-Bus-Schedule-to-Hoi-An.pdf) |
 | experience-more                         | Experience More                         | offer        | [Page](https://www.danang.intercontinental.com/offers/experience-more-offer/)                                 |
 | nam-tram-dining                         | Nam Tram Dining Journey                 | resort       | [Page](https://www.danang.intercontinental.com/dining/nam-tram-dining-journey/)                               |
 | airport-lounge                          | InterContinental Airport Lounge         | resort       | [Page](https://www.danang.intercontinental.com/amenities/airport-lounges/)                                    |
@@ -38,7 +38,7 @@ Au total : 18 nouvelles lignes et 3 fiches précisées. Chaque fiche traitée re
 
 ## Liens, photos et localisation
 
-Les liens Discovery sont les pages officielles propres à chaque expérience ou catégorie. Seules les variantes linguistiques déclarées par ces pages sont insérées. Le Design Tour reste sur la page anglaise, qui ne déclare pas les cinq variantes. La navette a une action Menu intitulée « Shuttle schedule » ouvrant le PDF officiel dans le lecteur du hub. Ses photos illustrent Hoi An, destination de la navette, sans présenter un véhicule non vérifié.
+Les liens Discovery sont les pages officielles propres à chaque expérience ou catégorie. Seules les variantes linguistiques déclarées par ces pages sont insérées. Le Design Tour reste sur la page anglaise, qui ne déclare pas les cinq variantes. La navette a une action Menu intitulée « Shuttle schedule » ouvrant le PDF officiel dans le lecteur du hub. Ses photos illustrent Hoi An, une destination desservie, sans présenter un véhicule non vérifié. La correction `20261006153000_general_shuttle_service.sql` élargit la card aux transferts aéroport, Hoi An, Da Nang et trajets personnalisés. Discover ouvre la page officielle Transportation ; le PDF porte le libellé spécifique « Hoi An shuttle schedule ». Les disponibilités, réservations et tarifs sont à confirmer auprès du concierge ; la gratuité du shuttle Hoi An ne se généralise pas aux autres transferts.
 
 Les nouveaux champs photo utilisent des images réelles du site officiel ; les variantes de 1024 pixels sont préférées lorsqu'elles sont présentes dans la page. Les photos déjà validées de Spa Lagoon Villas sont conservées. Les images génériques des anciennes cards Rooms et Penthouses sont remplacées par celles des catégories précises. Les photos restent administrables indépendamment avec `image_key` et `detail_image_key`. Elles ne sont pas transférées dans Supabase Storage par cette migration.
 
