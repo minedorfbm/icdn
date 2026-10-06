@@ -10,7 +10,12 @@ export type YouTubeOptions = {
   playerVars: Record<string, string | number>;
   events: {
     onReady: (event: {
-      target: { mute(): void; playVideo(): void; getIframe(): HTMLIFrameElement };
+      target: {
+        unMute(): void;
+        setVolume(volume: number): void;
+        playVideo(): void;
+        getIframe(): HTMLIFrameElement;
+      };
     }) => void;
     onStateChange: (event: { data: number }) => void;
     onError: () => void;

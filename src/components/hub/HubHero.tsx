@@ -58,7 +58,7 @@ export function HubHero({ image }: Readonly<{ image: string }>) {
           alt=""
           width={494}
           height={585}
-          className="size-full object-contain drop-shadow-[0_2px_3px_rgba(255,255,255,0.7)]"
+          className="size-full object-contain brightness-0 invert drop-shadow-[0_2px_3px_rgba(0,0,0,0.35)]"
         />
       </button>
       {filmOpen && (

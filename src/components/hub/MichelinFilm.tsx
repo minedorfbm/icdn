@@ -38,8 +38,8 @@ function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
           width: "100%",
           height: "100%",
           playerVars: {
-            autoplay: 1,
-            mute: 1,
+            // Start from onReady, after setting a quiet volume, rather than at YouTube's default.
+            autoplay: 0,
             playsinline: 1,
             rel: 0,
             origin: window.location.origin,
@@ -49,7 +49,8 @@ function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
               if (cancelled) return;
               window.clearTimeout(timeout);
               target.getIframe().title = "One MICHELIN Key — InterContinental Danang";
-              target.mute();
+              target.setVolume(20);
+              target.unMute();
               target.playVideo();
               setLoading(false);
             },
