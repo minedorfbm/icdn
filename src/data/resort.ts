@@ -61,7 +61,8 @@ export type DestinationType =
   | "beach"
   | "recreation";
 
-export type DestinationContentKind = "place" | "offer";
+export type DestinationContentFamily = "resort" | "offer" | "storytelling";
+export type DestinationAudience = "adult" | "all" | "kids";
 
 export interface Destination {
   id: string;
@@ -70,7 +71,14 @@ export interface Destination {
   cluster?: string;
   type: DestinationType;
   short_description: string;
-  contentKind: DestinationContentKind;
+  contentFamily: DestinationContentFamily;
+  audienceTags: DestinationAudience[];
+  offerDuration?: "limited" | "ongoing";
+  offerStartsOn?: string;
+  offerEndsOn?: string;
+  storytellingScope?: "resort" | "destination";
+  minimumAge?: number;
+  maximumAge?: number;
   /** Photography used by cards, search results and previews. */
   image: string;
   /** Independent cover photography for the expanded destination page. */
@@ -358,7 +366,14 @@ export function toDestination(
     ...(row.cluster ? { cluster: row.cluster } : {}),
     type,
     short_description: row.short_description,
-    contentKind: row.content_kind ?? "place",
+    contentFamily: row.content_family ?? (row.content_kind === "offer" ? "offer" : "resort"),
+    audienceTags: row.audience_tags ?? ["all"],
+    ...(row.offer_duration ? { offerDuration: row.offer_duration } : {}),
+    ...(row.offer_starts_on ? { offerStartsOn: row.offer_starts_on } : {}),
+    ...(row.offer_ends_on ? { offerEndsOn: row.offer_ends_on } : {}),
+    ...(row.storytelling_scope ? { storytellingScope: row.storytelling_scope } : {}),
+    ...(row.minimum_age != null ? { minimumAge: row.minimum_age } : {}),
+    ...(row.maximum_age != null ? { maximumAge: row.maximum_age } : {}),
     image,
     detailImage: resolveImage(row.detail_image_key ?? "") || image,
     ...(row.instagram_spot ? { instagram_spot: true } : {}),

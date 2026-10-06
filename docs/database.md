@@ -11,11 +11,11 @@ Le hub utilise trois collections communes aux quatre niveaux : **DINING**, **WEL
 À l'issue de cette répartition, les 43 cards visibles sont réparties ainsi :
 
 | Niveau | DINING | WELLNESS | EXPERIENCES |
-| --- | ---: | ---: | ---: |
-| HEAVEN | 2 | 2 | 9 |
-| SKY | 4 | 0 | 4 |
-| EARTH | 3 | 5 | 5 |
-| SEA | 0 | 7 | 2 |
+| ------ | -----: | -------: | ----------: |
+| HEAVEN |      2 |        2 |           9 |
+| SKY    |      4 |        0 |           4 |
+| EARTH  |      3 |        5 |           5 |
+| SEA    |      0 |        7 |           2 |
 
 Pour réorganiser une card, modifier `destinations.cluster` avec l'une des trois clés. La répartition de la migration est ponctuelle : un changement de type ne déplace pas automatiquement une card. `levels.clusters` définit l'ordre des onglets ; la base refuse une collection absente du niveau. Les six langues du hub traduisent les libellés. Les anciennes clés du dictionnaire restent compatibles avec un catalogue encore en cache pendant le déploiement.
 
@@ -74,3 +74,7 @@ Ces protections empêchent désormais la suppression accidentelle en cascade d'u
 Inspection directe en lecture seule le 23 septembre 2026 : 4 niveaux, 47 lieux, 75 liens, 40 photos, 4 événements, 1 post et 10 réglages. Les 141 traductions de lieux et 12 traductions d'événements attendues étaient publiées, sans source dépassée. Le bucket public `hub-images` contenait 26 objets ; les 91 références d'image en base pointaient vers ces objets. Aucun contenu actif ne dépendait d'un lieu inactif et aucune catégorie utilisée n'était absente de son niveau.
 
 Quatre lieux actifs n'avaient aucun lien dans `destination_links` malgré une ancienne URL `DISCOVER` générique vers l'accueil du resort : `instagram-spots`, `moulin-rouge`, `relaxation-pavilion` et `wall-of-lanterns`. Il faut décider éditorialement, pour chacun, entre aucun bouton et un véritable lien spécifique ; rétablir l'URL générique serait trompeur.
+
+## Familles éditoriales et espaces marketing
+
+Voir [la classification éditoriale](editorial-taxonomy.md) pour les champs de `destinations`, les trois vues marketing et les règles de publication.

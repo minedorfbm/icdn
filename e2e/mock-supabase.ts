@@ -19,6 +19,8 @@ const destinations = ["citron", "tingara"].map((id, display_order) => ({
   image_key: "/intercontinental-touch-icon.png",
   detail_image_key: "/intercontinental-touch-icon.png",
   content_kind: "place",
+  content_family: "resort",
+  audience_tags: ["all"],
   instagram_spot: false,
   display_order,
   active: true,
@@ -30,7 +32,18 @@ destinations.push({
   cluster: "EXPERIENCES",
   type: "experience",
   content_kind: "offer",
+  content_family: "offer",
   display_order: 2,
+});
+destinations.push({
+  ...destinations[0]!,
+  id: "nature-experiences",
+  name: "Nature Discovery",
+  cluster: "EXPERIENCES",
+  type: "experience",
+  content_kind: "offer",
+  content_family: "storytelling",
+  display_order: 3,
 });
 const tables: Record<string, unknown[]> = {
   levels,

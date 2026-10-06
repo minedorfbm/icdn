@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { createHubValue, resolveHeroImage } from "../src/data/hub-value";
 import { actionsFor, instagramUrl, safeExternalUrl } from "../src/lib/destination-actions";
 import { LEVELS, toDestination, youtubeVideoId, type DestinationRow } from "../src/data/resort";
+import { destinationRow } from "../src/lib/hub-schema";
 import type { HubData } from "../src/lib/hub.functions";
 
 const row: DestinationRow = {
@@ -30,6 +31,43 @@ const ready: HubData = {
 };
 
 describe("database authority", () => {
+  test("editorial metadata overrides the legacy binary classification", () => {
+    const card = toDestination({
+      ...row,
+      content_kind: "offer",
+      content_family: "storytelling",
+      storytelling_scope: "destination",
+      audience_tags: ["adult", "kids"],
+      minimum_age: 14,
+    });
+    expect(card.contentFamily).toBe("storytelling");
+    expect(card.storytellingScope).toBe("destination");
+    expect(card.audienceTags).toEqual(["adult", "kids"]);
+    expect(card.minimumAge).toBe(14);
+    expect(toDestination(row).contentFamily).toBe("resort");
+    expect(toDestination(row).audienceTags).toEqual(["all"]);
+  });
+  test("audience validation rejects contradictory and duplicate tags", () => {
+    for (const audience_tags of [[], ["all", "kids"], ["kids", "kids"], ["unknown"]]) {
+      expect(destinationRow.safeParse({ ...row, audience_tags }).success).toBe(false);
+    }
+    expect(destinationRow.safeParse({ ...row, audience_tags: ["adult", "kids"] }).success).toBe(
+      true,
+    );
+  });
+  test("offer dates survive catalogue conversion and malformed dates are rejected", () => {
+    const card = toDestination({
+      ...row,
+      content_family: "offer",
+      offer_duration: "limited",
+      offer_starts_on: "2026-12-01",
+      offer_ends_on: "2026-12-31",
+    });
+    expect(card.offerDuration).toBe("limited");
+    expect(card.offerStartsOn).toBe("2026-12-01");
+    expect(card.offerEndsOn).toBe("2026-12-31");
+    expect(destinationRow.safeParse({ ...row, offer_starts_on: "tomorrow" }).success).toBe(false);
+  });
   test("expanded image is independent while an unset value keeps the card image", () => {
     const card = toDestination({ ...row, image_key: "d-citron" });
     expect(card.detailImage).toBe(card.image);
@@ -41,7 +79,7 @@ describe("database authority", () => {
     });
     expect(updated.image).toBe(card.image);
     expect(updated.detailImage).not.toBe(updated.image);
-    expect(updated.contentKind).toBe("offer");
+    expect(updated.contentFamily).toBe("offer");
   });
   test("intentional empty catalog does not resurrect bundled destinations", () => {
     expect(createHubValue({ ...ready, destinations: [] }).destinations).toEqual([]);
