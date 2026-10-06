@@ -28,6 +28,7 @@
     "test:mobile:install": "node node_modules/@playwright/test/cli.js install --with-deps webkit"
   },
   "overrides": {
+    "source-map-js": "1.2.2",
     "rolldown": "1.2.1",
     "undici": "7.29.1"
   },

@@ -6,7 +6,7 @@ import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
 import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
 import { localizedLinkUrl } from "@/lib/localized-links";
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useJourneyMotion } from "@/lib/use-journey-motion";
 import { ArrowUpRight, Phone } from "lucide-react";
@@ -23,17 +23,18 @@ export const Route = createFileRoute("/_hub")({
   loader: async ({ location }) => {
     // Complete the homepage HTML before requesting its catalogue. Some mobile
     // browsers buffer streamed documents; direct card URLs retain their SSR metadata.
+    const isHome = location.pathname === "/";
     const [settings, catalogue] = await Promise.all([
-      getHubSettings(),
-      location.pathname === "/" ? Promise.resolve(null) : getHubData(),
+      isHome || location.state.hubCard === true ? getHubSettings() : Promise.resolve(null),
+      isHome ? Promise.resolve(null) : getHubData(),
     ]);
-    return { settings, catalogue };
+    return { settings, catalogue, isHome };
   },
   staleTime: 0,
   head: ({ loaderData }) => ({
-    links: [
-      { rel: "preload", as: "image", href: resolveHeroImage(loaderData), fetchPriority: "high" },
-    ],
+    links: loaderData?.isHome
+      ? [{ rel: "preload", as: "image", href: resolveHeroImage(loaderData), fetchPriority: "high" }]
+      : [],
     meta: [
       { title: "InterContinental Danang — Digital Hub | Heaven to Sea" },
       {
@@ -56,6 +57,14 @@ export const Route = createFileRoute("/_hub")({
 
 function HubRoute() {
   const { settings, catalogue } = Route.useLoaderData();
+  const location = useLocation();
+  // History state survives a refresh. Keep the hub behind a card only when this
+  // mounted page actually came from the homepage during client navigation.
+  const [hasVisitedHome, setHasVisitedHome] = useState(location.pathname === "/");
+  useEffect(() => {
+    if (location.pathname === "/") setHasVisitedHome(true);
+  }, [location.pathname]);
+  const showHub = location.pathname === "/" || (hasVisitedHome && location.state.hubCard === true);
   const [result, setResult] = useState<{ data: HubData | null; failed: boolean }>({
     data: catalogue,
     failed: false,
@@ -84,16 +93,20 @@ function HubRoute() {
   }, [catalogue, attempt, result.data]);
   return (
     <I18nProvider editorial={data?.editorial}>
-      <main className="bg-background text-foreground">
-        <div className="hub-tools">
-          <LanguageSwitch />
-        </div>
-        <HubHero image={resolveHeroImage({ settings })} />
+      <main className="min-h-svh bg-background text-foreground">
+        {showHub && (
+          <>
+            <div className="hub-tools">
+              <LanguageSwitch />
+            </div>
+            <HubHero image={resolveHeroImage({ settings })} />
+          </>
+        )}
         {data ? (
           <ResortBrowserProvider>
             <HubProvider data={{ ...data, settings }}>
               <ResortMapProvider>
-                <Hub />
+                {showHub && <Hub />}
                 <Outlet />
               </ResortMapProvider>
             </HubProvider>
