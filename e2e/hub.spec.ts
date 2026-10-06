@@ -1,4 +1,30 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
+
+// Check geometry before clicking: click() would scroll a misplaced control into view.
+async function expectPersistentTools(dialog: Locator, scroller: Locator) {
+  const buttons = [
+    dialog.getByRole("button", { name: "Search", exact: true }),
+    dialog.getByRole("button", { name: "Contact", exact: true }),
+  ];
+  await expect(dialog).toBeVisible();
+  const before = await Promise.all(buttons.map((button) => button.boundingBox()));
+  expect(before.every(Boolean)).toBe(true);
+  await scroller.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+  await expect.poll(() => scroller.evaluate((el) => el.scrollTop)).toBeGreaterThan(100);
+  for (const [index, button] of buttons.entries()) {
+    await expect
+      .poll(async () => {
+        const box = await button.boundingBox();
+        return box ? Math.abs(box.y - before[index]!.y) : Infinity;
+      })
+      .toBeLessThan(1);
+    const insideViewport = await button.evaluate((el) => {
+      const box = el.getBoundingClientRect();
+      return box.top >= 0 && box.bottom <= innerHeight && box.left >= 0 && box.right <= innerWidth;
+    });
+    expect(insideViewport).toBe(true);
+  }
+}
 
 // Minimal two-page PDF generated locally, with real offsets and no external download.
 function menuPdf() {
@@ -211,7 +237,7 @@ test("search and concierge remain usable on direct cards and inside the PDF brow
   );
   await page.goto("/citron");
   const card = page.getByRole("dialog", { name: "Citron", exact: true });
-  await card.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+  await expectPersistentTools(card, card.locator("[data-destination-scroll]"));
   await card.getByRole("button", { name: "Contact", exact: true }).click();
   const contact = page.getByRole("dialog", { name: "Contact", exact: true });
   await expect(contact.getByRole("link", { name: "WhatsApp", exact: true })).toHaveAttribute(
@@ -240,6 +266,25 @@ test("search and concierge remain usable on direct cards and inside the PDF brow
   await expect(viewer).toHaveCount(0);
   await expect(page.getByRole("dialog", { name: "TINGARA", exact: true })).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test("Surprise me keeps search and concierge visible while its deck scrolls", async ({ page }) => {
+  await page.goto("/");
+  await page.locator(".discovery-surprise").click();
+  const surprise = page.getByRole("dialog", { name: "Surprise me", exact: true });
+  // A short screen exercises the overflow layout independently of card content length.
+  await page.setViewportSize({ width: 390, height: 600 });
+  await expectPersistentTools(surprise, surprise.locator("[data-surprise-scroll]"));
+  await surprise.getByRole("button", { name: "Contact", exact: true }).click();
+  const contact = page.getByRole("dialog", { name: "Contact", exact: true });
+  await expect(contact.getByRole("link", { name: "WhatsApp", exact: true })).toBeVisible();
+  await contact.getByRole("button", { name: "Close", exact: true }).click();
+  await surprise.getByRole("button", { name: "Search", exact: true }).click();
+  const search = page.getByRole("dialog", { name: "Search", exact: true });
+  await search.getByRole("searchbox").fill("TINGARA");
+  await search.getByRole("button", { name: /TINGARA/ }).click();
+  await expect(surprise).toHaveCount(0);
+  await expect(page.getByRole("dialog", { name: "TINGARA", exact: true })).toBeVisible();
 });
 
 test("the card deck advances and returns after horizontal pointer gestures", async ({ page }) => {
