@@ -27,6 +27,12 @@
   height: 100dvh;
   overflow: hidden;
 }
+.hub-search-trigger.hub-search-compact {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  justify-content: center;
+}
 .hub-search-shell {
   display: flex;
   flex-direction: column;

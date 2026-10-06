@@ -181,7 +181,14 @@ test("the compact map uses the home search and locates a matching place", async 
     .poll(() => map.locator(".atlas-header").evaluate((el) => el.getBoundingClientRect().height))
     .toBeLessThan(80);
 
-  await map.locator(".atlas-tools").getByRole("button", { name: "Search" }).click();
+  await map.locator(".atlas-header").getByRole("button", { name: "Contact", exact: true }).click();
+  const contact = page.getByRole("dialog", { name: "Contact", exact: true });
+  await expect(contact.getByRole("link", { name: "Zalo", exact: true })).toHaveAttribute(
+    "href",
+    "https://zalo.me/842363938888",
+  );
+  await contact.getByRole("button", { name: "Close", exact: true }).click();
+  await map.locator(".atlas-header").getByRole("button", { name: "Search", exact: true }).click();
   const search = page.getByRole("dialog", { name: "Search" });
   await expect(search.getByRole("heading", { name: "Find your next discovery" })).toBeVisible();
   await search.getByRole("searchbox").fill("Enchanted Holiday");
@@ -192,6 +199,47 @@ test("the compact map uses the home search and locates a matching place", async 
   await search.getByRole("button", { name: /Citron/ }).click();
   await expect(search).toHaveCount(0);
   await expect(map.locator(".atlas-preview")).toContainText("Citron");
+});
+
+test("search and concierge remain usable on direct cards and inside the PDF browser", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.route("**/api/resort-pdf?*", (route) =>
+    route.fulfill({ contentType: "application/pdf", body: menuPdf() }),
+  );
+  await page.goto("/citron");
+  const card = page.getByRole("dialog", { name: "Citron", exact: true });
+  await card.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+  await card.getByRole("button", { name: "Contact", exact: true }).click();
+  const contact = page.getByRole("dialog", { name: "Contact", exact: true });
+  await expect(contact.getByRole("link", { name: "WhatsApp", exact: true })).toHaveAttribute(
+    "href",
+    "https://wa.me/842363938888",
+  );
+  await contact.getByRole("button", { name: "Close", exact: true }).click();
+  await card.getByRole("button", { name: "Search", exact: true }).click();
+  const search = page.getByRole("dialog", { name: "Search", exact: true });
+  await expect(search.getByRole("searchbox")).toBeVisible();
+  await search.getByRole("button", { name: "Contact", exact: true }).click();
+  await expect(contact.getByRole("link", { name: "Phone call", exact: true })).toHaveAttribute(
+    "href",
+    "tel:+842363938888",
+  );
+  await contact.getByRole("button", { name: "Close", exact: true }).click();
+  await search.getByRole("button", { name: "Close", exact: true }).click();
+  await card.getByRole("link", { name: "Test menu", exact: true }).click();
+  const viewer = page.getByRole("dialog", { name: /Test menu/ });
+  await viewer.getByRole("button", { name: "Contact", exact: true }).click();
+  await expect(contact.getByRole("link", { name: "Zalo", exact: true })).toBeVisible();
+  await contact.getByRole("button", { name: "Close", exact: true }).click();
+  await viewer.getByRole("button", { name: "Search", exact: true }).click();
+  await search.getByRole("searchbox").fill("TINGARA");
+  await search.getByRole("button", { name: /TINGARA/ }).click();
+  await expect(viewer).toHaveCount(0);
+  await expect(page.getByRole("dialog", { name: "TINGARA", exact: true })).toBeVisible();
+  expect(errors).toEqual([]);
 });
 
 test("the card deck advances and returns after horizontal pointer gestures", async ({ page }) => {

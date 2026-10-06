@@ -26,7 +26,7 @@ export const Route = createFileRoute("/_hub")({
     // browsers buffer streamed documents; direct card URLs retain their SSR metadata.
     const isHome = location.pathname === "/";
     const [settings, catalogue] = await Promise.all([
-      isHome || location.state.hubCard === true ? getHubSettings() : Promise.resolve(null),
+      getHubSettings(),
       isHome ? Promise.resolve(null) : getHubData(),
     ]);
     return { settings, catalogue, isHome };
@@ -104,14 +104,14 @@ function HubRoute() {
           </>
         )}
         {data ? (
-          <ResortBrowserProvider>
-            <HubProvider data={{ ...data, settings }}>
+          <HubProvider data={{ ...data, settings }}>
+            <ResortBrowserProvider>
               <ResortMapProvider>
                 {showHub && <Hub />}
                 <Outlet />
               </ResortMapProvider>
-            </HubProvider>
-          </ResortBrowserProvider>
+            </ResortBrowserProvider>
+          </HubProvider>
         ) : (
           <CatalogueStatus failed={result.failed} onRetry={() => setAttempt((n) => n + 1)} />
         )}

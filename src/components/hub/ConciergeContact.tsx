@@ -19,7 +19,9 @@ function messagingUrl(value: string | undefined, hosts: readonly string[]) {
   }
 }
 
-export function ConciergeContact() {
+export function ConciergeContact({
+  className = "fixed bottom-[max(16px,env(safe-area-inset-bottom))] right-4 z-50",
+}: Readonly<{ className?: string }>) {
   const { contact, whatsapp, zalo } = useHub();
   const { t, linkLabel } = useI18n();
   const phone = /^tel:\+?[0-9 ()-]+$/.test(contact) ? contact : undefined;
@@ -39,7 +41,7 @@ export function ConciergeContact() {
         <button
           type="button"
           aria-label={linkLabel("Contact")}
-          className="brand-floating fixed bottom-4 right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-95"
+          className={`brand-floating flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-transform active:scale-95 ${className}`}
         >
           <Phone size={14} strokeWidth={1.3} aria-hidden />
         </button>
@@ -48,7 +50,8 @@ export function ConciergeContact() {
         side="bottom"
         closeLabel={t("close")}
         aria-describedby={undefined}
-        className="brand-ui mx-auto max-w-lg rounded-t-[28px] border-current/10 bg-white px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-[#30302d] [&>button]:flex [&>button]:size-11 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full"
+        overlayClassName="z-[128]"
+        className="brand-ui z-[129] mx-auto max-w-lg rounded-t-[28px] border-current/10 bg-white px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-[#30302d] [&>button]:flex [&>button]:size-11 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full"
       >
         <SheetHeader className="mb-6 text-left">
           <SheetTitle className="pr-12 font-serif text-2xl font-normal">

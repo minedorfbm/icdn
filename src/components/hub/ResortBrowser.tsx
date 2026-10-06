@@ -13,6 +13,8 @@ import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import { safeExternalUrl } from "@/lib/destination-actions";
 import { embeddedResortUrl, isResortPdf } from "@/lib/resort-browser";
 import { useI18n } from "@/i18n";
+import { HubSearch } from "@/features/search/HubSearch";
+import { ConciergeContact } from "./ConciergeContact";
 
 type ResortPage = Readonly<{ url: string; title: string }>;
 const OpenResortPage = createContext<((page: ResortPage) => void) | null>(null);
@@ -89,7 +91,7 @@ function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClos
       className="fixed inset-0 z-[100] flex h-[100dvh] flex-col overflow-hidden overscroll-none brand-ui brand-surface pb-[env(safe-area-inset-bottom,0px)]"
     >
       <header className="relative shrink-0 border-b brand-header px-3 pt-[env(safe-area-inset-top)]">
-        <div className="grid min-h-14 grid-cols-[44px_minmax(0,1fr)_44px] items-center gap-2">
+        <div className="grid min-h-14 grid-cols-[44px_minmax(0,1fr)_44px_44px_44px] items-center gap-1">
           <button
             type="button"
             onClick={onClose}
@@ -104,6 +106,8 @@ function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClos
           >
             {page.title}
           </p>
+          <HubSearch compact onNavigate={onClose} />
+          <ConciergeContact className="relative" />
           <a
             href={page.url}
             target="_blank"
