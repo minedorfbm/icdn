@@ -213,6 +213,73 @@
   animation: slow-zoom 4000ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.hero-welcome {
+  position: absolute;
+  top: max(64px, 9%);
+  left: 50%;
+  width: min(78%, 32rem);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  color: white;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 65%);
+}
+
+.hero-crest {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgb(0 0 0 / 25%));
+}
+
+.hero-welcome h1 {
+  font-size: clamp(26px, 8vw, 40px);
+  line-height: 1.1;
+}
+
+.hero-resort-name {
+  font-size: clamp(8px, 2.3vw, 11px);
+  letter-spacing: 0.16em;
+  line-height: 1.5;
+}
+
+.hero-invitation {
+  position: absolute;
+  top: 43%;
+  left: 50%;
+  width: min(56%, 360px);
+  min-height: 44px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  color: var(--brand-ink);
+  text-shadow: 0 1px 8px rgb(255 255 255 / 70%);
+}
+
+.hero-invitation-title {
+  font-size: clamp(28px, 7.8vw, 48px);
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+}
+
+.hero-invitation-caption {
+  font-size: clamp(8px, 2.1vw, 10px);
+  line-height: 1.7;
+  letter-spacing: 0.13em;
+}
+
+.hero-invitation:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 10px;
+  border-radius: var(--brand-radius);
+}
+
 @keyframes group-enter {
   from {
     opacity: 0.45;

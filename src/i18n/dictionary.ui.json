@@ -1,5 +1,6 @@
 {
   "en": {
+    "hero_welcome": "Welcome",
     "hero_kicker": "SUN PENINSULA · DA NANG",
     "hero_title_1": "Begin",
     "hero_title_2": "the Descent",
@@ -41,6 +42,7 @@
     "retry": "Try again"
   },
   "vi": {
+    "hero_welcome": "Chào mừng",
     "hero_kicker": "BÁN ĐẢO SƠN TRÀ · ĐÀ NẴNG",
     "hero_title_1": "Bắt đầu",
     "hero_title_2": "hành trình xuống biển",
@@ -82,6 +84,7 @@
     "retry": "Thử lại"
   },
   "ru": {
+    "hero_welcome": "Добро пожаловать",
     "hero_kicker": "ПОЛУОСТРОВ ШОНЧА · ДАНАНГ",
     "hero_title_1": "Начните",
     "hero_title_2": "спуск",
@@ -123,6 +126,7 @@
     "retry": "Попробовать снова"
   },
   "zh": {
+    "hero_welcome": "欢迎",
     "hero_kicker": "山茶半岛 · 岘港",
     "hero_title_1": "开启",
     "hero_title_2": "向海之旅",
@@ -164,6 +168,7 @@
     "retry": "重试"
   },
   "ko": {
+    "hero_welcome": "환영합니다",
     "hero_kicker": "선짜 반도 · 다낭",
     "hero_title_1": "하늘에서",
     "hero_title_2": "바다로",
@@ -205,6 +210,7 @@
     "retry": "다시 시도"
   },
   "ja": {
+    "hero_welcome": "ようこそ",
     "hero_kicker": "ソンチャ半島 · ダナン",
     "hero_title_1": "天空から",
     "hero_title_2": "海へ",

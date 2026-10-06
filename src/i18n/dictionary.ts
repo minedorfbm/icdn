@@ -14,6 +14,7 @@ export const LANGUAGES = [
 export type Lang = (typeof LANGUAGES)[number]["code"];
 
 export type UIKey =
+  | "hero_welcome"
   | "hero_kicker"
   | "hero_title_1"
   | "hero_title_2"
