@@ -186,6 +186,8 @@ test("the compact map uses the home search and locates a matching place", async 
   await expect(search.getByRole("heading", { name: "Find your next discovery" })).toBeVisible();
   await search.getByRole("searchbox").fill("Enchanted Holiday");
   await expect(search.getByRole("button", { name: /Enchanted Holiday Escape/ })).toHaveCount(0);
+  await search.getByRole("searchbox").fill("Nature Discovery");
+  await expect(search.getByRole("button", { name: /Nature Discovery/ })).toHaveCount(0);
   await search.getByRole("searchbox").fill("Citron");
   await search.getByRole("button", { name: /Citron/ }).click();
   await expect(search).toHaveCount(0);

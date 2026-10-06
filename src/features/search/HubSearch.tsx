@@ -58,7 +58,7 @@ export function SearchDialog({
   const entries = useMemo(
     () =>
       destinations
-        .filter((d) => d.active && (!placesOnly || d.contentKind === "place"))
+        .filter((d) => d.active && (!placesOnly || d.contentFamily === "resort"))
         .map((d) => ({
           item: d,
           name: d.name,

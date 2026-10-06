@@ -37,7 +37,23 @@ export const destinationRow = z.object({
   short_description: text,
   image_key: optionalText,
   detail_image_key: optionalText.optional(),
+  // Binary classification retained only for rolling-deployment compatibility.
   content_kind: z.enum(["place", "offer"]).optional(),
+  content_family: z.enum(["resort", "offer", "storytelling"]).optional(),
+  audience_tags: z
+    .array(z.enum(["adult", "all", "kids"]))
+    .min(1)
+    .max(2)
+    .refine(
+      (tags) => new Set(tags).size === tags.length && (!tags.includes("all") || tags.length === 1),
+    )
+    .optional(),
+  offer_duration: z.enum(["limited", "ongoing"]).nullable().optional(),
+  offer_starts_on: z.iso.date().nullable().optional(),
+  offer_ends_on: z.iso.date().nullable().optional(),
+  storytelling_scope: z.enum(["resort", "destination"]).nullable().optional(),
+  minimum_age: z.number().int().min(0).max(120).nullable().optional(),
+  maximum_age: z.number().int().min(0).max(120).nullable().optional(),
   instagram_spot: z.boolean().nullable().optional(),
   display_order: order,
   active: z.boolean(),
