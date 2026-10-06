@@ -53,6 +53,7 @@ function DestinationRoute() {
       onClose={closeDestination}
       aboveMap
       neutral={neutral}
+      portalled={false}
     />
   );
 }

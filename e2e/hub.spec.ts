@@ -107,6 +107,38 @@ test("direct card, two-page PDF, zoom and return preserve navigation", async ({ 
   expect(errors).toEqual([]);
 });
 
+test("a direct card is visible before JavaScript starts and does not render the homepage", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  try {
+    await page.goto("http://127.0.0.1:4173/citron");
+    const card = page.getByRole("dialog", { name: "Citron", exact: true });
+    await expect(card).toBeVisible();
+    await expect(card).toContainText("A restaurant overlooking the sea.");
+    await expect(page.locator(".threshold-img, #heaven, .hub-tools")).toHaveCount(0);
+    await expect(page.locator('link[rel="preload"][as="image"]')).toHaveCount(1);
+  } finally {
+    await context.close();
+  }
+});
+
+test("refreshing an internally opened card does not restore the homepage behind it", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.locator("#heaven").getByRole("button", { name: "Citron", exact: true }).click();
+  await expect(page).toHaveURL("/citron");
+  await expect(page.locator(".threshold-img")).toHaveCount(1);
+  await page.reload();
+  await expect(page.getByRole("dialog", { name: "Citron", exact: true })).toBeVisible();
+  await expect(page.locator(".threshold-img, #heaven, .hub-tools")).toHaveCount(0);
+  await page.getByRole("button", { name: "BACK", exact: true }).click();
+  await expect(page).toHaveURL("/");
+  await expect(page.locator(".threshold-img")).toBeVisible();
+});
+
 test("language and search remain usable when browser storage is denied", async ({ page }) => {
   await page.addInitScript(() => {
     Object.defineProperty(window, "localStorage", {

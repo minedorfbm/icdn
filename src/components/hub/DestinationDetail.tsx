@@ -17,7 +17,14 @@ export function DestinationDetail({
   onClose,
   aboveMap = false,
   neutral = false,
-}: Readonly<{ dest: Destination; onClose: () => void; aboveMap?: boolean; neutral?: boolean }>) {
+  portalled = true,
+}: Readonly<{
+  dest: Destination;
+  onClose: () => void;
+  aboveMap?: boolean;
+  neutral?: boolean;
+  portalled?: boolean;
+}>) {
   const { media, pending, failed, retry } = useDestinationMedia(summary.id);
   const dest = { ...summary, ...media };
   const { lang, t, typeLabel, levelLabel, action, description, event } = useI18n();
@@ -34,6 +41,7 @@ export function DestinationDetail({
     <FullscreenDialog
       title={dest.name}
       onClose={onClose}
+      portalled={portalled}
       data-level={dest.level}
       overlayClassName={
         aboveMap ? "fixed inset-0 z-[94] bg-black/30" : "fixed inset-0 z-[79] bg-black/30"
