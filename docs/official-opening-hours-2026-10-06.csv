@@ -1,0 +1,26 @@
+destination_id,service,days,opens,closes,status,source_url,checked_on,note
+citron,Breakfast,1-7,06:30,10:30,confirmed,https://www.danang.intercontinental.com/dining/citron/,2026-10-06,
+citron,Lunch,1-7,12:00,15:00,confirmed,https://www.danang.intercontinental.com/dining/citron/,2026-10-06,
+citron,Afternoon tea,1-7,14:30,16:30,confirmed,https://www.danang.intercontinental.com/dining/citron/,2026-10-06,
+citron,Dinner,1-7,18:00,22:00,confirmed,https://www.danang.intercontinental.com/dining/citron/,2026-10-06,
+la-maison-1888,Dinner,1-7,18:30,21:00,confirmed,https://www.danang.intercontinental.com/dining/la-maison-1888/,2026-10-06,Dinner until 21:00; last order 20:45. Temporary Heaven Level setting.
+tingara,Dinner,2-7,17:30,22:00,confirmed,https://www.danang.intercontinental.com/dining/tingara/,2026-10-06,English page is current; Japanese page and old factsheet differ.
+terra-mare,Lunch,4-5,12:00,15:00,confirmed,https://www.danang.intercontinental.com/dining/terra-mare/,2026-10-06,Rechecked for integration: lunch Thursday and Friday only.
+terra-mare,Lunch,6,12:00,14:00,confirmed,https://www.danang.intercontinental.com/dining/terra-mare/,2026-10-06,
+terra-mare,Dinner,1-5|7,17:30,22:00,confirmed,https://www.danang.intercontinental.com/dining/terra-mare/,2026-10-06,
+terra-mare,Beach BBQ buffet,6,18:00,21:30,confirmed,https://www.danang.intercontinental.com/dining/terra-mare/,2026-10-06,Weekly Saturday event; check availability before booking.
+long-bar,Drinks and leisure,1-7,10:00,23:00,confirmed,https://www.danang.intercontinental.com/dining/the-l_o_n_g-bar/,2026-10-06,
+long-bar,Food,1-7,11:30,22:00,confirmed,https://www.danang.intercontinental.com/dining/the-l_o_n_g-bar/,2026-10-06,
+mi-sol-spa,Spa,1-7,10:00,22:00,confirmed,https://www.danang.intercontinental.com/spas/mi-sol-spa/,2026-10-06,
+nail-hair,Salon,1-7,09:00,18:00,confirmed,https://www.danang.intercontinental.com/spas/nail-and-hair-studio/,2026-10-06,
+planet-trekkers,Kids club,1-7,09:00,18:00,confirmed,https://www.danang.intercontinental.com/recreation/planet-trekkers/,2026-10-06,Current page supersedes older PDF saying 09:00–20:00.
+soar-gym,Gym,1-7,00:00,24:00,confirmed,https://www.danang.intercontinental.com/resort-information/,2026-10-06,Official page describes 24-hour access.
+bensley-gallery,Gallery,3-7,08:00,17:00,confirmed,https://www.danang.intercontinental.com/amenities/bensley-outsider-gallery/,2026-10-06,Current page supersedes older brochures saying 09:00–18:00.
+club-lounge,Afternoon tea,1-7,14:00,16:00,conflict,https://www.danang.intercontinental.com/amenities/club-intercontinental/,2026-10-06,Same site also states 14:30–16:30; verify with resort before publishing.
+club-lounge,Cocktails and canapés,1-7,16:30,18:30,conflict,https://www.danang.intercontinental.com/amenities/club-intercontinental/,2026-10-06,Same site also states 17:30–19:30; verify with resort before publishing.
+long-pool,Pool,1-7,06:00,19:00,needs_confirmation,https://www.danang.intercontinental.com/ko/sitemap/,2026-10-06,FAQ says infinity pools operate 06:00–19:00; confirm this applies to L_O_N_G Pool.
+family-pool,Pool,1-7,06:00,19:00,needs_confirmation,https://www.danang.intercontinental.com/ko/sitemap/,2026-10-06,FAQ says infinity pools operate 06:00–19:00; confirm this applies to Garden Pool.
+kids-pool,Pool,1-7,06:00,19:00,needs_confirmation,https://www.danang.intercontinental.com/ko/sitemap/,2026-10-06,FAQ says infinity pools operate 06:00–19:00; confirm this applies to Kids Pool.
+sports-centre,Sports centre,1-7,08:00,22:00,dated_schedule,https://www.danang.intercontinental.com/wp-content/uploads/2026/04/Your-Guide-to-Fun-at-InterContinental-Danang.pdf,2026-10-06,PDF effective 2026-05-01; current schedule link changed and was not retrievable.
+marine-centre,Water sports area,1-7,09:00,17:30,dated_schedule,https://www.danang.intercontinental.com/wp-content/uploads/2026/04/Your-Guide-to-Fun-at-InterContinental-Danang.pdf,2026-10-06,PDF effective 2026-05-01; weather dependent; current schedule link changed.
+family-beach,Beach games,1-7,08:00,17:00,dated_schedule,https://www.danang.intercontinental.com/wp-content/uploads/2026/04/Your-Guide-to-Fun-at-InterContinental-Danang.pdf,2026-10-06,PDF effective 2026-05-01; this is activity availability rather than beach access.

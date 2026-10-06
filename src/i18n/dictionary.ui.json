@@ -39,7 +39,19 @@
     "pdf_zoom_out": "Zoom out",
     "hero_image_alt": "Flower-filled marble bowl in the resort lobby, overlooking the sea",
     "content_unavailable": "Content is temporarily unavailable.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "opening_hours": "OPENING HOURS",
+    "hours_opening": "Opening hours",
+    "hours_breakfast": "Breakfast",
+    "hours_lunch": "Lunch",
+    "hours_afternoon_tea": "Afternoon tea",
+    "hours_dinner": "Dinner",
+    "hours_drinks": "Drinks & leisure",
+    "hours_food": "Food",
+    "hours_24": "24 hours",
+    "hours_daily": "Daily",
+    "hours_last_order": "Last order",
+    "hours_local": "Local time in Danang (UTC+7)"
   },
   "vi": {
     "hero_welcome": "Chào mừng",
@@ -81,7 +93,19 @@
     "pdf_zoom_out": "Thu nhỏ",
     "hero_image_alt": "Bát đá cẩm thạch đầy hoa trong sảnh khu nghỉ dưỡng, nhìn ra biển",
     "content_unavailable": "Nội dung tạm thời không khả dụng.",
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "opening_hours": "GIỜ MỞ CỬA",
+    "hours_opening": "Giờ mở cửa",
+    "hours_breakfast": "Bữa sáng",
+    "hours_lunch": "Bữa trưa",
+    "hours_afternoon_tea": "Trà chiều",
+    "hours_dinner": "Bữa tối",
+    "hours_drinks": "Đồ uống & thư giãn",
+    "hours_food": "Phục vụ món ăn",
+    "hours_24": "24 giờ",
+    "hours_daily": "Hằng ngày",
+    "hours_last_order": "Gọi món cuối cùng",
+    "hours_local": "Giờ địa phương tại Đà Nẵng (UTC+7)"
   },
   "ru": {
     "hero_welcome": "Добро пожаловать",
@@ -123,7 +147,19 @@
     "pdf_zoom_out": "Уменьшить",
     "hero_image_alt": "Мраморная чаша с цветами в холле курорта с видом на море",
     "content_unavailable": "Содержимое временно недоступно.",
-    "retry": "Попробовать снова"
+    "retry": "Попробовать снова",
+    "opening_hours": "ЧАСЫ РАБОТЫ",
+    "hours_opening": "Часы работы",
+    "hours_breakfast": "Завтрак",
+    "hours_lunch": "Обед",
+    "hours_afternoon_tea": "Послеобеденный чай",
+    "hours_dinner": "Ужин",
+    "hours_drinks": "Напитки и отдых",
+    "hours_food": "Кухня",
+    "hours_24": "Круглосуточно",
+    "hours_daily": "Ежедневно",
+    "hours_last_order": "Последний заказ",
+    "hours_local": "Местное время в Дананге (UTC+7)"
   },
   "zh": {
     "hero_welcome": "欢迎",
@@ -165,7 +201,19 @@
     "pdf_zoom_out": "缩小",
     "hero_image_alt": "度假酒店大堂内盛满鲜花的大理石花盆，远处是大海",
     "content_unavailable": "内容暂时无法加载。",
-    "retry": "重试"
+    "retry": "重试",
+    "opening_hours": "营业时间",
+    "hours_opening": "营业时间",
+    "hours_breakfast": "早餐",
+    "hours_lunch": "午餐",
+    "hours_afternoon_tea": "下午茶",
+    "hours_dinner": "晚餐",
+    "hours_drinks": "饮品与休闲",
+    "hours_food": "餐饮",
+    "hours_24": "24小时",
+    "hours_daily": "每天",
+    "hours_last_order": "最后点餐",
+    "hours_local": "岘港当地时间（UTC+7）"
   },
   "ko": {
     "hero_welcome": "환영합니다",
@@ -207,7 +255,19 @@
     "pdf_zoom_in": "확대",
     "pdf_zoom_out": "축소",
     "content_unavailable": "콘텐츠를 일시적으로 불러올 수 없습니다.",
-    "retry": "다시 시도"
+    "retry": "다시 시도",
+    "opening_hours": "운영 시간",
+    "hours_opening": "운영 시간",
+    "hours_breakfast": "조식",
+    "hours_lunch": "점심",
+    "hours_afternoon_tea": "애프터눈 티",
+    "hours_dinner": "저녁",
+    "hours_drinks": "음료 및 휴식",
+    "hours_food": "음식",
+    "hours_24": "24시간",
+    "hours_daily": "매일",
+    "hours_last_order": "마지막 주문",
+    "hours_local": "다낭 현지 시간 (UTC+7)"
   },
   "ja": {
     "hero_welcome": "ようこそ",
@@ -249,6 +309,18 @@
     "pdf_zoom_in": "拡大",
     "pdf_zoom_out": "縮小",
     "content_unavailable": "コンテンツを一時的に読み込めません。",
-    "retry": "再試行"
+    "retry": "再試行",
+    "opening_hours": "営業時間",
+    "hours_opening": "営業時間",
+    "hours_breakfast": "朝食",
+    "hours_lunch": "昼食",
+    "hours_afternoon_tea": "アフタヌーンティー",
+    "hours_dinner": "夕食",
+    "hours_drinks": "ドリンク・リラックス",
+    "hours_food": "お食事",
+    "hours_24": "24時間",
+    "hours_daily": "毎日",
+    "hours_last_order": "ラストオーダー",
+    "hours_local": "ダナン現地時間（UTC+7）"
   }
 }

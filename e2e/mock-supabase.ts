@@ -74,6 +74,28 @@ const tables: Record<string, unknown[]> = {
       source_description: destinations[0]!.short_description,
     },
   ],
+  destination_opening_hours: [
+    {
+      id: "citron-breakfast",
+      destination_id: "citron",
+      service: "breakfast",
+      days: [1, 2, 3, 4, 5, 6, 7],
+      opens_minutes: 390,
+      closes_minutes: 630,
+      last_order_minutes: null,
+      display_order: 0,
+    },
+    {
+      id: "tingara-dinner",
+      destination_id: "tingara",
+      service: "dinner",
+      days: [2, 3, 4, 5, 6, 7],
+      opens_minutes: 1050,
+      closes_minutes: 1320,
+      last_order_minutes: 1305,
+      display_order: 0,
+    },
+  ],
   destination_videos: [
     {
       destination_id: "citron",
