@@ -46,6 +46,8 @@ export type UIKey =
   | "area"
   | "instagram"
   | "concierge"
+  | "contact_call"
+  | "contact_unavailable"
   | "language"
   | "events"
   | "explore_more"

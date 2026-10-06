@@ -9,7 +9,8 @@ import { localizedLinkUrl } from "@/lib/localized-links";
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useJourneyMotion } from "@/lib/use-journey-motion";
-import { ArrowUpRight, Phone } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { ConciergeContact } from "@/components/hub/ConciergeContact";
 import { LevelChapter } from "@/components/hub/LevelChapter";
 import { NamTramRail } from "@/components/hub/NamTramRail";
 import { type Level } from "@/data/resort";
@@ -143,7 +144,7 @@ function CatalogueStatus({
 function Hub() {
   const { openMap } = useResortMap();
   const hubRef = useRef<HTMLDivElement>(null);
-  const { levels, links, contact } = useHub();
+  const { levels, links } = useHub();
   const { active, visible } = useJourneyMotion(hubRef, levels);
   const { lang, t, linkLabel } = useI18n();
 
@@ -205,13 +206,7 @@ function Hub() {
       </section>
 
       {/* FIXED CONCIERGE BUTTON */}
-      <a
-        href={contact}
-        aria-label={t("concierge")}
-        className="brand-floating fixed bottom-4 right-4 z-50 flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-95"
-      >
-        <Phone size={14} strokeWidth={1.3} />
-      </a>
+      <ConciergeContact />
     </div>
   );
 }

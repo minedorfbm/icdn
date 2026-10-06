@@ -32,6 +32,8 @@ export interface HubValue {
   destinations: Destination[];
   links: { label: string; url: string; translations?: LinkTranslations }[];
   contact: string;
+  whatsapp: string | undefined;
+  zalo: string | undefined;
 }
 
 /** Use the same CMS image for the hero and its preload. */
@@ -102,5 +104,7 @@ export function createHubValue(data?: HubData): HubValue {
     }),
     links,
     contact: s["contact"] ?? OFFICIAL.contact,
+    whatsapp: s["whatsapp"],
+    zalo: s["zalo"],
   };
 }
