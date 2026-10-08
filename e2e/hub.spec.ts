@@ -406,6 +406,7 @@ test("a slow Instagram embed still appears after the former fallback deadline", 
     );
     await page.goto("/citron");
     const card = page.getByRole("dialog", { name: "Citron", exact: true });
+    await expect(card.locator(".instagram-media")).toHaveCount(1);
     await card
       .locator("[data-destination-scroll]")
       .evaluate((el) => el.scrollTo(0, el.scrollHeight));
@@ -432,6 +433,7 @@ test("Instagram can retry a failed script without reloading the card", async ({
     });
     await page.goto("/citron");
     const card = page.getByRole("dialog", { name: "Citron", exact: true });
+    await expect(card.locator(".instagram-media")).toHaveCount(1);
     await card
       .locator("[data-destination-scroll]")
       .evaluate((el) => el.scrollTo(0, el.scrollHeight));
