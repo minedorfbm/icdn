@@ -445,3 +445,57 @@ test("Instagram can retry a failed script without reloading the card", async ({
     await request.post("http://127.0.0.1:54329/control", { data: {} });
   }
 });
+
+test("Instagram dots follow the active post height and neighbouring posts share one load", async ({
+  page,
+}) => {
+  let loads = 0;
+  await page.route("https://www.instagram.com/embed.js", (route) => {
+    loads += 1;
+    return route.fulfill({
+      contentType: "application/javascript",
+      body: `
+      window.embedPasses = 0;
+      window.instgrm = { Embeds: { process() {
+        window.embedPasses++;
+        document.querySelectorAll('.instagram-media').forEach((post) => {
+          const short = post.dataset.instgrmPermalink.includes('/SHORT/');
+          const frame = document.createElement('iframe');
+          frame.title = short ? 'Short post' : 'Tall post';
+          frame.style.cssText = 'display:block;width:100%;border:0;height:' + (short ? 260 : 920) + 'px';
+          frame.srcdoc = '<p>Official Instagram post</p>';
+          post.replaceWith(frame);
+        });
+      } } };
+    `,
+    });
+  });
+  await page.goto("/nature-experiences");
+  const card = page.getByRole("dialog", { name: "Nature Discovery", exact: true });
+  const track = card.locator("[data-instagram-track]");
+  await expect(track).toBeVisible();
+  await track.scrollIntoViewIfNeeded();
+  await expect(card.locator('iframe[title="Short post"]')).toBeVisible();
+  await expect(card.locator('iframe[title="Tall post"]')).toBeAttached();
+  const expectHeight = async (height: number) => {
+    await expect.poll(async () => Math.round((await track.boundingBox())!.height)).toBe(height);
+    const dots = await card.locator("[data-instagram-pagination]").boundingBox();
+    const rect = (await track.boundingBox())!;
+    expect(dots!.y - rect.y - rect.height).toBeGreaterThanOrEqual(0);
+    expect(dots!.y - rect.y - rect.height).toBeLessThanOrEqual(10);
+  };
+  await expectHeight(260);
+  await card.getByRole("button", { name: "2 / 2", exact: true }).click();
+  await expectHeight(920);
+  await card.getByRole("button", { name: "1 / 2", exact: true }).click();
+  await expectHeight(260);
+  // Simulate Instagram adjusting its iframe for an expanded caption.
+  await card.locator('iframe[title="Short post"]').evaluate((el) => {
+    (el as HTMLElement).style.height = "360px";
+  });
+  await expectHeight(360);
+  expect(loads).toBe(1);
+  expect(await page.evaluate(() => (window as Window & { embedPasses: number }).embedPasses)).toBe(
+    1,
+  );
+});

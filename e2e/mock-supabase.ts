@@ -110,6 +110,15 @@ const tables: Record<string, unknown[]> = {
     },
   ],
   destination_posts: [
+    ...["SHORT", "TALL"].map((post, display_order) => ({
+      destination_id: "nature-experiences",
+      post_url: `https://www.instagram.com/p/${post}/`,
+      account: "intercontinentaldanang",
+      caption: null,
+      image_url: null,
+      posted_at: null,
+      display_order,
+    })),
     {
       destination_id: "citron",
       post_url: "https://www.instagram.com/p/TESTPOST/",

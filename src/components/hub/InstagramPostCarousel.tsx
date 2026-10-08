@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { DestinationPost } from "@/data/resort";
 import { useI18n } from "@/i18n";
 import { InstagramPostEmbed } from "./InstagramPostEmbed";
@@ -12,6 +12,23 @@ export function InstagramPostCarousel({ posts }: { posts: DestinationPost[] }) {
   const items = posts.slice(0, 5);
   const track = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
+  const [height, setHeight] = useState<number>();
+
+  useEffect(() => {
+    const node = track.current;
+    const slide = node?.children[index]?.firstElementChild;
+    if (!slide) return;
+    const measure = () => {
+      const next = Math.ceil(slide.getBoundingClientRect().height);
+      if (next > 0) setHeight(next);
+    };
+    // Instagram changes iframe height after loading, videos and caption expansion.
+    // Measure the content, not the flex item that used to stretch to the tallest post.
+    const observer = new ResizeObserver(measure);
+    observer.observe(slide);
+    measure();
+    return () => observer.disconnect();
+  }, [index, posts]);
 
   const onScroll = useCallback(() => {
     const node = track.current;
@@ -34,8 +51,9 @@ export function InstagramPostCarousel({ posts }: { posts: DestinationPost[] }) {
       <div
         ref={track}
         onScroll={onScroll}
-        className="-mx-6 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 [&::-webkit-scrollbar]:hidden"
-        style={{ scrollbarWidth: "none" }}
+        data-instagram-track
+        className="-mx-6 mt-5 flex items-start snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden px-6 [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: "none", height }}
       >
         {items.map((post) => (
           <div key={post.post_url} className="w-full shrink-0 snap-center">
@@ -44,7 +62,7 @@ export function InstagramPostCarousel({ posts }: { posts: DestinationPost[] }) {
         ))}
       </div>
 
-      <div className="mt-4 flex items-center justify-center gap-2">
+      <div data-instagram-pagination className="mt-2 flex items-center justify-center gap-2">
         {items.map((post, i) => (
           <button
             key={post.post_url}
