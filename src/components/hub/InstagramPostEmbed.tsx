@@ -17,18 +17,28 @@ let embedScript: Promise<void> | undefined;
 function loadEmbedScript(): Promise<void> {
   if (typeof document === "undefined" || window.instgrm) return Promise.resolve();
   if (embedScript) return embedScript;
-  embedScript = new Promise((resolve) => {
+  embedScript = new Promise((resolve, reject) => {
     const existing = document.querySelector<HTMLScriptElement>(`script[src="${SCRIPT_SRC}"]`);
     const script = existing ?? document.createElement("script");
-    const done = () => {
+    const cleanup = () => {
       clearTimeout(timeout);
-      script.removeEventListener("load", done);
-      script.removeEventListener("error", done);
-      resolve();
+      script.removeEventListener("load", loaded);
+      script.removeEventListener("error", failed);
     };
-    const timeout = setTimeout(done, 8000);
-    script.addEventListener("load", done, { once: true });
-    script.addEventListener("error", done, { once: true });
+    const loaded = () => {
+      cleanup();
+      if (window.instgrm) resolve();
+      else failed();
+    };
+    const failed = () => {
+      cleanup();
+      script.remove();
+      embedScript = undefined;
+      reject(new Error("Instagram embed script unavailable"));
+    };
+    const timeout = setTimeout(failed, 12000);
+    script.addEventListener("load", loaded, { once: true });
+    script.addEventListener("error", failed, { once: true });
     if (!existing) {
       script.src = SCRIPT_SRC;
       script.async = true;
@@ -57,6 +67,7 @@ export function InstagramPostEmbed({
   const embeddable = /instagram\.com\/(p|reel|reels)\//.test(post.post_url);
   const [failed, setFailed] = useState(!embeddable);
   const [ready, setReady] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     setFailed(!embeddable);
@@ -66,20 +77,36 @@ export function InstagramPostEmbed({
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
+    // Keep watching after the fallback appears: a slow embed can still recover.
+    const rendered = () => {
+      if (cancelled || !node.querySelector("iframe")) return;
+      if (timer) clearTimeout(timer);
+      setReady(true);
+      setFailed(false);
+    };
+    const mutations = new MutationObserver(rendered);
+    mutations.observe(node, { childList: true, subtree: true });
     const observer = new IntersectionObserver(
       (entries) => {
         if (!entries.some((e) => e.isIntersecting)) return;
         observer.disconnect();
-        void loadEmbedScript().then(() => {
-          if (cancelled) return;
-          window.instgrm?.Embeds.process();
-          timer = setTimeout(() => {
+        void loadEmbedScript().then(
+          () => {
             if (cancelled) return;
-            const iframe = node.querySelector("iframe");
-            if (iframe) setReady(true);
-            else setFailed(true);
-          }, 2600);
-        });
+            try {
+              window.instgrm?.Embeds.process();
+              rendered();
+              timer = setTimeout(() => {
+                if (!cancelled && !node.querySelector("iframe")) setFailed(true);
+              }, 12000);
+            } catch {
+              setFailed(true);
+            }
+          },
+          () => {
+            if (!cancelled) setFailed(true);
+          },
+        );
       },
       { rootMargin: "300px" },
     );
@@ -88,15 +115,16 @@ export function InstagramPostEmbed({
     return () => {
       cancelled = true;
       observer.disconnect();
+      mutations.disconnect();
       if (timer) clearTimeout(timer);
     };
-  }, [post.post_url, embeddable]);
+  }, [post.post_url, embeddable, attempt]);
 
   const handle = post.account ? `@${post.account.replace(/^@/, "")}` : null;
 
   const body = (
     <div ref={host} className={bare ? "" : "mt-5"}>
-      {!failed && (
+      {embeddable && (
         <div
           className={`overflow-hidden rounded-[18px] bg-white transition-opacity ${
             ready ? "opacity-100" : "opacity-0"
@@ -117,7 +145,20 @@ export function InstagramPostEmbed({
         </div>
       )}
 
-      {failed && <PostCard post={post} handle={handle} />}
+      {failed && (
+        <>
+          <PostCard post={post} handle={handle} />
+          {embeddable && (
+            <button
+              type="button"
+              onClick={() => setAttempt((value) => value + 1)}
+              className="mt-3 min-h-11 rounded-full border border-current/20 px-4 text-xs"
+            >
+              {t("retry")}
+            </button>
+          )}
+        </>
+      )}
       {!failed && !ready && <PostSkeleton />}
     </div>
   );

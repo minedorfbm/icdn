@@ -109,6 +109,17 @@ const tables: Record<string, unknown[]> = {
       display_order: 0,
     },
   ],
+  destination_posts: [
+    {
+      destination_id: "citron",
+      post_url: "https://www.instagram.com/p/TESTPOST/",
+      account: "intercontinentaldanang",
+      caption: null,
+      image_url: null,
+      posted_at: null,
+      display_order: 0,
+    },
+  ],
   destination_videos: [
     {
       destination_id: "citron",

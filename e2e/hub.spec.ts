@@ -1,5 +1,10 @@
 import { expect, test, type Locator } from "@playwright/test";
 
+// Instagram is external; focused tests below replace this route with a deterministic script.
+test.beforeEach(async ({ page }) => {
+  await page.route("https://www.instagram.com/embed.js", (route) => route.abort());
+});
+
 // Check geometry before clicking: click() would scroll a misplaced control into view.
 async function expectPersistentTools(dialog: Locator, scroller: Locator) {
   const buttons = [
@@ -372,4 +377,71 @@ test("expanded cards show localized hours and service days below the description
   await expect(hours).toContainText("Last order 21:45");
   const description = card.getByText("A restaurant overlooking the sea.", { exact: true });
   expect((await hours.boundingBox())!.y).toBeGreaterThan((await description.boundingBox())!.y);
+});
+
+const instagramTestScript = (delay: number) => `
+window.instgrm = { Embeds: { process() {
+  document.querySelectorAll('.instagram-media').forEach((post) => {
+    if (post.dataset.testProcessing) return;
+    post.dataset.testProcessing = 'true';
+    setTimeout(() => {
+      if (!post.isConnected) return;
+      const frame = document.createElement('iframe');
+      frame.title = 'Instagram test post';
+      frame.srcdoc = '<p>Official Instagram post</p>';
+      post.replaceWith(frame);
+    }, ${delay});
+  });
+} } };
+`;
+
+test("a slow Instagram embed still appears after the former fallback deadline", async ({
+  page,
+  request,
+}) => {
+  await request.post("http://127.0.0.1:54329/control", { data: {} });
+  try {
+    await page.route("https://www.instagram.com/embed.js", (route) =>
+      route.fulfill({ contentType: "application/javascript", body: instagramTestScript(3300) }),
+    );
+    await page.goto("/citron");
+    const card = page.getByRole("dialog", { name: "Citron", exact: true });
+    await expect(card.locator(".instagram-media")).toHaveCount(1);
+    await card
+      .locator("[data-destination-scroll]")
+      .evaluate((el) => el.scrollTo(0, el.scrollHeight));
+    const frame = card.locator('iframe[title="Instagram test post"]');
+    await expect(frame).toBeVisible({ timeout: 10000 });
+    await expect(card.getByRole("button", { name: "Try again", exact: true })).toHaveCount(0);
+  } finally {
+    await request.post("http://127.0.0.1:54329/control", { data: {} });
+  }
+});
+
+test("Instagram can retry a failed script without reloading the card", async ({
+  page,
+  request,
+}) => {
+  await request.post("http://127.0.0.1:54329/control", { data: {} });
+  let loads = 0;
+  try {
+    await page.route("https://www.instagram.com/embed.js", (route) => {
+      loads += 1;
+      return loads === 1
+        ? route.abort()
+        : route.fulfill({ contentType: "application/javascript", body: instagramTestScript(0) });
+    });
+    await page.goto("/citron");
+    const card = page.getByRole("dialog", { name: "Citron", exact: true });
+    await expect(card.locator(".instagram-media")).toHaveCount(1);
+    await card
+      .locator("[data-destination-scroll]")
+      .evaluate((el) => el.scrollTo(0, el.scrollHeight));
+    await expect(card.getByRole("link", { name: "VIEW ON INSTAGRAM", exact: true })).toBeVisible();
+    await card.getByRole("button", { name: "Try again", exact: true }).click();
+    await expect(card.locator('iframe[title="Instagram test post"]')).toBeVisible();
+    expect(loads).toBe(2);
+  } finally {
+    await request.post("http://127.0.0.1:54329/control", { data: {} });
+  }
 });
