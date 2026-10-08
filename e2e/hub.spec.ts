@@ -268,13 +268,50 @@ test("search and concierge remain usable on direct cards and inside the PDF brow
   expect(errors).toEqual([]);
 });
 
-test("Surprise me keeps search and concierge visible while its deck scrolls", async ({ page }) => {
+test("Surprise me fits the viewport without counters or overlapping contact controls", async ({
+  page,
+}) => {
   await page.goto("/");
   await page.locator(".discovery-surprise").click();
   const surprise = page.getByRole("dialog", { name: "Surprise me", exact: true });
-  // A short screen exercises the overflow layout independently of card content length.
-  await page.setViewportSize({ width: 390, height: 600 });
-  await expectPersistentTools(surprise, surprise.locator("[data-surprise-scroll]"));
+  await expect(surprise.locator("nav")).toHaveCount(0);
+  await expect(surprise.locator('[aria-live="polite"]')).toHaveCount(0);
+  for (const size of [
+    { width: 390, height: 844 },
+    { width: 320, height: 568 },
+  ]) {
+    await page.setViewportSize(size);
+    await expect
+      .poll(() => surprise.evaluate((el) => el.scrollHeight - el.clientHeight))
+      .toBeLessThanOrEqual(1);
+    const card = await surprise.locator(".perspective-card").first().boundingBox();
+    const phone = await surprise
+      .getByRole("button", { name: "Contact", exact: true })
+      .boundingBox();
+    expect(card!.y + card!.height).toBeLessThan(phone!.y);
+    expect(phone!.y + phone!.height).toBeLessThanOrEqual(size.height);
+    const heading = await surprise.locator(".surprise-heading").boundingBox();
+    const tools = await surprise.locator(".surprise-tools").boundingBox();
+    expect(heading!.y).toBeLessThan(tools!.y + tools!.height);
+  }
+  const stage = surprise.locator(".discovery-stack > .touch-pan-y");
+  const active = stage.locator('article[aria-hidden="false"]');
+  const firstName = await active.innerText();
+  for (const [event, x] of [
+    ["pointerdown", 280],
+    ["pointermove", 40],
+    ["pointerup", 40],
+  ] as const) {
+    await stage.dispatchEvent(event, {
+      pointerId: 1,
+      pointerType: "touch",
+      isPrimary: true,
+      button: 0,
+      clientX: x,
+      clientY: 250,
+    });
+  }
+  await expect.poll(() => active.innerText()).not.toBe(firstName);
   await surprise.getByRole("button", { name: "Contact", exact: true }).click();
   const contact = page.getByRole("dialog", { name: "Contact", exact: true });
   await expect(contact.getByRole("link", { name: "WhatsApp", exact: true })).toBeVisible();

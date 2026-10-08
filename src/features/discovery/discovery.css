@@ -168,13 +168,16 @@
   background: var(--brand-white);
   color: var(--brand-ink);
 }
-.surprise-scroll {
-  padding-top: calc(max(24px, env(safe-area-inset-top, 0px)) + 52px);
-  padding-bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 64px);
+.surprise-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-top: max(20px, env(safe-area-inset-top, 0px));
+  padding-bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 56px);
 }
 .surprise-tools {
   position: absolute;
-  top: max(24px, env(safe-area-inset-top, 0px));
+  top: max(20px, env(safe-area-inset-top, 0px));
   right: 20px;
   z-index: 10;
   display: flex;
@@ -185,7 +188,9 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  padding: 20px 20px 8px;
+  padding: 0 132px 8px 20px;
+  width: 100%;
+  flex-shrink: 0;
   max-width: 740px;
   margin: auto;
 }
@@ -195,13 +200,12 @@
 .surprise-heading h2 {
   margin-top: 4px;
   font:
-    400 34px/1.05 var(--font-serif),
+    400 clamp(26px, 7vw, 34px)/1.05 var(--font-serif),
     Georgia,
     serif;
   overflow-wrap: anywhere;
 }
-.surprise-tools button,
-.surprise-controls button {
+.surprise-tools button {
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -212,13 +216,14 @@
   color: var(--brand-ink);
   background: var(--brand-white);
 }
-.surprise-tools button:focus-visible,
-.surprise-controls button:focus-visible {
+.surprise-tools button:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 3px;
 }
 .surprise-hint {
-  padding: 4px 22px 0;
+  padding: 4px 22px 8px;
+  width: 100%;
+  flex-shrink: 0;
   font-size: 12px;
   line-height: 1.5;
   letter-spacing: 0.04em;
@@ -227,31 +232,21 @@
   margin: auto;
 }
 .surprise-deck {
-  --discovery-card-height: clamp(290px, calc(100svh - 265px), 730px);
+  --discovery-card-height: 100%;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   max-width: 740px;
-  margin: auto;
+  max-height: 754px;
+  margin: 0 auto;
 }
-.surprise-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin: 18px auto 0;
-  padding: 0 22px;
-  max-width: 740px;
+.discovery-stack {
+  height: 100%;
 }
-.surprise-controls span {
-  max-width: 25ch;
-  text-align: center;
-  font:
-    italic 16px/1.25 var(--font-serif),
-    Georgia,
-    serif;
-  color: var(--brand-muted);
-}
-.surprise-controls button:disabled {
-  opacity: 0.25;
-  cursor: default;
+.discovery-stack > .touch-pan-y {
+  height: 100%;
+  grid-template-rows: minmax(0, 1fr);
+  padding-block: 12px;
 }
 .surprise-empty {
   padding: 50px 24px;
