@@ -48,6 +48,26 @@ function loadEmbedScript(): Promise<void> {
   return embedScript;
 }
 
+let processing: Promise<void> | undefined;
+
+/** Neighbouring posts share one Instagram processing pass per frame. */
+function processEmbeds(): Promise<void> {
+  if (processing) return processing;
+  processing = new Promise((resolve, reject) => {
+    requestAnimationFrame(() => {
+      try {
+        window.instgrm?.Embeds.process();
+        resolve();
+      } catch (error) {
+        reject(error);
+      } finally {
+        processing = undefined;
+      }
+    });
+  });
+  return processing;
+}
+
 /**
  * Renders a real Instagram post (photo, account, full caption) via Instagram's
  * official embed. If the embed does not render — offline preview, private post,
@@ -90,25 +110,26 @@ export function InstagramPostEmbed({
       (entries) => {
         if (!entries.some((e) => e.isIntersecting)) return;
         observer.disconnect();
-        void loadEmbedScript().then(
-          () => {
-            if (cancelled) return;
-            try {
-              window.instgrm?.Embeds.process();
-              rendered();
-              timer = setTimeout(() => {
-                if (!cancelled && !node.querySelector("iframe")) setFailed(true);
-              }, 12000);
-            } catch {
-              setFailed(true);
-            }
-          },
-          () => {
-            if (!cancelled) setFailed(true);
-          },
-        );
+        void loadEmbedScript()
+          .then(processEmbeds)
+          .then(
+            () => {
+              if (cancelled) return;
+              try {
+                rendered();
+                timer = setTimeout(() => {
+                  if (!cancelled && !node.querySelector("iframe")) setFailed(true);
+                }, 12000);
+              } catch {
+                setFailed(true);
+              }
+            },
+            () => {
+              if (!cancelled) setFailed(true);
+            },
+          );
       },
-      { rootMargin: "300px" },
+      { rootMargin: "600px" },
     );
     observer.observe(node);
 
