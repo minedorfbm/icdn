@@ -1,5 +1,10 @@
 import { expect, test, type Locator } from "@playwright/test";
 
+// Instagram is external; focused tests below replace this route with a deterministic script.
+test.beforeEach(async ({ page }) => {
+  await page.route("https://www.instagram.com/embed.js", (route) => route.abort());
+});
+
 // Check geometry before clicking: click() would scroll a misplaced control into view.
 async function expectPersistentTools(dialog: Locator, scroller: Locator) {
   const buttons = [
@@ -394,7 +399,7 @@ test("a slow Instagram embed still appears after the former fallback deadline", 
   page,
   request,
 }) => {
-  await request.post("http://127.0.0.1:54329/control", { data: { instagramPosts: true } });
+  await request.post("http://127.0.0.1:54329/control", { data: {} });
   try {
     await page.route("https://www.instagram.com/embed.js", (route) =>
       route.fulfill({ contentType: "application/javascript", body: instagramTestScript(3300) }),
@@ -416,7 +421,7 @@ test("Instagram can retry a failed script without reloading the card", async ({
   page,
   request,
 }) => {
-  await request.post("http://127.0.0.1:54329/control", { data: { instagramPosts: true } });
+  await request.post("http://127.0.0.1:54329/control", { data: {} });
   let loads = 0;
   try {
     await page.route("https://www.instagram.com/embed.js", (route) => {
