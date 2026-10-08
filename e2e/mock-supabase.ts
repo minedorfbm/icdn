@@ -125,6 +125,7 @@ const tables: Record<string, unknown[]> = {
     { key: "zalo", value: "https://zalo.me/842363938888" },
   ],
 };
+let instagramPosts = false;
 let delay = 0;
 let failCatalogue = false;
 let failMediaOnce = false;
@@ -137,6 +138,7 @@ serve({
     if (url.pathname === "/control") {
       if (request.method === "POST") {
         const config = await request.json();
+        instagramPosts = config.instagramPosts ?? false;
         delay = config.delay ?? 0;
         failCatalogue = config.failCatalogue ?? false;
         failMediaOnce = config.failMediaOnce ?? false;
@@ -153,7 +155,20 @@ serve({
       failMediaOnce = false;
       return Response.json({ message: "test media offline" }, { status: 503 });
     }
-    let rows = tables[table] ?? [];
+    let rows =
+      table === "destination_posts" && instagramPosts
+        ? [
+            {
+              destination_id: "citron",
+              post_url: "https://www.instagram.com/p/TESTPOST/",
+              account: "intercontinentaldanang",
+              caption: null,
+              image_url: null,
+              posted_at: null,
+              display_order: 0,
+            },
+          ]
+        : (tables[table] ?? []);
     for (const column of ["destination_id", "id"]) {
       const filter = url.searchParams.get(column);
       if (filter?.startsWith("eq."))
