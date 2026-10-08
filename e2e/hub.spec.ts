@@ -294,7 +294,7 @@ test("Surprise me fits the viewport without counters or overlapping contact cont
     const tools = await surprise.locator(".surprise-tools").boundingBox();
     expect(heading!.y).toBeLessThan(tools!.y + tools!.height);
   }
-  const stage = surprise.locator(".touch-pan-y");
+  const stage = surprise.locator(".discovery-stack > .touch-pan-y");
   const active = stage.locator('article[aria-hidden="false"]');
   const firstName = await active.innerText();
   for (const [event, x] of [
