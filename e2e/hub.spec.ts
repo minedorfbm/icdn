@@ -499,3 +499,46 @@ test("Instagram dots follow the active post height and neighbouring posts share 
     1,
   );
 });
+
+test("Instagram keeps its placeholder until the initial zero-height iframe is ready", async ({
+  page,
+}) => {
+  await page.route("https://www.instagram.com/embed.js", (route) =>
+    route.fulfill({
+      contentType: "application/javascript",
+      body: `window.instgrm = { Embeds: { process() {
+      document.querySelectorAll('blockquote.instagram-media').forEach((post) => {
+        if (post.dataset.testProcessing) return;
+        post.dataset.testProcessing = 'true';
+        const frame = document.createElement('iframe');
+        frame.title = 'Initializing Instagram post';
+        frame.style.cssText = 'height:0;position:absolute;display:block;width:100%;border:0';
+        frame.srcdoc = '<p>Official Instagram post</p>';
+        post.before(frame);
+      });
+    } } };`,
+    }),
+  );
+  await page.goto("/citron");
+  const card = page.getByRole("dialog", { name: "Citron", exact: true });
+  await expect(card.locator(".instagram-media")).toHaveCount(1);
+  await card.locator("[data-destination-scroll]").evaluate((el) => el.scrollTo(0, el.scrollHeight));
+  const frame = card.locator('iframe[title="Initializing Instagram post"]');
+  await expect(frame).toBeAttached();
+  await expect(card.locator("[data-instagram-loading]")).toBeVisible();
+  await expect(
+    card.getByRole("link", { name: "https://www.instagram.com/p/TESTPOST/", exact: true }),
+  ).toBeHidden();
+  // A stuck zero-height player must fall back even though an iframe exists.
+  await expect(card.getByRole("button", { name: "Try again", exact: true })).toBeVisible({
+    timeout: 15000,
+  });
+  await expect(card.locator("[data-instagram-loading]")).toHaveCount(0);
+  await frame.evaluate((el) => {
+    (el as HTMLElement).style.height = "500px";
+    (el as HTMLElement).style.position = "static";
+  });
+  await expect(frame).toBeVisible();
+  await expect(card.getByRole("button", { name: "Try again", exact: true })).toHaveCount(0);
+  await expect(card.locator("[data-instagram-loading]")).toHaveCount(0);
+});
