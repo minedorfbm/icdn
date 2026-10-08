@@ -97,15 +97,32 @@ export function InstagramPostEmbed({
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
-    // Keep watching after the fallback appears: a slow embed can still recover.
+    let frame: HTMLIFrameElement | null = null;
+    let displayed = false;
+    const sizes = new ResizeObserver(() => rendered());
+    // Instagram inserts a zero-height iframe before its content is ready. Keep
+    // the skeleton until its resize message gives the player a usable height.
     const rendered = () => {
-      if (cancelled || !node.querySelector("iframe")) return;
+      if (cancelled) return;
+      const next = node.querySelector("iframe");
+      if (next !== frame) {
+        if (frame) sizes.unobserve(frame);
+        frame = next;
+        if (frame) sizes.observe(frame);
+      }
+      if (!frame || frame.getBoundingClientRect().height < 100) return;
+      displayed = true;
       if (timer) clearTimeout(timer);
       setReady(true);
       setFailed(false);
     };
     const mutations = new MutationObserver(rendered);
-    mutations.observe(node, { childList: true, subtree: true });
+    mutations.observe(node, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["style", "height"],
+    });
     const observer = new IntersectionObserver(
       (entries) => {
         if (!entries.some((e) => e.isIntersecting)) return;
@@ -118,7 +135,7 @@ export function InstagramPostEmbed({
               try {
                 rendered();
                 timer = setTimeout(() => {
-                  if (!cancelled && !node.querySelector("iframe")) setFailed(true);
+                  if (!cancelled && !displayed) setFailed(true);
                 }, 12000);
               } catch {
                 setFailed(true);
@@ -137,6 +154,7 @@ export function InstagramPostEmbed({
       cancelled = true;
       observer.disconnect();
       mutations.disconnect();
+      sizes.disconnect();
       if (timer) clearTimeout(timer);
     };
   }, [post.post_url, embeddable, attempt]);
@@ -147,7 +165,7 @@ export function InstagramPostEmbed({
     <div ref={host} className={bare ? "" : "mt-5"}>
       {embeddable && (
         <div
-          className={`overflow-hidden rounded-[18px] bg-white transition-opacity ${
+          className={`overflow-hidden rounded-[18px] bg-white transition-opacity [&_blockquote]:invisible ${
             ready ? "opacity-100" : "opacity-0"
           }`}
           style={ready ? undefined : { height: 1, pointerEvents: "none" }}
@@ -238,7 +256,10 @@ function PostCard({ post, handle }: { post: DestinationPost; handle: string | nu
 
 function PostSkeleton() {
   return (
-    <div className="animate-pulse overflow-hidden rounded-[18px] border border-current/12 bg-current/[0.04]">
+    <div
+      data-instagram-loading
+      className="animate-pulse overflow-hidden rounded-[18px] border border-current/12 bg-current/[0.04]"
+    >
       <div className="flex items-center gap-3 px-4 py-3.5">
         <span className="size-8 rounded-full bg-current/10" />
         <span className="h-2 w-28 rounded bg-current/10" />
