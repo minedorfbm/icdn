@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, RotateCcw, X } from "lucide-react";
+import { X } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { HubSearch } from "@/features/search/HubSearch";
 import { ConciergeContact } from "@/components/hub/ConciergeContact";
@@ -12,18 +12,15 @@ export function SurpriseDiscovery({
   items,
   index,
   onIndexChange,
-  onShuffle,
   onClose,
 }: Readonly<{
   items: Destination[];
   index: number;
   onIndexChange: Dispatch<SetStateAction<number>>;
-  onShuffle: () => void;
   onClose: () => void;
 }>) {
   const { lang, t } = useI18n();
   const copy = (key: Parameters<typeof discoveryCopy>[1]) => discoveryCopy(lang, key);
-  const last = index === items.length - 1;
   return (
     <FullscreenDialog
       title={copy("surprise")}
@@ -38,10 +35,7 @@ export function SurpriseDiscovery({
         </button>
       </div>
       <ConciergeContact />
-      <div
-        data-surprise-scroll
-        className="surprise-scroll h-full overflow-x-hidden overflow-y-auto overscroll-contain"
-      >
+      <div data-surprise-content className="surprise-content">
         <header className="surprise-heading">
           <div>
             <p>{copy("kicker")}</p>
@@ -60,30 +54,6 @@ export function SurpriseDiscovery({
                 layout="discovery"
               />
             </div>
-            <nav className="surprise-controls" aria-label={copy("surprise")}>
-              <button
-                type="button"
-                disabled={index === 0}
-                onClick={() => onIndexChange((i) => Math.max(0, i - 1))}
-                aria-label={copy("previous")}
-              >
-                <ArrowLeft size={20} />
-              </button>
-              <span>{copy("surpriseNote")}</span>
-              {last ? (
-                <button type="button" onClick={onShuffle} aria-label={copy("again")}>
-                  <RotateCcw size={20} />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => onIndexChange((i) => Math.min(items.length - 1, i + 1))}
-                  aria-label={copy("next")}
-                >
-                  <ArrowRight size={20} />
-                </button>
-              )}
-            </nav>
           </>
         ) : (
           <p className="surprise-empty">{copy("empty")}</p>

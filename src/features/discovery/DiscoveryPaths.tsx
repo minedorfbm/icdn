@@ -6,12 +6,7 @@ import { useI18n } from "@/i18n";
 import { useResortMap } from "@/features/resort-map/map-context";
 import tramIllustration from "@/assets/nam-tram-signature.webp";
 import { discoveryCopy } from "./discovery-copy";
-import {
-  readDiscovery,
-  restoreDiscovery,
-  shuffledIds,
-  type SavedDiscovery,
-} from "./surprise-order";
+import { readDiscovery, restoreDiscovery, type SavedDiscovery } from "./surprise-order";
 import { SurpriseDiscovery } from "./SurpriseDiscovery";
 import "./discovery.css";
 
@@ -102,12 +97,6 @@ export function DiscoveryPaths({ onJourney }: Readonly<{ onJourney: () => void }
       /* Continue in memory when browser storage is unavailable. */
     }
   }, [open, order, items, activeIndex]);
-  const shuffleAgain = () => {
-    const next = shuffledIds(destinations);
-    if (next.length > 1 && next[0] === items[activeIndex]?.id) next.push(next.shift()!);
-    setOrder(next);
-    setIndex(0);
-  };
 
   return (
     <section id="discover" className="discovery-paths" aria-labelledby="discovery-title">
@@ -140,7 +129,6 @@ export function DiscoveryPaths({ onJourney }: Readonly<{ onJourney: () => void }
           items={items}
           index={activeIndex}
           onIndexChange={setIndex}
-          onShuffle={shuffleAgain}
           onClose={() => setOpen(false)}
         />
       )}
