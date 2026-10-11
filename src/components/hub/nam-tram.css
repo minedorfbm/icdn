@@ -14,32 +14,29 @@
 }
 
 .nam-tram-stop {
-  display: block;
-  width: 26px;
-  height: 23px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
   max-width: none;
+  border-radius: 50%;
+  background: var(--tram-ebony);
   color: var(--tram-brass);
   filter: drop-shadow(0 1px 1px oklch(0 0 0 / 0.35));
   transition:
-    transform 240ms ease,
+    color 240ms ease,
     filter 240ms ease;
 }
 
-.nam-tram-station-roof {
-  fill: var(--tram-ebony);
-}
-
-.nam-tram-station-landing {
-  stroke-width: 1.7;
+.nam-tram-stop svg {
+  display: block;
+  width: 28px;
+  height: 28px;
 }
 
 .nam-tram-stop[data-active="true"] {
-  transform: translateY(8px);
+  color: oklch(0.93 0.025 85);
   filter: drop-shadow(0 0 3px oklch(0.79 0.066 83 / 0.6));
-}
-
-.nam-tram-stop[data-active="true"] .nam-tram-station-roof {
-  fill: var(--tram-brass);
 }
 
 .nam-tram-cabin {
@@ -159,13 +156,6 @@
   width: 30px;
   height: 32px;
   flex-shrink: 0;
-}
-
-.nam-tram-docked-cabin {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
 }
 
 .nam-tram-station-end {
