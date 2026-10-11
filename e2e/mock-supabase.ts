@@ -26,26 +26,28 @@ const destinations = ["citron", "tingara"].map((id, display_order) => ({
   display_order,
   active: true,
 }));
-destinations.push({
-  ...destinations[0]!,
-  id: "enchanted-holiday",
-  name: "Enchanted Holiday Escape",
-  cluster: "EXPERIENCES",
-  type: "experience",
-  content_kind: "offer",
-  content_family: "offer",
-  display_order: 2,
-});
-destinations.push({
-  ...destinations[0]!,
-  id: "nature-experiences",
-  name: "Nature Discovery",
-  cluster: "EXPERIENCES",
-  type: "experience",
-  content_kind: "offer",
-  content_family: "storytelling",
-  display_order: 3,
-});
+destinations.push(
+  {
+    ...destinations[0]!,
+    id: "enchanted-holiday",
+    name: "Enchanted Holiday Escape",
+    cluster: "EXPERIENCES",
+    type: "experience",
+    content_kind: "offer",
+    content_family: "offer",
+    display_order: 2,
+  },
+  {
+    ...destinations[0]!,
+    id: "nature-experiences",
+    name: "Nature Discovery",
+    cluster: "EXPERIENCES",
+    type: "experience",
+    content_kind: "offer",
+    content_family: "storytelling",
+    display_order: 3,
+  },
+);
 const tables: Record<string, unknown[]> = {
   levels,
   destinations,

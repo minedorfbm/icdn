@@ -355,6 +355,21 @@ export function groupEvents(rows: DestinationEventRow[]): Record<string, Destina
   return out;
 }
 
+function destinationPresentation(
+  row: DestinationRow,
+): Pick<Destination, "detailLayout" | "primaryLinkId" | "headings" | "headingTranslations"> {
+  return {
+    detailLayout: row.detail_layout ?? "classic",
+    ...(row.primary_link_id ? { primaryLinkId: row.primary_link_id } : {}),
+    headings: {
+      ...(row.links_heading ? { links: row.links_heading } : {}),
+      ...(row.video_heading ? { video: row.video_heading } : {}),
+      ...(row.instagram_heading ? { instagram: row.instagram_heading } : {}),
+    },
+    headingTranslations: row.heading_translations ?? {},
+  };
+}
+
 /** Converts a database row into the shape the components already consume. */
 export function toDestination(
   row: DestinationRow,
@@ -374,14 +389,7 @@ export function toDestination(
     type,
     short_description: row.short_description,
     ...(row.detail_description ? { detail_description: row.detail_description } : {}),
-    detailLayout: row.detail_layout ?? "classic",
-    ...(row.primary_link_id ? { primaryLinkId: row.primary_link_id } : {}),
-    headings: {
-      ...(row.links_heading ? { links: row.links_heading } : {}),
-      ...(row.video_heading ? { video: row.video_heading } : {}),
-      ...(row.instagram_heading ? { instagram: row.instagram_heading } : {}),
-    },
-    headingTranslations: row.heading_translations ?? {},
+    ...destinationPresentation(row),
     contentFamily: row.content_family ?? (row.content_kind === "offer" ? "offer" : "resort"),
     audienceTags: row.audience_tags ?? ["all"],
     ...(row.offer_duration ? { offerDuration: row.offer_duration } : {}),

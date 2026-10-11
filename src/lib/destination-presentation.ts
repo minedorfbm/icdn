@@ -34,13 +34,11 @@ export function relatedDestinations(
 ) {
   const ids = [...relations]
     .sort((a, b) => a.display_order - b.display_order)
-    .flatMap((row) =>
-      row.destination_id === id
-        ? [row.related_destination_id]
-        : row.related_destination_id === id
-          ? [row.destination_id]
-          : [],
-    );
+    .flatMap((row) => {
+      if (row.destination_id === id) return [row.related_destination_id];
+      if (row.related_destination_id === id) return [row.destination_id];
+      return [];
+    });
   return [...new Set(ids)].flatMap((related) => {
     const destination = catalogue.find(
       (item) => item.id === related && item.active && item.id !== id,

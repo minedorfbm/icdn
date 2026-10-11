@@ -1,7 +1,10 @@
 import type { Level } from "@/data/resort";
 
 /** Resort signage redrawn from the supplied references; inherits the level palette. */
-export function ResortLevelIcon({ level, className }: { level: Level; className?: string }) {
+export function ResortLevelIcon({
+  level,
+  className,
+}: Readonly<{ level: Level; className?: string }>) {
   return (
     <svg viewBox="0 0 64 64" fill="none" aria-hidden="true" className={className}>
       {level === "heaven" && (

@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronDown, MapPin } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import { useHub } from "@/data/hub-context";
+import type { Destination } from "@/data/resort";
 import { useI18n } from "@/i18n";
 import { useDestinationMedia } from "@/lib/use-destination-media";
 import { useDestinationNavigation } from "@/lib/use-destination-navigation";
@@ -25,12 +26,51 @@ import { ResortLevelIcon } from "./ResortLevelIcon";
 import type { DestinationDetailProps } from "./DestinationDetail";
 import "./editorial-detail.css";
 
-function SectionHeading({ label, title }: { label: string; title?: string | undefined }) {
+function SectionHeading({ label, title }: Readonly<{ label: string; title?: string | undefined }>) {
   return (
     <header className="editorial-section-heading">
       <p>{label}</p>
       {title && <h3>{title}</h3>}
     </header>
+  );
+}
+
+const destinationMapModes: Record<string, "tour" | "photos"> = {
+  "bensley-package": "tour",
+  "instagram-spots": "photos",
+};
+
+function collectionLabel(destination: Destination) {
+  if (destination.type === "spa") return "spa_collection";
+  if (destination.cluster === "DINING") return "dining_collection";
+  if (destination.cluster === "WELLNESS") return "wellness_collection";
+  return "links_collection";
+}
+
+function EditorialInstagram({
+  dest,
+  media,
+}: Readonly<{ dest: Destination; media: ReturnType<typeof useDestinationMedia>["media"] }>) {
+  const { t, lang } = useI18n();
+  if (media.posts.length > 0) {
+    return (
+      <section className="editorial-section" aria-label={t("from_our_world")}>
+        <SectionHeading
+          label={t("from_our_world")}
+          title={detailHeading(dest, "instagram", lang)}
+        />
+        <InstagramPostCarousel posts={media.posts} embedded />
+      </section>
+    );
+  }
+  if (media.photos.length === 0) return null;
+  const profile = instagramUrl(dest);
+  return (
+    <InstagramStrip
+      photos={media.photos}
+      {...(profile ? { instagramUrl: profile } : {})}
+      label={t("from_our_world")}
+    />
   );
 }
 
@@ -57,23 +97,16 @@ export function EditorialDestinationDetail({
   } = useI18n();
   const { openMap, locate } = useResortMap();
   const placeId = locate(dest.id);
-  const mapMode =
-    dest.id === "bensley-package" ? "tour" : dest.id === "instagram-spots" ? "photos" : undefined;
+  const mapMode = destinationMapModes[dest.id];
   const { primary, secondary } = detailActions(dest, lang);
   const related = relatedDestinations(dest.id, destinations, relations);
   const next = nextDestination(dest.id, destinations, sequence);
-  const events = (dest.events ?? []).map(event);
-  const collection =
-    dest.type === "spa"
-      ? "spa_collection"
-      : dest.cluster === "DINING"
-        ? "dining_collection"
-        : dest.cluster === "WELLNESS"
-          ? "wellness_collection"
-          : "links_collection";
-  const label = (item: NonNullable<typeof primary>) =>
-    item.label ? linkLabel(item.label) : action(item.kind === "WEBSITE" ? "DISCOVER" : item.kind);
-  const profile = instagramUrl(dest);
+  const events = (dest.events ?? []).map((item) => event(item));
+  const collection = collectionLabel(dest);
+  const label = (item: NonNullable<typeof primary>) => {
+    if (item.label) return linkLabel(item.label);
+    return action(item.kind === "WEBSITE" ? "DISCOVER" : item.kind);
+  };
 
   return (
     <FullscreenDialog
@@ -225,23 +258,7 @@ export function EditorialDestinationDetail({
                 <YouTubeVideos videos={media.videos} embedded />
               </section>
             )}
-            {media.posts.length > 0 ? (
-              <section className="editorial-section" aria-label={t("from_our_world")}>
-                <SectionHeading
-                  label={t("from_our_world")}
-                  title={detailHeading(dest, "instagram", lang)}
-                />
-                <InstagramPostCarousel posts={media.posts} embedded />
-              </section>
-            ) : (
-              media.photos.length > 0 && (
-                <InstagramStrip
-                  photos={media.photos}
-                  {...(profile ? { instagramUrl: profile } : {})}
-                  label={t("from_our_world")}
-                />
-              )
-            )}
+            <EditorialInstagram dest={dest} media={media} />
 
             {related.length > 0 && (
               <section className="editorial-section" aria-label={t("related_places")}>
