@@ -29,7 +29,8 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
       <nav
         aria-label={t("resort_levels")}
         aria-hidden={!visible}
-        className={`nam-tram fixed right-[env(safe-area-inset-right,0px)] top-1/2 z-40 -translate-y-1/2 select-none transition-[opacity,transform] duration-500 motion-reduce:transition-none ${
+        data-level={active}
+        className={`nam-tram nam-tram-rail fixed right-[env(safe-area-inset-right,0px)] top-1/2 z-40 -translate-y-1/2 select-none transition-[opacity,transform] duration-500 motion-reduce:transition-none ${
           visible ? "translate-x-0 opacity-100" : "pointer-events-none translate-x-3 opacity-0"
         }`}
       >
@@ -45,6 +46,16 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
               aria-hidden
               className="nam-tram-track pointer-events-none absolute inset-y-5 left-1/2 w-2 -translate-x-1/2"
             >
+              {LEVELS.slice(0, -1).map((level, index) => (
+                <span
+                  key={level.id}
+                  className="nam-tram-track-segment"
+                  style={{
+                    top: `${(index / (LEVELS.length - 1)) * 100}%`,
+                    height: `${100 / (LEVELS.length - 1)}%`,
+                  }}
+                />
+              ))}
               {LEVELS.map((level, index) => (
                 <span
                   key={level.id}

@@ -4,12 +4,34 @@
   color: var(--tram-brass);
 }
 
-.nam-tram-track {
-  border-inline: 1px solid oklch(0.79 0.066 83 / 0.45);
+.nam-tram-rail {
+  color: var(--brand-ink);
+}
+
+.nam-tram-rail[data-level="sky"],
+.nam-tram-rail[data-level="earth"] {
+  color: oklch(0.95 0.01 100);
+}
+
+.nam-tram-rail[data-level="sea"] {
+  color: var(--world-sea-foreground);
+}
+
+.nam-tram-track-segment {
+  position: absolute;
+  inset-inline: 0;
+}
+
+/* Interrupt the cable around each transparent symbol, rather than filling its background. */
+.nam-tram-track-segment::before {
+  content: "";
+  position: absolute;
+  inset: 18px 0;
+  border-inline: 1px solid color-mix(in oklab, currentColor 30%, transparent);
   background: repeating-linear-gradient(
     to bottom,
     transparent 0 23px,
-    oklch(0.79 0.066 83 / 0.2) 23px 24px
+    color-mix(in oklab, currentColor 15%, transparent) 23px 24px
   );
 }
 
@@ -19,13 +41,7 @@
   width: 30px;
   height: 30px;
   max-width: none;
-  border-radius: 50%;
-  background: var(--tram-ebony);
-  color: var(--tram-brass);
-  filter: drop-shadow(0 1px 1px oklch(0 0 0 / 0.35));
-  transition:
-    color 240ms ease,
-    filter 240ms ease;
+  color: inherit;
 }
 
 .nam-tram-stop svg {
@@ -34,9 +50,8 @@
   height: 28px;
 }
 
-.nam-tram-stop[data-active="true"] {
-  color: oklch(0.93 0.025 85);
-  filter: drop-shadow(0 0 3px oklch(0.79 0.066 83 / 0.6));
+.nam-tram-rail .nam-tram-stop[data-active="true"] {
+  visibility: hidden;
 }
 
 .nam-tram-cabin {
@@ -114,16 +129,6 @@
   position: relative;
 }
 
-.nam-tram-stations::before {
-  content: "";
-  position: absolute;
-  top: 28px;
-  bottom: 28px;
-  left: 11px;
-  width: 8px;
-  border-inline: 1px solid oklch(0.79 0.066 83 / 0.2);
-}
-
 .nam-tram-station {
   color: oklch(0.82 0.02 85);
   cursor: pointer;
@@ -180,8 +185,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nam-tram-station,
-  .nam-tram-stop {
+  .nam-tram-station {
     transition: none;
   }
 }
