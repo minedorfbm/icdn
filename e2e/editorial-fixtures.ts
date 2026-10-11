@@ -43,6 +43,18 @@ export const editorialTables: Record<string, unknown[]> = {
       image_key: "d-wine",
       detail_image_key: "d-wine",
     },
+    ...[
+      ["buffalo-bar", "Buffalo Bar", 1],
+      ["long-pool", "L_O_N_G Pool", 2],
+      ["spa-lagoon-villas", "One-Bedroom Spa Lagoon Villa", 3],
+    ].map(([id, name, index]) => ({
+      ...editorialDestinations[Number(index)],
+      id,
+      name,
+      display_order: 50,
+      detail_layout: "classic",
+      primary_link_id: null,
+    })),
   ],
   destination_links: editorialDestinations.flatMap(({ id }) =>
     [
@@ -67,6 +79,9 @@ export const editorialTables: Record<string, unknown[]> = {
   ),
   destination_relations: [
     { destination_id: "la-maison-1888", related_destination_id: "wine-cellar", display_order: 0 },
+    { destination_id: "buffalo-bar", related_destination_id: "la-maison-1888", display_order: 1 },
+    { destination_id: "long-bar", related_destination_id: "long-pool", display_order: 0 },
+    { destination_id: "mi-sol-spa", related_destination_id: "spa-lagoon-villas", display_order: 0 },
   ],
   destination_opening_hours: editorialDestinations.map(({ id }) => ({
     id: `${id}-hours`,

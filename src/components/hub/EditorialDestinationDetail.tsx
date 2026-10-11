@@ -1,16 +1,11 @@
 import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronDown, MapPin } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
-import { useHub } from "@/data/hub-context";
 import type { Destination } from "@/data/resort";
 import { useI18n } from "@/i18n";
 import { useDestinationMedia } from "@/lib/use-destination-media";
 import { useDestinationNavigation } from "@/lib/use-destination-navigation";
-import {
-  detailActions,
-  detailHeading,
-  nextDestination,
-  relatedDestinations,
-} from "@/lib/destination-presentation";
+import { useDestinationSwipe } from "@/lib/use-destination-swipe";
+import { detailActions, detailHeading } from "@/lib/destination-presentation";
 import { instagramUrl } from "@/lib/destination-actions";
 import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
@@ -22,6 +17,7 @@ import { OpeningHours } from "./OpeningHours";
 import { YouTubeVideos } from "./YouTubeVideos";
 import { InstagramPostCarousel } from "./InstagramPostCarousel";
 import { InstagramStrip } from "./InstagramStrip";
+import { RelatedDestinations } from "./RelatedDestinations";
 import { ResortLevelIcon } from "./ResortLevelIcon";
 import type { DestinationDetailProps } from "./DestinationDetail";
 import "./editorial-detail.css";
@@ -82,8 +78,8 @@ export function EditorialDestinationDetail({
   portalled = true,
 }: DestinationDetailProps) {
   const { media, pending, failed, retry } = useDestinationMedia(dest.id);
-  const { destinations, relations } = useHub();
-  const { openDestination, sequence } = useDestinationNavigation();
+  const { openDestination } = useDestinationNavigation();
+  const { ref: swipeRef, next } = useDestinationSwipe(dest.id);
   const {
     lang,
     t,
@@ -99,8 +95,6 @@ export function EditorialDestinationDetail({
   const placeId = locate(dest.id);
   const mapMode = destinationMapModes[dest.id];
   const { primary, secondary } = detailActions(dest, lang);
-  const related = relatedDestinations(dest.id, destinations, relations);
-  const next = nextDestination(dest.id, destinations, sequence);
   const events = (dest.events ?? []).map((item) => event(item));
   const collection = collectionLabel(dest);
   const label = (item: NonNullable<typeof primary>) => {
@@ -122,6 +116,7 @@ export function EditorialDestinationDetail({
       </div>
       <ConciergeContact />
       <div
+        ref={swipeRef}
         data-destination-scroll
         className="h-full overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain"
       >
@@ -260,27 +255,7 @@ export function EditorialDestinationDetail({
             )}
             <EditorialInstagram dest={dest} media={media} />
 
-            {related.length > 0 && (
-              <section className="editorial-section" aria-label={t("related_places")}>
-                <SectionHeading label={t("related_places")} />
-                <div className="editorial-related">
-                  {related.map((item) => (
-                    <button key={item.id} type="button" onClick={() => openDestination(item.id)}>
-                      <img
-                        src={item.image}
-                        alt=""
-                        width={88}
-                        height={88}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <span>{item.name}</span>
-                      <ArrowRight size={21} strokeWidth={1.4} aria-hidden />
-                    </button>
-                  ))}
-                </div>
-              </section>
-            )}
+            <RelatedDestinations id={dest.id} />
             {next && (
               <footer className="editorial-continue">
                 <button type="button" onClick={() => openDestination(next.id)}>

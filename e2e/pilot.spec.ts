@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
   await page.route("https://www.instagram.com/embed.js", (route) =>
@@ -109,12 +109,16 @@ test("related cards navigate using catalogue data and continue opens the next de
 }) => {
   await page.goto("/la-maison-1888");
   await page
-    .locator(".editorial-related")
+    .locator(".destination-related")
     .getByRole("button", { name: "Wine Cellar", exact: true })
     .click();
   await expect(page).toHaveURL("/wine-cellar");
   await expect(page.getByRole("dialog", { name: "Wine Cellar", exact: true })).toBeVisible();
-  await page.goBack();
+  await page
+    .locator(".destination-related")
+    .getByRole("button", { name: "La Maison 1888", exact: true })
+    .click();
+  await expect(page).toHaveURL("/la-maison-1888");
   await expect(page.locator(".editorial-title")).toHaveText("La Maison 1888");
   await page.locator(".editorial-continue button").click();
   await expect(page).toHaveURL("/wine-cellar");
@@ -130,4 +134,96 @@ test("new shared labels and source-matched editorial headings translate together
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
   await expect(page.locator(".editorial-section-heading")).toContainText(["特別なひとときを。"]);
   await expect(page.locator(".editorial-continue")).not.toContainText("CONTINUE THE JOURNEY");
+});
+
+test("all added relationships display once and open in both directions", async ({ page }) => {
+  for (const [source, sourceName, target, targetName] of [
+    ["la-maison-1888", "La Maison 1888", "buffalo-bar", "Buffalo Bar"],
+    ["long-bar", "L_O_N_G Bar", "long-pool", "L_O_N_G Pool"],
+    ["mi-sol-spa", "Mi Sol Spa & Wellness", "spa-lagoon-villas", "One-Bedroom Spa Lagoon Villa"],
+  ]) {
+    await page.goto(`/${source}`);
+    const related = page.locator(".destination-related");
+    await expect(related.getByRole("button", { name: targetName, exact: true })).toHaveCount(1);
+    await related.getByRole("button", { name: targetName, exact: true }).click();
+    await expect(page).toHaveURL(`/${target}`);
+    await expect(related.getByRole("button", { name: sourceName, exact: true })).toHaveCount(1);
+    await related.getByRole("button", { name: sourceName, exact: true }).click();
+    await expect(page).toHaveURL(`/${source}`);
+  }
+});
+
+async function swipe(
+  target: Locator,
+  from: [number, number],
+  to: [number, number],
+  cancel = false,
+) {
+  return target.evaluate(
+    (node, input) => {
+      // WebKit exposes Touch without a public constructor. Supply the event's touch lists.
+      const touch = (point: [number, number]) => ({
+        identifier: 1,
+        target: node,
+        clientX: point[0],
+        clientY: point[1],
+      });
+      const dispatch = (type: string, point: [number, number], ended = false) => {
+        const changed = touch(point);
+        const event = new Event(type, { bubbles: true, cancelable: true });
+        Object.defineProperties(event, {
+          touches: { value: ended ? [] : [changed] },
+          targetTouches: { value: ended ? [] : [changed] },
+          changedTouches: { value: [changed] },
+        });
+        // Observe the card handler before the dialog's document-level scroll lock.
+        const scroller = node.closest("[data-destination-scroll]")!;
+        let prevented = false;
+        const observe = () => {
+          prevented = event.defaultPrevented;
+        };
+        scroller.addEventListener(type, observe);
+        node.dispatchEvent(event);
+        scroller.removeEventListener(type, observe);
+        return prevented;
+      };
+      dispatch("touchstart", input.from);
+      const prevented = dispatch("touchmove", input.to);
+      dispatch(input.cancel ? "touchcancel" : "touchend", input.to, true);
+      return prevented;
+    },
+    { from, to, cancel },
+  );
+}
+
+test("horizontal swipes navigate forward and back across editorial and classic cards", async ({
+  page,
+}) => {
+  await page.goto("/la-maison-1888");
+  const hero = page.locator(".editorial-hero img");
+  await expect(hero).toBeVisible();
+  expect(await swipe(hero, [290, 280], [80, 283])).toBe(true);
+  await expect(page).toHaveURL("/wine-cellar");
+  const classicHero = page.locator("[data-destination-scroll] img").first();
+  await expect(classicHero).toBeVisible();
+  await swipe(classicHero, [80, 280], [290, 283]);
+  await expect(page).toHaveURL("/la-maison-1888");
+  await expect(page.locator("[data-destination-scroll]")).toHaveJSProperty("scrollTop", 0);
+});
+
+test("vertical gestures, screen edges, controls, Instagram and cancelled swipes keep the current card", async ({
+  page,
+}) => {
+  await page.goto("/mi-sol-spa");
+  const hero = page.locator(".editorial-hero img");
+  await expect(hero).toBeVisible();
+  expect(await swipe(hero, [200, 400], [205, 170])).toBe(false);
+  expect(await swipe(hero, [5, 280], [290, 283])).toBe(false);
+  expect(await swipe(hero, [290, 280], [240, 281])).toBe(true);
+  await swipe(hero, [290, 280], [80, 283], true);
+  expect(await swipe(page.locator(".editorial-primary"), [290, 280], [80, 283])).toBe(false);
+  const track = page.locator("[data-instagram-track]");
+  await expect(track).toBeAttached();
+  expect(await swipe(track, [290, 280], [80, 283])).toBe(false);
+  await expect(page).toHaveURL("/mi-sol-spa");
 });

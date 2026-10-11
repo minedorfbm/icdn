@@ -4,7 +4,7 @@ import { groupLinks, toDestination } from "../src/data/resort";
 import {
   detailActions,
   detailHeading,
-  nextDestination,
+  adjacentDestination,
   relatedDestinations,
 } from "../src/lib/destination-presentation";
 import { destinationRow } from "../src/lib/hub-schema";
@@ -86,11 +86,13 @@ test("continue follows the current deck, skips unpublished cards and wraps witho
   const b = { ...destination, id: "b", display_order: 2 };
   const c = { ...destination, id: "c", display_order: 3 };
   const hidden = { ...destination, id: "hidden", active: false };
-  expect(nextDestination("a", [c, b, a, hidden], ["a", "hidden", "c", "b"])?.id).toBe("c");
-  expect(nextDestination("b", [c, b, a, hidden], ["a", "c", "b"])?.id).toBe("a");
-  expect(nextDestination("a", [c, b, a])?.id).toBe("b");
-  expect(nextDestination("a", [a, hidden])).toBeUndefined();
-  expect(nextDestination("missing", [a, b])).toBeUndefined();
+  expect(adjacentDestination("a", [c, b, a, hidden], ["a", "hidden", "c", "b"])?.id).toBe("c");
+  expect(adjacentDestination("b", [c, b, a, hidden], ["a", "c", "b"])?.id).toBe("a");
+  expect(adjacentDestination("a", [c, b, a])?.id).toBe("b");
+  expect(adjacentDestination("a", [c, b, a], ["a", "c", "b"], -1)?.id).toBe("b");
+  expect(adjacentDestination("a", [c, b, a], undefined, -1)?.id).toBe("c");
+  expect(adjacentDestination("a", [a, hidden])).toBeUndefined();
+  expect(adjacentDestination("missing", [a, b])).toBeUndefined();
 });
 
 test("old destination rows keep the classic page and preserve independent images", () => {

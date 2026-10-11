@@ -47,7 +47,12 @@ export function relatedDestinations(
   });
 }
 
-export function nextDestination(id: string, catalogue: Destination[], sequence?: string[]) {
+export function adjacentDestination(
+  id: string,
+  catalogue: Destination[],
+  sequence?: string[],
+  direction: 1 | -1 = 1,
+) {
   const active = catalogue.filter((item) => item.active);
   const levels = ["heaven", "sky", "earth", "sea"];
   const ordered = [...active].sort(
@@ -63,5 +68,5 @@ export function nextDestination(id: string, catalogue: Destination[], sequence?:
   const items = contextual.some((dest) => dest.id === id) ? contextual : ordered;
   if (items.length < 2) return undefined;
   const index = items.findIndex((dest) => dest.id === id);
-  return index < 0 ? undefined : items[(index + 1) % items.length];
+  return index < 0 ? undefined : items[(index + direction + items.length) % items.length];
 }

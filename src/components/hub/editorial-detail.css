@@ -282,40 +282,6 @@
   font-size: 11px;
   letter-spacing: 1px;
 }
-.editorial-related {
-  display: grid;
-  gap: 10px;
-}
-.editorial-related button {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  min-width: 0;
-  text-align: left;
-  padding: 10px 15px 10px 10px;
-  border: 1px solid var(--editorial-border);
-  border-radius: 22px;
-  background: var(--editorial-panel);
-}
-.editorial-related img {
-  width: 74px;
-  height: 82px;
-  object-fit: cover;
-  border-radius: 14px;
-  flex-shrink: 0;
-}
-.editorial-related span {
-  flex: 1;
-  min-width: 0;
-  font-family: var(--brand-serif);
-  font-size: 23px;
-  line-height: 1.18;
-  overflow-wrap: anywhere;
-}
-.editorial-related svg {
-  flex-shrink: 0;
-}
 .editorial-continue {
   border-top: 1px solid var(--editorial-border);
   margin-top: 38px;

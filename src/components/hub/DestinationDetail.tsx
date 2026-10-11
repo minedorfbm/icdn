@@ -1,4 +1,5 @@
 import { useDestinationMedia } from "@/lib/use-destination-media";
+import { useDestinationSwipe } from "@/lib/use-destination-swipe";
 import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
@@ -14,6 +15,7 @@ import { useI18n } from "@/i18n";
 import { ResortLink } from "./ResortBrowser";
 import { HubSearch } from "@/features/search/HubSearch";
 import { ConciergeContact } from "./ConciergeContact";
+import { RelatedDestinations } from "./RelatedDestinations";
 import { EditorialDestinationDetail } from "./EditorialDestinationDetail";
 
 export type DestinationDetailProps = Readonly<{
@@ -42,6 +44,7 @@ function ClassicDestinationDetail({
 }: DestinationDetailProps) {
   const { media, pending, failed, retry } = useDestinationMedia(summary.id);
   const dest = { ...summary, ...media };
+  const { ref: swipeRef } = useDestinationSwipe(dest.id);
   const { lang, t, typeLabel, levelLabel, action, description, detailDescription, event } =
     useI18n();
   const { openMap, locate } = useResortMap();
@@ -69,6 +72,7 @@ function ClassicDestinationDetail({
       </div>
       <ConciergeContact />
       <div
+        ref={swipeRef}
         data-destination-scroll
         className="h-full overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain"
       >
@@ -255,6 +259,8 @@ function ClassicDestinationDetail({
                 YOUTUBE
               </a>
             </div>
+
+            <RelatedDestinations id={dest.id} />
 
             <button
               onClick={onClose}
