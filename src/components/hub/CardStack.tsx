@@ -116,7 +116,13 @@ export function CardStack({
           priority={near && i === index}
           near={near}
           onOpen={() =>
-            i === index ? openDestination(dest.id, layout === "discovery") : onIndexChange(i)
+            i === index
+              ? openDestination(
+                  dest.id,
+                  layout === "discovery",
+                  items.map((item) => item.id),
+                )
+              : onIndexChange(i)
           }
         />
       )),
@@ -246,7 +252,11 @@ export function CardStack({
                   e.currentTarget
                     .querySelector<HTMLButtonElement>("h3 button")
                     ?.focus({ preventScroll: true });
-                  openDestination(dest.id, layout === "discovery");
+                  openDestination(
+                    dest.id,
+                    layout === "discovery",
+                    items.map((item) => item.id),
+                  );
                 } else onIndexChange(i);
               }}
             >

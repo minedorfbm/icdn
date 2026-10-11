@@ -36,7 +36,6 @@ export function OpeningHours({ hours }: Readonly<{ hours: Hours[] }>) {
           </li>
         ))}
       </ul>
-      <p className="mt-4 text-[10px] opacity-60">{t("hours_local")}</p>
     </section>
   );
 }

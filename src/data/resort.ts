@@ -72,6 +72,10 @@ export interface Destination {
   type: DestinationType;
   short_description: string;
   detail_description?: string;
+  detailLayout?: "classic" | "editorial";
+  primaryLinkId?: string;
+  headings?: { links?: string; video?: string; instagram?: string };
+  headingTranslations?: NonNullable<DestinationRow["heading_translations"]>;
   contentFamily: DestinationContentFamily;
   audienceTags: DestinationAudience[];
   offerDuration?: "limited" | "ongoing";
@@ -101,6 +105,7 @@ export interface Destination {
 
 /** One action link attached to a destination. */
 export interface DestinationLink {
+  id?: string;
   translations?: LinkTranslations;
   kind: string;
   label?: string;
@@ -322,6 +327,7 @@ export function groupLinks(
   for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
     if (!row.url) continue;
     (out[row.destination_id] ??= []).push({
+      ...(row.id ? { id: row.id } : {}),
       kind: row.kind,
       url: row.url,
       translations: currentLinkTranslations(
@@ -349,6 +355,21 @@ export function groupEvents(rows: DestinationEventRow[]): Record<string, Destina
   return out;
 }
 
+function destinationPresentation(
+  row: DestinationRow,
+): Pick<Destination, "detailLayout" | "primaryLinkId" | "headings" | "headingTranslations"> {
+  return {
+    detailLayout: row.detail_layout ?? "classic",
+    ...(row.primary_link_id ? { primaryLinkId: row.primary_link_id } : {}),
+    headings: {
+      ...(row.links_heading ? { links: row.links_heading } : {}),
+      ...(row.video_heading ? { video: row.video_heading } : {}),
+      ...(row.instagram_heading ? { instagram: row.instagram_heading } : {}),
+    },
+    headingTranslations: row.heading_translations ?? {},
+  };
+}
+
 /** Converts a database row into the shape the components already consume. */
 export function toDestination(
   row: DestinationRow,
@@ -368,6 +389,7 @@ export function toDestination(
     type,
     short_description: row.short_description,
     ...(row.detail_description ? { detail_description: row.detail_description } : {}),
+    ...destinationPresentation(row),
     contentFamily: row.content_family ?? (row.content_kind === "offer" ? "offer" : "resort"),
     audienceTags: row.audience_tags ?? ["all"],
     ...(row.offer_duration ? { offerDuration: row.offer_duration } : {}),

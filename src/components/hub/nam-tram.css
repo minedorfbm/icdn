@@ -4,42 +4,54 @@
   color: var(--tram-brass);
 }
 
-.nam-tram-track {
-  border-inline: 1px solid oklch(0.79 0.066 83 / 0.45);
+.nam-tram-rail {
+  color: var(--brand-ink);
+}
+
+.nam-tram-rail[data-level="sky"],
+.nam-tram-rail[data-level="earth"] {
+  color: oklch(0.95 0.01 100);
+}
+
+.nam-tram-rail[data-level="sea"] {
+  color: var(--world-sea-foreground);
+}
+
+.nam-tram-track-segment {
+  position: absolute;
+  inset-inline: 0;
+}
+
+/* Interrupt the cable around each transparent symbol, rather than filling its background. */
+.nam-tram-track-segment::before {
+  content: "";
+  position: absolute;
+  inset: 18px 0;
+  border-inline: 1px solid color-mix(in oklab, currentColor 30%, transparent);
   background: repeating-linear-gradient(
     to bottom,
     transparent 0 23px,
-    oklch(0.79 0.066 83 / 0.2) 23px 24px
+    color-mix(in oklab, currentColor 15%, transparent) 23px 24px
   );
 }
 
 .nam-tram-stop {
-  display: block;
-  width: 26px;
-  height: 23px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
   max-width: none;
-  color: var(--tram-brass);
-  filter: drop-shadow(0 1px 1px oklch(0 0 0 / 0.35));
-  transition:
-    transform 240ms ease,
-    filter 240ms ease;
+  color: inherit;
 }
 
-.nam-tram-station-roof {
-  fill: var(--tram-ebony);
+.nam-tram-stop svg {
+  display: block;
+  width: 28px;
+  height: 28px;
 }
 
-.nam-tram-station-landing {
-  stroke-width: 1.7;
-}
-
-.nam-tram-stop[data-active="true"] {
-  transform: translateY(8px);
-  filter: drop-shadow(0 0 3px oklch(0.79 0.066 83 / 0.6));
-}
-
-.nam-tram-stop[data-active="true"] .nam-tram-station-roof {
-  fill: var(--tram-brass);
+.nam-tram-rail .nam-tram-stop[data-active="true"] {
+  visibility: hidden;
 }
 
 .nam-tram-cabin {
@@ -117,16 +129,6 @@
   position: relative;
 }
 
-.nam-tram-stations::before {
-  content: "";
-  position: absolute;
-  top: 28px;
-  bottom: 28px;
-  left: 11px;
-  width: 8px;
-  border-inline: 1px solid oklch(0.79 0.066 83 / 0.2);
-}
-
 .nam-tram-station {
   color: oklch(0.82 0.02 85);
   cursor: pointer;
@@ -161,13 +163,6 @@
   flex-shrink: 0;
 }
 
-.nam-tram-docked-cabin {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-}
-
 .nam-tram-station-end {
   margin-left: auto;
   margin-right: 4px;
@@ -190,8 +185,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nam-tram-station,
-  .nam-tram-stop {
+  .nam-tram-station {
     transition: none;
   }
 }

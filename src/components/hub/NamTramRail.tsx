@@ -29,7 +29,8 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
       <nav
         aria-label={t("resort_levels")}
         aria-hidden={!visible}
-        className={`nam-tram fixed right-[env(safe-area-inset-right,0px)] top-1/2 z-40 -translate-y-1/2 select-none transition-[opacity,transform] duration-500 motion-reduce:transition-none ${
+        data-level={active}
+        className={`nam-tram nam-tram-rail fixed right-[env(safe-area-inset-right,0px)] top-1/2 z-40 -translate-y-1/2 select-none transition-[opacity,transform] duration-500 motion-reduce:transition-none ${
           visible ? "translate-x-0 opacity-100" : "pointer-events-none translate-x-3 opacity-0"
         }`}
       >
@@ -45,13 +46,23 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
               aria-hidden
               className="nam-tram-track pointer-events-none absolute inset-y-5 left-1/2 w-2 -translate-x-1/2"
             >
+              {LEVELS.slice(0, -1).map((level, index) => (
+                <span
+                  key={level.id}
+                  className="nam-tram-track-segment"
+                  style={{
+                    top: `${(index / (LEVELS.length - 1)) * 100}%`,
+                    height: `${100 / (LEVELS.length - 1)}%`,
+                  }}
+                />
+              ))}
               {LEVELS.map((level, index) => (
                 <span
                   key={level.id}
                   className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
                   style={{ top: `${(index / (LEVELS.length - 1)) * 100}%` }}
                 >
-                  <NamTramStation active={level.id === active} />
+                  <NamTramStation level={level.id} active={level.id === active} />
                 </span>
               ))}
               <span className="nam-tram-carriage absolute inset-0">
@@ -99,12 +110,7 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
               className="nam-tram-station relative flex min-h-14 w-full items-center gap-5 text-left focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               <span aria-hidden className="nam-tram-station-marker">
-                <NamTramStation active={level.id === active} />
-                {level.id === active && (
-                  <span className="nam-tram-docked-cabin">
-                    <NamTramCabin />
-                  </span>
-                )}
+                <NamTramStation level={level.id} active={level.id === active} />
               </span>
               <span className="font-serif text-[23px] tracking-[0.12em]">
                 {levelLabel(level.id)}

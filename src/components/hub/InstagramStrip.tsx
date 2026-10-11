@@ -24,7 +24,7 @@ export function InstagramStrip({ photos, instagramUrl, label }: Props) {
   const handle = handleOf(instagramUrl);
 
   return (
-    <section className="mt-12">
+    <section className="mt-12" data-destination-swipe-ignore>
       <p className="px-0 text-[9px] tracking-[0.38em] opacity-45">
         {label}
         {handle && <span className="ml-2 opacity-80">· {handle}</span>}

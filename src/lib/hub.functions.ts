@@ -7,6 +7,7 @@ import { readHubSnapshot, readPublicSnapshot, publicCache } from "./hub-cache.se
 import {
   levelRow,
   destinationRow,
+  destinationRelationRow,
   photoRow,
   linkRow,
   eventRow,
@@ -56,6 +57,7 @@ export async function readHubData(): Promise<HubData> {
     siteLinkTranslations,
     descriptions,
     translatedEvents,
+    relations,
   ] = await Promise.all([
     read("levels", levelRow, undefined, "display_order"),
     read("destinations", destinationRow, "active", "display_order"),
@@ -67,6 +69,7 @@ export async function readHubData(): Promise<HubData> {
     read("site_link_translations", siteLinkTranslationRow, "active"),
     read("destination_translations", descriptionRow, "published"),
     read("event_translations", eventTranslationRow, "published"),
+    read("destination_relations", destinationRelationRow, "active", "display_order"),
   ]);
   return {
     levels,
@@ -78,6 +81,7 @@ export async function readHubData(): Promise<HubData> {
     linkTranslations,
     siteLinkTranslations,
     editorial: { descriptions, events: translatedEvents },
+    relations,
     // These belong to independent loading stages, not to the catalogue cache.
     settings: {},
     photos: [],

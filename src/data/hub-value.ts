@@ -25,6 +25,7 @@ export interface HubLevel {
 }
 
 export interface HubValue {
+  relations: NonNullable<HubData["relations"]>;
   mapPlaces: MapPlaceRow[];
   mapLinks: MapLinkRow[];
   heroImage: string;
@@ -87,6 +88,7 @@ export function createHubValue(data?: HubData): HubValue {
     }));
 
   return {
+    relations: data.relations ?? [],
     heroImage: resolveHeroImage(data),
     mapPlaces: data.mapPlaces ?? [],
     mapLinks: data.mapLinks ?? [],

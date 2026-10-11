@@ -6,6 +6,7 @@ declare module "@tanstack/react-router" {
   interface HistoryState {
     hubCard?: boolean;
     hubCardNeutral?: boolean;
+    hubSequence?: string[];
   }
 }
 
@@ -16,15 +17,20 @@ export function useDestinationNavigation() {
   const location = useLocation();
   const isDestination = location.pathname !== "/";
   const openDestination = useCallback(
-    (destinationId: string, neutral = false) => {
+    (destinationId: string, neutral = false, sequence?: string[]) => {
+      const ordered = sequence ?? (isDestination ? location.state.hubSequence : undefined);
       void navigate({
         to: "/$destinationId",
         params: { destinationId: destinationSlug(destinationId) },
-        state: { hubCard: true, hubCardNeutral: neutral },
+        state: {
+          hubCard: true,
+          hubCardNeutral: neutral,
+          ...(ordered ? { hubSequence: ordered } : {}),
+        },
         resetScroll: false,
       });
     },
-    [navigate],
+    [navigate, isDestination, location.state.hubSequence],
   );
   const closeDestination = useCallback(() => {
     if (location.state.hubCard) router.history.back();
@@ -35,5 +41,6 @@ export function useDestinationNavigation() {
     closeDestination,
     isDestination,
     neutral: location.state.hubCardNeutral ?? false,
+    sequence: location.state.hubSequence,
   };
 }

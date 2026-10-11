@@ -54,7 +54,16 @@
     "hours_local": "Local time in Danang (UTC+7)",
     "destination_updates": "LATEST UPDATES",
     "contact_call": "Phone call",
-    "contact_unavailable": "Not configured"
+    "contact_unavailable": "Not configured",
+    "in_motion": "IN MOTION",
+    "from_our_world": "FROM OUR WORLD",
+    "related_places": "EXPLORE MORE",
+    "continue_journey": "CONTINUE THE JOURNEY",
+    "practical_information": "Practical information",
+    "dining_collection": "THE DINING COLLECTION",
+    "wellness_collection": "THE WELLNESS COLLECTION",
+    "spa_collection": "THE SPA COLLECTION",
+    "links_collection": "THE COLLECTION"
   },
   "vi": {
     "hero_welcome": "Chào mừng",
@@ -111,7 +120,16 @@
     "hours_local": "Giờ địa phương tại Đà Nẵng (UTC+7)",
     "destination_updates": "THÔNG TIN MỚI NHẤT",
     "contact_call": "Gọi điện",
-    "contact_unavailable": "Chưa được thiết lập"
+    "contact_unavailable": "Chưa được thiết lập",
+    "in_motion": "KHOẢNH KHẮC CHUYỂN ĐỘNG",
+    "from_our_world": "TỪ THẾ GIỚI CỦA CHÚNG TÔI",
+    "related_places": "KHÁM PHÁ THÊM",
+    "continue_journey": "TIẾP TỤC HÀNH TRÌNH",
+    "practical_information": "Thông tin hữu ích",
+    "dining_collection": "BỘ SƯU TẬP ẨM THỰC",
+    "wellness_collection": "BỘ SƯU TẬP CHĂM SÓC SỨC KHỎE",
+    "spa_collection": "BỘ SƯU TẬP SPA",
+    "links_collection": "BỘ SƯU TẬP"
   },
   "ru": {
     "hero_welcome": "Добро пожаловать",
@@ -168,7 +186,16 @@
     "hours_local": "Местное время в Дананге (UTC+7)",
     "destination_updates": "АКТУАЛЬНАЯ ИНФОРМАЦИЯ",
     "contact_call": "Позвонить",
-    "contact_unavailable": "Не настроено"
+    "contact_unavailable": "Не настроено",
+    "in_motion": "В ДВИЖЕНИИ",
+    "from_our_world": "ИЗ НАШЕГО МИРА",
+    "related_places": "УЗНАТЬ БОЛЬШЕ",
+    "continue_journey": "ПРОДОЛЖИТЬ ПУТЕШЕСТВИЕ",
+    "practical_information": "Полезная информация",
+    "dining_collection": "ГАСТРОНОМИЧЕСКАЯ КОЛЛЕКЦИЯ",
+    "wellness_collection": "КОЛЛЕКЦИЯ ОЗДОРОВЛЕНИЯ",
+    "spa_collection": "СПА-КОЛЛЕКЦИЯ",
+    "links_collection": "КОЛЛЕКЦИЯ"
   },
   "zh": {
     "hero_welcome": "欢迎",
@@ -225,7 +252,16 @@
     "hours_local": "岘港当地时间（UTC+7）",
     "destination_updates": "最新资讯",
     "contact_call": "电话联系",
-    "contact_unavailable": "尚未配置"
+    "contact_unavailable": "尚未配置",
+    "in_motion": "动态时刻",
+    "from_our_world": "我们的世界",
+    "related_places": "探索更多",
+    "continue_journey": "继续旅程",
+    "practical_information": "实用信息",
+    "dining_collection": "美食精选",
+    "wellness_collection": "康养精选",
+    "spa_collection": "水疗精选",
+    "links_collection": "精选体验"
   },
   "ko": {
     "hero_welcome": "환영합니다",
@@ -282,7 +318,16 @@
     "hours_local": "다낭 현지 시간 (UTC+7)",
     "destination_updates": "최신 안내",
     "contact_call": "전화하기",
-    "contact_unavailable": "아직 설정되지 않음"
+    "contact_unavailable": "아직 설정되지 않음",
+    "in_motion": "영상으로 만나는 순간",
+    "from_our_world": "우리의 이야기",
+    "related_places": "더 알아보기",
+    "continue_journey": "여정 계속하기",
+    "practical_information": "이용 안내",
+    "dining_collection": "다이닝 컬렉션",
+    "wellness_collection": "웰니스 컬렉션",
+    "spa_collection": "스파 컬렉션",
+    "links_collection": "컬렉션"
   },
   "ja": {
     "hero_welcome": "ようこそ",
@@ -339,6 +384,15 @@
     "hours_local": "ダナン現地時間（UTC+7）",
     "destination_updates": "最新のお知らせ",
     "contact_call": "電話する",
-    "contact_unavailable": "未設定"
+    "contact_unavailable": "未設定",
+    "in_motion": "映像で楽しむ",
+    "from_our_world": "私たちの世界から",
+    "related_places": "さらに詳しく",
+    "continue_journey": "旅を続ける",
+    "practical_information": "ご利用案内",
+    "dining_collection": "ダイニングコレクション",
+    "wellness_collection": "ウェルネスコレクション",
+    "spa_collection": "スパコレクション",
+    "links_collection": "コレクション"
   }
 }
