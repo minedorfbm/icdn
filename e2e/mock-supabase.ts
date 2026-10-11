@@ -1,4 +1,5 @@
 import { serve } from "bun";
+import { editorialTables } from "./editorial-fixtures";
 
 // A deterministic read-only API: browser tests never need production credentials.
 const levels = ["heaven", "sky", "earth", "sea"].map((id, display_order) => ({
@@ -145,6 +146,9 @@ const tables: Record<string, unknown[]> = {
     { key: "zalo", value: "https://zalo.me/842363938888" },
   ],
 };
+for (const [table, rows] of Object.entries(editorialTables)) {
+  tables[table] = [...(tables[table] ?? []), ...rows];
+}
 let delay = 0;
 let failCatalogue = false;
 let failMediaOnce = false;

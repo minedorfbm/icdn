@@ -14,6 +14,15 @@ export const LANGUAGES = [
 export type Lang = (typeof LANGUAGES)[number]["code"];
 
 export type UIKey =
+  | "in_motion"
+  | "from_our_world"
+  | "related_places"
+  | "continue_journey"
+  | "practical_information"
+  | "dining_collection"
+  | "wellness_collection"
+  | "spa_collection"
+  | "links_collection"
   | "destination_updates"
   | "opening_hours"
   | "hours_opening"

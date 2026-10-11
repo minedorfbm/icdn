@@ -7,7 +7,13 @@ import { InstagramPostEmbed } from "./InstagramPostEmbed";
  * Horizontal, snap-scrolled carousel of up to 5 official Instagram post embeds.
  * A single post renders exactly like before (no dots, no scrolling).
  */
-export function InstagramPostCarousel({ posts }: { posts: DestinationPost[] }) {
+export function InstagramPostCarousel({
+  posts,
+  embedded = false,
+}: {
+  posts: DestinationPost[];
+  embedded?: boolean;
+}) {
   const { t } = useI18n();
   const items = posts.slice(0, 5);
   const track = useRef<HTMLDivElement>(null);
@@ -42,17 +48,20 @@ export function InstagramPostCarousel({ posts }: { posts: DestinationPost[] }) {
   }, []);
 
   if (items.length === 0) return null;
-  if (items.length === 1 && items[0]) return <InstagramPostEmbed post={items[0]} />;
+  if (items.length === 1 && items[0]) return <InstagramPostEmbed post={items[0]} bare={embedded} />;
 
   return (
-    <section className="mt-12">
-      <p className="text-[9px] tracking-[0.38em] opacity-45">{t("latest_posts")}</p>
+    <section
+      className={embedded ? undefined : "mt-12"}
+      aria-label={embedded ? undefined : t("latest_posts")}
+    >
+      {!embedded && <p className="text-[9px] tracking-[0.38em] opacity-45">{t("latest_posts")}</p>}
 
       <div
         ref={track}
         onScroll={onScroll}
         data-instagram-track
-        className="-mx-6 mt-5 flex items-start snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden px-6 [&::-webkit-scrollbar]:hidden"
+        className={`${embedded ? "editorial-media-track" : "-mx-6 mt-5 px-6"} flex items-start snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden`}
         style={{ scrollbarWidth: "none", height }}
       >
         {items.map((post) => (

@@ -78,3 +78,34 @@ Quatre lieux actifs n'avaient aucun lien dans `destination_links` malgré une an
 ## Familles éditoriales et espaces marketing
 
 Voir [la classification éditoriale](editorial-taxonomy.md) pour les champs de `destinations`, les trois vues marketing et les règles de publication.
+
+## Pilote des cards agrandies
+
+La migration `20261011120000_editorial_card_pilot.sql` ajoute les réglages du nouveau modèle à `destinations`. Elle active quatre fiches seulement : `citron` (Heaven), `la-maison-1888` (Sky), `long-bar` (Earth) et `mi-sol-spa` (Sea). Le service temporaire de La Maison au Heaven reste une actualité ; il ne change pas son niveau éditorial. Les descriptions, photos, liens, horaires, événements et médias existants restent leurs sources de référence.
+
+**Appliquée et contrôlée sur `cxcffaegqyvbhrpzpowa` le 11 octobre 2026.** Le contrôle retrouve quatre fiches `editorial`, cinq traductions en plus de l'anglais pour chacune, une relation et toujours 75 destinations au total. Le lien principal est DISCOVER pour Citron et L_O_N_G Bar, BOOK pour La Maison et Mi Sol Spa, selon leurs liens actuellement publiés. Ne pas réexécuter cette migration sur cette base. Le nouveau rendu devient visible seulement après le déploiement du code de la PR.
+
+| Champ dans `destinations` | Utilisation                                                                                                                              |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `detail_layout`           | `classic` conserve la présentation actuelle ; `editorial` active le nouveau modèle commun.                                               |
+| `primary_link_id`         | Identifiant d'un lien existant de **la même fiche** dans `destination_links`. Il est mis en avant et retiré de la collection secondaire. |
+| `links_heading`           | Titre personnalisé sous le label de la collection de liens.                                                                              |
+| `video_heading`           | Titre personnalisé sous « In motion ».                                                                                                   |
+| `instagram_heading`       | Titre personnalisé sous « From our world ».                                                                                              |
+| `heading_translations`    | Traductions des trois titres, associées à leur texte anglais de référence.                                                               |
+
+Un `primary_link_id` vide sélectionne automatiquement BOOK, puis DISCOVER/WEBSITE, puis la première action publiée. Si le lien choisi est dépublié, aucun bouton principal de remplacement n'est inventé. Sa suppression efface la sélection ; le choix automatique reprend alors. Les URL restent uniquement dans `destination_links`, avec leurs traductions existantes. Une même destination peut proposer plusieurs menus distincts.
+
+Les labels communs sont traduits dans le dictionnaire du hub (EN, VI, RU, ZH, KO, JA). Les titres personnalisés se gèrent en base, par exemple :
+
+```json
+{ "ja": { "video": { "source": "A table above the bay.", "value": "湾を見渡すテーブル。" } } }
+```
+
+Si le titre anglais change, sa traduction ne s'affiche plus tant que `source` n'a pas été actualisé après relecture. Une section sans contenu n'est pas rendue, même si son titre est renseigné. Les titres des quatre fiches pilotes sont initialisés dans les six langues. Les libellés personnalisés des actions conservent le fonctionnement actuel du dictionnaire ; cette migration ne crée pas de traduction libre de ces libellés.
+
+`destination_relations` relie deux fiches par leurs identifiants, dans l'ordre alphabétique, avec `display_order` et `active`. Une seule ligne suffit pour les deux sens et aucun nom, texte ou visuel n'est recopié. La relation La Maison 1888 ↔ Wine Cellar est initialisée. Une relation vers une fiche inactive n'est pas publique. Durant le pilote, seules les pages utilisant le nouveau modèle affichent ce bloc ; Wine Cellar conserve donc sa présentation classique. L'édition reste réservée aux opérateurs du projet Supabase ; aucune écriture anonyme n'est autorisée.
+
+Déploiement : appliquer **uniquement cette nouvelle migration**, une fois, avant de déployer le code. Ne pas rejouer l'historique complet. L'ancien code ignore les colonnes ajoutées ; le nouveau code peut aussi afficher le catalogue classique si la migration n'est pas encore appliquée. Vérifier les quatre fiches, un lien PDF, les horaires, les événements, les médias, la recherche, le téléphone et la relation sur mobile. Le bouton « Continue the journey » suit l'ordre du carrousel d'origine ; une arrivée directe utilise l'ordre des niveaux et des fiches publiées.
+
+Pour revenir immédiatement à l'ancien modèle, remettre `detail_layout = 'classic'` sur les quatre identifiants et attendre l'expiration du cache public (deux minutes). Il n'est pas nécessaire de supprimer les colonnes ni les relations. Après validation du pilote, l'activation des autres fiches sera une modification de ce champ, sans recréer leurs contenus. La branche classique sera retirée lors de la généralisation, avec le code de compatibilité de migration, pour ne pas maintenir durablement deux modèles.

@@ -1,0 +1,110 @@
+// Separate IDs keep the existing classic-card regressions active during the pilot.
+export const editorialDestinations = [
+  ["pilot-citron", "Heaven dining preview", "heaven", "restaurant", "d-citron"],
+  ["la-maison-1888", "La Maison 1888", "sky", "restaurant", "d-french-dining"],
+  ["long-bar", "L_O_N_G Bar", "earth", "bar", "d-bar"],
+  ["mi-sol-spa", "Mi Sol Spa & Wellness", "sea", "spa", "d-spa"],
+].map(([id, name, level_id, type, image_key], index) => ({
+  id,
+  name,
+  level_id,
+  type,
+  image_key,
+  detail_image_key: image_key,
+  cluster: type === "spa" ? "WELLNESS" : "DINING",
+  short_description: "A short card introduction.",
+  detail_description:
+    "Discover a distinctive setting in the heart of the resort. Take your time, explore the collection and choose the experience that suits your stay.",
+  content_kind: "place",
+  content_family: "resort",
+  audience_tags: ["all"],
+  instagram_spot: false,
+  display_order: 10 + index,
+  active: true,
+  detail_layout: "editorial",
+  primary_link_id: `${id}-book`,
+  links_heading: "A collection to discover.",
+  video_heading: "A closer look.",
+  instagram_heading: "Moments worth sharing.",
+  heading_translations: {
+    ja: { video: { source: "A closer look.", value: "特別なひとときを。" } },
+  },
+}));
+
+export const editorialTables: Record<string, unknown[]> = {
+  destinations: [
+    ...editorialDestinations,
+    {
+      ...editorialDestinations[1],
+      id: "wine-cellar",
+      name: "Wine Cellar",
+      detail_layout: "classic",
+      primary_link_id: null,
+      image_key: "d-wine",
+      detail_image_key: "d-wine",
+    },
+  ],
+  destination_links: editorialDestinations.flatMap(({ id }) =>
+    [
+      ["book", "BOOK", "Reserve your experience", "https://www.danang.intercontinental.com/book/"],
+      ["discover", "DISCOVER", null, "https://www.danang.intercontinental.com/"],
+      ["menu", "MENU", null, "https://www.danang.intercontinental.com/menu/"],
+      ["prices", "PRICE LIST", null, "https://www.danang.intercontinental.com/prices/"],
+      [
+        "treatments",
+        "DISCOVER",
+        "Treatments",
+        "https://www.danang.intercontinental.com/treatments/",
+      ],
+    ].map(([key, kind, label, url], display_order) => ({
+      id: `${id}-${key}`,
+      destination_id: id,
+      kind,
+      label,
+      url,
+      display_order,
+    })),
+  ),
+  destination_relations: [
+    { destination_id: "la-maison-1888", related_destination_id: "wine-cellar", display_order: 0 },
+  ],
+  destination_opening_hours: editorialDestinations.map(({ id }) => ({
+    id: `${id}-hours`,
+    destination_id: id,
+    service: "opening",
+    days: [1, 2, 3, 4, 5, 6, 7],
+    opens_minutes: 600,
+    closes_minutes: 1320,
+    last_order_minutes: null,
+    display_order: 0,
+  })),
+  destination_events: [
+    {
+      id: "pilot-event",
+      destination_id: "pilot-citron",
+      title: "Sunday Champagne Brunch",
+      schedule: ["Every Sunday", "12:30 – 15:30"],
+      description: "An event description that unfolds on demand.",
+      url: "https://www.danang.intercontinental.com/dining/",
+      display_order: 0,
+    },
+  ],
+  destination_videos: editorialDestinations.map(({ id }) => ({
+    destination_id: id,
+    video_url: "https://www.youtube.com/watch?v=PVN005yvGpY",
+    title: "Resort video",
+    title_translations: {},
+    display_order: 0,
+  })),
+  destination_posts: editorialDestinations.flatMap(({ id }) =>
+    ["SHORT", "TALL"].map((post, display_order) => ({
+      destination_id: id,
+      post_url: `https://www.instagram.com/p/${post}/`,
+      account: "intercontinentaldanang",
+      caption: null,
+      image_url: null,
+      posted_at: null,
+      display_order,
+    })),
+  ),
+};

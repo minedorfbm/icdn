@@ -1,0 +1,369 @@
+/* Isolated, CMS-controlled pilot. The surrounding hub and classic cards retain their palette. */
+.editorial-detail {
+  --level-bg: #faf8f1;
+  --level-fg: #2e2b26;
+  --editorial-accent: #65533d;
+  --editorial-panel: #f2ede3;
+  --editorial-button: #65533d;
+  --editorial-button-text: #faf8f1;
+  --editorial-muted: #6e675d;
+  --editorial-border: #ded0b3;
+  --font-serif: var(--brand-serif);
+  --font-sans: var(--brand-sans);
+  background: var(--level-bg);
+  color: var(--level-fg);
+  font-family: var(--brand-sans);
+}
+.editorial-detail[data-level="sky"] {
+  --level-bg: #17394b;
+  --level-fg: #f8f6ef;
+  --editorial-accent: #d3c3a2;
+  --editorial-panel: #203f51;
+  --editorial-button: #e6dbc3;
+  --editorial-button-text: #17394b;
+  --editorial-muted: #becbd0;
+  --editorial-border: #47616d;
+}
+.editorial-detail[data-level="earth"] {
+  --level-bg: #194e47;
+  --level-fg: #f7f5ee;
+  --editorial-accent: #e2ded1;
+  --editorial-panel: #255b53;
+  --editorial-button: #e2ded1;
+  --editorial-button-text: #194e47;
+  --editorial-muted: #c4dbd2;
+  --editorial-border: #658b7f;
+}
+.editorial-detail[data-level="sea"] {
+  --level-bg: #c8e6ef;
+  --level-fg: #183c4b;
+  --editorial-accent: #1a5368;
+  --editorial-panel: #d8ecf1;
+  --editorial-button: #1a5368;
+  --editorial-button-text: #eef6f5;
+  --editorial-muted: #4b707d;
+  --editorial-border: #8eb9c6;
+}
+.editorial-page {
+  max-width: 740px;
+  margin-inline: auto;
+}
+.editorial-hero {
+  position: relative;
+  height: clamp(350px, 58svh, 630px);
+}
+.editorial-hero > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.editorial-gradient {
+  position: absolute;
+  inset: 25% 0 0;
+  background: linear-gradient(
+    to top,
+    var(--level-bg),
+    color-mix(in oklab, var(--level-bg) 74%, transparent) 27%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+.editorial-back {
+  position: absolute;
+  top: max(24px, env(safe-area-inset-top));
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 10px 17px;
+  border: 1px solid var(--editorial-border);
+  border-radius: 30px;
+  background: var(--editorial-button);
+  color: var(--editorial-button-text);
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+.editorial-meta {
+  position: absolute;
+  bottom: 24px;
+  inset-inline: 28px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  color: var(--editorial-accent);
+}
+.editorial-meta svg {
+  width: 25px;
+  height: 25px;
+  flex-shrink: 0;
+}
+.editorial-body {
+  --editorial-gutter: 28px;
+  padding: 0 var(--editorial-gutter) max(110px, calc(env(safe-area-inset-bottom) + 85px));
+}
+.editorial-media-track {
+  margin-inline: calc(-1 * var(--editorial-gutter));
+  padding-inline: var(--editorial-gutter);
+}
+.editorial-title {
+  margin: 0 0 26px;
+  font-family: var(--brand-serif);
+  font-weight: 400;
+  font-size: clamp(36px, 11vw, 64px);
+  line-height: 1.03;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.editorial-description {
+  font-family: var(--brand-serif);
+  font-size: 19px;
+  line-height: 1.65;
+  color: var(--editorial-muted);
+}
+.editorial-primary {
+  margin-block: 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  min-height: 62px;
+  padding: 15px 23px;
+  border-radius: 36px;
+  background: var(--editorial-button);
+  color: var(--editorial-button-text);
+  font-size: 16px;
+}
+.editorial-primary svg {
+  flex-shrink: 0;
+}
+.editorial-practical {
+  margin-top: 26px;
+  border: 1px solid var(--editorial-border);
+  border-radius: 24px;
+  padding: 20px;
+  background: var(--editorial-panel);
+}
+.editorial-practical > section {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+.editorial-map {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding-block: 8px;
+  font-size: 13px;
+  text-align: left;
+}
+.editorial-map span {
+  flex: 1;
+}
+.editorial-practical > section + .editorial-map {
+  margin-top: 18px;
+  padding-top: 17px;
+  border-top: 1px solid var(--editorial-border);
+}
+.editorial-section {
+  margin-top: 38px;
+}
+.editorial-section-heading {
+  margin-bottom: 18px;
+}
+.editorial-section-heading > p {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--editorial-accent);
+}
+.editorial-section-heading h3 {
+  margin-top: 10px;
+  font-family: var(--brand-serif);
+  font-weight: 400;
+  font-size: clamp(27px, 7.5vw, 38px);
+  line-height: 1.12;
+  text-wrap: balance;
+}
+.editorial-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+.editorial-links > a,
+.editorial-links > button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  min-height: 60px;
+  padding: 12px 14px;
+  border: 1px solid var(--editorial-border);
+  border-radius: 22px;
+  background: var(--editorial-panel);
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.6px;
+  text-align: left;
+}
+.editorial-links span {
+  overflow-wrap: anywhere;
+}
+.editorial-links svg {
+  flex-shrink: 0;
+  color: var(--editorial-accent);
+}
+.editorial-links .editorial-link-wide {
+  grid-column: 1 / -1;
+}
+.editorial-events {
+  display: grid;
+  gap: 12px;
+}
+.editorial-events details {
+  border: 1px solid var(--editorial-border);
+  border-radius: 22px;
+  background: var(--editorial-panel);
+}
+.editorial-events summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  list-style: none;
+  padding: 20px;
+  min-height: 72px;
+  cursor: pointer;
+}
+.editorial-events summary::-webkit-details-marker {
+  display: none;
+}
+.editorial-events summary strong {
+  display: block;
+  font-family: var(--brand-serif);
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+.editorial-events summary > svg {
+  flex-shrink: 0;
+}
+.editorial-events details[open] summary > svg {
+  transform: rotate(180deg);
+}
+.editorial-event-schedule {
+  display: grid;
+  gap: 3px;
+  margin-top: 9px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--editorial-muted);
+}
+.editorial-event-content {
+  padding: 0 20px 20px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.editorial-event-content a,
+.editorial-event-content button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  margin-top: 14px;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.editorial-related {
+  display: grid;
+  gap: 10px;
+}
+.editorial-related button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+  padding: 10px 15px 10px 10px;
+  border: 1px solid var(--editorial-border);
+  border-radius: 22px;
+  background: var(--editorial-panel);
+}
+.editorial-related img {
+  width: 74px;
+  height: 82px;
+  object-fit: cover;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+.editorial-related span {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--brand-serif);
+  font-size: 23px;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+}
+.editorial-related svg {
+  flex-shrink: 0;
+}
+.editorial-continue {
+  border-top: 1px solid var(--editorial-border);
+  margin-top: 38px;
+  padding-top: 22px;
+}
+.editorial-continue button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  min-height: 55px;
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 1.6px;
+  color: var(--editorial-accent);
+}
+.editorial-continue strong {
+  display: block;
+  margin-top: 9px;
+  color: var(--level-fg);
+  font: 400 24px/1.2 var(--brand-serif);
+  letter-spacing: 0;
+}
+.editorial-continue svg {
+  flex-shrink: 0;
+}
+.editorial-loading {
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--editorial-muted);
+}
+.editorial-loading button {
+  display: block;
+  min-height: 44px;
+  text-decoration: underline;
+}
+@media (max-width: 350px) {
+  .editorial-body {
+    --editorial-gutter: 20px;
+  }
+  .editorial-meta {
+    inset-inline: 20px;
+    letter-spacing: 1px;
+    gap: 8px;
+  }
+  .editorial-links > a,
+  .editorial-links > button {
+    padding-inline: 11px;
+  }
+}

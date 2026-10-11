@@ -14,21 +14,32 @@ import { useI18n } from "@/i18n";
 import { ResortLink } from "./ResortBrowser";
 import { HubSearch } from "@/features/search/HubSearch";
 import { ConciergeContact } from "./ConciergeContact";
+import { EditorialDestinationDetail } from "./EditorialDestinationDetail";
 
-/** Full-screen editorial detail view for one destination. */
-export function DestinationDetail({
-  dest: summary,
-  onClose,
-  aboveMap = false,
-  neutral = false,
-  portalled = true,
-}: Readonly<{
+export type DestinationDetailProps = Readonly<{
   dest: Destination;
   onClose: () => void;
   aboveMap?: boolean;
   neutral?: boolean;
   portalled?: boolean;
-}>) {
+}>;
+
+export function DestinationDetail(props: DestinationDetailProps) {
+  return props.dest.detailLayout === "editorial" ? (
+    <EditorialDestinationDetail {...props} />
+  ) : (
+    <ClassicDestinationDetail {...props} />
+  );
+}
+
+/** Full-screen editorial detail view for one destination. */
+function ClassicDestinationDetail({
+  dest: summary,
+  onClose,
+  aboveMap = false,
+  neutral = false,
+  portalled = true,
+}: DestinationDetailProps) {
   const { media, pending, failed, retry } = useDestinationMedia(summary.id);
   const dest = { ...summary, ...media };
   const { lang, t, typeLabel, levelLabel, action, description, detailDescription, event } =

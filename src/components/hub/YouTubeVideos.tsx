@@ -3,7 +3,10 @@ import { Play } from "lucide-react";
 import type { DestinationVideo } from "@/data/resort";
 import { useI18n } from "@/i18n";
 
-function YouTubeVideo({ video }: Readonly<{ video: DestinationVideo }>) {
+function YouTubeVideo({
+  video,
+  showTitle = true,
+}: Readonly<{ video: DestinationVideo; showTitle?: boolean }>) {
   const { t, lang } = useI18n();
   const [playing, setPlaying] = useState(false);
   const isShort = video.format === "short";
@@ -52,21 +55,33 @@ function YouTubeVideo({ video }: Readonly<{ video: DestinationVideo }>) {
           </button>
         )}
       </div>
-      <h4 className="mt-3 font-serif text-[18px] leading-snug">{title}</h4>
+      {showTitle && <h4 className="mt-3 font-serif text-[18px] leading-snug">{title}</h4>}
     </article>
   );
 }
 
-export function YouTubeVideos({ videos }: Readonly<{ videos: DestinationVideo[] }>) {
+export function YouTubeVideos({
+  videos,
+  embedded = false,
+}: Readonly<{ videos: DestinationVideo[]; embedded?: boolean }>) {
   const { t } = useI18n();
   if (videos.length === 0) return null;
 
   return (
-    <section className="mt-12">
-      <h3 className="text-[9px] tracking-[0.42em] opacity-50">{t("videos")}</h3>
-      <div className="-mx-7 mt-5 flex snap-x snap-mandatory items-start gap-4 overflow-x-auto px-7 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <section
+      className={embedded ? undefined : "mt-12"}
+      aria-label={embedded ? undefined : t("videos")}
+    >
+      {!embedded && <h3 className="text-[9px] tracking-[0.42em] opacity-50">{t("videos")}</h3>}
+      <div
+        className={`${embedded ? "editorial-media-track" : "-mx-7 mt-5 px-7"} flex snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
+      >
         {videos.map((video) => (
-          <YouTubeVideo key={video.video_id} video={video} />
+          <YouTubeVideo
+            key={video.video_id}
+            video={video}
+            showTitle={!embedded || videos.length > 1}
+          />
         ))}
       </div>
     </section>
