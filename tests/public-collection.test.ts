@@ -39,24 +39,19 @@ test("a truncated gallery is not presented as a complete publication", async () 
   ).toBeNull();
 });
 
-test("before the presentation migration, the legacy destination query retains its filters", async () => {
-  fetchSpy.mockResolvedValueOnce(
+test("a missing presentation column is reported without retrying an obsolete catalogue", async () => {
+  fetchSpy.mockResolvedValue(
     Response.json(
-      { code: "42703", message: "column detail_layout does not exist" },
+      { code: "42703", message: "column links_heading does not exist" },
       { status: 400 },
     ),
   );
-  fetchSpy.mockResolvedValueOnce(Response.json([], { headers: { "content-range": "*/0" } }));
   expect(
     await reader()("destinations", destinationRow, "active", "display_order", "citron", "id"),
-  ).toEqual([]);
-  expect(fetchSpy).toHaveBeenCalledTimes(2);
-  const first = new URL(String(fetchSpy.mock.calls[0]![0]));
-  const legacy = new URL(String(fetchSpy.mock.calls[1]![0]));
-  expect(first.searchParams.get("select")).toContain("detail_layout");
-  expect(legacy.searchParams.get("select")).not.toContain("detail_layout");
-  expect(legacy.searchParams.get("select")).toContain("detail_image_key");
-  expect(legacy.searchParams.get("active")).toBe("eq.true");
-  expect(legacy.searchParams.get("id")).toBe("eq.citron");
-  expect(legacy.searchParams.get("order")).toBe(first.searchParams.get("order"));
+  ).toBeNull();
+  expect(fetchSpy).toHaveBeenCalledTimes(1);
+  const url = new URL(String(fetchSpy.mock.calls[0]![0]));
+  expect(url.searchParams.get("select")).toContain("links_heading");
+  expect(url.searchParams.get("active")).toBe("eq.true");
+  expect(url.searchParams.get("id")).toBe("eq.citron");
 });

@@ -36,7 +36,6 @@ export const destinationRow = z.object({
   type: destinationType,
   short_description: text,
   detail_description: optionalText.optional(),
-  detail_layout: z.enum(["classic", "editorial"]).optional(),
   primary_link_id: optionalText.optional(),
   links_heading: optionalText.optional(),
   video_heading: optionalText.optional(),
@@ -75,15 +74,6 @@ export const destinationRow = z.object({
   display_order: order,
   active: z.boolean(),
 });
-/** Columns introduced together; omit only these during a pre-migration deployment. */
-export const presentationColumns = [
-  "detail_layout",
-  "primary_link_id",
-  "links_heading",
-  "video_heading",
-  "instagram_heading",
-  "heading_translations",
-];
 export const destinationRelationRow = z.object({
   destination_id: text,
   related_destination_id: text,
