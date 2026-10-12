@@ -492,10 +492,12 @@ test("Instagram dots follow the active post height and neighbouring posts share 
       .poll(async () => {
         const box = (await frame.boundingBox())!;
         const limit = (await bounds.boundingBox())!;
-        const fillsEnvelope = Math.abs(Math.max(box.width / limit.width, box.height / limit.height) - 1) < 0.01;
+        const fillsEnvelope =
+          Math.abs(Math.max(box.width / limit.width, box.height / limit.height) - 1) < 0.01;
         const fitsEnvelope = box.width <= limit.width + 1 && box.height <= limit.height + 1;
         const naturalWidth = await frame.evaluate((el) => (el as HTMLElement).offsetWidth);
-        const keepsAspectRatio = Math.abs(box.width / box.height - naturalWidth / naturalHeight) < 0.01;
+        const keepsAspectRatio =
+          Math.abs(box.width / box.height - naturalWidth / naturalHeight) < 0.01;
         const followsPlayer = Math.abs((await track.boundingBox())!.height - box.height) <= 1;
         return fillsEnvelope && fitsEnvelope && keepsAspectRatio && followsPlayer;
       })
