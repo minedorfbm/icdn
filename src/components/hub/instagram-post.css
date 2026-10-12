@@ -1,0 +1,29 @@
+.instagram-post[data-fit-to-screen] {
+  position: relative;
+  width: min(100%, 80vw, 320px);
+}
+
+/* Give the native caption more room than a 9:16 media-only player. Keep the
+   complete post and pagination within the available mobile viewport. */
+.instagram-post-bounds {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: min(800px, max(160px, calc(100svh - 80px)));
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Instagram needs a stable layout width; only its painted size is reduced.
+   The full player stays interactive, with no crop or nested scrolling. */
+.instagram-post[data-fit-to-screen] .instagram-post-content {
+  width: 326px;
+  transform-origin: top left;
+}
+.instagram-post[data-fit-to-screen] .instagram-post-content iframe {
+  display: block;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}

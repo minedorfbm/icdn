@@ -40,6 +40,13 @@ for (const [id, level, color] of [
     await expect(card).not.toContainText("Local time");
     await expect(card.locator(".editorial-meta svg")).toHaveCount(1);
     await expect(card.locator(".editorial-title + .editorial-description")).toHaveCount(1);
+    await expect(card.locator(".editorial-description")).toHaveCSS(
+      "font-size",
+      id === "la-maison-1888" ? "16px" : "19px",
+    );
+    await expect(card.locator(".instagram-post[data-fit-to-screen]")).toHaveCount(
+      id === "la-maison-1888" ? 2 : 0,
+    );
     const scroller = card.locator("[data-destination-scroll]");
     for (const size of [
       { width: 320, height: 568 },
@@ -98,7 +105,10 @@ test("events retain their schedule, unfold on demand and precede both media sect
   const track = card.locator("[data-instagram-track]");
   await track.scrollIntoViewIfNeeded();
   await expect(card.locator('iframe[title="Instagram test post"]').first()).toBeVisible();
-  await expect.poll(async () => Math.round((await track.boundingBox())!.height)).toBe(320);
+  const frame = (await card.locator('iframe[title="Instagram test post"]').first().boundingBox())!;
+  await expect
+    .poll(async () => Math.ceil((await track.boundingBox())!.height))
+    .toBe(Math.ceil(frame.height));
   const dots = (await card.locator("[data-instagram-pagination]").boundingBox())!;
   const post = (await track.boundingBox())!;
   expect(dots.y - post.y - post.height).toBeLessThanOrEqual(10);
