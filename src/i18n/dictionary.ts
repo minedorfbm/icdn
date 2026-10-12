@@ -18,6 +18,7 @@ export type UIKey =
   | "from_our_world"
   | "related_places"
   | "continue_journey"
+  | "previous_discovery"
   | "practical_information"
   | "dining_collection"
   | "wellness_collection"

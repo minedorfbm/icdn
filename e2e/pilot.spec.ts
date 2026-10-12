@@ -19,11 +19,11 @@ test.beforeEach(async ({ page }) => {
 
 for (const [id, level, color] of [
   ["pilot-citron", "heaven", "rgb(250, 248, 241)"],
-  ["la-maison-1888", "sky", "rgb(23, 57, 75)"],
+  ["la-maison-1888", "sky", "oklch(0.235 0.065 244)"],
   ["long-bar", "earth", "rgb(25, 78, 71)"],
   ["mi-sol-spa", "sea", "rgb(200, 230, 239)"],
 ] as const) {
-  test(`${level} pilot keeps its palette, compact collection and floating tools at mobile widths`, async ({
+  test(`${level} card keeps its palette, compact collection and floating tools at mobile widths`, async ({
     page,
   }, testInfo) => {
     await page.goto(`/${id}`);
@@ -40,13 +40,8 @@ for (const [id, level, color] of [
     await expect(card).not.toContainText("Local time");
     await expect(card.locator(".editorial-meta svg")).toHaveCount(1);
     await expect(card.locator(".editorial-title + .editorial-description")).toHaveCount(1);
-    await expect(card.locator(".editorial-description")).toHaveCSS(
-      "font-size",
-      id === "la-maison-1888" ? "16px" : "19px",
-    );
-    await expect(card.locator(".instagram-post[data-fit-to-screen]")).toHaveCount(
-      id === "la-maison-1888" ? 2 : 0,
-    );
+    await expect(card.locator(".editorial-description")).toHaveCSS("font-size", "16px");
+    await expect(card.locator(".instagram-post[data-fit-to-screen]")).toHaveCount(2);
     const scroller = card.locator("[data-destination-scroll]");
     for (const size of [
       { width: 320, height: 568 },
@@ -130,7 +125,7 @@ test("related cards navigate using catalogue data and continue opens the next de
     .click();
   await expect(page).toHaveURL("/la-maison-1888");
   await expect(page.locator(".editorial-title")).toHaveText("La Maison 1888");
-  await page.locator(".editorial-continue button").click();
+  await page.locator("[data-next-destination]").click();
   await expect(page).toHaveURL("/wine-cellar");
 });
 
@@ -143,7 +138,9 @@ test("new shared labels and source-matched editorial headings translate together
   await page.goto("/mi-sol-spa");
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
   await expect(page.locator(".editorial-section-heading")).toContainText(["特別なひとときを。"]);
-  await expect(page.locator(".editorial-continue")).not.toContainText("CONTINUE THE JOURNEY");
+  await expect(page.locator(".destination-journey")).not.toContainText("CONTINUE THE JOURNEY");
+  await page.locator("[data-next-destination]").click();
+  await expect(page.locator("[data-previous-destination]")).toContainText("前に見たスポット");
 });
 
 test("all added relationships display once and open in both directions", async ({ page }) => {
@@ -206,7 +203,7 @@ async function swipe(
   );
 }
 
-test("horizontal swipes navigate forward and back across editorial and classic cards", async ({
+test("horizontal swipes navigate forward and back across current and legacy catalogue rows", async ({
   page,
 }) => {
   await page.goto("/la-maison-1888");
@@ -214,11 +211,116 @@ test("horizontal swipes navigate forward and back across editorial and classic c
   await expect(hero).toBeVisible();
   expect(await swipe(hero, [290, 280], [80, 283])).toBe(true);
   await expect(page).toHaveURL("/wine-cellar");
-  const classicHero = page.locator("[data-destination-scroll] img").first();
-  await expect(classicHero).toBeVisible();
-  await swipe(classicHero, [80, 280], [290, 283]);
+  const nextHero = page.locator("[data-destination-scroll] img").first();
+  await expect(nextHero).toBeVisible();
+  await swipe(nextHero, [80, 280], [290, 283]);
   await expect(page).toHaveURL("/la-maison-1888");
   await expect(page.locator("[data-destination-scroll]")).toHaveJSProperty("scrollTop", 0);
+});
+
+test("previous discovery follows visited relationships and is absent on the first card", async ({
+  page,
+}) => {
+  await page.goto("/la-maison-1888");
+  await expect(page.locator(".editorial-hero img")).toBeVisible();
+  await expect(page.locator("[data-previous-destination]")).toHaveCount(0);
+  await swipe(page.locator(".editorial-hero img"), [80, 280], [290, 283]);
+  await expect(page).toHaveURL("/la-maison-1888");
+
+  // Selecting the current place from search must not create a visit to itself.
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  const search = page.getByRole("dialog", { name: "Search", exact: true });
+  await search.getByRole("searchbox").fill("La Maison");
+  await search.locator(".hub-search-results button").filter({ hasText: "La Maison 1888" }).click();
+  await expect(search).toHaveCount(0);
+  await expect(page.locator("[data-previous-destination]")).toHaveCount(0);
+
+  await page
+    .locator(".destination-related")
+    .getByRole("button", { name: "Buffalo Bar", exact: true })
+    .click();
+  await expect(page).toHaveURL("/buffalo-bar");
+  await expect(page.locator("[data-previous-destination]")).toContainText("La Maison 1888");
+  await page
+    .locator(".destination-related")
+    .getByRole("button", { name: "La Maison 1888", exact: true })
+    .click();
+  await expect(page).toHaveURL("/la-maison-1888");
+  await expect(page.locator("[data-previous-destination]")).toContainText("Buffalo Bar");
+
+  for (const width of [320, 390, 768]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.locator(".destination-journey").scrollIntoViewIfNeeded();
+    const buttons = await page.locator(".destination-journey button").all();
+    const [previous, next] = await Promise.all(buttons.map((button) => button.boundingBox()));
+    expect(previous!.x).toBeGreaterThanOrEqual(0);
+    expect(previous!.x + previous!.width).toBeLessThan(next!.x);
+    expect(next!.x + next!.width).toBeLessThanOrEqual(width);
+    await expect
+      .poll(() =>
+        page.locator("[data-destination-scroll]").evaluate((el) => el.scrollWidth - el.clientWidth),
+      )
+      .toBeLessThanOrEqual(1);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator("[data-destination-scroll]").evaluate((el) => el.scrollTo(0, 0));
+  await swipe(page.locator(".editorial-hero img"), [80, 280], [290, 283]);
+  await expect(page).toHaveURL("/buffalo-bar");
+  await page.locator("[data-previous-destination]").click();
+  await expect(page).toHaveURL("/la-maison-1888");
+  await expect(page.locator("[data-previous-destination]")).toHaveCount(0);
+
+  // Starting from a direct URL must never use browser Back to leave the hub.
+  await page.locator("[data-next-destination]").click();
+  await expect(page).toHaveURL("/wine-cellar");
+  await page.getByRole("button", { name: "BACK", exact: true }).click();
+  await expect(page).toHaveURL("/");
+  await expect(page.locator(".threshold-img")).toBeVisible();
+});
+
+test("top Back skips the card trail and restores the home's selected card and scroll", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const stage = page.locator("#heaven .touch-pan-y").first();
+  await stage.scrollIntoViewIfNeeded();
+  for (const [type, x] of [
+    ["pointerdown", 300],
+    ["pointermove", 50],
+    ["pointerup", 50],
+  ] as const) {
+    await stage.dispatchEvent(type, {
+      pointerId: 1,
+      pointerType: "touch",
+      isPrimary: true,
+      button: 0,
+      clientX: x,
+      clientY: 200,
+    });
+  }
+  const active = stage.locator('article[aria-hidden="false"]');
+  await expect(active).toContainText("TINGARA");
+  const openCard = active.getByRole("button", { name: "TINGARA", exact: true });
+  await openCard.scrollIntoViewIfNeeded();
+  const homeScroll = await page.evaluate(() => window.scrollY);
+  expect(homeScroll).toBeGreaterThan(100);
+  await openCard.press("Enter");
+  await expect(page).toHaveURL("/tingara");
+  await expect(page.locator("[data-previous-destination]")).toHaveCount(0);
+  await page.locator("[data-next-destination]").click();
+  await expect(page).not.toHaveURL("/tingara");
+  const secondUrl = page.url();
+  await page.locator("[data-next-destination]").click();
+  await expect(page).not.toHaveURL(secondUrl);
+  await page.getByRole("button", { name: "BACK", exact: true }).click();
+  await expect(page).toHaveURL("/");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(active).toContainText("TINGARA");
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeCloseTo(homeScroll, 0);
+  // Starting another journey has no stale previous-card control.
+  await openCard.press("Enter");
+  await expect(page).toHaveURL("/tingara");
+  await expect(page.locator("[data-previous-destination]")).toHaveCount(0);
 });
 
 test("vertical gestures, screen edges, controls, Instagram and cancelled swipes keep the current card", async ({

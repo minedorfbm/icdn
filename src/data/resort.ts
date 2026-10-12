@@ -359,7 +359,7 @@ function destinationPresentation(
   row: DestinationRow,
 ): Pick<Destination, "detailLayout" | "primaryLinkId" | "headings" | "headingTranslations"> {
   return {
-    detailLayout: row.detail_layout ?? "classic",
+    detailLayout: "editorial",
     ...(row.primary_link_id ? { primaryLinkId: row.primary_link_id } : {}),
     headings: {
       ...(row.links_heading ? { links: row.links_heading } : {}),

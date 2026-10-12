@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useHub } from "@/data/hub-context";
 import { adjacentDestination } from "./destination-presentation";
 import { useDestinationNavigation } from "./use-destination-navigation";
+import { findPublicDestination } from "./destination-route";
 
 const INTERACTIVE =
   'a,button,input,select,textarea,summary,iframe,video,[contenteditable]:not([contenteditable="false"]),[data-instagram-track],[data-destination-swipe-ignore]';
@@ -68,17 +69,22 @@ function bindSwipe(node: HTMLElement, navigate: (direction: 1 | -1) => void) {
 export function useDestinationSwipe(id: string) {
   const ref = useRef<HTMLDivElement>(null);
   const { destinations } = useHub();
-  const { sequence, openDestination, neutral } = useDestinationNavigation();
+  const { sequence, openDestination, neutral, previousCard, openPreviousDestination } =
+    useDestinationNavigation();
   const next = adjacentDestination(id, destinations, sequence);
-  const previous = adjacentDestination(id, destinations, sequence, -1);
+  const previous = previousCard ? findPublicDestination(destinations, previousCard) : undefined;
   const nextId = next?.id;
   const previousId = previous?.id;
+  const openNext = useCallback(() => {
+    if (nextId) openDestination(nextId, neutral);
+  }, [nextId, openDestination, neutral]);
   useEffect(() => {
     const node = ref.current;
-    if (!node || !nextId || !previousId) return;
-    return bindSwipe(node, (direction) =>
-      openDestination(direction === 1 ? nextId : previousId, neutral),
-    );
-  }, [id, nextId, previousId, openDestination, neutral]);
-  return { ref, next };
+    if (!node || (!nextId && !previousId)) return;
+    return bindSwipe(node, (direction) => {
+      if (direction === 1) openNext();
+      else if (previousId) openPreviousDestination();
+    });
+  }, [id, nextId, previousId, openNext, openPreviousDestination]);
+  return { ref, next, previous, openNext, openPrevious: openPreviousDestination };
 }

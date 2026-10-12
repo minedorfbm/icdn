@@ -1,4 +1,4 @@
-/* Isolated, CMS-controlled pilot. The surrounding hub and classic cards retain their palette. */
+/* Shared expanded-card palette, including raised surfaces and featured actions. */
 .editorial-detail {
   --level-bg: #faf8f1;
   --level-fg: #2e2b26;
@@ -15,14 +15,18 @@
   font-family: var(--brand-sans);
 }
 .editorial-detail[data-level="sky"] {
-  --level-bg: #17394b;
+  --level-bg: var(--world-sky);
   --level-fg: #f8f6ef;
   --editorial-accent: #d3c3a2;
-  --editorial-panel: #203f51;
+  --editorial-panel: color-mix(in oklab, var(--world-sky) 92%, var(--level-fg));
   --editorial-button: #e6dbc3;
-  --editorial-button-text: #17394b;
+  --editorial-button-text: var(--world-sky);
   --editorial-muted: #becbd0;
-  --editorial-border: #47616d;
+  --editorial-border: color-mix(in oklab, var(--world-sky) 72%, var(--level-fg));
+}
+.editorial-detail .editorial-body > section > article {
+  background: var(--editorial-panel);
+  border-color: var(--editorial-border);
 }
 .editorial-detail[data-level="earth"] {
   --level-bg: #194e47;
@@ -121,12 +125,9 @@
 }
 .editorial-description {
   font-family: var(--brand-serif);
-  font-size: 19px;
+  font-size: 16px;
   line-height: 1.65;
   color: var(--editorial-muted);
-}
-.editorial-page[data-destination-id="la-maison-1888"] .editorial-description {
-  font-size: 16px;
 }
 .editorial-primary {
   margin-block: 26px;
@@ -284,33 +285,6 @@
   margin-top: 14px;
   font-size: 11px;
   letter-spacing: 1px;
-}
-.editorial-continue {
-  border-top: 1px solid var(--editorial-border);
-  margin-top: 38px;
-  padding-top: 22px;
-}
-.editorial-continue button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  min-height: 55px;
-  text-align: left;
-  font-size: 11px;
-  letter-spacing: 1.6px;
-  color: var(--editorial-accent);
-}
-.editorial-continue strong {
-  display: block;
-  margin-top: 9px;
-  color: var(--level-fg);
-  font: 400 24px/1.2 var(--brand-serif);
-  letter-spacing: 0;
-}
-.editorial-continue svg {
-  flex-shrink: 0;
 }
 .editorial-loading {
   margin-top: 20px;
