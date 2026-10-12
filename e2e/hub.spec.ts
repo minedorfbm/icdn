@@ -485,32 +485,25 @@ test("Instagram dots follow the active post height and neighbouring posts share 
     // available width instead of assuming that the full 80vw is always available.
     const width = (await card.locator(".instagram-post").nth(postIndex).boundingBox())!.width;
     expect(width).toBeLessThanOrEqual(Math.min(size.width * 0.8, 320) + 1);
-    const naturalWidth = await frame.evaluate((el) => (el as HTMLElement).offsetWidth);
-    const limit = Math.min((width * 16) / 9, Math.max(160, size.height - 160));
-    const height = naturalHeight * Math.min(1, width / naturalWidth, limit / naturalHeight);
-    console.log(
-      "embed geometry",
-      await frame.evaluate((el) => ({
-        frame: el.getBoundingClientRect().toJSON(),
-        offsetWidth: (el as HTMLElement).offsetWidth,
-        offsetHeight: (el as HTMLElement).offsetHeight,
-        host: el.closest(".instagram-post")?.getBoundingClientRect().toJSON(),
-        bounds: el
-          .closest(".instagram-post")
-          ?.querySelector(".instagram-post-bounds")
-          ?.getBoundingClientRect()
-          .toJSON(),
-        fit: (el.parentElement as HTMLElement).style.cssText,
-        viewport: el.parentElement?.parentElement?.getBoundingClientRect().toJSON(),
-      })),
-    );
+    const bounds = card.locator(".instagram-post-bounds").nth(postIndex);
+    // WebKit can also narrow the 9:16 envelope when its height is capped.
+    // Check the painted player against that envelope, not a guessed CSS width.
     await expect
-      .poll(async () => Math.ceil((await track.boundingBox())!.height))
-      .toBe(Math.ceil(height));
-    const frameBox = (await frame.boundingBox())!;
-    expect(Math.abs(frameBox.height - height)).toBeLessThan(1);
-    expect(frameBox.height).toBeLessThanOrEqual(limit + 1);
-    expect(frameBox.width).toBeLessThanOrEqual(width + 1);
+      .poll(async () => {
+        const box = (await frame.boundingBox())!;
+        const limit = (await bounds.boundingBox())!;
+        const fillsEnvelope = Math.abs(Math.max(box.width / limit.width, box.height / limit.height) - 1) < 0.01;
+        const fitsEnvelope = box.width <= limit.width + 1 && box.height <= limit.height + 1;
+        const naturalWidth = await frame.evaluate((el) => (el as HTMLElement).offsetWidth);
+        const keepsAspectRatio = Math.abs(box.width / box.height - naturalWidth / naturalHeight) < 0.01;
+        const followsPlayer = Math.abs((await track.boundingBox())!.height - box.height) <= 1;
+        return fillsEnvelope && fitsEnvelope && keepsAspectRatio && followsPlayer;
+      })
+      .toBe(true);
+    const limit = (await bounds.boundingBox())!;
+    expect(limit.width).toBeLessThanOrEqual(width + 1);
+    expect(limit.height).toBeLessThanOrEqual((width * 16) / 9 + 1);
+    expect(limit.height).toBeLessThanOrEqual(Math.max(160, size.height - 160) + 1);
     const dots = await card.locator("[data-instagram-pagination]").boundingBox();
     const rect = (await track.boundingBox())!;
     expect(dots!.y - rect.y - rect.height).toBeGreaterThanOrEqual(0);
