@@ -1,0 +1,30 @@
+.instagram-post {
+  position: relative;
+  width: min(100%, 80vw, 320px);
+}
+
+/* Match a 9:16 YouTube Short, leaving room for the heading and pagination.
+   This invisible sizing box also responds to rotation and mobile browser chrome. */
+.instagram-post-bounds {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  max-height: max(160px, calc(100svh - 160px));
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Instagram needs a stable layout width; only its painted size is reduced.
+   The full player stays interactive, with no crop or nested scrolling. */
+.instagram-post-content {
+  width: 326px;
+  transform-origin: top left;
+}
+.instagram-post-content iframe {
+  display: block;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}

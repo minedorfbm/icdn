@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Instagram } from "lucide-react";
 import type { DestinationPost } from "@/data/resort";
 import { useI18n } from "@/i18n";
+import "./instagram-post.css";
 
 const SCRIPT_SRC = "https://www.instagram.com/embed.js";
 
@@ -69,8 +70,8 @@ function processEmbeds(): Promise<void> {
 }
 
 /**
- * Renders a real Instagram post (photo, account, full caption) via Instagram's
- * official embed. If the embed does not render — offline preview, private post,
+ * Renders the compact official Instagram embed, fitted within a story-sized
+ * viewport. If the embed does not render — offline preview, private post,
  * blocked script — a matching in-house post card is shown instead.
  */
 export function InstagramPostEmbed({
@@ -83,11 +84,13 @@ export function InstagramPostEmbed({
 }) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
+  const bounds = useRef<HTMLDivElement>(null);
   // Only single posts/reels can be embedded; account links show the post card.
   const embeddable = /instagram\.com\/(p|reel|reels)\//.test(post.post_url);
   const [failed, setFailed] = useState(!embeddable);
   const [ready, setReady] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [fit, setFit] = useState({ width: 326, height: 0, scale: 1 });
 
   useEffect(() => {
     setFailed(!embeddable);
@@ -110,13 +113,27 @@ export function InstagramPostEmbed({
         frame = next;
         if (frame) sizes.observe(frame);
       }
-      if (!frame || frame.getBoundingClientRect().height < 100) return;
+      // Measure before the transform: measuring the painted rectangle would
+      // repeatedly shrink an already scaled iframe after each resize message.
+      if (!frame || frame.offsetHeight < 100 || !bounds.current) return;
+      const limit = bounds.current.getBoundingClientRect();
+      if (!frame.offsetWidth || !limit.width || !limit.height) return;
+      const scale = Math.min(1, limit.width / frame.offsetWidth, limit.height / frame.offsetHeight);
+      const nextFit = {
+        width: frame.offsetWidth * scale,
+        height: frame.offsetHeight * scale,
+        scale,
+      };
+      setFit((previous) =>
+        previous.width === nextFit.width && previous.height === nextFit.height ? previous : nextFit,
+      );
       displayed = true;
       if (timer) clearTimeout(timer);
       setReady(true);
       setFailed(false);
     };
     const mutations = new MutationObserver(rendered);
+    if (bounds.current) sizes.observe(bounds.current);
     mutations.observe(node, {
       childList: true,
       subtree: true,
@@ -162,25 +179,29 @@ export function InstagramPostEmbed({
   const handle = post.account ? `@${post.account.replace(/^@/, "")}` : null;
 
   const body = (
-    <div ref={host} className={bare ? "" : "mt-5"}>
+    <div ref={host} className={`instagram-post ${bare ? "" : "mt-5"}`}>
+      <div ref={bounds} className="instagram-post-bounds" aria-hidden />
       {embeddable && (
         <div
-          className={`overflow-hidden rounded-[18px] bg-white transition-opacity [&_blockquote]:invisible ${
+          className={`instagram-post-viewport overflow-hidden rounded-[18px] bg-white transition-opacity [&_blockquote]:invisible ${
             ready ? "opacity-100" : "opacity-0"
           }`}
-          style={ready ? undefined : { height: 1, pointerEvents: "none" }}
+          style={
+            ready ? { width: fit.width, height: fit.height } : { height: 1, pointerEvents: "none" }
+          }
         >
-          <blockquote
-            className="instagram-media"
-            data-instgrm-permalink={post.post_url}
-            data-instgrm-version="14"
-            data-instgrm-captioned=""
-            style={{ margin: 0, width: "100%", minWidth: "unset" }}
-          >
-            <a href={post.post_url} target="_blank" rel="noreferrer">
-              {post.post_url}
-            </a>
-          </blockquote>
+          <div className="instagram-post-content" style={{ transform: `scale(${fit.scale})` }}>
+            <blockquote
+              className="instagram-media"
+              data-instgrm-permalink={post.post_url}
+              data-instgrm-version="14"
+              style={{ margin: 0, width: "100%", minWidth: "unset" }}
+            >
+              <a href={post.post_url} target="_blank" rel="noreferrer">
+                {post.post_url}
+              </a>
+            </blockquote>
+          </div>
         </div>
       )}
 

@@ -477,8 +477,19 @@ test("Instagram dots follow the active post height and neighbouring posts share 
   await track.scrollIntoViewIfNeeded();
   await expect(card.locator('iframe[title="Short post"]')).toBeVisible();
   await expect(card.locator('iframe[title="Tall post"]')).toBeAttached();
-  const expectHeight = async (height: number) => {
-    await expect.poll(async () => Math.round((await track.boundingBox())!.height)).toBe(height);
+  const expectHeight = async (naturalHeight: number) => {
+    const size = page.viewportSize()!;
+    const width = Math.min(size.width * 0.8, 320);
+    const limit = Math.min((width * 16) / 9, Math.max(160, size.height - 160));
+    const height = naturalHeight * Math.min(1, width / 326, limit / naturalHeight);
+    await expect
+      .poll(async () => Math.ceil((await track.boundingBox())!.height))
+      .toBe(Math.ceil(height));
+    const frame = card.locator("iframe").nth(naturalHeight === 920 ? 1 : 0);
+    const frameBox = (await frame.boundingBox())!;
+    expect(Math.abs(frameBox.height - height)).toBeLessThan(1);
+    expect(frameBox.height).toBeLessThanOrEqual(limit + 1);
+    expect(frameBox.width).toBeLessThanOrEqual(width + 1);
     const dots = await card.locator("[data-instagram-pagination]").boundingBox();
     const rect = (await track.boundingBox())!;
     expect(dots!.y - rect.y - rect.height).toBeGreaterThanOrEqual(0);
@@ -487,6 +498,15 @@ test("Instagram dots follow the active post height and neighbouring posts share 
   await expectHeight(260);
   await card.getByRole("button", { name: "2 / 2", exact: true }).click();
   await expectHeight(920);
+  for (const size of [
+    { width: 320, height: 568 },
+    { width: 768, height: 1024 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(size);
+    await card.getByRole("button", { name: "2 / 2", exact: true }).click();
+    await expectHeight(920);
+  }
   await card.getByRole("button", { name: "1 / 2", exact: true }).click();
   await expectHeight(260);
   // Simulate Instagram adjusting its iframe for an expanded caption.

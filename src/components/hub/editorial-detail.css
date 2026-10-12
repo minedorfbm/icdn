@@ -121,7 +121,7 @@
 }
 .editorial-description {
   font-family: var(--brand-serif);
-  font-size: 19px;
+  font-size: 16px;
   line-height: 1.65;
   color: var(--editorial-muted);
 }

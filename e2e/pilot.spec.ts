@@ -98,7 +98,10 @@ test("events retain their schedule, unfold on demand and precede both media sect
   const track = card.locator("[data-instagram-track]");
   await track.scrollIntoViewIfNeeded();
   await expect(card.locator('iframe[title="Instagram test post"]').first()).toBeVisible();
-  await expect.poll(async () => Math.round((await track.boundingBox())!.height)).toBe(320);
+  const frame = (await card.locator('iframe[title="Instagram test post"]').first().boundingBox())!;
+  await expect
+    .poll(async () => Math.ceil((await track.boundingBox())!.height))
+    .toBe(Math.ceil(frame.height));
   const dots = (await card.locator("[data-instagram-pagination]").boundingBox())!;
   const post = (await track.boundingBox())!;
   expect(dots.y - post.y - post.height).toBeLessThanOrEqual(10);
