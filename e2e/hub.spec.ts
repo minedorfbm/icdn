@@ -488,6 +488,22 @@ test("Instagram dots follow the active post height and neighbouring posts share 
     const naturalWidth = await frame.evaluate((el) => (el as HTMLElement).offsetWidth);
     const limit = Math.min((width * 16) / 9, Math.max(160, size.height - 160));
     const height = naturalHeight * Math.min(1, width / naturalWidth, limit / naturalHeight);
+    console.log(
+      "embed geometry",
+      await frame.evaluate((el) => ({
+        frame: el.getBoundingClientRect().toJSON(),
+        offsetWidth: (el as HTMLElement).offsetWidth,
+        offsetHeight: (el as HTMLElement).offsetHeight,
+        host: el.closest(".instagram-post")?.getBoundingClientRect().toJSON(),
+        bounds: el
+          .closest(".instagram-post")
+          ?.querySelector(".instagram-post-bounds")
+          ?.getBoundingClientRect()
+          .toJSON(),
+        fit: (el.parentElement as HTMLElement).style.cssText,
+        viewport: el.parentElement?.parentElement?.getBoundingClientRect().toJSON(),
+      })),
+    );
     await expect
       .poll(async () => Math.ceil((await track.boundingBox())!.height))
       .toBe(Math.ceil(height));
