@@ -479,13 +479,18 @@ test("Instagram dots follow the active post height and neighbouring posts share 
   await expect(card.locator('iframe[title="Tall post"]')).toBeAttached();
   const expectHeight = async (naturalHeight: number) => {
     const size = page.viewportSize()!;
-    const width = Math.min(size.width * 0.8, 320);
+    const postIndex = naturalHeight === 920 ? 1 : 0;
+    const frame = card.locator("iframe").nth(postIndex);
+    // Classic cards have different gutters from editorial cards. Use the actual
+    // available width instead of assuming that the full 80vw is always available.
+    const width = (await card.locator(".instagram-post").nth(postIndex).boundingBox())!.width;
+    expect(width).toBeLessThanOrEqual(Math.min(size.width * 0.8, 320) + 1);
+    const naturalWidth = await frame.evaluate((el) => (el as HTMLElement).offsetWidth);
     const limit = Math.min((width * 16) / 9, Math.max(160, size.height - 160));
-    const height = naturalHeight * Math.min(1, width / 326, limit / naturalHeight);
+    const height = naturalHeight * Math.min(1, width / naturalWidth, limit / naturalHeight);
     await expect
       .poll(async () => Math.ceil((await track.boundingBox())!.height))
       .toBe(Math.ceil(height));
-    const frame = card.locator("iframe").nth(naturalHeight === 920 ? 1 : 0);
     const frameBox = (await frame.boundingBox())!;
     expect(Math.abs(frameBox.height - height)).toBeLessThan(1);
     expect(frameBox.height).toBeLessThanOrEqual(limit + 1);
@@ -509,7 +514,7 @@ test("Instagram dots follow the active post height and neighbouring posts share 
   }
   await card.getByRole("button", { name: "1 / 2", exact: true }).click();
   await expectHeight(260);
-  // Simulate Instagram adjusting its iframe for an expanded caption.
+  // Simulate Instagram adjusting its iframe after a media resize message.
   await card.locator('iframe[title="Short post"]').evaluate((el) => {
     (el as HTMLElement).style.height = "360px";
   });
