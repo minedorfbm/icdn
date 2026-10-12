@@ -1,6 +1,20 @@
 import type { Lang } from "@/i18n/dictionary";
 const languageIndex: Record<Lang, number> = { en: 0, vi: 1, ru: 2, zh: 3, ko: 4, ja: 5 };
 const copy = {
+  moods: [
+    "Follow your mood",
+    "Theo cảm hứng của bạn",
+    "По настроению",
+    "随心探索",
+    "기분에 따라",
+    "気分に合わせて",
+  ],
+  relax: ["Relax", "Thư giãn", "Расслабиться", "放松", "휴식", "リラックス"],
+  romantic: ["Romantic", "Lãng mạn", "Романтика", "浪漫", "로맨틱", "ロマンチック"],
+  family: ["Family", "Gia đình", "Семья", "亲子", "가족", "家族"],
+  active: ["Sport", "Thể thao", "Спорт", "运动", "운동", "スポーツ"],
+  nature: ["Nature", "Thiên nhiên", "Природа", "自然", "자연", "自然散策"],
+  rain: ["Rainy day", "Trời mưa", "Дождливый день", "雨天", "비 오는 날", "雨の日"],
   search: ["Search", "Tìm kiếm", "Поиск", "搜索", "검색", "検索"],
   title: [
     "Find your next discovery",
@@ -11,12 +25,12 @@ const copy = {
     "次の発見を探す",
   ],
   placeholder: [
-    "A place, an activity…",
-    "Địa điểm, hoạt động…",
-    "Место, занятие…",
-    "地点、活动…",
-    "장소, 액티비티…",
-    "場所、アクティビティ…",
+    "A place, an activity, a mood…",
+    "Địa điểm, hoạt động, tâm trạng…",
+    "Место, занятие, настроение…",
+    "地点、活动、心情…",
+    "장소, 액티비티, 기분…",
+    "場所、体験、気分…",
   ],
   clear: [
     "Clear search",
@@ -36,12 +50,12 @@ const copy = {
     "該当する場所がありません",
   ],
   hint: [
-    "Try another name or browse all collections.",
-    "Thử tên khác hoặc xem tất cả bộ sưu tập.",
-    "Попробуйте другое название или откройте все подборки.",
-    "请尝试其他名称或浏览所有分类。",
-    "다른 이름으로 검색하거나 모든 카테고리를 둘러보세요.",
-    "別の名前で検索するか、すべてのカテゴリーをご覧ください。",
+    "Try a name or a wish, like Japanese dining, relaxation or family activities.",
+    "Thử tên hoặc mong muốn, như món Nhật, thư giãn hay hoạt động gia đình.",
+    "Попробуйте название или пожелание: японская кухня, отдых, семейные занятия.",
+    "试试名称或想法，例如日料、放松或亲子活动。",
+    "이름이나 원하는 경험을 검색해 보세요. 일식, 휴식, 가족 액티비티 등이 있어요.",
+    "名前や希望で検索できます。日本料理、リラックス、家族の体験など。",
   ],
   dining: [
     "Restaurants & bars",

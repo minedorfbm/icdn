@@ -72,6 +72,8 @@ export interface Destination {
   type: DestinationType;
   short_description: string;
   detail_description?: string;
+  /** Search-only concepts and synonyms, editable by the marketing team. */
+  searchKeywords?: string[];
   primaryLinkId?: string;
   headings?: { links?: string; video?: string; instagram?: string };
   headingTranslations?: NonNullable<DestinationRow["heading_translations"]>;
@@ -387,6 +389,7 @@ export function toDestination(
     type,
     short_description: row.short_description,
     ...(row.detail_description ? { detail_description: row.detail_description } : {}),
+    searchKeywords: row.search_keywords ?? [],
     ...destinationPresentation(row),
     contentFamily: row.content_family ?? (row.content_kind === "offer" ? "offer" : "resort"),
     audienceTags: row.audience_tags ?? ["all"],

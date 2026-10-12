@@ -140,6 +140,22 @@
   font-size: 12px;
   letter-spacing: 0.1em;
 }
+.hub-search-moods > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.hub-search-moods button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--brand-border);
+  border-radius: var(--brand-radius);
+  font-size: 12px;
+}
+.hub-search-moods button:active {
+  background: var(--brand-paper);
+}
 .hub-search-note {
   font-family: var(--brand-serif);
   font-size: 20px;
