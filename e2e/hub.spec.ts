@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 // Instagram is external; focused tests below replace this route with a deterministic script.
 test.beforeEach(async ({ page }) => {
@@ -446,61 +446,7 @@ test("Instagram can retry a failed script without reloading the card", async ({
   }
 });
 
-test("Instagram dots follow the active post height and neighbouring posts share one load", async ({
-  page,
-}) => {
-  let loads = 0;
-  await page.route("https://www.instagram.com/embed.js", (route) => {
-    loads += 1;
-    return route.fulfill({
-      contentType: "application/javascript",
-      body: `
-      window.embedPasses = 0;
-      window.instgrm = { Embeds: { process() {
-        window.embedPasses++;
-        document.querySelectorAll('.instagram-media').forEach((post) => {
-          const short = post.dataset.instgrmPermalink.includes('/SHORT/');
-          const frame = document.createElement('iframe');
-          frame.title = short ? 'Short post' : 'Tall post';
-          frame.style.cssText = 'display:block;width:100%;border:0;height:' + (short ? 260 : 920) + 'px';
-          frame.srcdoc = '<p>Official Instagram post</p>';
-          post.replaceWith(frame);
-        });
-      } } };
-    `,
-    });
-  });
-  await page.goto("/nature-experiences");
-  const card = page.getByRole("dialog", { name: "Nature Discovery", exact: true });
-  const track = card.locator("[data-instagram-track]");
-  await expect(track).toBeVisible();
-  await track.scrollIntoViewIfNeeded();
-  await expect(card.locator('iframe[title="Short post"]')).toBeVisible();
-  await expect(card.locator('iframe[title="Tall post"]')).toBeAttached();
-  const expectHeight = async (height: number) => {
-    await expect.poll(async () => Math.round((await track.boundingBox())!.height)).toBe(height);
-    const dots = await card.locator("[data-instagram-pagination]").boundingBox();
-    const rect = (await track.boundingBox())!;
-    expect(dots!.y - rect.y - rect.height).toBeGreaterThanOrEqual(0);
-    expect(dots!.y - rect.y - rect.height).toBeLessThanOrEqual(10);
-  };
-  await expectHeight(260);
-  await card.getByRole("button", { name: "2 / 2", exact: true }).click();
-  await expectHeight(920);
-  await card.getByRole("button", { name: "1 / 2", exact: true }).click();
-  await expectHeight(260);
-  // Simulate Instagram adjusting its iframe for an expanded caption.
-  await card.locator('iframe[title="Short post"]').evaluate((el) => {
-    (el as HTMLElement).style.height = "360px";
-  });
-  await expectHeight(360);
-  expect(loads).toBe(1);
-  expect(await page.evaluate(() => (window as Window & { embedPasses: number }).embedPasses)).toBe(
-    1,
-  );
-});
-
-test("La Maison fits captioned posts to the screen and keeps the dots nearby", async ({ page }) => {
+async function openInstagramCarousel(page: Page, path: string, name: string) {
   let loads = 0;
   await page.route("https://www.instagram.com/embed.js", (route) => {
     loads += 1;
@@ -523,13 +469,69 @@ test("La Maison fits captioned posts to the screen and keeps the dots nearby", a
     `,
     });
   });
-  await page.goto("/la-maison-1888");
-  const card = page.getByRole("dialog", { name: "La Maison 1888", exact: true });
+  await page.goto(path);
+  const card = page.getByRole("dialog", { name, exact: true });
   const track = card.locator("[data-instagram-track]");
   await expect(track).toBeVisible();
   await track.scrollIntoViewIfNeeded();
   await expect(card.locator('iframe[title="Short post"]')).toBeVisible();
   await expect(card.locator('iframe[title="Tall post"]')).toBeAttached();
+  return { card, track, loadCount: () => loads };
+}
+
+async function resizeInstagramPost(card: Locator, title: string, height: number) {
+  await card.locator(`iframe[title="${title}"]`).evaluate((el, nextHeight) => {
+    (el as HTMLElement).style.height = `${nextHeight}px`;
+  }, height);
+}
+
+async function expectInstagramPagination(card: Locator) {
+  await expect
+    .poll(() =>
+      card.evaluate((el) => {
+        const dots = el.querySelector("[data-instagram-pagination]")!.getBoundingClientRect();
+        const track = el.querySelector("[data-instagram-track]")!.getBoundingClientRect();
+        const gap = dots.top - track.bottom;
+        return gap >= 0 && gap <= 10;
+      }),
+    )
+    .toBe(true);
+}
+
+test("Instagram dots follow the active post height and neighbouring posts share one load", async ({
+  page,
+}) => {
+  const { card, track, loadCount } = await openInstagramCarousel(
+    page,
+    "/nature-experiences",
+    "Nature Discovery",
+  );
+  const expectHeight = async (height: number) => {
+    await expect.poll(async () => Math.round((await track.boundingBox())!.height)).toBe(height);
+    await expectInstagramPagination(card);
+  };
+  await expectHeight(260);
+  await card.getByRole("button", { name: "2 / 2", exact: true }).click();
+  await expectHeight(920);
+  await card.getByRole("button", { name: "1 / 2", exact: true }).click();
+  await expectHeight(260);
+  // Simulate Instagram adjusting its iframe for an expanded caption.
+  await resizeInstagramPost(card, "Short post", 360);
+  await expectHeight(360);
+  expect(loadCount()).toBe(1);
+  expect(await page.evaluate(() => (window as Window & { embedPasses: number }).embedPasses)).toBe(
+    1,
+  );
+});
+
+test("La Maison shows a legible caption excerpt with tightly spaced posts and dots", async ({
+  page,
+}) => {
+  const { card, track, loadCount } = await openInstagramCarousel(
+    page,
+    "/la-maison-1888",
+    "La Maison 1888",
+  );
   await expect(card.locator('iframe[title="Short post"]')).toHaveAttribute(
     "data-captioned",
     "true",
@@ -537,36 +539,49 @@ test("La Maison fits captioned posts to the screen and keeps the dots nearby", a
   await expect(card.locator('iframe[title="Tall post"]')).toHaveAttribute("data-captioned", "true");
   const expectHeight = async (naturalHeight: number) => {
     const size = page.viewportSize()!;
-    const postIndex = naturalHeight === 920 ? 1 : 0;
+    const postIndex = naturalHeight >= 920 ? 1 : 0;
+    const post = card.locator(".instagram-post").nth(postIndex);
     const frame = card.locator("iframe").nth(postIndex);
-    // Classic cards have different gutters from editorial cards. Use the actual
-    // available width instead of assuming that the full 80vw is always available.
-    const width = (await card.locator(".instagram-post").nth(postIndex).boundingBox())!.width;
-    expect(width).toBeLessThanOrEqual(Math.min(size.width * 0.8, 320) + 1);
-    const bounds = card.locator(".instagram-post-bounds").nth(postIndex);
-    // Check the complete captioned player against the available screen area.
+    const viewport = post.locator(".instagram-post-viewport");
+    const bounds = post.locator(".instagram-post-bounds");
     await expect
       .poll(async () => {
-        const box = (await frame.boundingBox())!;
+        const box = (await viewport.boundingBox())!;
         const limit = (await bounds.boundingBox())!;
+        const media = (await frame.boundingBox())!;
         const fillsEnvelope =
           Math.abs(Math.max(box.width / limit.width, box.height / limit.height) - 1) < 0.01;
         const fitsEnvelope = box.width <= limit.width + 1 && box.height <= limit.height + 1;
         const naturalWidth = await frame.evaluate((el) => (el as HTMLElement).offsetWidth);
         const keepsAspectRatio =
-          Math.abs(box.width / box.height - naturalWidth / naturalHeight) < 0.01;
-        const followsPlayer = Math.abs((await track.boundingBox())!.height - box.height) <= 1;
-        return fillsEnvelope && fitsEnvelope && keepsAspectRatio && followsPlayer;
+          Math.abs(media.width / media.height - naturalWidth / naturalHeight) < 0.01;
+        const followsPreview = Math.abs((await track.boundingBox())!.height - box.height) <= 1;
+        return fillsEnvelope && fitsEnvelope && keepsAspectRatio && followsPreview;
       })
       .toBe(true);
+    const box = (await viewport.boundingBox())!;
     const limit = (await bounds.boundingBox())!;
-    expect(limit.width).toBeLessThanOrEqual(width + 1);
-    expect(limit.height).toBeLessThanOrEqual(800);
-    expect(limit.height).toBeLessThanOrEqual(Math.max(160, size.height - 80) + 1);
-    const dots = await card.locator("[data-instagram-pagination]").boundingBox();
-    const rect = (await track.boundingBox())!;
-    expect(dots!.y - rect.y - rect.height).toBeGreaterThanOrEqual(0);
-    expect(dots!.y - rect.y - rect.height).toBeLessThanOrEqual(10);
+    expect(box.width).toBeGreaterThan(limit.width * 0.75);
+    expect(box.width).toBeLessThanOrEqual(320);
+    expect(box.height).toBeLessThanOrEqual(800);
+    expect(box.height).toBeLessThanOrEqual(Math.max(160, size.height - 80) + 1);
+    expect(Math.abs((await post.boundingBox())!.width - box.width)).toBeLessThan(1);
+    if (naturalHeight >= 920) {
+      await expect(viewport).toHaveAttribute("data-caption-preview", "true");
+      expect((await frame.boundingBox())!.height).toBeGreaterThan(box.height);
+    } else {
+      await expect(viewport).not.toHaveAttribute("data-caption-preview");
+    }
+    // Read both rectangles in one frame while smooth scrolling is settling.
+    await expect
+      .poll(() =>
+        card.locator(".instagram-post-viewport").evaluateAll(([first, second]) => {
+          const left = first!.getBoundingClientRect();
+          return second!.getBoundingClientRect().left - left.right;
+        }),
+      )
+      .toBeCloseTo(16, 0);
+    await expectInstagramPagination(card);
   };
   await expectHeight(260);
   await card.getByRole("button", { name: "2 / 2", exact: true }).click();
@@ -583,11 +598,19 @@ test("La Maison fits captioned posts to the screen and keeps the dots nearby", a
   await card.getByRole("button", { name: "1 / 2", exact: true }).click();
   await expectHeight(260);
   // Simulate Instagram adjusting its iframe after a media resize message.
-  await card.locator('iframe[title="Short post"]').evaluate((el) => {
-    (el as HTMLElement).style.height = "360px";
-  });
+  await resizeInstagramPost(card, "Short post", 360);
   await expectHeight(360);
-  expect(loads).toBe(1);
+  await card.getByRole("button", { name: "2 / 2", exact: true }).click();
+  await expectHeight(920);
+  const beforeCaptionChange = await card.locator(".instagram-post-viewport").nth(1).boundingBox();
+  // A longer native caption should be clipped, not shrink the photo or open a gap.
+  await resizeInstagramPost(card, "Tall post", 1800);
+  await expectHeight(1800);
+  const afterCaptionChange = await card.locator(".instagram-post-viewport").nth(1).boundingBox();
+  expect(afterCaptionChange!.width).toBeCloseTo(beforeCaptionChange!.width, 0);
+  expect(afterCaptionChange!.height).toBeCloseTo(beforeCaptionChange!.height, 0);
+
+  expect(loadCount()).toBe(1);
   expect(await page.evaluate(() => (window as Window & { embedPasses: number }).embedPasses)).toBe(
     1,
   );
