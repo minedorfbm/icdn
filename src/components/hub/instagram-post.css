@@ -3,14 +3,13 @@
   width: min(100%, 80vw, 320px);
 }
 
-/* Match a 9:16 YouTube Short, leaving room for the heading and pagination.
-   This invisible sizing box also responds to rotation and mobile browser chrome. */
+/* Give the native caption more room than a 9:16 media-only player. Keep the
+   complete post and pagination within the available mobile viewport. */
 .instagram-post-bounds {
   position: absolute;
   inset: 0 auto auto 0;
   width: 100%;
-  aspect-ratio: 9 / 16;
-  max-height: max(160px, calc(100svh - 160px));
+  height: min(800px, max(160px, calc(100svh - 80px)));
   visibility: hidden;
   pointer-events: none;
 }

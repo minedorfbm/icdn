@@ -70,8 +70,8 @@ function processEmbeds(): Promise<void> {
 }
 
 /**
- * Renders the compact official Instagram embed, fitted within a story-sized
- * viewport. If the embed does not render — offline preview, private post,
+ * Renders the official Instagram embed with its native caption, fitted within
+ * a screen-sized viewport. If the embed does not render — offline preview, private post,
  * blocked script — a matching in-house post card is shown instead.
  */
 export function InstagramPostEmbed({
@@ -195,6 +195,7 @@ export function InstagramPostEmbed({
               className="instagram-media"
               data-instgrm-permalink={post.post_url}
               data-instgrm-version="14"
+              data-instgrm-captioned=""
               style={{ margin: 0, width: "100%", minWidth: "unset" }}
             >
               <a href={post.post_url} target="_blank" rel="noreferrer">

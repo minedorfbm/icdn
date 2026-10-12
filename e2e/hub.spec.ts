@@ -462,6 +462,7 @@ test("Instagram dots follow the active post height and neighbouring posts share 
           const short = post.dataset.instgrmPermalink.includes('/SHORT/');
           const frame = document.createElement('iframe');
           frame.title = short ? 'Short post' : 'Tall post';
+          frame.dataset.captioned = String(post.hasAttribute('data-instgrm-captioned'));
           frame.style.cssText = 'display:block;width:100%;border:0;height:' + (short ? 260 : 920) + 'px';
           frame.srcdoc = '<p>Official Instagram post</p>';
           post.replaceWith(frame);
@@ -477,6 +478,11 @@ test("Instagram dots follow the active post height and neighbouring posts share 
   await track.scrollIntoViewIfNeeded();
   await expect(card.locator('iframe[title="Short post"]')).toBeVisible();
   await expect(card.locator('iframe[title="Tall post"]')).toBeAttached();
+  await expect(card.locator('iframe[title="Short post"]')).toHaveAttribute(
+    "data-captioned",
+    "true",
+  );
+  await expect(card.locator('iframe[title="Tall post"]')).toHaveAttribute("data-captioned", "true");
   const expectHeight = async (naturalHeight: number) => {
     const size = page.viewportSize()!;
     const postIndex = naturalHeight === 920 ? 1 : 0;
@@ -486,8 +492,7 @@ test("Instagram dots follow the active post height and neighbouring posts share 
     const width = (await card.locator(".instagram-post").nth(postIndex).boundingBox())!.width;
     expect(width).toBeLessThanOrEqual(Math.min(size.width * 0.8, 320) + 1);
     const bounds = card.locator(".instagram-post-bounds").nth(postIndex);
-    // WebKit can also narrow the 9:16 envelope when its height is capped.
-    // Check the painted player against that envelope, not a guessed CSS width.
+    // Check the complete captioned player against the available screen area.
     await expect
       .poll(async () => {
         const box = (await frame.boundingBox())!;
@@ -504,8 +509,8 @@ test("Instagram dots follow the active post height and neighbouring posts share 
       .toBe(true);
     const limit = (await bounds.boundingBox())!;
     expect(limit.width).toBeLessThanOrEqual(width + 1);
-    expect(limit.height).toBeLessThanOrEqual((width * 16) / 9 + 1);
-    expect(limit.height).toBeLessThanOrEqual(Math.max(160, size.height - 160) + 1);
+    expect(limit.height).toBeLessThanOrEqual(800);
+    expect(limit.height).toBeLessThanOrEqual(Math.max(160, size.height - 80) + 1);
     const dots = await card.locator("[data-instagram-pagination]").boundingBox();
     const rect = (await track.boundingBox())!;
     expect(dots!.y - rect.y - rect.height).toBeGreaterThanOrEqual(0);
