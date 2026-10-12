@@ -1,9 +1,8 @@
-import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronDown, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, ChevronDown, MapPin } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import type { Destination } from "@/data/resort";
 import { useI18n } from "@/i18n";
 import { useDestinationMedia } from "@/lib/use-destination-media";
-import { useDestinationNavigation } from "@/lib/use-destination-navigation";
 import { useDestinationSwipe } from "@/lib/use-destination-swipe";
 import { detailActions, detailHeading } from "@/lib/destination-presentation";
 import { instagramUrl } from "@/lib/destination-actions";
@@ -18,6 +17,7 @@ import { YouTubeVideos } from "./YouTubeVideos";
 import { InstagramPostCarousel } from "./InstagramPostCarousel";
 import { InstagramStrip } from "./InstagramStrip";
 import { RelatedDestinations } from "./RelatedDestinations";
+import { DestinationJourneyNavigation } from "./DestinationJourneyNavigation";
 import { ResortLevelIcon } from "./ResortLevelIcon";
 import type { DestinationDetailProps } from "./DestinationDetail";
 import "./editorial-detail.css";
@@ -55,11 +55,7 @@ function EditorialInstagram({
           label={t("from_our_world")}
           title={detailHeading(dest, "instagram", lang)}
         />
-        <InstagramPostCarousel
-          posts={media.posts}
-          embedded
-          fitToScreen={dest.id === "la-maison-1888"}
-        />
+        <InstagramPostCarousel posts={media.posts} embedded fitToScreen />
       </section>
     );
   }
@@ -74,7 +70,7 @@ function EditorialInstagram({
   );
 }
 
-/** The same template serves every opt-in destination; all content comes from the catalogue. */
+/** The same template serves every destination; all content comes from the catalogue. */
 export function EditorialDestinationDetail({
   dest,
   onClose,
@@ -82,8 +78,7 @@ export function EditorialDestinationDetail({
   portalled = true,
 }: DestinationDetailProps) {
   const { media, pending, failed, retry } = useDestinationMedia(dest.id);
-  const { openDestination } = useDestinationNavigation();
-  const { ref: swipeRef, next } = useDestinationSwipe(dest.id);
+  const { ref: swipeRef, ...journey } = useDestinationSwipe(dest.id);
   const {
     lang,
     t,
@@ -260,17 +255,7 @@ export function EditorialDestinationDetail({
             <EditorialInstagram dest={dest} media={media} />
 
             <RelatedDestinations id={dest.id} />
-            {next && (
-              <footer className="editorial-continue">
-                <button type="button" onClick={() => openDestination(next.id)}>
-                  <span>
-                    {t("continue_journey")}
-                    <strong>{next.name}</strong>
-                  </span>
-                  <ArrowRight size={24} strokeWidth={1.4} aria-hidden />
-                </button>
-              </footer>
-            )}
+            <DestinationJourneyNavigation {...journey} />
           </div>
         </article>
       </div>

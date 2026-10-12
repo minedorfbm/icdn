@@ -1,4 +1,4 @@
-// Separate IDs keep the existing classic-card regressions active during the pilot.
+// Mixed legacy/current API rows verify every destination receives the shared model.
 export const editorialDestinations = [
   ["pilot-citron", "Heaven dining preview", "heaven", "restaurant", "d-citron"],
   ["la-maison-1888", "La Maison 1888", "sky", "restaurant", "d-french-dining"],

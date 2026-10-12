@@ -498,123 +498,101 @@ async function expectInstagramPagination(card: Locator) {
     .toBe(true);
 }
 
-test("Instagram dots follow the active post height and neighbouring posts share one load", async ({
-  page,
-}) => {
-  const { card, track, loadCount } = await openInstagramCarousel(
+for (const [path, name] of [
+  ["/la-maison-1888", "La Maison 1888"],
+  ["/nature-experiences", "Nature Discovery"],
+]) {
+  test(`${name} shows a legible caption excerpt with tightly spaced posts and dots`, async ({
     page,
-    "/nature-experiences",
-    "Nature Discovery",
-  );
-  const expectHeight = async (height: number) => {
-    await expect.poll(async () => Math.round((await track.boundingBox())!.height)).toBe(height);
-    await expectInstagramPagination(card);
-  };
-  await expectHeight(260);
-  await card.getByRole("button", { name: "2 / 2", exact: true }).click();
-  await expectHeight(920);
-  await card.getByRole("button", { name: "1 / 2", exact: true }).click();
-  await expectHeight(260);
-  // Simulate Instagram adjusting its iframe for an expanded caption.
-  await resizeInstagramPost(card, "Short post", 360);
-  await expectHeight(360);
-  expect(loadCount()).toBe(1);
-  expect(await page.evaluate(() => (window as Window & { embedPasses: number }).embedPasses)).toBe(
-    1,
-  );
-});
-
-test("La Maison shows a legible caption excerpt with tightly spaced posts and dots", async ({
-  page,
-}) => {
-  const { card, track, loadCount } = await openInstagramCarousel(
-    page,
-    "/la-maison-1888",
-    "La Maison 1888",
-  );
-  await expect(card.locator('iframe[title="Short post"]')).toHaveAttribute(
-    "data-captioned",
-    "true",
-  );
-  await expect(card.locator('iframe[title="Tall post"]')).toHaveAttribute("data-captioned", "true");
-  const expectHeight = async (naturalHeight: number) => {
-    const size = page.viewportSize()!;
-    const postIndex = naturalHeight >= 920 ? 1 : 0;
-    const post = card.locator(".instagram-post").nth(postIndex);
-    const frame = card.locator("iframe").nth(postIndex);
-    const viewport = post.locator(".instagram-post-viewport");
-    const bounds = post.locator(".instagram-post-bounds");
-    await expect
-      .poll(async () => {
-        const box = (await viewport.boundingBox())!;
-        const limit = (await bounds.boundingBox())!;
-        const media = (await frame.boundingBox())!;
-        const fillsEnvelope =
-          Math.abs(Math.max(box.width / limit.width, box.height / limit.height) - 1) < 0.01;
-        const fitsEnvelope = box.width <= limit.width + 1 && box.height <= limit.height + 1;
-        const naturalWidth = await frame.evaluate((el) => (el as HTMLElement).offsetWidth);
-        const keepsAspectRatio =
-          Math.abs(media.width / media.height - naturalWidth / naturalHeight) < 0.01;
-        const followsPreview = Math.abs((await track.boundingBox())!.height - box.height) <= 1;
-        return fillsEnvelope && fitsEnvelope && keepsAspectRatio && followsPreview;
-      })
-      .toBe(true);
-    const box = (await viewport.boundingBox())!;
-    const limit = (await bounds.boundingBox())!;
-    expect(box.width).toBeGreaterThan(limit.width * 0.75);
-    expect(box.width).toBeLessThanOrEqual(320);
-    expect(box.height).toBeLessThanOrEqual(800);
-    expect(box.height).toBeLessThanOrEqual(Math.max(160, size.height - 80) + 1);
-    expect(Math.abs((await post.boundingBox())!.width - box.width)).toBeLessThan(1);
-    if (naturalHeight >= 920) {
-      await expect(viewport).toHaveAttribute("data-caption-preview", "true");
-      expect((await frame.boundingBox())!.height).toBeGreaterThan(box.height);
-    } else {
-      await expect(viewport).not.toHaveAttribute("data-caption-preview");
-    }
-    // Read both rectangles in one frame while smooth scrolling is settling.
-    await expect
-      .poll(() =>
-        card.locator(".instagram-post-viewport").evaluateAll(([first, second]) => {
-          const left = first!.getBoundingClientRect();
-          return second!.getBoundingClientRect().left - left.right;
-        }),
-      )
-      .toBeCloseTo(16, 0);
-    await expectInstagramPagination(card);
-  };
-  await expectHeight(260);
-  await card.getByRole("button", { name: "2 / 2", exact: true }).click();
-  await expectHeight(920);
-  for (const size of [
-    { width: 320, height: 568 },
-    { width: 768, height: 1024 },
-    { width: 390, height: 844 },
-  ]) {
-    await page.setViewportSize(size);
+  }) => {
+    const { card, track, loadCount } = await openInstagramCarousel(page, path, name);
+    await expect(card.locator('iframe[title="Short post"]')).toHaveAttribute(
+      "data-captioned",
+      "true",
+    );
+    await expect(card.locator('iframe[title="Tall post"]')).toHaveAttribute(
+      "data-captioned",
+      "true",
+    );
+    const expectHeight = async (naturalHeight: number) => {
+      const size = page.viewportSize()!;
+      const postIndex = naturalHeight >= 920 ? 1 : 0;
+      const post = card.locator(".instagram-post").nth(postIndex);
+      const frame = card.locator("iframe").nth(postIndex);
+      const viewport = post.locator(".instagram-post-viewport");
+      const bounds = post.locator(".instagram-post-bounds");
+      await expect
+        .poll(async () => {
+          const box = (await viewport.boundingBox())!;
+          const limit = (await bounds.boundingBox())!;
+          const media = (await frame.boundingBox())!;
+          const fillsEnvelope =
+            Math.abs(Math.max(box.width / limit.width, box.height / limit.height) - 1) < 0.01;
+          const fitsEnvelope = box.width <= limit.width + 1 && box.height <= limit.height + 1;
+          const naturalWidth = await frame.evaluate((el) => (el as HTMLElement).offsetWidth);
+          const keepsAspectRatio =
+            Math.abs(media.width / media.height - naturalWidth / naturalHeight) < 0.01;
+          const followsPreview = Math.abs((await track.boundingBox())!.height - box.height) <= 1;
+          return fillsEnvelope && fitsEnvelope && keepsAspectRatio && followsPreview;
+        })
+        .toBe(true);
+      const box = (await viewport.boundingBox())!;
+      const limit = (await bounds.boundingBox())!;
+      expect(box.width).toBeGreaterThan(limit.width * 0.75);
+      expect(box.width).toBeLessThanOrEqual(320);
+      expect(box.height).toBeLessThanOrEqual(800);
+      expect(box.height).toBeLessThanOrEqual(Math.max(160, size.height - 80) + 1);
+      expect(Math.abs((await post.boundingBox())!.width - box.width)).toBeLessThan(1);
+      if (naturalHeight >= 920) {
+        await expect(viewport).toHaveAttribute("data-caption-preview", "true");
+        expect((await frame.boundingBox())!.height).toBeGreaterThan(box.height);
+      } else {
+        await expect(viewport).not.toHaveAttribute("data-caption-preview");
+      }
+      // Read both rectangles in one frame while smooth scrolling is settling.
+      await expect
+        .poll(() =>
+          card.locator(".instagram-post-viewport").evaluateAll(([first, second]) => {
+            const left = first!.getBoundingClientRect();
+            return second!.getBoundingClientRect().left - left.right;
+          }),
+        )
+        .toBeCloseTo(16, 0);
+      await expectInstagramPagination(card);
+    };
+    await expectHeight(260);
     await card.getByRole("button", { name: "2 / 2", exact: true }).click();
     await expectHeight(920);
-  }
-  await card.getByRole("button", { name: "1 / 2", exact: true }).click();
-  await expectHeight(260);
-  // Simulate Instagram adjusting its iframe after a media resize message.
-  await resizeInstagramPost(card, "Short post", 360);
-  await expectHeight(360);
-  await card.getByRole("button", { name: "2 / 2", exact: true }).click();
-  await expectHeight(920);
-  const beforeCaptionChange = await card.locator(".instagram-post-viewport").nth(1).boundingBox();
-  // A longer native caption should be clipped, not shrink the photo or open a gap.
-  await resizeInstagramPost(card, "Tall post", 1800);
-  await expectHeight(1800);
-  const afterCaptionChange = await card.locator(".instagram-post-viewport").nth(1).boundingBox();
-  expect(afterCaptionChange!.width).toBeCloseTo(beforeCaptionChange!.width, 0);
-  expect(afterCaptionChange!.height).toBeCloseTo(beforeCaptionChange!.height, 0);
+    for (const size of [
+      { width: 320, height: 568 },
+      { width: 768, height: 1024 },
+      { width: 390, height: 844 },
+    ]) {
+      await page.setViewportSize(size);
+      await card.getByRole("button", { name: "2 / 2", exact: true }).click();
+      await expectHeight(920);
+    }
+    await card.getByRole("button", { name: "1 / 2", exact: true }).click();
+    await expectHeight(260);
+    // Simulate Instagram adjusting its iframe after a media resize message.
+    await resizeInstagramPost(card, "Short post", 360);
+    await expectHeight(360);
+    await card.getByRole("button", { name: "2 / 2", exact: true }).click();
+    await expectHeight(920);
+    const beforeCaptionChange = await card.locator(".instagram-post-viewport").nth(1).boundingBox();
+    // A longer native caption should be clipped, not shrink the photo or open a gap.
+    await resizeInstagramPost(card, "Tall post", 1800);
+    await expectHeight(1800);
+    const afterCaptionChange = await card.locator(".instagram-post-viewport").nth(1).boundingBox();
+    expect(afterCaptionChange!.width).toBeCloseTo(beforeCaptionChange!.width, 0);
+    expect(afterCaptionChange!.height).toBeCloseTo(beforeCaptionChange!.height, 0);
 
-  expect(loadCount()).toBe(1);
-  expect(await page.evaluate(() => (window as Window & { embedPasses: number }).embedPasses)).toBe(
-    1,
-  );
-});
+    expect(loadCount()).toBe(1);
+    expect(
+      await page.evaluate(() => (window as Window & { embedPasses: number }).embedPasses),
+    ).toBe(1);
+  });
+}
 
 test("Instagram keeps its placeholder until the initial zero-height iframe is ready", async ({
   page,

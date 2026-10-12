@@ -16,6 +16,7 @@ import { ResortLink } from "./ResortBrowser";
 import { HubSearch } from "@/features/search/HubSearch";
 import { ConciergeContact } from "./ConciergeContact";
 import { RelatedDestinations } from "./RelatedDestinations";
+import { DestinationJourneyNavigation } from "./DestinationJourneyNavigation";
 import { EditorialDestinationDetail } from "./EditorialDestinationDetail";
 
 export type DestinationDetailProps = Readonly<{
@@ -27,15 +28,11 @@ export type DestinationDetailProps = Readonly<{
 }>;
 
 export function DestinationDetail(props: DestinationDetailProps) {
-  return props.dest.detailLayout === "editorial" ? (
-    <EditorialDestinationDetail {...props} />
-  ) : (
-    <ClassicDestinationDetail {...props} />
-  );
+  return <EditorialDestinationDetail {...props} />;
 }
 
 /** Full-screen editorial detail view for one destination. */
-function ClassicDestinationDetail({
+export function ClassicDestinationDetail({
   dest: summary,
   onClose,
   aboveMap = false,
@@ -44,7 +41,7 @@ function ClassicDestinationDetail({
 }: DestinationDetailProps) {
   const { media, pending, failed, retry } = useDestinationMedia(summary.id);
   const dest = { ...summary, ...media };
-  const { ref: swipeRef } = useDestinationSwipe(dest.id);
+  const { ref: swipeRef, ...journey } = useDestinationSwipe(dest.id);
   const { lang, t, typeLabel, levelLabel, action, description, detailDescription, event } =
     useI18n();
   const { openMap, locate } = useResortMap();
@@ -262,13 +259,7 @@ function ClassicDestinationDetail({
 
             <RelatedDestinations id={dest.id} />
 
-            <button
-              onClick={onClose}
-              className="mt-14 inline-flex items-center gap-2 text-[10px] tracking-[0.32em] opacity-55 transition-opacity hover:opacity-90"
-            >
-              <ArrowLeft className="size-4 shrink-0" strokeWidth={1.3} aria-hidden />
-              {t("back_journey")}
-            </button>
+            <DestinationJourneyNavigation {...journey} />
           </div>
         </div>
       </div>

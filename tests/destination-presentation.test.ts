@@ -95,7 +95,7 @@ test("continue follows the current deck, skips unpublished cards and wraps witho
   expect(adjacentDestination("missing", [a, b])).toBeUndefined();
 });
 
-test("old destination rows keep the classic page and preserve independent images", () => {
+test("all destination rows use the shared model and preserve independent images", () => {
   const row = destinationRow.parse({
     id: "citron",
     name: "Citron",
@@ -108,7 +108,10 @@ test("old destination rows keep the classic page and preserve independent images
     active: true,
     display_order: 0,
   });
-  expect(toDestination(row).detailLayout).toBe("classic");
+  expect(toDestination(row).detailLayout).toBe("editorial");
+  expect(toDestination({ ...row, active: false, detail_layout: "classic" }).detailLayout).toBe(
+    "editorial",
+  );
   expect(toDestination({ ...row, detail_layout: "editorial" }).detailLayout).toBe("editorial");
   expect(toDestination(row).image).not.toBe(toDestination(row).detailImage);
 });
