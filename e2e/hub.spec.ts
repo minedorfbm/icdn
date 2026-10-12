@@ -446,7 +446,7 @@ test("Instagram can retry a failed script without reloading the card", async ({
   }
 });
 
-async function mockInstagramCarousel(page: Page) {
+async function openInstagramCarousel(page: Page, path: string, name: string) {
   let loads = 0;
   await page.route("https://www.instagram.com/embed.js", (route) => {
     loads += 1;
@@ -469,30 +469,46 @@ async function mockInstagramCarousel(page: Page) {
     `,
     });
   });
-  return () => loads;
-}
-
-async function expectInstagramPagination(card: Locator, track: Locator) {
-  const dots = (await card.locator("[data-instagram-pagination]").boundingBox())!;
-  const rect = (await track.boundingBox())!;
-  expect(dots.y - rect.y - rect.height).toBeGreaterThanOrEqual(0);
-  expect(dots.y - rect.y - rect.height).toBeLessThanOrEqual(10);
-}
-
-test("Instagram dots follow the active post height and neighbouring posts share one load", async ({
-  page,
-}) => {
-  const loadCount = await mockInstagramCarousel(page);
-  await page.goto("/nature-experiences");
-  const card = page.getByRole("dialog", { name: "Nature Discovery", exact: true });
+  await page.goto(path);
+  const card = page.getByRole("dialog", { name, exact: true });
   const track = card.locator("[data-instagram-track]");
   await expect(track).toBeVisible();
   await track.scrollIntoViewIfNeeded();
   await expect(card.locator('iframe[title="Short post"]')).toBeVisible();
   await expect(card.locator('iframe[title="Tall post"]')).toBeAttached();
+  return { card, track, loadCount: () => loads };
+}
+
+async function resizeInstagramPost(card: Locator, title: string, height: number) {
+  await card.locator(`iframe[title="${title}"]`).evaluate((el, nextHeight) => {
+    (el as HTMLElement).style.height = `${nextHeight}px`;
+  }, height);
+}
+
+async function expectInstagramPagination(card: Locator) {
+  await expect
+    .poll(() =>
+      card.evaluate((el) => {
+        const dots = el.querySelector("[data-instagram-pagination]")!.getBoundingClientRect();
+        const track = el.querySelector("[data-instagram-track]")!.getBoundingClientRect();
+        const gap = dots.top - track.bottom;
+        return gap >= 0 && gap <= 10;
+      }),
+    )
+    .toBe(true);
+}
+
+test("Instagram dots follow the active post height and neighbouring posts share one load", async ({
+  page,
+}) => {
+  const { card, track, loadCount } = await openInstagramCarousel(
+    page,
+    "/nature-experiences",
+    "Nature Discovery",
+  );
   const expectHeight = async (height: number) => {
     await expect.poll(async () => Math.round((await track.boundingBox())!.height)).toBe(height);
-    await expectInstagramPagination(card, track);
+    await expectInstagramPagination(card);
   };
   await expectHeight(260);
   await card.getByRole("button", { name: "2 / 2", exact: true }).click();
@@ -500,9 +516,7 @@ test("Instagram dots follow the active post height and neighbouring posts share 
   await card.getByRole("button", { name: "1 / 2", exact: true }).click();
   await expectHeight(260);
   // Simulate Instagram adjusting its iframe for an expanded caption.
-  await card.locator('iframe[title="Short post"]').evaluate((el) => {
-    (el as HTMLElement).style.height = "360px";
-  });
+  await resizeInstagramPost(card, "Short post", 360);
   await expectHeight(360);
   expect(loadCount()).toBe(1);
   expect(await page.evaluate(() => (window as Window & { embedPasses: number }).embedPasses)).toBe(
@@ -513,14 +527,11 @@ test("Instagram dots follow the active post height and neighbouring posts share 
 test("La Maison shows a legible caption excerpt with tightly spaced posts and dots", async ({
   page,
 }) => {
-  const loadCount = await mockInstagramCarousel(page);
-  await page.goto("/la-maison-1888");
-  const card = page.getByRole("dialog", { name: "La Maison 1888", exact: true });
-  const track = card.locator("[data-instagram-track]");
-  await expect(track).toBeVisible();
-  await track.scrollIntoViewIfNeeded();
-  await expect(card.locator('iframe[title="Short post"]')).toBeVisible();
-  await expect(card.locator('iframe[title="Tall post"]')).toBeAttached();
+  const { card, track, loadCount } = await openInstagramCarousel(
+    page,
+    "/la-maison-1888",
+    "La Maison 1888",
+  );
   await expect(card.locator('iframe[title="Short post"]')).toHaveAttribute(
     "data-captioned",
     "true",
@@ -570,7 +581,7 @@ test("La Maison shows a legible caption excerpt with tightly spaced posts and do
         }),
       )
       .toBeCloseTo(16, 0);
-    await expectInstagramPagination(card, track);
+    await expectInstagramPagination(card);
   };
   await expectHeight(260);
   await card.getByRole("button", { name: "2 / 2", exact: true }).click();
@@ -587,17 +598,13 @@ test("La Maison shows a legible caption excerpt with tightly spaced posts and do
   await card.getByRole("button", { name: "1 / 2", exact: true }).click();
   await expectHeight(260);
   // Simulate Instagram adjusting its iframe after a media resize message.
-  await card.locator('iframe[title="Short post"]').evaluate((el) => {
-    (el as HTMLElement).style.height = "360px";
-  });
+  await resizeInstagramPost(card, "Short post", 360);
   await expectHeight(360);
   await card.getByRole("button", { name: "2 / 2", exact: true }).click();
   await expectHeight(920);
   const beforeCaptionChange = await card.locator(".instagram-post-viewport").nth(1).boundingBox();
   // A longer native caption should be clipped, not shrink the photo or open a gap.
-  await card.locator('iframe[title="Tall post"]').evaluate((el) => {
-    (el as HTMLElement).style.height = "1800px";
-  });
+  await resizeInstagramPost(card, "Tall post", 1800);
   await expectHeight(1800);
   const afterCaptionChange = await card.locator(".instagram-post-viewport").nth(1).boundingBox();
   expect(afterCaptionChange!.width).toBeCloseTo(beforeCaptionChange!.width, 0);
