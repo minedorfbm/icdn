@@ -51,7 +51,10 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return withSecurityHeaders(await normalizeCatastrophicSsrResponse(response, requestId));
+      return withSecurityHeaders(
+        await normalizeCatastrophicSsrResponse(response, requestId),
+        request,
+      );
     } catch (error) {
       console.error("[ssr] Request failed", { requestId, error });
       return withSecurityHeaders(
