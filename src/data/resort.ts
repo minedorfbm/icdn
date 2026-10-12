@@ -72,7 +72,6 @@ export interface Destination {
   type: DestinationType;
   short_description: string;
   detail_description?: string;
-  detailLayout?: "classic" | "editorial";
   primaryLinkId?: string;
   headings?: { links?: string; video?: string; instagram?: string };
   headingTranslations?: NonNullable<DestinationRow["heading_translations"]>;
@@ -357,9 +356,8 @@ export function groupEvents(rows: DestinationEventRow[]): Record<string, Destina
 
 function destinationPresentation(
   row: DestinationRow,
-): Pick<Destination, "detailLayout" | "primaryLinkId" | "headings" | "headingTranslations"> {
+): Pick<Destination, "primaryLinkId" | "headings" | "headingTranslations"> {
   return {
-    detailLayout: "editorial",
     ...(row.primary_link_id ? { primaryLinkId: row.primary_link_id } : {}),
     headings: {
       ...(row.links_heading ? { links: row.links_heading } : {}),

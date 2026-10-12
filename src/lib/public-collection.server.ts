@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { presentationColumns, readRows } from "./hub-schema";
+import { readRows } from "./hub-schema";
 
 /** One validated anonymous reader shared by the three public loading stages. */
 export function publicReader() {
@@ -39,20 +39,7 @@ export function publicReader() {
     if (order) query = query.order(order);
     // Avoid multiplying an outage by the SDK's automatic GET retries.
     // The UI owns retry; this deadline covers the whole collection read.
-    let result = await query.retry(false).abortSignal(AbortSignal.timeout(8000));
-    // The previous catalogue remains usable until the additive presentation migration lands.
-    // Never retry network failures or errors from other tables.
-    if (table === "destinations" && ["42703", "PGRST204"].includes(result.error?.code ?? "")) {
-      let legacy = supabase
-        .from(table)
-        .select(columns.filter((column) => !presentationColumns.includes(column)).join(","), {
-          count: "exact",
-        });
-      if (filter) legacy = legacy.eq(filter, true);
-      if (destinationId) legacy = legacy.eq(idColumn, destinationId);
-      if (order) legacy = legacy.order(order);
-      result = await legacy.retry(false).abortSignal(AbortSignal.timeout(8000));
-    }
+    const result = await query.retry(false).abortSignal(AbortSignal.timeout(8000));
     // PostgREST may cap responses. A truncated catalogue must not look like a valid publication.
     if (result.error || (result.count != null && result.count > (result.data?.length ?? 0))) {
       console.error("[hub] Collection unavailable or truncated", { table });

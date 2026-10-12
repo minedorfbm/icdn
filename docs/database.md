@@ -85,14 +85,14 @@ Le modèle éditorial validé s'applique à toutes les destinations, y compris l
 
 La migration `20261012120000_editorial_catalogue_rollout.sql` généralise le réglage et initialise 225 titres personnalisés pour les 75 destinations, avec 1 125 traductions (VI, RU, ZH, KO, JA en plus de l'anglais). Les quatre fiches du pilote gardent leurs titres approuvés. Les descriptions, photographies, horaires, actualités, événements et relations restent leurs sources existantes.
 
-| Champ dans `destinations` | Utilisation |
-| --- | --- |
-| `detail_layout` | `editorial` par défaut. Le site utilise le modèle commun même pour une ancienne ligne encore marquée `classic`. |
-| `primary_link_id` | Identifiant d'un lien actif de **la même fiche** dans `destination_links`, mis en avant et retiré de la collection secondaire. |
-| `links_heading` | Titre personnalisé sous le label de la collection de liens. |
-| `video_heading` | Titre personnalisé sous « In motion ». |
-| `instagram_heading` | Titre personnalisé sous « From our world ». |
-| `heading_translations` | Traductions des trois titres, associées à leur texte anglais de référence. |
+| Champ dans `destinations` | Utilisation                                                                                                                          |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `detail_layout`           | Champ historique conservé en base avec la valeur `editorial`. Le site utilise toujours le modèle commun et ne lit plus ce sélecteur. |
+| `primary_link_id`         | Identifiant d'un lien actif de **la même fiche** dans `destination_links`, mis en avant et retiré de la collection secondaire.       |
+| `links_heading`           | Titre personnalisé sous le label de la collection de liens.                                                                          |
+| `video_heading`           | Titre personnalisé sous « In motion ».                                                                                               |
+| `instagram_heading`       | Titre personnalisé sous « From our world ».                                                                                          |
+| `heading_translations`    | Traductions des trois titres, associées à leur texte anglais de référence.                                                           |
 
 Un `primary_link_id` vide sélectionne automatiquement BOOK, puis DISCOVER/WEBSITE, puis la première action publiée. Si un lien choisi est dépublié, aucun remplacement n'est inventé. Sa suppression efface la sélection ; le choix automatique reprend alors. Les URL restent dans `destination_links`, avec leurs variantes linguistiques. Plusieurs menus distincts peuvent appartenir à une même fiche.
 
@@ -108,4 +108,6 @@ Si le titre anglais change, la traduction n'est plus utilisée tant que `source`
 
 La navigation inférieure propose « Previous discovery » uniquement après la visite d'une autre fiche, et « Continue the journey » vers la suivante dans le carrousel d'origine (ou l'ordre du catalogue pour une arrivée directe). Les swipes suivent ces mêmes directions. Le bouton Back supérieur restaure directement la position et la sélection précédentes de l'accueil.
 
-Déploiement : sauvegarder les champs éditoriaux des 75 fiches, appliquer uniquement la nouvelle migration et publier le code compatible. Contrôler les 75 modèles et traductions, les 73 publications et les deux fiches masquées, puis vérifier les quatre univers sur mobile. Le code classique est conservé jusqu'à cette vérification, puis retiré. Un retour arrière passe par Git et la sauvegarde des champs, pas par une bascule du champ `detail_layout`.
+Déploiement : sauvegarder les champs éditoriaux des 75 fiches, appliquer uniquement la nouvelle migration et publier le code compatible. Contrôler les 75 modèles et traductions, les 73 publications et les deux fiches masquées, puis vérifier les quatre univers sur mobile. Après vérification de la publication, le rendu classique, ses styles et la compatibilité de lecture antérieure à la migration sont retirés. Un retour arrière passe par Git et la sauvegarde des champs, pas par une bascule du champ `detail_layout`.
+
+Contrôle du 12 octobre 2026 après application : 75 modèles éditoriaux, 75 jeux complets de titres dans les six langues, 71 liens principaux utilisables, 73 fiches actives et 2 masquées (`information`, `reception`). La comparaison des exports avant/après confirme que les autres champs sont inchangés.
