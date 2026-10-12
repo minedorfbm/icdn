@@ -14,7 +14,7 @@ Au total : 18 nouvelles lignes et 3 fiches précisées. Chaque fiche traitée re
 
 | ID stable                               | Nom                                     | Famille      | Source officielle                                                                                             |
 | --------------------------------------- | --------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------- |
-| shuttle                                 | Shuttle                       | resort       | [Page](https://www.danang.intercontinental.com/wp-content/uploads/2025/12/Shuttle-Bus-Schedule-to-Hoi-An.pdf) |
+| shuttle                                 | Shuttle                                 | resort       | [Page](https://www.danang.intercontinental.com/wp-content/uploads/2025/12/Shuttle-Bus-Schedule-to-Hoi-An.pdf) |
 | experience-more                         | Experience More                         | offer        | [Page](https://www.danang.intercontinental.com/offers/experience-more-offer/)                                 |
 | nam-tram-dining                         | Nam Tram Dining Journey                 | resort       | [Page](https://www.danang.intercontinental.com/dining/nam-tram-dining-journey/)                               |
 | airport-lounge                          | InterContinental Airport Lounge         | resort       | [Page](https://www.danang.intercontinental.com/amenities/airport-lounges/)                                    |
@@ -55,3 +55,11 @@ Vérifier après application : 15 cards actives de type `accommodation`, les six
 Résultat SQL de production : 21 fiches traitées actives, 15 catégories d’hébergement actives, 105 traductions à jour et 75 lignes au total. Les 42 URL photo sélectionnées répondent avec HTTP 200 et un type image.
 
 Contrôle dans le navigateur en production : les 21 adresses directes affichent la fiche attendue, dont les trois adresses historiques conservées. Les descriptions traduites et les liens officiels sont visibles.
+
+## Menus vérifiés le 13 octobre 2026
+
+La migration `20261013140000_current_official_menus.sql` remplace le menu principal de La Maison par le Gourmand Limited Edition et la brochure Wedding de juin par celle d’octobre (type BROCHURE). Elle masque les deux anciens menus végétarien/végan de La Maison et le menu Lunch de Tingara, qui ne sont plus publiés sur leurs pages actuelles, ainsi que le lien Afternoon Tea de Citron rangé dans Tingara. Les quatre lignes historiques sont conservées inactives. Les onze liens toujours publiés et les horaires Shuttle à confirmer sont conservés.
+
+Les identifiants, les actions mises en valeur, les ordres, les descriptions et les horaires ne changent pas. Le libellé Gourmand Menu est traduit dans les six langues. [Le relevé des corrections](official-menu-corrections-20261013.json) conserve les anciennes valeurs et les pages officielles sources. La transaction refuse les modifications concurrentes et peut être répétée sans réactiver les liens historiques. Aucun droit de lecture/écriture n’est modifié.
+
+Application Supabase contrôlée : six modifications sur six concordent, quatre liens historiques sont masqués, les douze autres liens de l’audit et les trois actions mises en valeur sont inchangés. La lecture publique confirme les deux liens actualisés et l’absence des quatre liens masqués.
