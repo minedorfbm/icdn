@@ -500,7 +500,9 @@ test("Instagram dots follow the active post height and neighbouring posts share 
   );
 });
 
-test("La Maison fits captioned posts to the screen and keeps the dots nearby", async ({ page }) => {
+test("La Maison shows a legible caption excerpt with tightly spaced posts and dots", async ({
+  page,
+}) => {
   let loads = 0;
   await page.route("https://www.instagram.com/embed.js", (route) => {
     loads += 1;
@@ -537,32 +539,43 @@ test("La Maison fits captioned posts to the screen and keeps the dots nearby", a
   await expect(card.locator('iframe[title="Tall post"]')).toHaveAttribute("data-captioned", "true");
   const expectHeight = async (naturalHeight: number) => {
     const size = page.viewportSize()!;
-    const postIndex = naturalHeight === 920 ? 1 : 0;
+    const postIndex = naturalHeight >= 920 ? 1 : 0;
+    const post = card.locator(".instagram-post").nth(postIndex);
     const frame = card.locator("iframe").nth(postIndex);
-    // Classic cards have different gutters from editorial cards. Use the actual
-    // available width instead of assuming that the full 80vw is always available.
-    const width = (await card.locator(".instagram-post").nth(postIndex).boundingBox())!.width;
-    expect(width).toBeLessThanOrEqual(Math.min(size.width * 0.8, 320) + 1);
-    const bounds = card.locator(".instagram-post-bounds").nth(postIndex);
-    // Check the complete captioned player against the available screen area.
+    const viewport = post.locator(".instagram-post-viewport");
+    const bounds = post.locator(".instagram-post-bounds");
     await expect
       .poll(async () => {
-        const box = (await frame.boundingBox())!;
+        const box = (await viewport.boundingBox())!;
         const limit = (await bounds.boundingBox())!;
+        const media = (await frame.boundingBox())!;
         const fillsEnvelope =
           Math.abs(Math.max(box.width / limit.width, box.height / limit.height) - 1) < 0.01;
         const fitsEnvelope = box.width <= limit.width + 1 && box.height <= limit.height + 1;
         const naturalWidth = await frame.evaluate((el) => (el as HTMLElement).offsetWidth);
         const keepsAspectRatio =
-          Math.abs(box.width / box.height - naturalWidth / naturalHeight) < 0.01;
-        const followsPlayer = Math.abs((await track.boundingBox())!.height - box.height) <= 1;
-        return fillsEnvelope && fitsEnvelope && keepsAspectRatio && followsPlayer;
+          Math.abs(media.width / media.height - naturalWidth / naturalHeight) < 0.01;
+        const followsPreview = Math.abs((await track.boundingBox())!.height - box.height) <= 1;
+        return fillsEnvelope && fitsEnvelope && keepsAspectRatio && followsPreview;
       })
       .toBe(true);
+    const box = (await viewport.boundingBox())!;
     const limit = (await bounds.boundingBox())!;
-    expect(limit.width).toBeLessThanOrEqual(width + 1);
-    expect(limit.height).toBeLessThanOrEqual(800);
-    expect(limit.height).toBeLessThanOrEqual(Math.max(160, size.height - 80) + 1);
+    expect(box.width).toBeGreaterThan(limit.width * 0.75);
+    expect(box.width).toBeLessThanOrEqual(320);
+    expect(box.height).toBeLessThanOrEqual(800);
+    expect(box.height).toBeLessThanOrEqual(Math.max(160, size.height - 80) + 1);
+    expect(Math.abs((await post.boundingBox())!.width - box.width)).toBeLessThan(1);
+    if (naturalHeight >= 920) {
+      await expect(viewport).toHaveAttribute("data-caption-preview", "true");
+      expect((await frame.boundingBox())!.height).toBeGreaterThan(box.height);
+    } else {
+      await expect(viewport).not.toHaveAttribute("data-caption-preview");
+    }
+    const first = (await card.locator(".instagram-post-viewport").nth(0).boundingBox())!;
+    const second = (await card.locator(".instagram-post-viewport").nth(1).boundingBox())!;
+    expect(second.x - first.x - first.width).toBeGreaterThanOrEqual(14);
+    expect(second.x - first.x - first.width).toBeLessThanOrEqual(18);
     const dots = await card.locator("[data-instagram-pagination]").boundingBox();
     const rect = (await track.boundingBox())!;
     expect(dots!.y - rect.y - rect.height).toBeGreaterThanOrEqual(0);
@@ -587,6 +600,18 @@ test("La Maison fits captioned posts to the screen and keeps the dots nearby", a
     (el as HTMLElement).style.height = "360px";
   });
   await expectHeight(360);
+  await card.getByRole("button", { name: "2 / 2", exact: true }).click();
+  await expectHeight(920);
+  const beforeCaptionChange = await card.locator(".instagram-post-viewport").nth(1).boundingBox();
+  // A longer native caption should be clipped, not shrink the photo or open a gap.
+  await card.locator('iframe[title="Tall post"]').evaluate((el) => {
+    (el as HTMLElement).style.height = "1800px";
+  });
+  await expectHeight(1800);
+  const afterCaptionChange = await card.locator(".instagram-post-viewport").nth(1).boundingBox();
+  expect(afterCaptionChange!.width).toBeCloseTo(beforeCaptionChange!.width, 0);
+  expect(afterCaptionChange!.height).toBeCloseTo(beforeCaptionChange!.height, 0);
+
   expect(loads).toBe(1);
   expect(await page.evaluate(() => (window as Window & { embedPasses: number }).embedPasses)).toBe(
     1,

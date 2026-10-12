@@ -68,7 +68,10 @@ export function InstagramPostCarousel({
         style={{ scrollbarWidth: "none", height }}
       >
         {items.map((post) => (
-          <div key={post.post_url} className="w-full shrink-0 snap-center">
+          <div
+            key={post.post_url}
+            className={`${fitToScreen ? "" : "w-full"} shrink-0 snap-center`}
+          >
             <InstagramPostEmbed post={post} bare fitToScreen={fitToScreen} />
           </div>
         ))}

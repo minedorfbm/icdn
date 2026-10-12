@@ -5,6 +5,9 @@ import { useI18n } from "@/i18n";
 import "./instagram-post.css";
 
 const SCRIPT_SRC = "https://www.instagram.com/embed.js";
+// At Instagram's 326px layout width, keep the media, controls and beginning of
+// the caption. Long captions must not make the entire post tiny.
+const CAPTION_PREVIEW_HEIGHT = 740;
 
 declare global {
   interface Window {
@@ -70,8 +73,8 @@ function processEmbeds(): Promise<void> {
 }
 
 /**
- * Renders the official Instagram embed with its native caption, fitted within
- * a screen-sized viewport. If the embed does not render — offline preview, private post,
+ * Renders the official Instagram embed, optionally showing a screen-sized
+ * preview of its native caption. If the embed does not render — offline preview, private post,
  * blocked script — a matching in-house post card is shown instead.
  */
 export function InstagramPostEmbed({
@@ -93,7 +96,7 @@ export function InstagramPostEmbed({
   const [failed, setFailed] = useState(!embeddable);
   const [ready, setReady] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const [fit, setFit] = useState({ width: 326, height: 0, scale: 1 });
+  const [fit, setFit] = useState({ width: 326, height: 0, scale: 1, clipped: false });
 
   useEffect(() => {
     setFailed(!embeddable);
@@ -123,18 +126,18 @@ export function InstagramPostEmbed({
         if (!bounds.current) return;
         const limit = bounds.current.getBoundingClientRect();
         if (!frame.offsetWidth || !limit.width || !limit.height) return;
-        const scale = Math.min(
-          1,
-          limit.width / frame.offsetWidth,
-          limit.height / frame.offsetHeight,
-        );
+        const previewHeight = Math.min(frame.offsetHeight, CAPTION_PREVIEW_HEIGHT);
+        const scale = Math.min(1, limit.width / frame.offsetWidth, limit.height / previewHeight);
         const nextFit = {
           width: frame.offsetWidth * scale,
-          height: frame.offsetHeight * scale,
+          height: previewHeight * scale,
           scale,
+          clipped: frame.offsetHeight > previewHeight,
         };
         setFit((previous) =>
-          previous.width === nextFit.width && previous.height === nextFit.height
+          previous.width === nextFit.width &&
+          previous.height === nextFit.height &&
+          previous.clipped === nextFit.clipped
             ? previous
             : nextFit,
         );
@@ -195,10 +198,12 @@ export function InstagramPostEmbed({
       ref={host}
       data-fit-to-screen={fitToScreen || undefined}
       className={`instagram-post ${bare ? "" : "mt-5"}`}
+      style={fitToScreen && ready && !failed ? { width: fit.width } : undefined}
     >
       {fitToScreen && <div ref={bounds} className="instagram-post-bounds" aria-hidden />}
       {embeddable && (
         <div
+          data-caption-preview={(fitToScreen && ready && fit.clipped) || undefined}
           className={`instagram-post-viewport overflow-hidden rounded-[18px] bg-white transition-opacity [&_blockquote]:invisible ${
             ready ? "opacity-100" : "opacity-0"
           }`}
