@@ -36,9 +36,17 @@ async function readTable<T>(table: string, query: string): Promise<T[]> {
   return response.json();
 }
 const destinations = live
-  ? await readTable<{ id: string; short_description: string; detail_description?: string | null }>(
+  ? await readTable<{
+      id: string;
+      short_description: string;
+      detail_description?: string | null;
+      links_heading?: string | null;
+      video_heading?: string | null;
+      instagram_heading?: string | null;
+      heading_translations?: Record<string, Record<string, { source: string; value: string }>>;
+    }>(
       "destinations",
-      "select=id,short_description,detail_description&active=eq.true",
+      "select=id,short_description,detail_description,links_heading,video_heading,instagram_heading,heading_translations&active=eq.true",
     )
   : Object.entries(sources).map(([id, short_description]) => ({
       id,
@@ -89,6 +97,19 @@ for (const { code } of LANGUAGES) {
         issues.push(`${code}: missing expanded description ${item.id}`);
       else if (row.source_detail_description !== item.detail_description)
         issues.push(`${code}: stale expanded description ${item.id}`);
+    }
+  }
+  if (database) {
+    for (const item of destinations) {
+      for (const section of ["links", "video", "instagram"] as const) {
+        const source = item[`${section}_heading`];
+        if (!source?.trim()) continue;
+        const translation = item.heading_translations?.[code]?.[section];
+        if (!translation?.value?.trim())
+          issues.push(`${code}: missing ${section} heading ${item.id}`);
+        else if (translation.source !== source)
+          issues.push(`${code}: stale ${section} heading ${item.id}`);
+      }
     }
   }
   for (const notice of notices) {

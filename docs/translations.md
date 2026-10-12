@@ -38,10 +38,24 @@ Aucune écriture en production n’est effectuée par le code du site. Aucun acc
 - Après les migrations de [maintenance de la base](database.md), une modification de la source anglaise courte dépublie automatiquement les traductions devenues obsolètes. Pour le texte long, la comparaison avec `source_detail_description` écarte une traduction dépassée à l’affichage et l’audit la signale ; elle ne dépublie pas l’accroche courte. Vérifier leur texte et leurs colonnes `source_*` avant de les republier ; `updated_at` trace les modifications ultérieures.
 - Les événements utilisent leur identifiant stable, pas leur titre, en mode base.
 
-Les nouveaux textes sont des propositions de traduction à relire par des locuteurs natifs, notamment les offres et conditions. Les montants, horaires et liens existants ont été conservés. La traduction automatique par IA et l’administration visuelle ne sont pas incluses dans cette étape. Les pages d’erreur, textes d’accessibilité, légendes et libellés personnalisés restent des éléments d’un chantier distinct ; ils ne sont pas couverts par les deux nouvelles tables.
+Les nouveaux textes sont des propositions de traduction à relire par des locuteurs natifs, notamment les offres et conditions. Les montants, horaires et liens existants ont été conservés. La traduction automatique par IA et l’administration visuelle ne sont pas incluses dans cette étape. Les pages d’erreur et libellés personnalisés utilisent les dictionnaires du code ; ils ne sont pas couverts par les deux tables éditoriales. Les légendes natives Instagram et les pages externes restent sous la responsabilité de leurs éditeurs.
 
 ## Prévisualisations Cloudflare
 
 Le bloc `previews.vars` de `wrangler.json` configure la commande `wrangler preview` utilisée pour les branches. Il utilise volontairement le même catalogue public Supabase que le site, avec la clé publiable et les droits de lecture RLS ; aucune clé administrateur n’est fournie.
 
 Les instantanés historiques sont archivés dans `scripts/translation-snapshot/` pour les outils d’export et d’audit local. Ils ne sont pas inclus dans le site. Si une traduction manque, a été dépubliée ou ne correspond plus à sa source, le texte source courant est affiché. Une panne de la table de traductions ne réintroduit pas une version archivée.
+
+## Corrections de l’audit du 13 octobre 2026
+
+La migration `20261013120000_translation_audit_corrections.sql` corrige 48 champs de description et 6 titres de sections, puis ajoute 51 variantes Discover vérifiées sur les sites officiels. Elle a été appliquée au projet existant et chaque valeur a été contrôlée après publication : 54/54 corrections, 51/51 variantes, aucune divergence. Les 75 cards (73 actives et 2 masquées) et leurs 375 traductions publiées sont conservées. Les deux cards masquées reçoivent leurs variantes sans devenir visibles.
+
+La transaction refuse une source anglaise modifiée, une traduction éditée depuis l’audit ou un lien concurrent différent ; une répétition après application est sans effet sur les textes déjà corrigés. Ne rejouer que cette migration sur une autre installation disposant des mêmes sources, pas les migrations historiques. Les valeurs anciennes et nouvelles sont listées dans [le relevé des corrections](translation-corrections-20261013/editorial-corrections.json).
+
+Les 98 variantes Discover manquantes ont chacune une décision dans [la couverture des liens](translation-corrections-20261013/discover-coverage.json) et les pages contrôlées figurent dans [le relevé de vérification](translation-corrections-20261013/discover-variant-verification.json). 51 sont ajoutées ; 42 n’ont pas d’équivalent fidèle annoncé sur la page officielle ; les 5 liens de langues annoncés par l’offre Club InterContinental sont rejetés car ils décrivent « Book Now, Pay Later ». Ces 47 cas conservent la source anglaise. Les URL ne sont jamais construites automatiquement à partir d’un préfixe de langue.
+
+Les versions officielles de Daycation, M Club et Meetings contiennent encore certains titres ou paragraphes en anglais dans plusieurs langues. Le hub peut sélectionner la version officielle disponible, mais ne traduit pas le contenu de ces pages externes. Le relevé de vérification signale cette limite ; présence d’une variante ne signifie pas traduction intégrale du site du resort.
+
+Les pages 404 (y compris les chemins de cards inconnus), les erreurs React et le secours serveur utilisent les six langues. Le secours serveur sélectionne d’abord la langue de la requête puis restaure le choix `adj-lang` côté navigateur, même sans chargement du JavaScript principal. L’interface des horaires Shuttle, les repères entrée/lagon, le retour vers le lieu précédent et l’erreur PDF sont harmonisés.
+
+Le contrôle `i18n:audit:database` vérifie désormais aussi la présence et la source des titres personnalisés de collection, vidéo et Instagram. Il détecte les omissions et les textes obsolètes ; une relecture reste nécessaire pour la qualité du sens.

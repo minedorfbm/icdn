@@ -378,10 +378,10 @@ export function MapArtwork({
               Bãi Bắc Bay
             </text>
             <text className="entrance-caption" x="927" y="847" textAnchor="end">
-              RESORT ENTRANCE
+              {mapCopy(lang, "entrance")}
             </text>
             <text className="lagoon-caption" x="1060" y="530" textAnchor="end">
-              MI SOL LAGOON
+              {mapCopy(lang, "lagoon")}
             </text>
           </g>
         </g>

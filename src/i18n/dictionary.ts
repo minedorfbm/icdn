@@ -14,6 +14,11 @@ export const LANGUAGES = [
 export type Lang = (typeof LANGUAGES)[number]["code"];
 
 export type UIKey =
+  | "not_found_title"
+  | "not_found_body"
+  | "error_page_title"
+  | "error_page_body"
+  | "go_home"
   | "in_motion"
   | "from_our_world"
   | "related_places"
@@ -346,6 +351,7 @@ export const LINK_LABEL: Record<Lang, Record<string, string>> = {
     "IHG One Rewards": "IHG One Rewards",
     "Resort Map": "Resort Map",
     Contact: "Contact",
+    "Hoi An shuttle schedule": "Hoi An shuttle schedule",
   },
   vi: {
     Website: "Trang chính thức",
@@ -355,6 +361,7 @@ export const LINK_LABEL: Record<Lang, Record<string, string>> = {
     "IHG One Rewards": "IHG One Rewards",
     "Resort Map": "Bản đồ khu nghỉ",
     Contact: "Liên hệ",
+    "Hoi An shuttle schedule": "Lịch xe đưa đón Hội An",
   },
   ru: {
     Website: "Сайт",
@@ -364,6 +371,7 @@ export const LINK_LABEL: Record<Lang, Record<string, string>> = {
     "IHG One Rewards": "IHG One Rewards",
     "Resort Map": "Карта курорта",
     Contact: "Контакты",
+    "Hoi An shuttle schedule": "Расписание шаттла в Хойан",
   },
   zh: {
     Website: "官方网站",
@@ -373,6 +381,7 @@ export const LINK_LABEL: Record<Lang, Record<string, string>> = {
     "IHG One Rewards": "IHG 优悦会",
     "Resort Map": "度假村地图",
     Contact: "联系我们",
+    "Hoi An shuttle schedule": "会安接驳车时刻表",
   },
   ko: koDict.LINK_LABEL,
   ja: jaDict.LINK_LABEL,

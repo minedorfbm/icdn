@@ -1,9 +1,24 @@
-export function renderErrorPage(): string {
+import { UI, type Lang } from "../i18n/dictionary";
+
+export function renderErrorPage(lang: Lang = "en"): string {
+  const copy = UI[lang];
+  const translations = Object.fromEntries(
+    Object.entries(UI).map(([locale, labels]) => [
+      locale,
+      {
+        title: labels.error_page_title,
+        body: labels.error_page_body,
+        retry: labels.retry,
+        home: labels.go_home,
+      },
+    ]),
+  );
+  const serialized = JSON.stringify(translations).replaceAll("<", "\\u003c");
   return `<!doctype html>
-<html lang="en">
+<html lang="${lang}">
   <head>
     <meta charset="utf-8" />
-    <title>This page didn't load</title>
+    <title>${copy.error_page_title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
       body { font: 15px/1.5 system-ui, -apple-system, sans-serif; background: #fafafa; color: #111; display: grid; place-items: center; min-height: 100vh; margin: 0; padding: 1.5rem; }
@@ -18,13 +33,28 @@ export function renderErrorPage(): string {
   </head>
   <body>
     <div class="card">
-      <h1>This page didn't load</h1>
-      <p>Something went wrong on our end. You can try refreshing or head back home.</p>
+      <h1 id="error-title">${copy.error_page_title}</h1>
+      <p id="error-body">${copy.error_page_body}</p>
       <div class="actions">
-        <button class="primary" onclick="location.reload()">Try again</button>
-        <a class="secondary" href="/">Go home</a>
+        <button id="error-retry" class="primary" onclick="location.reload()">${copy.retry}</button>
+        <a id="error-home" class="secondary" href="/">${copy.go_home}</a>
       </div>
     </div>
+    <script>
+      (() => {
+        const translations = ${serialized};
+        let saved;
+        try { saved = localStorage.getItem("adj-lang"); } catch {}
+        const browser = navigator.language.split(/[-_]/)[0].toLowerCase();
+        const locale = Object.hasOwn(translations, saved) ? saved : Object.hasOwn(translations, browser) ? browser : document.documentElement.lang;
+        const copy = translations[locale];
+        document.documentElement.lang = locale;
+        document.title = copy.title;
+        for (const key of ["title", "body", "retry", "home"]) {
+          document.getElementById("error-" + key).textContent = copy[key];
+        }
+      })();
+    </script>
   </body>
 </html>`;
 }
