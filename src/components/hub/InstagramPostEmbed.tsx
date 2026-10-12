@@ -77,10 +77,13 @@ function processEmbeds(): Promise<void> {
 export function InstagramPostEmbed({
   post,
   bare = false,
+  fitToScreen = false,
 }: {
   post: DestinationPost;
   /** Hides the section wrapper/label so a carousel can own the heading. */
   bare?: boolean;
+  /** Opt-in sizing pilot; other destinations keep their existing embed layout. */
+  fitToScreen?: boolean;
 }) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
@@ -115,18 +118,27 @@ export function InstagramPostEmbed({
       }
       // Measure before the transform: measuring the painted rectangle would
       // repeatedly shrink an already scaled iframe after each resize message.
-      if (!frame || frame.offsetHeight < 100 || !bounds.current) return;
-      const limit = bounds.current.getBoundingClientRect();
-      if (!frame.offsetWidth || !limit.width || !limit.height) return;
-      const scale = Math.min(1, limit.width / frame.offsetWidth, limit.height / frame.offsetHeight);
-      const nextFit = {
-        width: frame.offsetWidth * scale,
-        height: frame.offsetHeight * scale,
-        scale,
-      };
-      setFit((previous) =>
-        previous.width === nextFit.width && previous.height === nextFit.height ? previous : nextFit,
-      );
+      if (!frame || frame.offsetHeight < 100) return;
+      if (fitToScreen) {
+        if (!bounds.current) return;
+        const limit = bounds.current.getBoundingClientRect();
+        if (!frame.offsetWidth || !limit.width || !limit.height) return;
+        const scale = Math.min(
+          1,
+          limit.width / frame.offsetWidth,
+          limit.height / frame.offsetHeight,
+        );
+        const nextFit = {
+          width: frame.offsetWidth * scale,
+          height: frame.offsetHeight * scale,
+          scale,
+        };
+        setFit((previous) =>
+          previous.width === nextFit.width && previous.height === nextFit.height
+            ? previous
+            : nextFit,
+        );
+      }
       displayed = true;
       if (timer) clearTimeout(timer);
       setReady(true);
@@ -174,23 +186,34 @@ export function InstagramPostEmbed({
       sizes.disconnect();
       if (timer) clearTimeout(timer);
     };
-  }, [post.post_url, embeddable, attempt]);
+  }, [post.post_url, embeddable, attempt, fitToScreen]);
 
   const handle = post.account ? `@${post.account.replace(/^@/, "")}` : null;
 
   const body = (
-    <div ref={host} className={`instagram-post ${bare ? "" : "mt-5"}`}>
-      <div ref={bounds} className="instagram-post-bounds" aria-hidden />
+    <div
+      ref={host}
+      data-fit-to-screen={fitToScreen || undefined}
+      className={`instagram-post ${bare ? "" : "mt-5"}`}
+    >
+      {fitToScreen && <div ref={bounds} className="instagram-post-bounds" aria-hidden />}
       {embeddable && (
         <div
           className={`instagram-post-viewport overflow-hidden rounded-[18px] bg-white transition-opacity [&_blockquote]:invisible ${
             ready ? "opacity-100" : "opacity-0"
           }`}
           style={
-            ready ? { width: fit.width, height: fit.height } : { height: 1, pointerEvents: "none" }
+            ready
+              ? fitToScreen
+                ? { width: fit.width, height: fit.height }
+                : undefined
+              : { height: 1, pointerEvents: "none" }
           }
         >
-          <div className="instagram-post-content" style={{ transform: `scale(${fit.scale})` }}>
+          <div
+            className="instagram-post-content"
+            style={fitToScreen ? { transform: `scale(${fit.scale})` } : undefined}
+          >
             <blockquote
               className="instagram-media"
               data-instgrm-permalink={post.post_url}

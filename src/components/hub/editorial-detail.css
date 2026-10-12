@@ -121,9 +121,12 @@
 }
 .editorial-description {
   font-family: var(--brand-serif);
-  font-size: 16px;
+  font-size: 19px;
   line-height: 1.65;
   color: var(--editorial-muted);
+}
+.editorial-page[data-destination-id="la-maison-1888"] .editorial-description {
+  font-size: 16px;
 }
 .editorial-primary {
   margin-block: 26px;

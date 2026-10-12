@@ -55,7 +55,11 @@ function EditorialInstagram({
           label={t("from_our_world")}
           title={detailHeading(dest, "instagram", lang)}
         />
-        <InstagramPostCarousel posts={media.posts} embedded />
+        <InstagramPostCarousel
+          posts={media.posts}
+          embedded
+          fitToScreen={dest.id === "la-maison-1888"}
+        />
       </section>
     );
   }
@@ -120,7 +124,7 @@ export function EditorialDestinationDetail({
         data-destination-scroll
         className="h-full overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain"
       >
-        <article className="editorial-page detail-enter">
+        <article className="editorial-page detail-enter" data-destination-id={dest.id}>
           <div className="editorial-hero">
             <img
               src={dest.detailImage}

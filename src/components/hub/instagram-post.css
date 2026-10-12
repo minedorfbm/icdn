@@ -1,4 +1,4 @@
-.instagram-post {
+.instagram-post[data-fit-to-screen] {
   position: relative;
   width: min(100%, 80vw, 320px);
 }
@@ -16,11 +16,11 @@
 
 /* Instagram needs a stable layout width; only its painted size is reduced.
    The full player stays interactive, with no crop or nested scrolling. */
-.instagram-post-content {
+.instagram-post[data-fit-to-screen] .instagram-post-content {
   width: 326px;
   transform-origin: top left;
 }
-.instagram-post-content iframe {
+.instagram-post[data-fit-to-screen] .instagram-post-content iframe {
   display: block;
   width: 100% !important;
   min-width: 0 !important;

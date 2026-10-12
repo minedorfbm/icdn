@@ -10,9 +10,11 @@ import { InstagramPostEmbed } from "./InstagramPostEmbed";
 export function InstagramPostCarousel({
   posts,
   embedded = false,
+  fitToScreen = false,
 }: {
   posts: DestinationPost[];
   embedded?: boolean;
+  fitToScreen?: boolean;
 }) {
   const { t } = useI18n();
   const items = posts.slice(0, 5);
@@ -48,7 +50,8 @@ export function InstagramPostCarousel({
   }, []);
 
   if (items.length === 0) return null;
-  if (items.length === 1 && items[0]) return <InstagramPostEmbed post={items[0]} bare={embedded} />;
+  if (items.length === 1 && items[0])
+    return <InstagramPostEmbed post={items[0]} bare={embedded} fitToScreen={fitToScreen} />;
 
   return (
     <section
@@ -66,7 +69,7 @@ export function InstagramPostCarousel({
       >
         {items.map((post) => (
           <div key={post.post_url} className="w-full shrink-0 snap-center">
-            <InstagramPostEmbed post={post} bare />
+            <InstagramPostEmbed post={post} bare fitToScreen={fitToScreen} />
           </div>
         ))}
       </div>

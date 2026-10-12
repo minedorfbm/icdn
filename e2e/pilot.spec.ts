@@ -40,6 +40,13 @@ for (const [id, level, color] of [
     await expect(card).not.toContainText("Local time");
     await expect(card.locator(".editorial-meta svg")).toHaveCount(1);
     await expect(card.locator(".editorial-title + .editorial-description")).toHaveCount(1);
+    await expect(card.locator(".editorial-description")).toHaveCSS(
+      "font-size",
+      id === "la-maison-1888" ? "16px" : "19px",
+    );
+    await expect(card.locator(".instagram-post[data-fit-to-screen]")).toHaveCount(
+      id === "la-maison-1888" ? 2 : 0,
+    );
     const scroller = card.locator("[data-destination-scroll]");
     for (const size of [
       { width: 320, height: 568 },
