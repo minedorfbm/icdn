@@ -1,5 +1,6 @@
+import { NotFoundPage } from "@/components/NotFoundPage";
 import { getHubData } from "@/lib/hub.functions";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createHubValue } from "@/data/hub-value";
 import { DestinationDetail } from "@/components/hub/DestinationDetail";
 import { useDestinationNavigation } from "@/lib/use-destination-navigation";
@@ -33,14 +34,7 @@ export const Route = createFileRoute("/_hub/$destinationId")({
         }
       : {},
   component: DestinationRoute,
-  notFoundComponent: () => (
-    <section className="brand-ui fixed inset-0 z-[100] grid place-content-center gap-6 bg-background p-8 text-center">
-      <h1 className="font-serif text-4xl">404</h1>
-      <Link to="/" className="min-h-11 border-b p-3">
-        InterContinental Danang — Digital Hub
-      </Link>
-    </section>
-  ),
+  notFoundComponent: NotFoundPage,
 });
 
 function DestinationRoute() {

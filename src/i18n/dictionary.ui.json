@@ -33,7 +33,7 @@
     "close": "Close",
     "open_browser": "Open in browser",
     "page_loading": "Loading…",
-    "pdf_error": "This menu could not be displayed. Open it in the browser instead.",
+    "pdf_error": "This document could not be displayed. Open it in the browser instead.",
     "pdf_page": "Page",
     "pdf_zoom_in": "Zoom in",
     "pdf_zoom_out": "Zoom out",
@@ -64,7 +64,12 @@
     "dining_collection": "THE DINING COLLECTION",
     "wellness_collection": "THE WELLNESS COLLECTION",
     "spa_collection": "THE SPA COLLECTION",
-    "links_collection": "THE COLLECTION"
+    "links_collection": "THE COLLECTION",
+    "not_found_title": "Page not found",
+    "not_found_body": "The page you’re looking for doesn’t exist or has been moved.",
+    "error_page_title": "This page didn’t load",
+    "error_page_body": "Something went wrong. Please try again or return to the homepage.",
+    "go_home": "Go home"
   },
   "vi": {
     "hero_welcome": "Chào mừng",
@@ -100,7 +105,7 @@
     "close": "Đóng",
     "open_browser": "Mở trong trình duyệt",
     "page_loading": "Đang tải…",
-    "pdf_error": "Không thể hiển thị thực đơn này. Vui lòng mở trong trình duyệt.",
+    "pdf_error": "Không thể hiển thị tài liệu này. Vui lòng mở trong trình duyệt.",
     "pdf_page": "Trang",
     "pdf_zoom_in": "Phóng to",
     "pdf_zoom_out": "Thu nhỏ",
@@ -126,12 +131,17 @@
     "from_our_world": "TỪ THẾ GIỚI CỦA CHÚNG TÔI",
     "related_places": "ĐỊA ĐIỂM LIÊN QUAN",
     "continue_journey": "TIẾP TỤC HÀNH TRÌNH",
-    "previous_discovery": "KHÁM PHÁ TRƯỚC",
+    "previous_discovery": "ĐỊA ĐIỂM TRƯỚC",
     "practical_information": "Thông tin hữu ích",
     "dining_collection": "BỘ SƯU TẬP ẨM THỰC",
     "wellness_collection": "BỘ SƯU TẬP CHĂM SÓC SỨC KHỎE",
     "spa_collection": "BỘ SƯU TẬP SPA",
-    "links_collection": "BỘ SƯU TẬP"
+    "links_collection": "BỘ SƯU TẬP",
+    "not_found_title": "Không tìm thấy trang",
+    "not_found_body": "Trang bạn tìm không tồn tại hoặc đã được chuyển.",
+    "error_page_title": "Không thể tải trang này",
+    "error_page_body": "Đã xảy ra lỗi. Vui lòng thử lại hoặc trở về trang chủ.",
+    "go_home": "Về trang chủ"
   },
   "ru": {
     "hero_welcome": "Добро пожаловать",
@@ -167,7 +177,7 @@
     "close": "Закрыть",
     "open_browser": "Открыть в браузере",
     "page_loading": "Загрузка…",
-    "pdf_error": "Не удалось показать меню. Откройте его в браузере.",
+    "pdf_error": "Не удалось показать документ. Откройте его в браузере.",
     "pdf_page": "Страница",
     "pdf_zoom_in": "Увеличить",
     "pdf_zoom_out": "Уменьшить",
@@ -193,12 +203,17 @@
     "from_our_world": "ИЗ НАШЕГО МИРА",
     "related_places": "СВЯЗАННЫЕ МЕСТА",
     "continue_journey": "ПРОДОЛЖИТЬ ПУТЕШЕСТВИЕ",
-    "previous_discovery": "ПРЕДЫДУЩЕЕ ОТКРЫТИЕ",
+    "previous_discovery": "ПРЕДЫДУЩЕЕ МЕСТО",
     "practical_information": "Полезная информация",
     "dining_collection": "ГАСТРОНОМИЧЕСКАЯ КОЛЛЕКЦИЯ",
     "wellness_collection": "КОЛЛЕКЦИЯ ОЗДОРОВЛЕНИЯ",
     "spa_collection": "СПА-КОЛЛЕКЦИЯ",
-    "links_collection": "КОЛЛЕКЦИЯ"
+    "links_collection": "КОЛЛЕКЦИЯ",
+    "not_found_title": "Страница не найдена",
+    "not_found_body": "Страница, которую вы ищете, не существует или была перемещена.",
+    "error_page_title": "Не удалось загрузить страницу",
+    "error_page_body": "Произошла ошибка. Попробуйте ещё раз или вернитесь на главную страницу.",
+    "go_home": "На главную"
   },
   "zh": {
     "hero_welcome": "欢迎",
@@ -234,7 +249,7 @@
     "close": "关闭",
     "open_browser": "在浏览器中打开",
     "page_loading": "正在加载…",
-    "pdf_error": "无法显示此菜单。请在浏览器中打开。",
+    "pdf_error": "无法显示此文档。请在浏览器中打开。",
     "pdf_page": "第",
     "pdf_zoom_in": "放大",
     "pdf_zoom_out": "缩小",
@@ -260,12 +275,17 @@
     "from_our_world": "我们的世界",
     "related_places": "相关场所",
     "continue_journey": "继续旅程",
-    "previous_discovery": "上一次探索",
+    "previous_discovery": "上一个地点",
     "practical_information": "实用信息",
     "dining_collection": "美食精选",
     "wellness_collection": "康养精选",
     "spa_collection": "水疗精选",
-    "links_collection": "精选体验"
+    "links_collection": "精选体验",
+    "not_found_title": "页面未找到",
+    "not_found_body": "您查找的页面不存在或已被移动。",
+    "error_page_title": "此页面未能加载",
+    "error_page_body": "出现了问题。请重试或返回首页。",
+    "go_home": "返回首页"
   },
   "ko": {
     "hero_welcome": "환영합니다",
@@ -302,7 +322,7 @@
     "hero_image_alt": "바다가 보이는 리조트 로비의 꽃으로 가득한 대리석 그릇",
     "open_browser": "브라우저에서 열기",
     "page_loading": "불러오는 중…",
-    "pdf_error": "메뉴를 표시할 수 없습니다. 브라우저에서 열어 주세요.",
+    "pdf_error": "문서를 표시할 수 없습니다. 브라우저에서 열어 주세요.",
     "pdf_page": "페이지",
     "pdf_zoom_in": "확대",
     "pdf_zoom_out": "축소",
@@ -332,7 +352,12 @@
     "dining_collection": "다이닝 컬렉션",
     "wellness_collection": "웰니스 컬렉션",
     "spa_collection": "스파 컬렉션",
-    "links_collection": "컬렉션"
+    "links_collection": "컬렉션",
+    "not_found_title": "페이지를 찾을 수 없습니다",
+    "not_found_body": "찾으시는 페이지가 없거나 다른 위치로 이동되었습니다.",
+    "error_page_title": "페이지를 불러오지 못했습니다",
+    "error_page_body": "문제가 발생했습니다. 다시 시도하거나 홈으로 돌아가 주세요.",
+    "go_home": "홈으로 돌아가기"
   },
   "ja": {
     "hero_welcome": "ようこそ",
@@ -369,7 +394,7 @@
     "hero_image_alt": "海を望むリゾートのロビーに置かれた花いっぱいの大理石の鉢",
     "open_browser": "ブラウザで開く",
     "page_loading": "読み込み中…",
-    "pdf_error": "メニューを表示できません。ブラウザーで開いてください。",
+    "pdf_error": "文書を表示できません。ブラウザーで開いてください。",
     "pdf_page": "ページ",
     "pdf_zoom_in": "拡大",
     "pdf_zoom_out": "縮小",
@@ -399,6 +424,11 @@
     "dining_collection": "ダイニングコレクション",
     "wellness_collection": "ウェルネスコレクション",
     "spa_collection": "スパコレクション",
-    "links_collection": "コレクション"
+    "links_collection": "コレクション",
+    "not_found_title": "ページが見つかりません",
+    "not_found_body": "お探しのページは存在しないか、移動されました。",
+    "error_page_title": "ページを読み込めませんでした",
+    "error_page_body": "問題が発生しました。もう一度お試しいただくか、ホームにお戻りください。",
+    "go_home": "ホームに戻る"
   }
 }

@@ -1,0 +1,488 @@
+[
+  {
+    "card": "nursery",
+    "locale": "ja",
+    "field": "description",
+    "source": "Care for the youngest guests.",
+    "old": "小さなお客様をお預かりします。",
+    "new": "小さなお客様のご滞在をサポート。",
+    "findings": ["T01"]
+  },
+  {
+    "card": "four-bedroom-pool-villa",
+    "locale": "vi",
+    "field": "description",
+    "source": "A four-bedroom residence on Earth level with three private pools, separate living rooms and a dedicated resort host.",
+    "old": "Dinh thự bốn phòng ngủ tại tầng Earth, có ba hồ bơi riêng, phòng khách riêng cho từng phòng ngủ và Người Dẫn Lối riêng.",
+    "new": "Dinh thự bốn phòng ngủ tại khu Earth, có ba hồ bơi riêng, các phòng khách riêng biệt và Người Dẫn Lối riêng.",
+    "findings": ["T02"]
+  },
+  {
+    "card": "experience-more",
+    "locale": "zh",
+    "field": "description",
+    "source": "A stay for two adults with daily breakfast, return airport transfers and USD 200 resort credit per day for dining, bars or spa. Credit expires nightly and is not cumulative.",
+    "old": "双人住宿套餐含每日早餐、往返机场接送及每日200美元度假村消费额度，可用于餐饮、酒吧或水疗。额度每晚到期，不可累积。",
+    "new": "两位成人住宿套餐含每日早餐、往返机场接送及每日200美元度假村消费额度，可用于餐饮、酒吧或水疗。额度每晚到期，不可累积。",
+    "findings": ["T03"]
+  },
+  {
+    "card": "nguoi-dan-loi",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Penthouse and villa guests are welcomed by a dedicated resort host, known as “the one who leads the way”. Personalised planning, discreet assistance and thoughtful Vietnamese rituals shape a stay around your pace and preferences.",
+    "old": "Гостей пентхаусов и вилл встречает персональный хозяин Người Dẫn Lối — «тот, кто ведёт». Индивидуальное планирование, деликатная помощь и вьетнамские ритуалы формируют отдых в соответствии с вашим ритмом и пожеланиями.",
+    "new": "Гостей пентхаусов и вилл встречает персональный помощник Người Dẫn Lối — «тот, кто ведёт». Индивидуальное планирование, деликатная помощь и вьетнамские ритуалы формируют отдых в соответствии с вашим ритмом и пожеланиями.",
+    "findings": ["T07"]
+  },
+  {
+    "card": "four-bedroom-pool-villa",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Celebrate time together in a four-bedroom residence on Earth level, with separate living spaces and three private pools. Expansive terraces and a dedicated resort host make it a flexible setting for family holidays or a gathering with friends.",
+    "old": "Проведите время вместе в резиденции с четырьмя спальнями на уровне Earth, отдельными гостиными и тремя бассейнами. Большие террасы и персональный хозяин создают гибкое пространство для семьи или друзей.",
+    "new": "Проведите время вместе в резиденции с четырьмя спальнями на уровне Earth, отдельными гостиными и тремя приватными бассейнами. Большие террасы и персональный помощник создают гибкое пространство для семьи или друзей.",
+    "findings": ["T07"]
+  },
+  {
+    "card": "three-bedroom-sun-peninsula-residence",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Make room for time together in a 1,000 sqm, three-bedroom residence with direct private beach access. Two infinity pools and generous terraces invite outdoor living, with a dedicated resort host and Club InterContinental privileges enhancing the stay.",
+    "old": "Проведите время вместе в резиденции 1000 м² с тремя спальнями и прямым выходом на приватный пляж. Два бассейна, просторные террасы, персональный хозяин и привилегии Club дополняют проживание.",
+    "new": "Проведите время вместе в резиденции 1000 м² с тремя спальнями и прямым выходом на приватный пляж. Два инфинити-бассейна, просторные террасы, персональный помощник и привилегии Club дополняют проживание.",
+    "findings": ["T07", "T11"]
+  },
+  {
+    "card": "moulin-rouge",
+    "locale": "ko",
+    "field": "detail_description",
+    "source": "Gather family, friends or colleagues for a private karaoke evening on Heaven level. The resort’s M Rouge lounge has six equipped karaoke rooms, offering a playful setting for celebrations and team activities; enquire about reservations.",
+    "old": "Heaven 층에서 가족·친구·동료와 프라이빗 노래방의 밤을 즐기세요. M Rouge의 장비를 갖춘 여섯 객실은 축하와 팀 활동에 적합합니다. 예약은 리조트에 문의하세요.",
+    "new": "Heaven 구역에서 가족·친구·동료와 프라이빗 노래방의 밤을 즐기세요. M Rouge의 시설을 갖춘 여섯 개의 전용 노래방은 축하와 팀 활동에 적합합니다. 예약은 리조트에 문의하세요.",
+    "findings": ["T08", "T10"]
+  },
+  {
+    "card": "organic-garden",
+    "locale": "vi",
+    "field": "detail_description",
+    "source": "Follow the journey from garden to table in the resort’s organic growing space. Discover fresh herbs and ingredients used in culinary experiences, or enquire about garden-led cooking, group activities and farm-to-table dining.",
+    "old": "Theo hành trình từ vườn đến bàn ăn tại khu trồng hữu cơ của resort. Khám phá thảo mộc và nguyên liệu tươi cho trải nghiệm ẩm thực, hoặc hỏi về lớp nấu ăn, hoạt động nhóm và dùng bữa tại vườn.",
+    "new": "Theo hành trình từ vườn đến bàn ăn tại khu trồng hữu cơ của resort. Khám phá thảo mộc và nguyên liệu tươi cho trải nghiệm ẩm thực, hoặc hỏi về lớp nấu ăn, hoạt động nhóm và ẩm thực từ vườn đến bàn ăn.",
+    "findings": ["T09"]
+  },
+  {
+    "card": "club-lounge",
+    "locale": "ko",
+    "field": "detail_description",
+    "source": "A private retreat on Heaven level with sweeping views of the bay. Eligible guests enjoy breakfast, afternoon tea and evening cocktails in a calm setting, with dedicated family rooms welcoming guests travelling with children.",
+    "old": "Heaven 층에서 만의 탁 트인 전망을 즐기는 프라이빗 공간입니다. 이용 자격을 갖춘 고객은 조식, 애프터눈 티와 저녁 칵테일을 즐길 수 있으며, 어린이 동반 가족을 위한 별도 공간도 마련되어 있습니다.",
+    "new": "Heaven 구역에서 만의 탁 트인 전망을 즐기는 프라이빗 공간입니다. 이용 자격을 갖춘 고객은 조식, 애프터눈 티와 저녁 칵테일을 즐길 수 있으며, 어린이 동반 가족을 위한 별도 공간도 마련되어 있습니다.",
+    "findings": ["T10"]
+  },
+  {
+    "card": "nam-tram-dining",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Board a private Nam Tram cabin for a dining journey designed for two. A curated course awaits at each resort level as you travel from Heaven to Sea, pairing rainforest scenery with an unusual romantic experience.",
+    "old": "二人だけのNam Tramキャビンで美食の旅へ。HeavenからSeaまで、各階で特別な一皿が待っています。熱帯雨林の眺めとともに、趣あるロマンティックな体験をお楽しみください。",
+    "new": "二人だけのNam Tramキャビンで美食の旅へ。HeavenからSeaまで、各レベルで特別な一皿が待っています。熱帯雨林の眺めとともに、趣あるロマンティックな体験をお楽しみください。",
+    "findings": ["T10"]
+  },
+  {
+    "card": "nam-tram-dining",
+    "locale": "ko",
+    "field": "detail_description",
+    "source": "Board a private Nam Tram cabin for a dining journey designed for two. A curated course awaits at each resort level as you travel from Heaven to Sea, pairing rainforest scenery with an unusual romantic experience.",
+    "old": "두 사람을 위한 프라이빗 Nam Tram 식사 여행을 떠나보세요. Heaven에서 Sea까지 각 층마다 준비된 요리를 맛보며, 열대우림 풍경과 함께 색다른 로맨틱한 경험을 즐길 수 있습니다.",
+    "new": "두 사람을 위한 프라이빗 Nam Tram 식사 여행을 떠나보세요. Heaven에서 Sea까지 각 레벨마다 준비된 요리를 맛보며, 열대우림 풍경과 함께 색다른 로맨틱한 경험을 즐길 수 있습니다.",
+    "findings": ["T10"]
+  },
+  {
+    "card": "club-lounge",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "A private retreat on Heaven level with sweeping views of the bay. Eligible guests enjoy breakfast, afternoon tea and evening cocktails in a calm setting, with dedicated family rooms welcoming guests travelling with children.",
+    "old": "Heaven階にある、湾を一望するプライベートな空間。対象のお客様は朝食、アフタヌーンティー、イブニングカクテルを楽しめます。お子様連れのご家族には専用のファミリールームがあります。",
+    "new": "Heavenエリアにある、湾を一望するプライベートな空間。対象のお客様は朝食、アフタヌーンティー、イブニングカクテルを楽しめます。お子様連れのご家族には専用のファミリールームがあります。",
+    "findings": ["T10"]
+  },
+  {
+    "card": "design-digital-tour",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Start at Reception and follow a self-guided walk into Bill Bensley’s imaginative world. Your phone reveals Vietnamese inspirations, hidden architectural details and the stories linking the lobby, Citron, Heritage Village and the resort’s lower levels.",
+    "old": "Receptionを出発し、Bill Bensleyの想像の世界をセルフ散策。スマートフォンがベトナムの着想、隠れた建築の細部、ロビー、Citron、Heritage Villageと下層階を結ぶ物語をご案内します。",
+    "new": "Receptionを出発し、Bill Bensleyの想像の世界をセルフ散策。スマートフォンがベトナムの着想、隠れた建築の細部、ロビー、Citron、Heritage Villageと下方のリゾートエリアを結ぶ物語をご案内します。",
+    "findings": ["T10"]
+  },
+  {
+    "card": "design-digital-tour",
+    "locale": "ko",
+    "field": "detail_description",
+    "source": "Start at Reception and follow a self-guided walk into Bill Bensley’s imaginative world. Your phone reveals Vietnamese inspirations, hidden architectural details and the stories linking the lobby, Citron, Heritage Village and the resort’s lower levels.",
+    "old": "Reception에서 시작해 Bill Bensley의 상상 세계를 셀프 도보로 탐험하세요. 휴대전화가 베트남의 영감, 숨은 건축 디테일과 로비·Citron·Heritage Village·아래층을 연결하는 이야기를 들려줍니다.",
+    "new": "Reception에서 시작해 Bill Bensley의 상상 세계를 셀프 도보로 탐험하세요. 휴대전화가 베트남의 영감, 숨은 건축 디테일과 로비·Citron·Heritage Village·아래쪽 리조트 구역을 연결하는 이야기를 들려줍니다.",
+    "findings": ["T10"]
+  },
+  {
+    "card": "heritage-village",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Explore a corner of the resort where Vietnamese-inspired architecture meets art and shopping. On Sky level, the Heritage Village brings the Bensley Outsider Gallery and Sammy’s Boutique into a walk through the resort’s creative character.",
+    "old": "ベトナム風の建築、アート、ショッピングが出会う一角へ。Sky階のHeritage Villageでは、Bensley Outsider GalleryとSammy’s Boutiqueを巡り、リゾートの創造的な魅力に触れられます。",
+    "new": "ベトナム風の建築、アート、ショッピングが出会う一角へ。SkyエリアのHeritage Villageでは、Bensley Outsider GalleryとSammy’s Boutiqueを巡り、リゾートの創造的な魅力に触れられます。",
+    "findings": ["T10"]
+  },
+  {
+    "card": "heritage-village",
+    "locale": "ko",
+    "field": "detail_description",
+    "source": "Explore a corner of the resort where Vietnamese-inspired architecture meets art and shopping. On Sky level, the Heritage Village brings the Bensley Outsider Gallery and Sammy’s Boutique into a walk through the resort’s creative character.",
+    "old": "베트남식 건축, 예술과 쇼핑이 만나는 리조트의 한편을 탐험하세요. Sky 층의 Heritage Village에서 Bensley Outsider Gallery와 Sammy’s Boutique를 걸으며 리조트의 창작 개성을 느낄 수 있습니다.",
+    "new": "베트남식 건축, 예술과 쇼핑이 만나는 리조트의 한편을 탐험하세요. Sky 구역의 Heritage Village에서 Bensley Outsider Gallery와 Sammy’s Boutique를 걸으며 리조트의 창작 개성을 느낄 수 있습니다.",
+    "findings": ["T10"]
+  },
+  {
+    "card": "bensley-gallery",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Step into Bill Bensley’s colourful artistic world on Sky level. Original paintings draw inspiration from his travels and nature, while Kate McCoy’s fine jewellery adds another creative perspective; ask the gallery team about viewing or purchasing a piece.",
+    "old": "Sky階でBill Bensleyの色彩豊かな芸術の世界へ。旅や自然に着想を得た原画とKate McCoyのジュエリーが並びます。作品の鑑賞や購入はギャラリーのスタッフへご相談ください。",
+    "new": "SkyエリアでBill Bensleyの色彩豊かな芸術の世界へ。旅や自然に着想を得た原画とKate McCoyのジュエリーが並びます。作品の鑑賞や購入はギャラリーのスタッフへご相談ください。",
+    "findings": ["T10"]
+  },
+  {
+    "card": "bensley-gallery",
+    "locale": "ko",
+    "field": "detail_description",
+    "source": "Step into Bill Bensley’s colourful artistic world on Sky level. Original paintings draw inspiration from his travels and nature, while Kate McCoy’s fine jewellery adds another creative perspective; ask the gallery team about viewing or purchasing a piece.",
+    "old": "Sky 층에서 Bill Bensley의 다채로운 예술 세계를 만나보세요. 여행과 자연에서 영감을 받은 원화와 Kate McCoy의 파인 주얼리가 함께합니다. 작품 감상과 구매는 갤러리 팀에 문의하세요.",
+    "new": "Sky 구역에서 Bill Bensley의 다채로운 예술 세계를 만나보세요. 여행과 자연에서 영감을 받은 원화와 Kate McCoy의 파인 주얼리가 함께합니다. 작품 감상과 구매는 갤러리 팀에 문의하세요.",
+    "findings": ["T10"]
+  },
+  {
+    "card": "relaxation-pavilion",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Take a quieter break at this hillside lookout above the bay. Sit, enjoy the view and let the resort’s landscape become the experience; it is a simple pause between exploring the levels and returning to the beach.",
+    "old": "湾を見下ろす丘の展望スペースで、静かなひと休みを。腰かけて景色そのものを楽しみましょう。各階の探索とビーチへ戻る合間に、穏やかな時間を過ごせます。",
+    "new": "湾を見下ろす丘の展望スペースで、静かなひと休みを。腰かけて景色そのものを楽しみましょう。各レベルの探索とビーチへ戻る合間に、穏やかな時間を過ごせます。",
+    "findings": ["T10"]
+  },
+  {
+    "card": "relaxation-pavilion",
+    "locale": "ko",
+    "field": "detail_description",
+    "source": "Take a quieter break at this hillside lookout above the bay. Sit, enjoy the view and let the resort’s landscape become the experience; it is a simple pause between exploring the levels and returning to the beach.",
+    "old": "만 위 언덕의 전망 공간에서 조용히 쉬어가세요. 앉아서 풍경을 감상하고 리조트의 경관 자체를 경험해 보세요. 여러 층 탐험과 해변 복귀 사이의 편안한 휴식입니다.",
+    "new": "만 위 언덕의 전망 공간에서 조용히 쉬어가세요. 앉아서 풍경을 감상하고 리조트의 경관 자체를 경험해 보세요. 여러 구역 탐험과 해변 복귀 사이의 편안한 휴식입니다.",
+    "findings": ["T10"]
+  },
+  {
+    "card": "four-bedroom-pool-villa",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Celebrate time together in a four-bedroom residence on Earth level, with separate living spaces and three private pools. Expansive terraces and a dedicated resort host make it a flexible setting for family holidays or a gathering with friends.",
+    "old": "Earth階の4ベッドルーム・レジデンスで集いの時間を。独立した居住空間、3つの専用プール、広いテラス、専属ホストが、ご家族の休暇にも友人との集まりにも応えます。",
+    "new": "Earthエリアの4ベッドルーム・レジデンスで集いの時間を。独立した居住空間、3つの専用プール、広いテラス、専属ホストが、ご家族の休暇にも友人との集まりにも応えます。",
+    "findings": ["T10"]
+  },
+  {
+    "card": "four-bedroom-pool-villa",
+    "locale": "ko",
+    "field": "detail_description",
+    "source": "Celebrate time together in a four-bedroom residence on Earth level, with separate living spaces and three private pools. Expansive terraces and a dedicated resort host make it a flexible setting for family holidays or a gathering with friends.",
+    "old": "Earth 층의 4베드룸 레지던스에서 분리된 거실 공간과 전용 수영장 세 곳으로 함께하는 시간을 즐기세요. 넓은 테라스와 전담 호스트가 가족 휴가나 친구 모임을 편안하게 준비합니다.",
+    "new": "Earth 구역의 4베드룸 레지던스에서 분리된 거실 공간과 전용 수영장 세 곳으로 함께하는 시간을 즐기세요. 넓은 테라스와 전담 호스트가 가족 휴가나 친구 모임을 편안하게 준비합니다.",
+    "findings": ["T10"]
+  },
+  {
+    "card": "moulin-rouge",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Gather family, friends or colleagues for a private karaoke evening on Heaven level. The resort’s M Rouge lounge has six equipped karaoke rooms, offering a playful setting for celebrations and team activities; enquire about reservations.",
+    "old": "Heaven階で家族や友人、同僚とプライベートなカラオケの夜を。M Rougeには設備の整った6室があり、お祝いにもチームの交流にもぴったりです。予約はご相談ください。",
+    "new": "Heavenエリアで家族や友人、同僚とプライベートなカラオケの夜を。M Rougeには設備の整った6室があり、お祝いにもチームの交流にもぴったりです。予約はご相談ください。",
+    "findings": ["T10"]
+  },
+  {
+    "card": "nam-tram",
+    "locale": "ko",
+    "field": "links_heading",
+    "source": "Four levels, one remarkable ride.",
+    "old": "네 개의 층을 잇는 특별한 여정.",
+    "new": "네 개의 레벨을 잇는 특별한 여정.",
+    "findings": ["T10"]
+  },
+  {
+    "card": "penthouses",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Rise above the resort in a one-bedroom penthouse with panoramic views, a rooftop infinity pool and a wraparound terrace. Indoor and outdoor living spaces, a kitchen and Club InterContinental privileges create a private setting for an exceptional escape.",
+    "old": "Поднимитесь над курортом в пентхаус с одной спальней, панорамой, бассейном на крыше и круговой террасой. Внутренние и внешние пространства, кухня и привилегии Club создают приватное место для особенного отдыха.",
+    "new": "Поднимитесь над курортом в пентхаус с одной спальней, панорамой, инфинити-бассейном на крыше и круговой террасой. Внутренние и внешние пространства, кухня и привилегии Club создают приватное место для особенного отдыха.",
+    "findings": ["T11"]
+  },
+  {
+    "card": "one-bedroom-seaside-villa-by-the-beach",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Step from a one-bedroom seaside villa to the beach by your own staircase. A shaded terrace and private infinity pool make staying in just as inviting, while Club InterContinental privileges bring further comfort to your coastal retreat.",
+    "old": "Спуститесь из прибрежной виллы с одной спальней на пляж по собственной лестнице. Тенистая терраса и приватный бассейн располагают остаться дома, а привилегии Club добавляют комфорта морскому отдыху.",
+    "new": "Спуститесь из прибрежной виллы с одной спальней на пляж по собственной лестнице. Тенистая терраса и приватный инфинити-бассейн располагают остаться дома, а привилегии Club добавляют комфорта морскому отдыху.",
+    "findings": ["T11"]
+  },
+  {
+    "card": "one-bedroom-seaside-villa-on-the-rocks",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Listen to the surf from a one-bedroom villa set above the rocks at a quiet end of the beach. Your private infinity pool and sun terrace invite lingering sea views, complemented by Club InterContinental privileges.",
+    "old": "Слушайте прибой в вилле с одной спальней над скалами у тихого края пляжа. Приватный бассейн и солнечная терраса располагают любоваться морем, а привилегии Club дополняют отдых.",
+    "new": "Слушайте прибой в вилле с одной спальней над скалами у тихого края пляжа. Приватный инфинити-бассейн и солнечная терраса располагают любоваться морем, а привилегии Club дополняют отдых.",
+    "findings": ["T11"]
+  },
+  {
+    "card": "two-bedroom-seaside-villa-on-the-rocks",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Share a spacious two-bedroom villa above the shoreline, with the sound of waves below. Multiple terraces, sundecks and a private infinity pool offer different places to gather or unwind, creating a seaside escape for time together.",
+    "old": "Разделите отдых в просторной вилле с двумя спальнями над берегом под шум волн. Террасы, площадки для загара и приватный бассейн предлагают места для встреч и уединения в морском пейзаже.",
+    "new": "Разделите отдых в просторной вилле с двумя спальнями над берегом под шум волн. Террасы, площадки для загара и приватный инфинити-бассейн предлагают места для встреч и уединения в морском пейзаже.",
+    "findings": ["T11"]
+  },
+  {
+    "card": "two-bedroom-royal-residence-by-the-sea",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Enjoy an exceptionally private two-storey residence beside the water. Two bedrooms, a dining pavilion over the sea, a media room and a 13-metre infinity pool bring generous space for shared meals, quiet evenings and coastal views.",
+    "old": "Отдохните в уединённой двухэтажной резиденции у воды. Две спальни, павильон для ужинов над морем, медиакомната и 13-метровый бассейн создают простор для общих трапез и спокойных вечеров.",
+    "new": "Отдохните в уединённой двухэтажной резиденции у воды. Две спальни, павильон для ужинов над морем, медиакомната и 13-метровый инфинити-бассейн создают простор для общих трапез и спокойных вечеров.",
+    "findings": ["T11"]
+  },
+  {
+    "card": "two-bedroom-sun-peninsula-residence",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Gather in an 800 sqm residence with two bedrooms, two infinity pools and spacious outdoor living areas. A dedicated Người Dẫn Lối host and Club InterContinental privileges help shape a private stay around your family or friends.",
+    "old": "Соберитесь в резиденции 800 м² с двумя спальнями, двумя бассейнами и просторными открытыми зонами. Персональный Người Dẫn Lối и привилегии Club помогают создать приватный отдых для семьи или друзей.",
+    "new": "Соберитесь в резиденции 800 м² с двумя спальнями, двумя инфинити-бассейнами и просторными открытыми зонами. Персональный Người Dẫn Lối и привилегии Club помогают создать приватный отдых для семьи или друзей.",
+    "findings": ["T11"]
+  },
+  {
+    "card": "three-bedroom-bai-bac-bay-villa",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Retreat to a secluded hillside villa with three bedrooms and views over the beach. Three infinity pools give your group room to relax, while a dedicated Người Dẫn Lối host helps coordinate the details of your stay.",
+    "old": "Уединитесь в вилле на склоне с тремя спальнями и видом на пляж. Три бассейна оставляют группе пространство для отдыха, а персональный Người Dẫn Lối помогает организовать детали проживания.",
+    "new": "Уединитесь в вилле на склоне с тремя спальнями и видом на пляж. Три инфинити-бассейна оставляют группе пространство для отдыха, а персональный Người Dẫn Lối помогает организовать детали проживания.",
+    "findings": ["T11"]
+  },
+  {
+    "card": "one-bedroom-seaside-villa-by-the-beach",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Step from a one-bedroom seaside villa to the beach by your own staircase. A shaded terrace and private infinity pool make staying in just as inviting, while Club InterContinental privileges bring further comfort to your coastal retreat.",
+    "old": "1ベッドルームの海辺のヴィラから、専用階段でビーチへ。日陰のテラスとプライベートプールは、ヴィラに留まる時間も魅力的に。Club InterContinentalの特典が海辺の休息を豊かにします。",
+    "new": "1ベッドルームの海辺のヴィラから、専用階段でビーチへ。日陰のテラスとプライベートなインフィニティプールは、ヴィラに留まる時間も魅力的に。Club InterContinentalの特典が海辺の休息を豊かにします。",
+    "findings": ["T11"]
+  },
+  {
+    "card": "two-bedroom-seaside-villa-on-the-rocks",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Share a spacious two-bedroom villa above the shoreline, with the sound of waves below. Multiple terraces, sundecks and a private infinity pool offer different places to gather or unwind, creating a seaside escape for time together.",
+    "old": "波音が届く海辺の広々とした2ベッドルームのヴィラを、ご一緒に。複数のテラス、サンデッキ、専用プールが、集まる時間にも一人でくつろぐ時間にも合う場所を用意しています。",
+    "new": "波音が届く海辺の広々とした2ベッドルームのヴィラを、ご一緒に。複数のテラス、サンデッキ、専用のインフィニティプールが、集まる時間にも一人でくつろぐ時間にも合う場所を用意しています。",
+    "findings": ["T11"]
+  },
+  {
+    "card": "two-bedroom-royal-residence-by-the-sea",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Enjoy an exceptionally private two-storey residence beside the water. Two bedrooms, a dining pavilion over the sea, a media room and a 13-metre infinity pool bring generous space for shared meals, quiet evenings and coastal views.",
+    "old": "水辺のプライベートな2階建てレジデンスでくつろいで。2つの寝室、海上のダイニングパビリオン、メディアルーム、13メートルのプールが、食事や静かな夜の時間にゆとりを添えます。",
+    "new": "水辺のプライベートな2階建てレジデンスでくつろいで。2つの寝室、海上のダイニングパビリオン、メディアルーム、13メートルのインフィニティプールが、食事や静かな夜の時間にゆとりを添えます。",
+    "findings": ["T11"]
+  },
+  {
+    "card": "three-bedroom-sun-peninsula-residence",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Make room for time together in a 1,000 sqm, three-bedroom residence with direct private beach access. Two infinity pools and generous terraces invite outdoor living, with a dedicated resort host and Club InterContinental privileges enhancing the stay.",
+    "old": "専用ビーチへ直接出られる1,000㎡の3ベッドルーム・レジデンスで、共に過ごす時間を。2つのプールと広いテラス、専属ホスト、Clubの特典が滞在を充実させます。",
+    "new": "専用ビーチへ直接出られる1,000㎡の3ベッドルーム・レジデンスで、共に過ごす時間を。2つのインフィニティプールと広いテラス、専属ホスト、Clubの特典が滞在を充実させます。",
+    "findings": ["T11"]
+  },
+  {
+    "card": "three-bedroom-bai-bac-bay-villa",
+    "locale": "ja",
+    "field": "detail_description",
+    "source": "Retreat to a secluded hillside villa with three bedrooms and views over the beach. Three infinity pools give your group room to relax, while a dedicated Người Dẫn Lối host helps coordinate the details of your stay.",
+    "old": "ビーチを見渡す、静かな丘の3ベッドルーム・ヴィラでくつろいで。3つのプールが皆様の休息にゆとりを用意し、専属のNgười Dẫn Lốiホストが滞在の細部をお手伝いします。",
+    "new": "ビーチを見渡す、静かな丘の3ベッドルーム・ヴィラでくつろいで。3つのインフィニティプールが皆様の休息にゆとりを用意し、専属のNgười Dẫn Lốiホストが滞在の細部をお手伝いします。",
+    "findings": ["T11"]
+  },
+  {
+    "card": "experience-more",
+    "locale": "vi",
+    "field": "description",
+    "source": "A stay for two adults with daily breakfast, return airport transfers and USD 200 resort credit per day for dining, bars or spa. Credit expires nightly and is not cumulative.",
+    "old": "Kỳ nghỉ dành cho hai người lớn với bữa sáng hằng ngày, đưa đón sân bay hai chiều và tín dụng 200 USD mỗi ngày để dùng tại nhà hàng, quầy bar hoặc spa. Tín dụng hết hạn mỗi đêm và không cộng dồn.",
+    "new": "Kỳ nghỉ dành cho hai người lớn với bữa sáng hằng ngày, đưa đón sân bay hai chiều và hạn mức chi tiêu tại resort trị giá 200 USD mỗi ngày để dùng tại nhà hàng, quầy bar hoặc spa. Hạn mức này hết hạn mỗi đêm và không cộng dồn.",
+    "findings": ["T12"]
+  },
+  {
+    "card": "experience-more",
+    "locale": "vi",
+    "field": "detail_description",
+    "source": "Make each day your own with a stay for two, daily breakfast and return airport transfers. A USD 200 daily credit can be spent on dining, bars or spa; unused credit expires each night and does not accumulate.",
+    "old": "Tận hưởng kỳ nghỉ cho hai người với bữa sáng hằng ngày và đưa đón sân bay hai chiều. Tín dụng 200 USD mỗi ngày dùng tại nhà hàng, bar hoặc spa; phần chưa dùng hết hạn mỗi đêm, không cộng dồn.",
+    "new": "Tận hưởng kỳ nghỉ cho hai người lớn với bữa sáng hằng ngày và đưa đón sân bay hai chiều. Hạn mức chi tiêu tại resort trị giá 200 USD mỗi ngày dùng tại nhà hàng, bar hoặc spa; phần chưa dùng hết hạn mỗi đêm, không cộng dồn.",
+    "findings": ["T12"]
+  },
+  {
+    "card": "dia-tang",
+    "locale": "ko",
+    "field": "detail_description",
+    "source": "Discover a quiet spirit-house setting within the resort’s hillside landscape. A short pause here offers another perspective on the surroundings; approach respectfully and follow any local guidance when visiting this contemplative corner.",
+    "old": "리조트 언덕 풍경 속 조용한 영혼의 집을 만나보세요. 잠시 멈추어 주변을 다른 시각으로 바라볼 수 있습니다. 존중하는 마음으로 방문하고 현장 안내를 따라주세요.",
+    "new": "리조트 언덕 풍경 속 고요한 작은 사당을 만나보세요. 잠시 멈추어 주변을 다른 시각으로 바라볼 수 있습니다. 존중하는 마음으로 방문하고 현장 안내를 따라주세요.",
+    "findings": ["T13"]
+  },
+  {
+    "card": "dia-tang",
+    "locale": "zh",
+    "field": "detail_description",
+    "source": "Discover a quiet spirit-house setting within the resort’s hillside landscape. A short pause here offers another perspective on the surroundings; approach respectfully and follow any local guidance when visiting this contemplative corner.",
+    "old": "发现度假村山坡景观中的宁静灵屋空间。短暂停留，换个角度感受周围环境；请怀着尊重参观，并遵守现场指引。",
+    "new": "发现度假村山坡景观中的宁静小型祭祀空间。短暂停留，换个角度感受周围环境；请怀着尊重参观，并遵守现场指引。",
+    "findings": ["T13"]
+  },
+  {
+    "card": "kids-pool",
+    "locale": "zh",
+    "field": "detail_description",
+    "source": "A dedicated pool for younger guests, located beside the Garden Pool. Make it part of a relaxed family day by the water, with the resort’s wider pool facilities nearby; children should remain under an accompanying adult’s supervision.",
+    "old": "专为年轻宾客准备的泳池，位于Garden Pool旁。可将这里纳入悠闲的家庭亲水时光，邻近度假村其他泳池设施；儿童应始终由同行成人看护。",
+    "new": "专为儿童宾客准备的泳池，位于Garden Pool旁。可将这里纳入悠闲的家庭亲水时光，邻近度假村其他泳池设施；儿童应始终由同行成人看护。",
+    "findings": ["T14"]
+  },
+  {
+    "card": "nature-experiences",
+    "locale": "ko",
+    "field": "detail_description",
+    "source": "Explore Son Tra’s rainforest with the resort’s naturalist-led experiences and Nature Discovery Guide. Learn about native plants, birds and red-shanked douc langurs; wildlife sightings are never guaranteed, and current tour availability should be checked before booking.",
+    "old": "리조트 자연 전문가의 체험과 Nature Discovery Guide로 손트라 우림을 탐험하세요. 토종 식물, 새와 붉은정강이두크원숭이를 알아보세요. 야생동물 목격은 보장되지 않으며 투어 운영 여부는 예약 전 확인해야 합니다.",
+    "new": "리조트 자연 전문가의 체험과 Nature Discovery Guide로 선짜 우림을 탐험하세요. 토종 식물, 새와 붉은정강이두크원숭이를 알아보세요. 야생동물 목격은 보장되지 않으며 투어 운영 여부는 예약 전 확인해야 합니다.",
+    "findings": ["T15"]
+  },
+  {
+    "card": "nature-experiences",
+    "locale": "ru",
+    "field": "detail_description",
+    "source": "Explore Son Tra’s rainforest with the resort’s naturalist-led experiences and Nature Discovery Guide. Learn about native plants, birds and red-shanked douc langurs; wildlife sightings are never guaranteed, and current tour availability should be checked before booking.",
+    "old": "Исследуйте лес Сонча с натуралистом курорта и путеводителем Nature Discovery Guide. Узнайте о растениях, птицах и дуках; встречи с животными не гарантированы, доступность экскурсий уточняйте заранее.",
+    "new": "Исследуйте лес Шонча с натуралистом курорта и путеводителем Nature Discovery Guide. Узнайте о растениях, птицах и дуках; встречи с животными не гарантированы, доступность экскурсий уточняйте заранее.",
+    "findings": ["T15"]
+  },
+  {
+    "card": "bensley-gallery",
+    "locale": "ja",
+    "field": "description",
+    "source": "Bold, colourful paintings by Bill Bensley, the architect behind the resort — with Kate McCoy's high-end diamond jewelry. Open Wed–Sun.",
+    "old": "リゾートを手がけた建築家ビル・ベンズリーによる大胆で色彩豊かな絵画と、Kate McCoyの高級ダイヤモンドジュエリー。水曜～日曜営業。",
+    "new": "リゾートを手がけた建築家ビル・ベンスリーによる大胆で色彩豊かな絵画と、Kate McCoyの高級ダイヤモンドジュエリー。水曜～日曜営業。",
+    "findings": ["T15"]
+  },
+  {
+    "card": "nam-tram-dining",
+    "locale": "vi",
+    "field": "description",
+    "source": "A private dining journey for two aboard the Nam Tram, with a curated dish at each of the four resort levels, from Heaven to Sea. Contact the resort for reservations.",
+    "old": "Hành trình ẩm thực riêng tư dành cho hai người trên Nam Tràm, thưởng thức món ăn được tuyển chọn tại bốn tầng của khu nghỉ dưỡng, từ Heaven đến Sea. Liên hệ khu nghỉ dưỡng để đặt chỗ.",
+    "new": "Hành trình ẩm thực riêng tư dành cho hai người trên Nam Tram, thưởng thức món ăn được tuyển chọn tại bốn khu Heaven, Sky, Earth và Sea. Liên hệ khu nghỉ dưỡng để đặt chỗ.",
+    "findings": ["T15"]
+  },
+  {
+    "card": "buffalo-bar",
+    "locale": "vi",
+    "field": "description",
+    "source": "Cocktails beneath the Heritage Village.",
+    "old": "Cocktail bên dưới Làng Di Sản.",
+    "new": "Cocktail bên dưới Heritage Village.",
+    "findings": ["T15"]
+  },
+  {
+    "card": "buffalo-bar",
+    "locale": "ru",
+    "field": "description",
+    "source": "Cocktails beneath the Heritage Village.",
+    "old": "Коктейли под Деревней наследия.",
+    "new": "Коктейли под Heritage Village.",
+    "findings": ["T15"]
+  },
+  {
+    "card": "mi-sol-spa",
+    "locale": "zh",
+    "field": "links_heading",
+    "source": "Find your moment of calm.",
+    "old": "寻觅属于你的宁静。",
+    "new": "寻觅属于您的宁静。",
+    "findings": ["T17"]
+  },
+  {
+    "card": "buffalo-bar",
+    "locale": "vi",
+    "field": "video_heading",
+    "source": "The art of the aperitif.",
+    "old": "Nghệ thuật thưởng thức khai vị.",
+    "new": "Nghệ thuật thưởng thức rượu khai vị.",
+    "findings": ["T18"]
+  },
+  {
+    "card": "kids-pool",
+    "locale": "ru",
+    "field": "description",
+    "source": "Small water for small guests.",
+    "old": "Маленькая вода для маленьких гостей.",
+    "new": "Небольшой бассейн для юных гостей.",
+    "findings": ["T19"]
+  },
+  {
+    "card": "nail-hair",
+    "locale": "ru",
+    "field": "instagram_heading",
+    "source": "Polished holiday moments.",
+    "old": "Ухоженные мгновения отпуска.",
+    "new": "Красота в каждом мгновении отпуска.",
+    "findings": ["T19"]
+  },
+  {
+    "card": "resort-classic-panoramic-room-oceanview",
+    "locale": "ru",
+    "field": "links_heading",
+    "source": "Open your room to the horizon.",
+    "old": "Откройте комнату горизонту.",
+    "new": "Откройте для себя простор горизонта.",
+    "findings": ["T19"]
+  },
+  {
+    "card": "the-summit",
+    "locale": "ru",
+    "field": "links_heading",
+    "source": "Bring your occasion to life.",
+    "old": "Воплотите своё событие.",
+    "new": "Воплотите идею вашего мероприятия.",
+    "findings": ["T19"]
+  },
+  {
+    "card": "nam-tram-dining",
+    "locale": "ko",
+    "field": "description",
+    "source": "A private dining journey for two aboard the Nam Tram, with a curated dish at each of the four resort levels, from Heaven to Sea. Contact the resort for reservations.",
+    "old": "남 트램을 타고 Heaven부터 Sea까지 리조트의 네 층에서 엄선된 요리를 맛보는 두 사람만의 다이닝 여행입니다. 예약은 리조트에 문의해 주세요.",
+    "new": "남 트램을 타고 Heaven부터 Sea까지 리조트의 네 개의 레벨에서 엄선된 요리를 맛보는 두 사람만의 다이닝 여행입니다. 예약은 리조트에 문의해 주세요.",
+    "findings": ["T10"]
+  }
+]

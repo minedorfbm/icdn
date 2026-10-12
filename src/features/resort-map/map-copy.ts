@@ -1,6 +1,22 @@
 import type { Lang } from "@/i18n/dictionary";
 const languageIndex: Record<Lang, number> = { en: 0, vi: 1, ru: 2, zh: 3, ko: 4, ja: 5 };
 const copy = {
+  entrance: [
+    "Resort entrance",
+    "Lối vào khu nghỉ dưỡng",
+    "Вход на курорт",
+    "度假村入口",
+    "리조트 입구",
+    "リゾート入口",
+  ],
+  lagoon: [
+    "Mi Sol lagoon",
+    "Đầm nước Mi Sol",
+    "Лагуна Mi Sol",
+    "Mi Sol 泻湖",
+    "Mi Sol 라군",
+    "Mi Sol ラグーン",
+  ],
   title: [
     "Resort map",
     "Bản đồ khu nghỉ dưỡng",

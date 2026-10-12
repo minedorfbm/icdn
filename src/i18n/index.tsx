@@ -22,7 +22,7 @@ import {
 } from "./editorial";
 import type { DestinationEvent } from "@/data/events";
 
-const STORAGE_KEY = "adj-lang";
+import { LANGUAGE_STORAGE_KEY, readPreferredLanguage } from "./preferred-language";
 
 interface I18nValue {
   lang: Lang;
@@ -41,10 +41,6 @@ interface I18nValue {
 
 const I18nContext = createContext<I18nValue | null>(null);
 
-function isLang(v: string | null): v is Lang {
-  return !!v && LANGUAGES.some((l) => l.code === v);
-}
-
 export function I18nProvider({
   children,
   editorial,
@@ -53,19 +49,7 @@ export function I18nProvider({
 
   // English by default; a previous choice or the device language is restored after hydration.
   useEffect(() => {
-    let stored: string | null = null;
-    try {
-      stored = localStorage.getItem(STORAGE_KEY);
-    } catch {
-      /* Persistence is optional. */
-    }
-    if (isLang(stored)) {
-      setLangState(stored);
-      return;
-    }
-    const nav = navigator.language.slice(0, 2).toLowerCase();
-    const guess = isLang(nav) ? nav : null;
-    if (guess) setLangState(guess);
+    setLangState(readPreferredLanguage());
   }, []);
 
   useEffect(() => {
@@ -75,7 +59,7 @@ export function I18nProvider({
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
     try {
-      localStorage.setItem(STORAGE_KEY, l);
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, l);
     } catch {
       /* Keep the in-memory language. */
     }

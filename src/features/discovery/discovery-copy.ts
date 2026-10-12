@@ -68,9 +68,9 @@ const copy = {
   ],
   previous: [
     "Previous discovery",
-    "Khám phá trước",
+    "Địa điểm trước",
     "Предыдущее место",
-    "上一个发现",
+    "上一个地点",
     "이전 장소",
     "前のスポット",
   ],
