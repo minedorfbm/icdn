@@ -79,6 +79,10 @@ Quatre lieux actifs n'avaient aucun lien dans `destination_links` malgré une an
 
 Voir [la classification éditoriale](editorial-taxonomy.md) pour les champs de `destinations`, les trois vues marketing et les règles de publication.
 
+## Recherche par envie
+
+`destinations.search_keywords` contient les concepts et synonymes de recherche, indépendamment des textes affichés. La migration `20261013003000_destination_search_keywords.sql` a été appliquée le 13 octobre 2026 aux 75 fiches, dont les deux masquées, sans modifier leur contenu ni leur statut. Voir [le vocabulaire de recherche](search.md) pour la maintenance et les traductions des envies.
+
 ## Modèle partagé des cards agrandies
 
 Le modèle éditorial validé s'applique à toutes les destinations, y compris les fiches masquées et les nouvelles fiches. Le statut `active` reste indépendant de la présentation : une fiche masquée ne devient pas publique.

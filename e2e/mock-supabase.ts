@@ -17,6 +17,10 @@ const destinations = ["citron", "tingara"].map((id, display_order) => ({
   cluster: "DINING",
   type: "restaurant",
   short_description: "A restaurant overlooking the sea.",
+  search_keywords:
+    id === "tingara"
+      ? ["japanese", "dining", "romantic", "rain"]
+      : ["vietnamese", "dining", "romantic"],
   image_key: "/intercontinental-touch-icon.png",
   detail_image_key: "/intercontinental-touch-icon.png",
   content_kind: "place",
@@ -35,6 +39,7 @@ destinations.push(
     type: "experience",
     content_kind: "offer",
     content_family: "offer",
+    search_keywords: ["family", "activity"],
     display_order: 2,
   },
   {
@@ -45,6 +50,7 @@ destinations.push(
     type: "experience",
     content_kind: "offer",
     content_family: "storytelling",
+    search_keywords: ["nature", "activity"],
     display_order: 3,
   },
 );

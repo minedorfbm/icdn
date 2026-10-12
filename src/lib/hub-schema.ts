@@ -36,6 +36,7 @@ export const destinationRow = z.object({
   type: destinationType,
   short_description: text,
   detail_description: optionalText.optional(),
+  search_keywords: z.array(text).optional(),
   primary_link_id: optionalText.optional(),
   links_heading: optionalText.optional(),
   video_heading: optionalText.optional(),

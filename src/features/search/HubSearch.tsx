@@ -60,7 +60,8 @@ export function SearchDialog({
     if (resultsRef.current) resultsRef.current.scrollTop = 0;
   }, [query, collection]);
   const { destinations } = useHub();
-  const { lang, t, cluster, levelLabel, typeLabel, description, event } = useI18n();
+  const { lang, t, cluster, levelLabel, typeLabel, description, detailDescription, event } =
+    useI18n();
   const { openDestination } = useDestinationNavigation();
   const copy = (key: Parameters<typeof searchCopy>[1]) => searchCopy(lang, key);
   const entries = useMemo(
@@ -71,10 +72,13 @@ export function SearchDialog({
           item: d,
           name: d.name,
           collection: d.cluster ?? "",
+          keywords: d.searchKeywords ?? [],
           text: [
             d.id,
             d.short_description,
             description(d.id, d.short_description),
+            d.detail_description ?? "",
+            detailDescription(d.id, d.detail_description ?? d.short_description),
             d.type,
             typeLabel(d.type),
             d.level,
@@ -87,7 +91,16 @@ export function SearchDialog({
             }),
           ].join(" "),
         })),
-    [destinations, placesOnly, description, typeLabel, levelLabel, cluster, event],
+    [
+      destinations,
+      placesOnly,
+      description,
+      detailDescription,
+      typeLabel,
+      levelLabel,
+      cluster,
+      event,
+    ],
   );
   const results = useMemo(
     () => searchEntries(entries, query, collection),
@@ -179,6 +192,20 @@ export function SearchDialog({
           </div>
         </header>
         <div ref={resultsRef} className="hub-search-results">
+          {!query.trim() && (
+            <section className="hub-search-moods" aria-label={copy("moods")}>
+              <h3>{copy("moods")}</h3>
+              <div>
+                {(["relax", "romantic", "family", "active", "nature", "rain"] as const).map(
+                  (mood) => (
+                    <button type="button" key={mood} onClick={() => setQuery(copy(mood))}>
+                      {copy(mood)}
+                    </button>
+                  ),
+                )}
+              </div>
+            </section>
+          )}
           {groups.map((group) => (
             <section key={group.key} aria-label={group.label}>
               <h3>{group.label}</h3>
