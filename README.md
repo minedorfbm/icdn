@@ -77,7 +77,7 @@ Les formes des données publiques sont validées côté serveur dans `src/lib/hu
 
 Les tests WebKit utilisent un profil iPhone 13 et une API locale fictive : aucune clé de production n’est nécessaire. Ils couvrent l’ouverture directe, le PDF multipage et le zoom, le retour, les gestes de navigation, ainsi que la recherche et les langues avec stockage navigateur refusé. La sensation tactile et les médias tiers nécessitent toujours une vérification sur appareil réel.
 
-Les réponses du Worker interdisent l’encadrement par une origine tierce (`frame-ancestors 'self'`), les objets intégrés et les changements de base d’URL externes. Une politique de ressources CSP est évaluée en mode rapport : les violations apparaissent dans la console du navigateur, sans collecte serveur. Valider les médias et réservations tiers avant de l’activer en mode bloquant.
+Les réponses du Worker interdisent par défaut l’encadrement par une origine tierce (`frame-ancestors 'self'`), les objets intégrés et les changements de base d’URL externes. Seules les réponses HTML publiques réussies à `/` et `/la-maison-1888` sur `icdn.artdigitaljourney.com` autorisent aussi `https://artdigitaljourney.com`, pour la démonstration intégrée au site ADJ. Ces réponses utilisent la liste exacte CSP sans l’en-tête contradictoire `X-Frame-Options`; les autres réponses conservent `SAMEORIGIN`. Une politique de ressources CSP est évaluée en mode rapport : les violations apparaissent dans la console du navigateur, sans collecte serveur. Valider les médias et réservations tiers avant de l’activer en mode bloquant.
 
 ## Découvertes après le hero
 
