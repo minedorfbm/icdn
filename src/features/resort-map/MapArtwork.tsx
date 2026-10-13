@@ -1,6 +1,14 @@
 /* oxlint-disable jsx-a11y/prefer-tag-over-role -- interactive SVG hotspots cannot be HTML buttons. */
 import { useLayoutEffect, useMemo, useRef, useState, type SVGProps, type MouseEvent } from "react";
-import { ArrowLeft, ArrowRight, Compass, MapPin, Sparkles, Utensils } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BedDouble,
+  Compass,
+  MapPin,
+  Sparkles,
+  Utensils,
+} from "lucide-react";
 import { ArchitectureArtwork } from "./ArchitectureArtwork";
 import { bensleyTour } from "./map.data";
 import { useI18n } from "@/i18n";
@@ -27,6 +35,7 @@ import type { MapCamera } from "./useMapCamera";
 import { photoSpots, walkingTimes, type LegendLayers } from "./map.legend";
 
 const collectionIcons = {
+  accommodation: BedDouble,
   dining: Utensils,
   wellness: Sparkles,
   experiences: Compass,
@@ -495,7 +504,7 @@ export function MapArtwork({
                 transform={`translate(${place.point.x} ${place.point.y})`}
                 role="button"
                 tabIndex={photosVisible || dimmed ? -1 : 0}
-                aria-label={`${place.name} · ${levelLabel(place.level)}`}
+                aria-label={`${place.accommodationGroup ? mapCopy(lang, place.accommodationGroup) : place.name} · ${(place.accommodationGroup ? place.coveredLevels : [place.level]).map(levelLabel).join(" / ")}`}
                 aria-pressed={place.id === selectedId}
                 aria-disabled={dimmed}
                 onClick={(event) => {

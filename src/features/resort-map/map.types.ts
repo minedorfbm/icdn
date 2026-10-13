@@ -1,7 +1,8 @@
 import type { z } from "zod";
 import type { mapPlaceRow, mapLinkRow } from "@/lib/hub-schema";
 import type { Level } from "@/data/resort";
-export type PlaceCategory = "dining" | "wellness" | "experiences" | "beach" | "bensley";
+export type PlaceCategory =
+  "dining" | "wellness" | "experiences" | "beach" | "bensley" | "accommodation";
 export type MapPoint = { x: number; y: number };
 export type Place = {
   id: string;
@@ -12,6 +13,9 @@ export type Place = {
   point: MapPoint;
   focus: MapPoint & { zoom: number };
   tourOrder?: number;
+  accommodationGroup?: NonNullable<MapPlaceRow["accommodation_group"]>;
+  coveredLevels: Level[];
+  roomNumbers?: string;
 };
 export type TourStop = { placeId: string; order: number; travel: "walk" | "tram" };
 export type MapPlaceRow = z.infer<typeof mapPlaceRow>;

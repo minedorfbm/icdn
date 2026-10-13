@@ -157,6 +157,37 @@ const tables: Record<string, unknown[]> = {
 for (const [table, rows] of Object.entries(editorialTables)) {
   tables[table] = [...(tables[table] ?? []), ...rows];
 }
+for (const [index, id] of ["rooms", "club-panoramic-room-oceanview"].entries()) {
+  tables["destinations"]!.push({
+    ...destinations[0],
+    id,
+    name: index === 0 ? "Resort Classic Room Oceanview" : "Club Panoramic Room Oceanview",
+    type: "accommodation",
+    cluster: "EXPERIENCES",
+    display_order: 90 + index,
+    search_keywords: ["room", "accommodation"],
+  });
+  tables["map_destination_links"]!.push({
+    place_id: "hillside-rooms",
+    destination_id: id,
+    display_order: index,
+    is_primary: true,
+    active: true,
+  });
+}
+tables["map_places"]!.push({
+  id: "hillside-rooms",
+  name: "Rooms & Suites",
+  level_id: "heaven",
+  pin: 101,
+  x: 438,
+  y: 320,
+  zoom: 1.65,
+  active: true,
+  accommodation_group: "rooms",
+  covered_levels: ["heaven", "sky", "earth"],
+  room_numbers: "501-567 / 301-393 / 219-245",
+});
 let delay = 0;
 let failCatalogue = false;
 let failMediaOnce = false;
