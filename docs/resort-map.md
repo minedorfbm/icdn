@@ -21,7 +21,7 @@ Aucune écriture anonyme n’est autorisée. Les associations ne sont lisibles q
 
 La migration `20260927120000_resort_map.sql` ajoute 24 repères et 33 associations (32 lisibles publiquement à l’intégration, la réception étant masquée). Plusieurs équipements partagent le repère du bâtiment : La Maison/Wine Cellar/Buffalo Bar, Heritage Village/galerie/boutique, LONG/Soar/Planet Trekkers, Garden Pool/Kids Pool. Cette association n’invente pas de position précise à l’intérieur du bâtiment.
 
-Les offres sans lieu déterminé (IHG, mariages, fêtes…) n’ont pas de point artificiel. Bensley Package ouvre le parcours, Instagram Spots ouvre les repères photo. Les lieux dont le rapprochement reste incertain — Family Pool, B Lounge, Kate McCoy, Family Beach, Club Beach, Spa Lagoon Villas et Sea Experiences — restent accessibles dans le hub ; leur position pourra être ajoutée après validation. Les sentiers, temps de marche et le parcours sont illustratifs, sans géolocalisation ni guidage en temps réel.
+Les offres sans lieu déterminé (IHG, mariages, fêtes…) n’ont pas de point artificiel. Bensley Package ouvre le parcours, Instagram Spots ouvre les repères photo. Les lieux dont le rapprochement reste incertain — Family Pool, B Lounge, Kate McCoy, Family Beach, Club Beach et Sea Experiences — restent accessibles dans le hub ; leur position pourra être ajoutée après validation. Les sentiers, temps de marche et le parcours sont illustratifs, sans géolocalisation ni guidage en temps réel.
 
 ## Provenance et performance
 
@@ -30,3 +30,11 @@ Le dessin, les coordonnées et le parcours proviennent du dépôt privé `minedo
 ## Validation
 
 Exécuter les contrôles habituels du README et `supabase/manual/verify-resort-map.sql`. Tester un repère partagé, une card masquée, la recherche, le zoom/déplacement, le retour card → carte et l’ouverture des PDF/vidéos au-dessus de la carte. Vérifier les formats téléphone portrait/paysage et tablette, puis les gestes sur un véritable iPhone. La migration est rejouable sans écraser les réglages existants.
+
+## Zones des hébergements — 13 octobre 2026
+
+La carte fournie décrit des plages de numéros, pas la répartition exacte des catégories Classic/Club/Suites ni le bâtiment de chaque villa. Quinze cards sont donc associées à cinq zones représentatives, avec une indication explicite de précision dans les six langues. Les numéros sont des références de la zone sur le plan, pas une attribution garantie à chaque catégorie. Le repère des villas Sea représente l’ensemble des villas côtières, pas le bâtiment individuel d’une résidence.
+
+`accommodation_group`, `covered_levels` et `room_numbers` complètent `map_places`. Les zones conservent leur titre et leurs niveaux géographiques ; le premier hébergement lié ne remplace pas le nom de la zone. Un filtre Hébergements et une icône de lit permettent de les repérer. Toutes les cards associées sont proposées, avec une liste défilante sur mobile. Les chambres/suites couvrent Heaven, Sky et Earth ; les penthouses Heaven et Sky ; les villas quatre chambres Earth ; les villas côtières et du lagon Sea. Cela ne modifie pas le niveau éditorial des cards d’accueil.
+
+La préparation `20261013160000_accommodation_map_areas.sql` a été appliquée le 13 octobre 2026 : les colonnes existent et les cinq zones ainsi que les quinze liens sont **inactifs**. Le contrôle public confirme que les repères et associations précédents sont préservés. Les repères existants restent publiés. Après fusion et déploiement du code, exécuter `docs/activate-accommodation-map-areas.sql` puis vérifier les quinze actions View on map et la recherche. Cette séparation empêche l’ancienne interface d’afficher les zones comme des bâtiments précis. [Le relevé des zones](accommodation-map-areas.json) conserve les coordonnées du plan original et celles du dessin du hub.

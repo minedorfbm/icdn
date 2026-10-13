@@ -79,7 +79,9 @@ export default function ResortMap({
       places.filter(
         (p) =>
           (!level ||
-            linkedDestinations(p.id, mapLinks, destinations).some((d) => d.level === level) ||
+            p.coveredLevels.includes(level) ||
+            (!p.accommodationGroup &&
+              linkedDestinations(p.id, mapLinks, destinations).some((d) => d.level === level)) ||
             p.level === level) &&
           (!collection || p.categories.includes(collection)),
       ),
@@ -271,7 +273,10 @@ export default function ResortMap({
           {hasPreview && (
             <MapPreview
               key={selected.id}
-              title={selected.name}
+              title={
+                selected.accommodationGroup ? copy(selected.accommodationGroup) : selected.name
+              }
+              area={selected.accommodationGroup ? selected : undefined}
               destinations={related}
               onDestination={onDestination}
               onClose={() => {
@@ -308,7 +313,7 @@ export default function ResortMap({
           <div className="atlas-bottom">
             {mode === "explore" && !hasPreview && !searchOpen && (
               <div className="atlas-collections" aria-label={t("collections")}>
-                {(["dining", "wellness", "experiences"] as const).map((c) => (
+                {(["dining", "wellness", "experiences", "accommodation"] as const).map((c) => (
                   <button
                     type="button"
                     aria-pressed={collection === c}
@@ -318,7 +323,7 @@ export default function ResortMap({
                       fit();
                     }}
                   >
-                    {cluster(c.toUpperCase())}
+                    {c === "accommodation" ? copy("accommodation") : cluster(c.toUpperCase())}
                   </button>
                 ))}
               </div>
@@ -357,6 +362,7 @@ function MapPreview({
   onDestination,
   onClose,
   kicker,
+  area,
   children,
 }: Readonly<{
   title: string;
@@ -364,6 +370,7 @@ function MapPreview({
   onDestination: (id: string) => void;
   onClose: () => void;
   kicker: string | undefined;
+  area?: import("./map.types").Place | undefined;
   children: React.ReactNode;
 }>) {
   const { lang, description, levelLabel } = useI18n();
@@ -382,11 +389,27 @@ function MapPreview({
       <div className="atlas-preview-heading">
         {primary && <img src={primary.image} alt="" width={64} height={64} decoding="async" />}
         <div>
-          <p>{kicker ?? (primary ? levelLabel(primary.level) : mapCopy(lang, "landmark"))}</p>
+          <p>
+            {kicker ??
+              (area
+                ? area.coveredLevels.map(levelLabel).join(" / ")
+                : primary
+                  ? levelLabel(primary.level)
+                  : mapCopy(lang, "landmark"))}
+          </p>
           <h3>{title}</h3>
         </div>
       </div>
-      {primary && (
+      {area && (
+        <p className="atlas-description">
+          <strong>{mapCopy(lang, "accommodationArea")}</strong>
+          <br />
+          {mapCopy(lang, "planNumbers")}: {area.roomNumbers}
+          <br />
+          {mapCopy(lang, "areaNote")}
+        </p>
+      )}
+      {primary && !area && (
         <>
           <button
             type="button"
@@ -412,10 +435,10 @@ function MapPreview({
           )}
         </>
       )}
-      {destinations.length > 1 && (
+      {(area || destinations.length > 1) && (
         <div className="atlas-related">
-          <p>{mapCopy(lang, "here")}</p>
-          {destinations.slice(1).map((d) => (
+          <p>{mapCopy(lang, area ? "accommodation" : "here")}</p>
+          {(area ? destinations : destinations.slice(1)).map((d) => (
             <button type="button" key={d.id} onClick={() => onDestination(d.id)}>
               {d.name}
               <ArrowUpRight size={15} />

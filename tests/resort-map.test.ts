@@ -1,3 +1,4 @@
+import areas from "../docs/accommodation-map-areas.json";
 import { describe, expect, test } from "bun:test";
 import {
   destinationPlace,
@@ -91,5 +92,57 @@ describe("Supabase map associations", () => {
         "tourNote",
       ] as const)
         expect(mapCopy(code, key).length).toBeGreaterThan(0);
+  });
+});
+
+describe("accommodation areas from the official plan", () => {
+  test("all fifteen existing categories have one primary area without fabricated villa-level pins", () => {
+    const rows = areas.areas.map((a) => ({ ...a, active: true }));
+    const links = rows.flatMap((a) =>
+      a.destination_ids.map((id, display_order) => link(a.id, id, true, display_order)),
+    );
+    const cards = links.map((l) => ({
+      ...destination(l.destination_id),
+      type: "accommodation",
+      cluster: "EXPERIENCES",
+    }));
+    expect(new Set(links.map((l) => l.destination_id)).size).toBe(15);
+    const places = liveMapPlaces(rows, links, cards);
+    expect(places).toHaveLength(5);
+    for (const a of rows) {
+      const mapped = places.find((p) => p.id === a.id)!;
+      expect(mapped.name).toBe(a.name);
+      expect(mapped.coveredLevels).toEqual(a.covered_levels);
+      expect(mapped.categories).toEqual(["accommodation"]);
+      expect(mapped.point).toEqual({ x: a.x, y: a.y });
+      for (const id of a.destination_ids) expect(destinationPlace(id, links, rows)).toBe(a.id);
+    }
+    expect(places.find((p) => p.id === "hillside-rooms")?.coveredLevels).toEqual([
+      "heaven",
+      "sky",
+      "earth",
+    ]);
+    expect(linkedDestinations("seaside-villas", links, cards)).toHaveLength(7);
+    expect(
+      liveMapPlaces(
+        rows.map((r) => ({ ...r, active: false })),
+        links,
+        cards,
+      ),
+    ).toEqual([]);
+  });
+  test("area labels and the precision note are available in all six languages", () => {
+    for (const { code } of LANGUAGES)
+      for (const key of [
+        "accommodation",
+        "rooms",
+        "penthouses",
+        "earthVillas",
+        "seasideVillas",
+        "lagoonVillas",
+        "areaNote",
+        "planNumbers",
+      ] as const)
+        expect(mapCopy(code, key).trim()).toBeTruthy();
   });
 });

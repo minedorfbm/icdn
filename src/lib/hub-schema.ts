@@ -121,6 +121,12 @@ export const videoRow = z.object({
   display_order: order,
 });
 export const mapPlaceRow = z.object({
+  accommodation_group: z
+    .enum(["rooms", "penthouses", "earthVillas", "seasideVillas", "lagoonVillas"])
+    .nullable()
+    .optional(),
+  covered_levels: z.array(levelId).optional(),
+  room_numbers: optionalText.optional(),
   id: text,
   name: text,
   level_id: levelId,
