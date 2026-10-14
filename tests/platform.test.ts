@@ -10,6 +10,12 @@ describe("Worker response security", () => {
     expect(response.headers.get("content-security-policy-report-only")).toContain(
       "worker-src 'self' blob:",
     );
+    const policy = response.headers.get("content-security-policy")!;
+    expect(policy).toContain("frame-src https://www.youtube-nocookie.com");
+    expect(policy).toContain("https://www.instagram.com");
+    expect(policy).toContain("https://www.tablecheck.com");
+    expect(policy).toContain("worker-src 'self' blob:");
+    expect(policy).toContain("script-src-attr 'none'");
     expect(response.status).toBe(201);
     expect(await response.text()).toBe("ok");
     expect(response.headers.get("cache-control")).toBe("public");
@@ -24,7 +30,7 @@ describe("Worker response security", () => {
         new Response("demo", { headers: { "content-type": "text/html; charset=utf-8" } }),
         new Request(`https://icdn.artdigitaljourney.com${path}`),
       );
-      expect(response.headers.get("content-security-policy")).toBe(
+      expect(response.headers.get("content-security-policy")).toContain(
         "frame-ancestors 'self' https://artdigitaljourney.com; base-uri 'self'; object-src 'none'",
       );
       expect(response.headers.has("x-frame-options")).toBe(false);
@@ -52,7 +58,7 @@ describe("Worker response security", () => {
       new Response("protected", { status, headers: { "content-type": type } }),
       new Request(url, { method: method ?? "GET" }),
     );
-    expect(response.headers.get("content-security-policy")).toBe(
+    expect(response.headers.get("content-security-policy")).toContain(
       "frame-ancestors 'self'; base-uri 'self'; object-src 'none'",
     );
     expect(response.headers.get("x-frame-options")).toBe("SAMEORIGIN");

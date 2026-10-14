@@ -23,6 +23,7 @@ jobs:
       - run: bun install --frozen-lockfile --ignore-scripts
       - run: bun run security:audit
       - run: bun run migrations:check
+      - run: bun run migrations:test
       - run: bun run i18n:check
       - run: bun run images:check
       - run: bun run test

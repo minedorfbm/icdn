@@ -997,16 +997,23 @@ BEGIN
     "url": "https://www.ihg.com/onerewards/content/jp/ja/home"
   }
 ]$variants$::jsonb) LOOP
-   SELECT destination_id,kind,url INTO parent FROM public.destination_links WHERE id=(p->>'link_id')::uuid FOR UPDATE;
+   SELECT id,destination_id,kind,url INTO parent FROM public.destination_links WHERE id=(p->>'link_id')::uuid FOR UPDATE;
+   IF NOT FOUND THEN
+     -- Fresh databases generate different UUIDs. Require one exact source match;
+     -- an existing audited UUID still follows the original concurrency guards.
+     SELECT id,destination_id,kind,url INTO STRICT parent FROM public.destination_links
+     WHERE destination_id=p->>'card' AND kind::text IN ('DISCOVER','WEBSITE') AND url=p->>'source'
+     FOR UPDATE;
+   END IF;
    IF NOT FOUND OR parent.destination_id IS DISTINCT FROM p->>'card' OR parent.kind::text NOT IN ('DISCOVER','WEBSITE') OR parent.url IS DISTINCT FROM p->>'source' THEN
      RAISE EXCEPTION 'Discover source changed since verification: %',p->>'card';
    END IF;
-   SELECT * INTO existing FROM public.destination_link_translations WHERE link_id=(p->>'link_id')::uuid AND locale=p->>'locale' FOR UPDATE;
+   SELECT * INTO existing FROM public.destination_link_translations WHERE link_id=parent.id AND locale=p->>'locale' FOR UPDATE;
    IF FOUND AND (existing.url IS DISTINCT FROM p->>'url' OR existing.source_url IS DISTINCT FROM p->>'source') THEN
      RAISE EXCEPTION 'Discover variant already edited: % / %',p->>'card',p->>'locale';
    END IF;
    INSERT INTO public.destination_link_translations(link_id,locale,url,source_url,active)
-   VALUES((p->>'link_id')::uuid,p->>'locale',p->>'url',p->>'source',true)
+   VALUES(parent.id,p->>'locale',p->>'url',p->>'source',true)
    ON CONFLICT(link_id,locale) DO UPDATE SET active=true WHERE NOT destination_link_translations.active;
  END LOOP;
 END;
