@@ -9,7 +9,7 @@ test("accommodation zones connect cards and map without claiming a precise build
   const preview = map.locator(".atlas-preview");
   await expect(preview.getByRole("heading", { name: "Rooms & Suites" })).toBeVisible();
   await expect(preview).toContainText("501-567 / 301-393 / 219-245");
-  await expect(preview).toContainText("exact villa building");
+  await expect(preview).toContainText("Room numbers");
   await expect(
     preview.getByRole("button", { name: "Resort Classic Room Oceanview", exact: true }),
   ).toBeVisible();

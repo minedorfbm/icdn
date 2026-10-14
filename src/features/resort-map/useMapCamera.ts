@@ -13,7 +13,7 @@ import { MAP_SIZE } from "./map.geometry";
 
 const { width: MAP_WIDTH, height: MAP_HEIGHT } = MAP_SIZE;
 const MIN_SCALE = 1;
-const MAX_SCALE = 4.2;
+const MAX_SCALE = 8;
 const HORIZONTAL_OVERSCAN = 460;
 const VERTICAL_OVERSCAN = 180;
 
@@ -114,7 +114,10 @@ export function useMapCamera() {
       setCamera((current) => {
         const scale = clamp(current.scale + amount, MIN_SCALE, MAX_SCALE);
         const ratio = scale / current.scale;
-        const anchor = { x: MAP_WIDTH / 2, y: MAP_HEIGHT / 2 };
+        const anchor = {
+          x: viewport.current.x + viewport.current.width * 0.5,
+          y: viewport.current.y + viewport.current.height * 0.34,
+        };
         return constrain({
           scale,
           x: anchor.x - (anchor.x - current.x) * ratio,
@@ -133,6 +136,8 @@ export function useMapCamera() {
     (point: MapPoint, scale = 1.8) => {
       const compact = typeof window !== "undefined" && window.innerWidth <= 820;
       const nextScale = clamp(scale * (compact ? 1.45 : 1), MIN_SCALE, MAX_SCALE);
+      // A requested place must not be replaced by the initial mobile overview.
+      initialView.current = false;
       setCamera(
         constrain({
           scale: nextScale,

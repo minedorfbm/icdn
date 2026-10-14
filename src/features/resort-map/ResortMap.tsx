@@ -99,7 +99,8 @@ export default function ResortMap({
       setSelectedId(id);
       setSearchOpen(false);
       setOptions(false);
-      focusOn(place.focus, place.focus.zoom);
+      // Keep accommodation zones wider than individual venues.
+      focusOn(place.focus, Math.max(place.focus.zoom, place.accommodationGroup ? 2.4 : 3.4));
     },
     [places, focusOn],
   );
