@@ -86,11 +86,13 @@ function nearestInEnvelope(point: MapPoint, polygon: MapPoint[]): MapPoint {
       );
       return { x: a.x + t * dx, y: a.y + t * dy };
     })
-    .reduce((best, candidate) =>
-      Math.hypot(candidate.x - point.x, candidate.y - point.y) <
-      Math.hypot(best.x - point.x, best.y - point.y)
-        ? candidate
-        : best,
+    .reduce(
+      (best, candidate) =>
+        Math.hypot(candidate.x - point.x, candidate.y - point.y) <
+        Math.hypot(best.x - point.x, best.y - point.y)
+          ? candidate
+          : best,
+      polygon[0]!,
     );
 }
 

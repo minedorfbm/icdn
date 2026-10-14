@@ -597,7 +597,7 @@ export function MapArtwork({
                   transform={`translate(${place.point.x} ${place.point.y})`}
                   role="button"
                   tabIndex={photosVisible || dimmed ? -1 : 0}
-                  aria-label={`${place.accommodationGroup ? mapCopy(lang, place.accommodationGroup) : place.name} · ${(place.accommodationGroup ? place.coveredLevels : [place.level]).map(levelLabel).join(" / ")}`}
+                  aria-label={`${place.accommodationGroup ? mapCopy(lang, place.accommodationGroup) : place.name} · ${(place.accommodationGroup ? place.coveredLevels : [place.level]).map((level) => levelLabel(level)).join(" / ")}`}
                   aria-pressed={place.id === selectedId}
                   aria-disabled={dimmed}
                   onClick={(event) => {
