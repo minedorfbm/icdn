@@ -135,6 +135,7 @@ describe("accommodation areas from the official plan", () => {
     for (const { code } of LANGUAGES)
       for (const key of [
         "accommodation",
+        "planNumbers",
         "rooms",
         "penthouses",
         "earthVillas",

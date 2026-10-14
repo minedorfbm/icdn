@@ -42,6 +42,14 @@ const copy = {
     "Spa Lagoon 빌라",
     "Spa Lagoonヴィラ",
   ],
+  planNumbers: [
+    "Plan references",
+    "Số trên bản đồ",
+    "Номера на плане",
+    "地图编号",
+    "지도 번호",
+    "地図の番号",
+  ],
   entrance: [
     "Resort entrance",
     "Lối vào khu nghỉ dưỡng",
