@@ -55,6 +55,7 @@ export default function ResortMap({
     [mapPlaces, mapLinks, destinations],
   );
   const [selectedId, setSelectedId] = useState<string | null>(request.placeId ?? null);
+  const [selectedStation, setSelectedStation] = useState<string | null>(null);
   const [mode, setMode] = useState<MapMode>(request.mode ?? "explore");
   const [photoId, setPhotoId] = useState<string | null>(null);
   const [tourIndex, setTourIndex] = useState(0);
@@ -97,6 +98,7 @@ export default function ResortMap({
       const place = places.find((p) => p.id === id);
       if (!place) return;
       setSelectedId(id);
+      setSelectedStation(null);
       setSearchOpen(false);
       setOptions(false);
       // Keep accommodation zones wider than individual venues.
@@ -105,6 +107,7 @@ export default function ResortMap({
     [places, focusOn],
   );
   useEffect(() => {
+    setSelectedStation(null);
     setMode(request.mode ?? "explore");
     setPhotoId(null);
     setCollection(null);
@@ -118,6 +121,7 @@ export default function ResortMap({
     }
   }, [request, select, fit, tourStops]);
   const changeMode = (next: MapMode) => {
+    setSelectedStation(null);
     setMode(next);
     setSelectedId(null);
     setPhotoId(null);
@@ -137,6 +141,7 @@ export default function ResortMap({
   };
   const choosePhoto = (id: string) => {
     if (!allowPlaceClick()) return;
+    setSelectedStation(null);
     const spot = photoSpots.find((p) => p.id === id);
     if (!spot) return;
     setPhotoId(id);
@@ -144,6 +149,7 @@ export default function ResortMap({
     focusOn(spot.point, 2.1);
   };
   const applyLevel = (next: Level | null) => {
+    setSelectedStation(null);
     setLevel(next);
     setSelectedId(null);
     setOptions(false);
@@ -194,6 +200,7 @@ export default function ResortMap({
               places={places}
               visibleIds={visibleIds}
               selectedId={selectedId}
+              selectedStation={selectedStation}
               activeFilters={filters}
               mode={mode === "tour" ? "tour" : "explore"}
               activeTourIndex={tourIndex}
@@ -205,6 +212,10 @@ export default function ResortMap({
                 walking: mode === "walk",
               }}
               onSelectPhoto={choosePhoto}
+              onSelectStation={(station) => {
+                if (allowPlaceClick())
+                  setSelectedStation((current) => (current === station ? null : station));
+              }}
               onViewportChange={onViewportChange}
               onSelectPlace={(id) => {
                 if (allowPlaceClick()) {
@@ -216,7 +227,23 @@ export default function ResortMap({
                   select(id);
                 }
               }}
-              interactionProps={{ ...handlers, tabIndex: 0, "aria-label": copy("gestures") }}
+              interactionProps={{
+                ...handlers,
+                tabIndex: 0,
+                "aria-label": copy("gestures"),
+                onClick: (event) => {
+                  if (
+                    event.target instanceof Element &&
+                    !event.target.closest('[role="button"]') &&
+                    allowPlaceClick()
+                  )
+                    setSelectedStation(null);
+                },
+                onKeyDown: (event) => {
+                  if (event.key === "Home" || event.key === "0") setSelectedStation(null);
+                  handlers.onKeyDown(event);
+                },
+              }}
             />
           </div>
           {options && (
@@ -252,7 +279,14 @@ export default function ResortMap({
             <button type="button" aria-label={copy("zoomOut")} onClick={() => zoomBy(-0.35)}>
               <Minus size={18} />
             </button>
-            <button type="button" aria-label={copy("fit")} onClick={fit}>
+            <button
+              type="button"
+              aria-label={copy("fit")}
+              onClick={() => {
+                setSelectedStation(null);
+                fit();
+              }}
+            >
               <LocateFixed size={18} />
             </button>
           </div>
@@ -320,6 +354,7 @@ export default function ResortMap({
                     aria-pressed={collection === c}
                     key={c}
                     onClick={() => {
+                      setSelectedStation(null);
                       setCollection(collection === c ? null : c);
                       fit();
                     }}
