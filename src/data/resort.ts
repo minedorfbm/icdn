@@ -107,6 +107,7 @@ export interface Destination {
 /** One action link attached to a destination. */
 export interface DestinationLink {
   id?: string;
+  benefitsId?: string;
   translations?: LinkTranslations;
   kind: string;
   label?: string;
@@ -336,6 +337,7 @@ export function groupLinks(
         row.url,
       ),
       ...(row.label ? { label: row.label } : {}),
+      ...(row.benefits_id ? { benefitsId: row.benefits_id } : {}),
     });
   }
   return out;

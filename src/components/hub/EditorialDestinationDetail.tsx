@@ -9,6 +9,7 @@ import { instagramUrl } from "@/lib/destination-actions";
 import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
 import { HubSearch } from "@/features/search/HubSearch";
+import { AccommodationBenefits } from "./AccommodationBenefits";
 import { ResortLink } from "./ResortBrowser";
 import { ConciergeContact } from "./ConciergeContact";
 import { DestinationNotices } from "./DestinationNotices";
@@ -149,16 +150,23 @@ export function EditorialDestinationDetail({
                 : description(dest.id, dest.short_description)}
             </p>
             <DestinationNotices notices={media.notices} />
-            {primary && (
-              <ResortLink
-                href={primary.url}
-                pageTitle={`${dest.name} · ${label(primary)}`}
-                className="editorial-primary"
-              >
-                <span>{label(primary)}</span>
-                <ArrowUpRight size={25} strokeWidth={1.5} aria-hidden />
-              </ResortLink>
-            )}
+            {primary &&
+              (primary.benefitsId ? (
+                <AccommodationBenefits
+                  id={primary.benefitsId}
+                  dest={dest}
+                  className="editorial-primary"
+                />
+              ) : (
+                <ResortLink
+                  href={primary.url}
+                  pageTitle={`${dest.name} · ${label(primary)}`}
+                  className="editorial-primary"
+                >
+                  <span>{label(primary)}</span>
+                  <ArrowUpRight size={25} strokeWidth={1.5} aria-hidden />
+                </ResortLink>
+              ))}
 
             {(media.hours.length > 0 || placeId || mapMode) && (
               <section className="editorial-practical" aria-label={t("practical_information")}>
@@ -197,17 +205,25 @@ export function EditorialDestinationDetail({
               <section className="editorial-section" aria-label={t(collection)}>
                 <SectionHeading label={t(collection)} title={detailHeading(dest, "links", lang)} />
                 <div className="editorial-links">
-                  {secondary.map((item, index) => (
-                    <ResortLink
-                      key={item.id ?? `${item.kind}-${index}`}
-                      href={item.url}
-                      pageTitle={`${dest.name} · ${label(item)}`}
-                      className={label(item).length > 28 ? "editorial-link-wide" : undefined}
-                    >
-                      <span>{label(item)}</span>
-                      <ArrowUpRight size={17} strokeWidth={1.4} aria-hidden />
-                    </ResortLink>
-                  ))}
+                  {secondary.map((item, index) =>
+                    item.benefitsId ? (
+                      <AccommodationBenefits
+                        key={item.id ?? `${item.kind}-${index}`}
+                        id={item.benefitsId}
+                        dest={dest}
+                      />
+                    ) : (
+                      <ResortLink
+                        key={item.id ?? `${item.kind}-${index}`}
+                        href={item.url}
+                        pageTitle={`${dest.name} · ${label(item)}`}
+                        className={label(item).length > 28 ? "editorial-link-wide" : undefined}
+                      >
+                        <span>{label(item)}</span>
+                        <ArrowUpRight size={17} strokeWidth={1.4} aria-hidden />
+                      </ResortLink>
+                    ),
+                  )}
                 </div>
               </section>
             )}

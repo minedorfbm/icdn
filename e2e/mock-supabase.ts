@@ -1,4 +1,5 @@
 import { serve } from "bun";
+import benefitsSeed from "../docs/accommodation-benefits.json";
 import { editorialTables } from "./editorial-fixtures";
 
 // A deterministic read-only API: browser tests never need production credentials.
@@ -188,6 +189,43 @@ tables["map_places"]!.push({
   covered_levels: ["heaven", "sky", "earth"],
   room_numbers: "501-567 / 301-393 / 219-245",
 });
+const standardBenefits = benefitsSeed.groups.find((group) => group.id === "standard")!;
+tables["accommodation_benefits"] = [{ id: "standard", items: standardBenefits.items }];
+tables["accommodation_benefit_translations"] = Object.entries(standardBenefits.translations).map(
+  ([locale, items]) => ({
+    benefits_id: "standard",
+    locale,
+    items,
+    source_items: standardBenefits.items,
+  }),
+);
+tables["destination_links"]!.push(
+  {
+    id: "rooms-discover",
+    label: null,
+    destination_id: "rooms",
+    kind: "DISCOVER",
+    url: "https://www.danang.intercontinental.com/room-suites/resort-classic-room-oceanview/",
+    display_order: 0,
+  },
+  {
+    id: "rooms-floor",
+    destination_id: "rooms",
+    kind: "BROCHURE",
+    label: "Floor plan",
+    url: benefitsSeed.accommodations[0]!.floor_plan,
+    display_order: 20,
+  },
+  {
+    id: "rooms-benefits",
+    destination_id: "rooms",
+    kind: "INFO",
+    label: "Benefits",
+    benefits_id: "standard",
+    url: benefitsSeed.accommodations[0]!.source_url,
+    display_order: 21,
+  },
+);
 let delay = 0;
 let failCatalogue = false;
 let failMediaOnce = false;
@@ -217,7 +255,7 @@ serve({
       return Response.json({ message: "test media offline" }, { status: 503 });
     }
     let rows = tables[table] ?? [];
-    for (const column of ["destination_id", "id"]) {
+    for (const column of ["destination_id", "id", "benefits_id"]) {
       const filter = url.searchParams.get(column);
       if (filter?.startsWith("eq."))
         rows = rows.filter((row) => (row as Record<string, unknown>)[column] === filter.slice(3));

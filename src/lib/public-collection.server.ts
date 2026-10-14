@@ -30,7 +30,7 @@ export function publicReader() {
     filter?: "active" | "published",
     order?: string,
     destinationId?: string,
-    idColumn: "destination_id" | "id" = "destination_id",
+    idColumn: "destination_id" | "id" | "benefits_id" = "destination_id",
   ) => {
     const columns = schema.keyof().options;
     let query = supabase.from(table).select(columns.join(","), { count: "exact" });

@@ -92,6 +92,7 @@ export const linkRow = z.object({
   destination_id: text,
   kind: text,
   label: optionalText,
+  benefits_id: optionalText.optional(),
   url: text,
   display_order: order,
 });

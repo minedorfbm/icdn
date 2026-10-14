@@ -344,6 +344,8 @@ export const ACTION: Record<Lang, Record<string, string>> = {
 /** Footer link labels. */
 export const LINK_LABEL: Record<Lang, Record<string, string>> = {
   en: {
+    "Floor plan": "Floor plan",
+    Benefits: "Benefits",
     Website: "Website",
     Instagram: "Instagram",
     Dining: "Dining",
@@ -355,6 +357,8 @@ export const LINK_LABEL: Record<Lang, Record<string, string>> = {
     "Gourmand Menu": "Gourmand Menu",
   },
   vi: {
+    "Floor plan": "Sơ đồ mặt bằng",
+    Benefits: "Quyền lợi",
     Website: "Trang chính thức",
     Instagram: "Instagram",
     Dining: "Ẩm thực",
@@ -366,6 +370,8 @@ export const LINK_LABEL: Record<Lang, Record<string, string>> = {
     "Gourmand Menu": "Thực đơn Gourmand",
   },
   ru: {
+    "Floor plan": "План номера",
+    Benefits: "Привилегии",
     Website: "Сайт",
     Instagram: "Instagram",
     Dining: "Рестораны",
@@ -377,6 +383,8 @@ export const LINK_LABEL: Record<Lang, Record<string, string>> = {
     "Gourmand Menu": "Меню Gourmand",
   },
   zh: {
+    "Floor plan": "平面图",
+    Benefits: "专享礼遇",
     Website: "官方网站",
     Instagram: "Instagram",
     Dining: "餐饮",
