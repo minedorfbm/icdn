@@ -131,7 +131,7 @@ function CatalogueStatus({
       className="brand-ui grid min-h-[50svh] place-content-center gap-5 px-7 text-center"
       aria-busy={!failed}
     >
-      <p role="status">{t(failed ? "content_unavailable" : "page_loading")}</p>
+      <output className="block">{t(failed ? "content_unavailable" : "page_loading")}</output>
       {failed && (
         <button className="min-h-11 border-b" onClick={onRetry}>
           {t("retry")}

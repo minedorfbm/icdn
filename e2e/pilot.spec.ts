@@ -306,12 +306,16 @@ test("top Back skips the card trail and restores the home's selected card and sc
   expect(homeScroll).toBeGreaterThan(100);
   await openCard.press("Enter");
   await expect(page).toHaveURL("/tingara");
+  await expect(page.locator('article[data-destination-id="tingara"]')).toBeVisible();
   await expect(page.locator("[data-previous-destination]")).toHaveCount(0);
   await page.locator("[data-next-destination]").click();
-  await expect(page).not.toHaveURL("/tingara");
-  const secondUrl = page.url();
+  await expect(page).toHaveURL("/pilot-citron");
+  // History commits before the route loader finishes: wait for the new card,
+  // otherwise the second click can still target TINGARA's old next button.
+  await expect(page.locator('article[data-destination-id="pilot-citron"]')).toBeVisible();
   await page.locator("[data-next-destination]").click();
-  await expect(page).not.toHaveURL(secondUrl);
+  await expect(page).toHaveURL("/citron");
+  await expect(page.locator('article[data-destination-id="citron"]')).toBeVisible();
   await page.getByRole("button", { name: "BACK", exact: true }).click();
   await expect(page).toHaveURL("/");
   await expect(page.getByRole("dialog")).toHaveCount(0);
