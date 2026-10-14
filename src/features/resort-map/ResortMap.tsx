@@ -400,13 +400,9 @@ function MapPreview({
           <h3>{title}</h3>
         </div>
       </div>
-      {area && (
+      {area?.roomNumbers && (
         <p className="atlas-description">
-          <strong>{mapCopy(lang, "accommodationArea")}</strong>
-          <br />
           {mapCopy(lang, "planNumbers")}: {area.roomNumbers}
-          <br />
-          {mapCopy(lang, "areaNote")}
         </p>
       )}
       {primary && !area && (

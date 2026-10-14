@@ -42,22 +42,6 @@ const copy = {
     "Spa Lagoon 빌라",
     "Spa Lagoonヴィラ",
   ],
-  accommodationArea: [
-    "Accommodation area",
-    "Khu lưu trú",
-    "Зона проживания",
-    "住宿区域",
-    "숙박 구역",
-    "宿泊エリア",
-  ],
-  areaNote: [
-    "Area shown on the resort plan. It does not identify each room category or exact villa building; confirm your assigned location with the resort.",
-    "Khu vực theo bản đồ resort. Bản đồ không xác định vị trí từng hạng phòng hoặc biệt thự cụ thể; vui lòng xác nhận vị trí được bố trí với resort.",
-    "Зона по плану курорта. Расположение каждой категории номера или конкретной виллы не указано; уточните назначенное размещение у сотрудников.",
-    "此为度假村地图标示区域。地图未注明各房型或具体别墅建筑的位置；请向度假村确认您的入住位置。",
-    "리조트 지도에 표시된 구역입니다. 각 객실 유형이나 개별 빌라 건물의 정확한 위치는 표시되지 않으므로 배정 위치를 리조트에 확인해 주세요.",
-    "リゾートの地図に基づくエリアです。各客室タイプや個別のヴィラの建物は特定されていないため、ご宿泊場所はリゾートにご確認ください。",
-  ],
   planNumbers: [
     "Plan references",
     "Số trên bản đồ",
