@@ -23,6 +23,8 @@
 }
 .instagram-post[data-fit-to-screen] .instagram-post-content iframe {
   display: block;
+  /* Instagram injects inline dimensions and margins; specificity alone cannot
+     override them. Keep the official embed inside the approved caption preview. */
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;

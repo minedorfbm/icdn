@@ -6,6 +6,32 @@ import { localizedBenefits, type BenefitContent } from "@/lib/accommodation-bene
 import { getAccommodationBenefits } from "@/lib/accommodation-benefits.functions";
 import type { Destination } from "@/data/resort";
 
+function BenefitsContent({
+  loading,
+  items,
+  onRetry,
+}: Readonly<{ loading: boolean; items: readonly string[]; onRetry: () => void }>) {
+  const { t } = useI18n();
+  if (loading) return <output className="block">{t("page_loading")}</output>;
+  if (!items.length) {
+    return (
+      <div>
+        <output className="block">{t("content_unavailable")}</output>
+        <button type="button" onClick={onRetry}>
+          {t("retry")}
+        </button>
+      </div>
+    );
+  }
+  return (
+    <ul>
+      {items.map((item, index) => (
+        <li key={index}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+
 function BenefitsDialog({
   id,
   dest,
@@ -52,22 +78,11 @@ function BenefitsDialog({
         </button>
       </header>
       <div className="benefits-body" aria-busy={content === undefined}>
-        {content === undefined ? (
-          <p role="status">{t("page_loading")}</p>
-        ) : items.length ? (
-          <ul>
-            {items.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-        ) : (
-          <div role="status">
-            <p>{t("content_unavailable")}</p>
-            <button type="button" onClick={() => setAttempt((value) => value + 1)}>
-              {t("retry")}
-            </button>
-          </div>
-        )}
+        <BenefitsContent
+          loading={content === undefined}
+          items={items}
+          onRetry={() => setAttempt((value) => value + 1)}
+        />
       </div>
     </FullscreenDialog>
   );

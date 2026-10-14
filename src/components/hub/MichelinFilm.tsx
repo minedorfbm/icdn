@@ -85,12 +85,9 @@ function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
     <div className="relative h-full w-full max-w-[calc(100dvh*9/16)]">
       <div ref={host} className="absolute inset-0 [&_iframe]:size-full [&_iframe]:border-0" />
       {loading && (
-        <p
-          role="status"
-          className="pointer-events-none absolute inset-0 grid place-items-center text-sm"
-        >
+        <output className="pointer-events-none absolute inset-0 grid place-items-center text-sm">
           {t("page_loading")}
-        </p>
+        </output>
       )}
       {failed && (
         <a

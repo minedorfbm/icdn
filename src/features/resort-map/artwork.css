@@ -924,6 +924,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .hub-atlas * {
+    /* The visitor's motion preference also overrides inline animation styles. */
     animation: none !important;
     transition: none !important;
   }
