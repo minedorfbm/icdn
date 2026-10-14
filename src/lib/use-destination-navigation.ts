@@ -5,7 +5,6 @@ import { destinationSlug } from "@/lib/destination-route";
 declare module "@tanstack/react-router" {
   interface HistoryState {
     hubCard?: boolean;
-    hubCardNeutral?: boolean;
     hubSequence?: string[];
     hubHomeIndex?: number;
     hubPreviousCard?: string;
@@ -19,7 +18,7 @@ export function useDestinationNavigation() {
   const location = useLocation();
   const isDestination = location.pathname !== "/";
   const openDestination = useCallback(
-    (destinationId: string, neutral = false, sequence?: string[]) => {
+    (destinationId: string, sequence?: string[]) => {
       const slug = destinationSlug(destinationId);
       if (location.pathname === `/${slug}`) return;
       const ordered = sequence ?? (isDestination ? location.state.hubSequence : undefined);
@@ -29,7 +28,6 @@ export function useDestinationNavigation() {
         params: { destinationId: slug },
         state: {
           hubCard: true,
-          hubCardNeutral: neutral,
           ...(homeIndex !== undefined ? { hubHomeIndex: homeIndex } : {}),
           ...(isDestination ? { hubPreviousCard: location.pathname.slice(1) } : {}),
           ...(ordered ? { hubSequence: ordered } : {}),
@@ -54,7 +52,6 @@ export function useDestinationNavigation() {
     openPreviousDestination,
     previousCard: location.state.hubPreviousCard,
     isDestination,
-    neutral: location.state.hubCardNeutral ?? false,
     sequence: location.state.hubSequence,
   };
 }

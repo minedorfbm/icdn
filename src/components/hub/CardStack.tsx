@@ -119,14 +119,13 @@ export function CardStack({
             i === index
               ? openDestination(
                   dest.id,
-                  layout === "discovery",
                   items.map((item) => item.id),
                 )
               : onIndexChange(i)
           }
         />
       )),
-    [items, index, near, onIndexChange, openDestination, layout],
+    [items, index, near, onIndexChange, openDestination],
   );
 
   if (items.length === 0) return null;
@@ -254,7 +253,6 @@ export function CardStack({
                     ?.focus({ preventScroll: true });
                   openDestination(
                     dest.id,
-                    layout === "discovery",
                     items.map((item) => item.id),
                   );
                 } else onIndexChange(i);

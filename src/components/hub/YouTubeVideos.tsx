@@ -60,30 +60,13 @@ function YouTubeVideo({
   );
 }
 
-export function YouTubeVideos({
-  videos,
-  embedded = false,
-}: Readonly<{ videos: DestinationVideo[]; embedded?: boolean }>) {
-  const { t } = useI18n();
+export function YouTubeVideos({ videos }: Readonly<{ videos: DestinationVideo[] }>) {
   if (videos.length === 0) return null;
-
   return (
-    <section
-      className={embedded ? undefined : "mt-12"}
-      aria-label={embedded ? undefined : t("videos")}
-    >
-      {!embedded && <h3 className="text-[9px] tracking-[0.42em] opacity-50">{t("videos")}</h3>}
-      <div
-        className={`${embedded ? "editorial-media-track" : "-mx-7 mt-5 px-7"} flex snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden`}
-      >
-        {videos.map((video) => (
-          <YouTubeVideo
-            key={video.video_id}
-            video={video}
-            showTitle={!embedded || videos.length > 1}
-          />
-        ))}
-      </div>
-    </section>
+    <div className="editorial-media-track flex snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {videos.map((video) => (
+        <YouTubeVideo key={video.video_id} video={video} showTitle={videos.length > 1} />
+      ))}
+    </div>
   );
 }

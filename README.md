@@ -22,6 +22,7 @@ Le site ne demande ni compte utilisateur ni clé secrète pour lire le contenu. 
 
 ```sh
 bun run security:audit
+bun run migrations:check
 bun run i18n:check
 bun run images:check
 bun run test
@@ -34,6 +35,8 @@ bun run deploy:check
 ```
 
 Le workflow [Validate hub](.github/workflows/ci.yml) exécute ces contrôles sur les pull requests et `main`. `bun run preview:cloudflare` permet ensuite de tester le Worker construit en local. Les gestes tactiles et le rendu responsive doivent aussi être vérifiés dans un navigateur et sur téléphone.
+
+Le dernier [audit du code et de la sécurité](docs/audits/code-security-2026-10-14.md) détaille les corrections, les vérifications et la dette de synchronisation Supabase restante.
 
 ## Modifier le contenu
 
@@ -51,7 +54,7 @@ Pour modifier une card, mettre à jour sa ligne dans `destinations`. Les actions
 
 Les quatre niveaux partagent trois collections : **DINING · WELLNESS · EXPERIENCES**. Seules les collections contenant des cards publiées sont affichées. Leur ordre vient de `levels.clusters`, l’appartenance de chaque card de `destinations.cluster`. Une card sans collection reste accessible dans « More » ; l’index « All places » permet d’ouvrir directement chaque lieu. Voir [la gestion des collections](docs/database.md#collections-et-navigation).
 
-La recherche globale, à côté des langues, présente les collections Dining, Wellness et Experiences. Elle indexe uniquement les cards actives déjà chargées depuis Supabase : noms, descriptions traduites et sources, types, niveaux et événements. Les mots saisis sont combinés, les accents ignorés et les petites erreurs sur les noms tolérées ; les correspondances exactes de nom passent en premier. Les filtres reprennent `destinations.cluster`. Ouvrir une fiche conserve la recherche et son défilement au retour. Aucun index externe ni migration SQL n’est nécessaire.
+La recherche globale, à côté des langues, propose Dining, Wellness, Experiences et Accommodation. Elle indexe uniquement les cards actives déjà chargées depuis Supabase : noms, descriptions traduites et sources, types, niveaux et événements. Les mots saisis sont combinés, les accents ignorés et les petites erreurs sur les noms tolérées ; les correspondances exactes de nom passent en premier. Le filtre Accommodation utilise le type hébergement ; les autres reprennent `destinations.cluster`. Ouvrir une fiche conserve la recherche et son défilement au retour. Aucun index externe ni migration SQL n’est nécessaire.
 
 Chaque card active dispose d’une adresse directe basée sur son `destinations.id` : `/tingara`, `/citron`, `/la-maison-1888`, `/mi-sol-spa`, etc. L’ouverture depuis Journey, Surprise me ou l’atlas met à jour l’adresse ; Retour restaure le contexte de navigation. Un lien ouvert directement ou rechargé affiche la fiche correspondante avec ses données Supabase et les traductions du hub. Les identifiants doivent rester stables pour préserver les liens et QR codes. Une adresse inconnue ou une card dépubliée renvoie une page 404 ; aucune migration de base n’est nécessaire.
 
@@ -61,7 +64,7 @@ La liste des destinations intégrables est centralisée dans `src/lib/resort-bro
 
 Le fil Nam Tram reste compact à droite : quatre points et une cabine indiquent la progression. Un toucher ouvre le sélecteur des quatre niveaux. Une zone dédiée évite le chevauchement avec les collections ; la taille des cards reste inchangée.
 
-Les vidéos YouTube des fiches agrandies viennent de `destination_videos`. La première vidéo est associée à Mi Sol Spa ; toute nouvelle ligne est inactive par défaut. Voir [la procédure de publication](docs/database.md#vidéos-youtube) avant d'activer une autre vidéo.
+Les vidéos YouTube des fiches agrandies viennent de `destination_videos`. Les vidéos classiques et Shorts publiés sont affichés dans l’ordre défini par la base ; toute nouvelle ligne est inactive par défaut. Voir [la procédure de publication](docs/database.md#vidéos-youtube) avant d'activer une autre vidéo.
 
 La [procédure de maintenance de la base](docs/database.md) décrit les protections de publication. Les boutons utilisent uniquement `destination_links`. La migration historique `20260924120000_retire_legacy_action_columns.sql` retire les anciennes colonnes d’URL ; ne pas la rejouer sans vérifier l’état de la base.
 
@@ -69,7 +72,7 @@ Les photos des cards, niveaux et galeries sont référencées par URL publique S
 
 Le cache Cloudflare conserve séparément les réglages de l’accueil, le catalogue et les médias de chaque card pendant au maximum deux minutes à partir du début de leur lecture. Une seule implémentation applique cette expiration stricte à chaque clé. À expiration, aucune ancienne réponse n’est réutilisée en cas de panne. Une collection secondaire indisponible est omise ; les collections lues avec succès restent applicables, y compris une liste vide ou une dépublication. Si les destinations ou les niveaux sont indisponibles, l’accueil reste visible et propose de réessayer le chargement du catalogue. Aucun catalogue local ne peut réintroduire une card. Un onglet déjà ouvert doit être rechargé pour garantir une nouvelle lecture.
 
-La page d’accueil attend seulement `site_settings` (une lecture hors cache), puis charge le catalogue en arrière-plan après son affichage. Celui-ci comprend dix collections nécessaires aux cards, à la recherche, aux traductions et aux correspondances avec la map. Les galeries photo, posts Instagram et vidéos sont lus uniquement pour la card ouverte, après vérification que le lieu est actif. Les liens directs vers une card conservent leur rendu et leurs métadonnées côté serveur. La map interactive et le lecteur PDF restent chargés à la demande. Les images des niveaux éloignés n’ont pas encore de `src` ; les deux images voisines du swipe sont préparées à basse priorité.
+La page d’accueil attend seulement `site_settings` (une lecture hors cache), puis charge le catalogue en arrière-plan après son affichage. Celui-ci comprend onze collections nécessaires aux cards, à la recherche, aux traductions et aux correspondances avec la map. Les galeries photo, posts Instagram et vidéos sont lus uniquement pour la card ouverte, après vérification que le lieu est actif. Les liens directs vers une card conservent leur rendu et leurs métadonnées côté serveur. La map interactive et le lecteur PDF restent chargés à la demande. Les images des niveaux éloignés n’ont pas encore de `src` ; les deux images voisines du swipe sont préparées à basse priorité.
 
 Les tests mobiles ralentissent volontairement le catalogue de 3,5 secondes : ils vérifient que le hero est déjà visible et que le sélecteur de langue fonctionne, puis testent la reprise après une panne du catalogue et des médias. Les lectures Supabase ont une limite de huit secondes et ne cumulent plus les tentatives automatiques du SDK ; le visiteur peut relancer la lecture. Ces mesures locales ne constituent pas une garantie de temps de chargement en production.
 
@@ -116,8 +119,8 @@ small controls readable; sand is used for backgrounds and borders.
 
 This theme covers the welcome/discovery interface, map controls, Surprise me,
 language menu, concierge button, footer and embedded browser/PDF chrome.
-Destination details opened from the map or Surprise me use the neutral theme;
-those opened in the Journey retain their level's palette. The four Journey
+All expanded destination cards use the shared template and their level's palette,
+whether opened from Journey, search, Surprise me or the map. The four Journey
 worlds, Nam Tram and illustrated map artwork keep their colors and visual identity.
 All hub typography, including the Journey and its cards, uses the shared brand font stacks.
 The footer social URLs are configured by `site_settings.youtube`, `site_settings.x`,

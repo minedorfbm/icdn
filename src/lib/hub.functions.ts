@@ -22,7 +22,7 @@ import {
   settingRow,
   type HubData,
 } from "./hub-schema";
-export type { HubData, LevelRow } from "./hub-schema";
+export type { HubData } from "./hub-schema";
 
 // Only settings block the homepage; its catalogue loads after the hero is displayed.
 export const getHubSettings = createServerFn({ method: "GET" }).handler(() =>
@@ -44,7 +44,7 @@ export const getHubData = createServerFn({ method: "GET" }).handler(async () => 
   return data;
 });
 
-export async function readHubData(): Promise<HubData> {
+async function readHubData(): Promise<HubData> {
   const read = publicReader();
   const [
     levels,

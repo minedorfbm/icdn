@@ -1,21 +1,11 @@
 import type { Lang } from "@/i18n/dictionary";
 import { localizedLinkUrl } from "./localized-links";
 import { type Destination } from "@/data/resort";
-
-const ALLOWED_LINK_PROTOCOLS = new Set(["https:", "mailto:", "tel:"]);
-
-export function safeExternalUrl(value: string | undefined): string | undefined {
-  if (!value) return undefined;
-  try {
-    return ALLOWED_LINK_PROTOCOLS.has(new URL(value).protocol) ? value : undefined;
-  } catch {
-    return undefined;
-  }
-}
+import { instagramLink, safeExternalUrl } from "./external-url";
 
 /** Only current, published database links can produce actions. */
 export function instagramUrl(dest: Destination) {
-  return safeExternalUrl(dest.links?.find((link) => link.kind === "INSTAGRAM")?.url);
+  return instagramLink(dest.links?.find((link) => link.kind === "INSTAGRAM")?.url);
 }
 
 export interface DestinationAction {

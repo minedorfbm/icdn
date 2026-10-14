@@ -1,5 +1,8 @@
 # Base Supabase : cohérence et publication
 
+> État de maintenance au 14 octobre 2026 : les procédures de septembre ci-dessous sont historiques, pas une liste de scripts à rejouer. Le journal de production contient 41 versions et s’arrête au 30 septembre ; 17 fichiers plus récents ont des effets déjà présents en base sans journal complet. Voir l’[audit code et sécurité](audits/code-security-2026-10-14.md) avant toute synchronisation. `bun run migrations:check` contrôle les noms et doublons locaux ; il ne certifie pas la synchronisation de la base.
+
+
 ## Collections et navigation
 
 Le hub utilise trois collections communes aux quatre niveaux : **DINING**, **WELLNESS** et **EXPERIENCES**, dans cet ordre. Les collections vides ne sont pas affichées. La migration [`20260925180000_three_collections.sql`](../supabase/migrations/20260925180000_three_collections.sql) remplace les anciens regroupements, y compris pour les fiches inactives, et dépublie Reception Lobby et Information Desk sans supprimer leurs contenus.

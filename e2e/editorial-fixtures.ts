@@ -1,5 +1,5 @@
 // Mixed legacy/current API rows verify every destination receives the shared model.
-export const editorialDestinations = [
+const editorialDestinations = [
   ["pilot-citron", "Heaven dining preview", "heaven", "restaurant", "d-citron"],
   ["la-maison-1888", "La Maison 1888", "sky", "restaurant", "d-french-dining"],
   ["long-bar", "L_O_N_G Bar", "earth", "bar", "d-bar"],

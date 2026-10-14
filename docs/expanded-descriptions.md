@@ -7,7 +7,7 @@
 - `destination_translations.description` et `source_description` concernent l’accroche.
 - `destination_translations.detail_description` et `source_detail_description` concernent la fiche agrandie, avec les mêmes identifiant, langue et statut de publication.
 
-La migration `20261006170000_expanded_card_descriptions.sql` a été appliquée en production le 6 octobre 2026 : 73 fiches publiques, 365 traductions longues (VI, RU, ZH, KO, JA). Elle est transactionnelle, ne supprime aucune card et ne modifie aucun droit. Ne pas rejouer les migrations historiques sur cette base.
+La migration `20261006170001_expanded_card_descriptions.sql` a été appliquée en production le 6 octobre 2026 : 73 fiches publiques, 365 traductions longues (VI, RU, ZH, KO, JA). Elle est transactionnelle, ne supprime aucune card et ne modifie aucun droit. Ne pas rejouer les migrations historiques sur cette base.
 
 Les paragraphes anglais comportent environ 30 à 40 mots. L’objectif est environ quatre lignes sur mobile ; le nombre réel dépend de la largeur et de la langue. Le texte reste intégral, sans limite de lignes ni points de suspension. Il utilise une taille de 16 px et un interligne de 1,65.
 
@@ -30,3 +30,5 @@ Les descriptions sont originales, basées sur les pages officielles vérifiées 
 Les informations temporaires de La Maison 1888 et Buffalo Bar sont séparées des descriptions dans [les actualités des destinations](destination-notices.md). Cela ne change pas les positions permanentes de la carte. Revoir les dates de l’offre Enchanted Holiday à son expiration.
 
 Pour B Lounge, Nursery, Spirit House et Relaxation Pavilion, aucune page officielle dédiée suffisamment détaillée n’a été trouvée : les textes restent prudents, fondés sur le catalogue, et invitent à confirmer les modalités avec l’équipe. Ils n’inventent pas d’horaires, de prestations garanties ou de capacités.
+
+Le fichier a été renuméroté le 14 octobre 2026 de `20261006170000` à `20261006170001` pour éviter une collision avec les réglages concierge. Aucune de ces deux versions n’était enregistrée dans le journal de production au moment de l’audit. Le SQL et les contenus restent identiques ; ce renommage ne justifie pas leur réexécution.

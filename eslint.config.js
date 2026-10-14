@@ -44,9 +44,9 @@ export default tseslint.config(
   },
   eslintPluginPrettier,
   {
-    files: ["src/integrations/supabase/**/*.ts", "src/routeTree.gen.ts"],
+    files: ["src/routeTree.gen.ts"],
     rules: {
-      // Generated files are re-created by Supabase/Lovable tooling.
+      // Generated route definitions are re-created by TanStack tooling.
       "prettier/prettier": "off",
       "prefer-const": "warn",
       "@typescript-eslint/no-unused-vars": "off",

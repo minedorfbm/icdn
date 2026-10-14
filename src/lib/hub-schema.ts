@@ -4,8 +4,8 @@ import { z } from "zod";
 const text = z.string();
 const optionalText = text.nullable();
 const order = z.number().int();
-export const levelId = z.enum(["heaven", "sky", "earth", "sea"]);
-export const destinationType = z.enum([
+const levelId = z.enum(["heaven", "sky", "earth", "sea"]);
+const destinationType = z.enum([
   "restaurant",
   "bar",
   "spa",
@@ -188,7 +188,6 @@ export const hubDataSchema = z.object({
     .optional(),
 });
 export type HubData = z.infer<typeof hubDataSchema>;
-export type LevelRow = z.infer<typeof levelRow>;
 
 /** A malformed collection is unavailable, never silently truncated or partially published. */
 export function readRows<T>(

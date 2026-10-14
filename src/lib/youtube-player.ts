@@ -2,7 +2,7 @@ export interface YouTubePlayer {
   destroy(): void;
 }
 
-export type YouTubeOptions = {
+type YouTubeOptions = {
   host: string;
   videoId: string;
   width: string;

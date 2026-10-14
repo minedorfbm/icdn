@@ -1,22 +1,12 @@
 import { ArrowUpRight, MessageCircle, Phone } from "lucide-react";
+import { httpsUrl } from "@/lib/external-url";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 /** Messaging accounts are configured separately from the resort's telephone line. */
 function messagingUrl(value: string | undefined, hosts: readonly string[]) {
-  if (!value) return undefined;
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" &&
-      !url.username &&
-      !url.password &&
-      hosts.includes(url.hostname)
-      ? url.href
-      : undefined;
-  } catch {
-    return undefined;
-  }
+  return httpsUrl(value, hosts)?.href;
 }
 
 export function ConciergeContact({

@@ -62,7 +62,7 @@ export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }
               <ResortMap
                 request={request}
                 onClose={close}
-                onDestination={(id) => openDestination(id, true)}
+                onDestination={(id) => openDestination(id)}
               />
             </Suspense>
           </MapBoundary>

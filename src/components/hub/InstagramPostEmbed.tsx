@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Instagram } from "lucide-react";
 import type { DestinationPost } from "@/data/resort";
 import { useI18n } from "@/i18n";
+import { instagramEmbedUrl, instagramLink } from "@/lib/external-url";
 import "./instagram-post.css";
 
 const SCRIPT_SRC = "https://www.instagram.com/embed.js";
@@ -72,27 +73,14 @@ function processEmbeds(): Promise<void> {
   return processing;
 }
 
-/**
- * Renders the official Instagram embed, optionally showing a screen-sized
- * preview of its native caption. If the embed does not render — offline preview, private post,
- * blocked script — a matching in-house post card is shown instead.
- */
-export function InstagramPostEmbed({
-  post,
-  bare = false,
-  fitToScreen = false,
-}: {
-  post: DestinationPost;
-  /** Hides the section wrapper/label so a carousel can own the heading. */
-  bare?: boolean;
-  /** Opt-in sizing pilot; other destinations keep their existing embed layout. */
-  fitToScreen?: boolean;
-}) {
+/** Official embed with the shared caption preview and an offline fallback. */
+export function InstagramPostEmbed({ post }: { post: DestinationPost }) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
   const bounds = useRef<HTMLDivElement>(null);
   // Only single posts/reels can be embedded; account links show the post card.
-  const embeddable = /instagram\.com\/(p|reel|reels)\//.test(post.post_url);
+  const permalink = instagramEmbedUrl(post.post_url);
+  const embeddable = !!permalink;
   const [failed, setFailed] = useState(!embeddable);
   const [ready, setReady] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -122,26 +110,25 @@ export function InstagramPostEmbed({
       // Measure before the transform: measuring the painted rectangle would
       // repeatedly shrink an already scaled iframe after each resize message.
       if (!frame || frame.offsetHeight < 100) return;
-      if (fitToScreen) {
-        if (!bounds.current) return;
-        const limit = bounds.current.getBoundingClientRect();
-        if (!frame.offsetWidth || !limit.width || !limit.height) return;
-        const previewHeight = Math.min(frame.offsetHeight, CAPTION_PREVIEW_HEIGHT);
-        const scale = Math.min(1, limit.width / frame.offsetWidth, limit.height / previewHeight);
-        const nextFit = {
-          width: frame.offsetWidth * scale,
-          height: previewHeight * scale,
-          scale,
-          clipped: frame.offsetHeight > previewHeight,
-        };
-        setFit((previous) =>
-          previous.width === nextFit.width &&
-          previous.height === nextFit.height &&
-          previous.clipped === nextFit.clipped
-            ? previous
-            : nextFit,
-        );
-      }
+      if (!bounds.current) return;
+      const limit = bounds.current.getBoundingClientRect();
+      if (!frame.offsetWidth || !limit.width || !limit.height) return;
+      const previewHeight = Math.min(frame.offsetHeight, CAPTION_PREVIEW_HEIGHT);
+      const scale = Math.min(1, limit.width / frame.offsetWidth, limit.height / previewHeight);
+      const nextFit = {
+        width: frame.offsetWidth * scale,
+        height: previewHeight * scale,
+        scale,
+        clipped: frame.offsetHeight > previewHeight,
+      };
+      setFit((previous) =>
+        previous.width === nextFit.width &&
+        previous.height === nextFit.height &&
+        previous.scale === nextFit.scale &&
+        previous.clipped === nextFit.clipped
+          ? previous
+          : nextFit,
+      );
       displayed = true;
       if (timer) clearTimeout(timer);
       setReady(true);
@@ -189,44 +176,37 @@ export function InstagramPostEmbed({
       sizes.disconnect();
       if (timer) clearTimeout(timer);
     };
-  }, [post.post_url, embeddable, attempt, fitToScreen]);
+  }, [post.post_url, embeddable, attempt]);
 
   const handle = post.account ? `@${post.account.replace(/^@/, "")}` : null;
 
-  const body = (
+  return (
     <div
       ref={host}
-      data-fit-to-screen={fitToScreen || undefined}
-      className={`instagram-post ${bare ? "" : "mt-5"}`}
-      style={fitToScreen && ready && !failed ? { width: fit.width } : undefined}
+      data-fit-to-screen
+      className="instagram-post"
+      style={ready && !failed ? { width: fit.width } : undefined}
     >
-      {fitToScreen && <div ref={bounds} className="instagram-post-bounds" aria-hidden />}
+      <div ref={bounds} className="instagram-post-bounds" aria-hidden />
       {embeddable && (
         <div
-          data-caption-preview={(fitToScreen && ready && fit.clipped) || undefined}
+          data-caption-preview={(ready && fit.clipped) || undefined}
           className={`instagram-post-viewport overflow-hidden rounded-[18px] bg-white transition-opacity [&_blockquote]:invisible ${
             ready ? "opacity-100" : "opacity-0"
           }`}
           style={
-            ready
-              ? fitToScreen
-                ? { width: fit.width, height: fit.height }
-                : undefined
-              : { height: 1, pointerEvents: "none" }
+            ready ? { width: fit.width, height: fit.height } : { height: 1, pointerEvents: "none" }
           }
         >
-          <div
-            className="instagram-post-content"
-            style={fitToScreen ? { transform: `scale(${fit.scale})` } : undefined}
-          >
+          <div className="instagram-post-content" style={{ transform: `scale(${fit.scale})` }}>
             <blockquote
               className="instagram-media"
-              data-instgrm-permalink={post.post_url}
+              data-instgrm-permalink={permalink}
               data-instgrm-version="14"
               data-instgrm-captioned=""
               style={{ margin: 0, width: "100%", minWidth: "unset" }}
             >
-              <a href={post.post_url} target="_blank" rel="noreferrer">
+              <a href={permalink} target="_blank" rel="noreferrer">
                 {post.post_url}
               </a>
             </blockquote>
@@ -251,21 +231,9 @@ export function InstagramPostEmbed({
       {!failed && !ready && <PostSkeleton />}
     </div>
   );
-
-  if (bare) return body;
-
-  return (
-    <section className="mt-12">
-      <p className="text-[9px] tracking-[0.38em] opacity-45">
-        {t("latest_post")}
-        {handle && <span className="ml-2 opacity-80">· {handle}</span>}
-      </p>
-      {body}
-    </section>
-  );
 }
 
-/** In-house replica of an Instagram post, used when the embed cannot render. */
+/** Published preview and safe Instagram link when the embed cannot render. */
 function PostCard({ post, handle }: { post: DestinationPost; handle: string | null }) {
   const { t } = useI18n();
   return (
@@ -292,7 +260,7 @@ function PostCard({ post, handle }: { post: DestinationPost; handle: string | nu
         </p>
       )}
       <a
-        href={post.post_url}
+        href={instagramLink(post.post_url)}
         target="_blank"
         rel="noreferrer"
         className="flex items-center justify-between px-4 pb-4 pt-3 text-[10px] tracking-[0.3em] opacity-70 transition-opacity hover:opacity-100"
