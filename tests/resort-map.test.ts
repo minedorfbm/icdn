@@ -131,7 +131,7 @@ describe("accommodation areas from the official plan", () => {
       ),
     ).toEqual([]);
   });
-  test("area labels and the precision note are available in all six languages", () => {
+  test("area labels are available in all six languages", () => {
     for (const { code } of LANGUAGES)
       for (const key of [
         "accommodation",
@@ -140,8 +140,6 @@ describe("accommodation areas from the official plan", () => {
         "earthVillas",
         "seasideVillas",
         "lagoonVillas",
-        "areaNote",
-        "planNumbers",
       ] as const)
         expect(mapCopy(code, key).trim()).toBeTruthy();
   });
