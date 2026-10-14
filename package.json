@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "bun test tests",
+    "test:coverage": "bun test tests --coverage --coverage-reporter=text --coverage-reporter=lcov && bun scripts/report-coverage.ts",
     "typecheck": "tsc --noEmit",
     "preview:cloudflare": "wrangler dev --config .output/server/wrangler.json",
     "deploy": "wrangler deploy --config .output/server/wrangler.json",
