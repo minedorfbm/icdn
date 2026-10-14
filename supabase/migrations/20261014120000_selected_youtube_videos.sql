@@ -315,6 +315,11 @@ BEGIN
   END IF;
   IF r ? 'replace_id' THEN
    SELECT * INTO actual FROM public.destination_videos WHERE id=(r->>'replace_id')::uuid FOR UPDATE;
+   IF NOT FOUND THEN
+    SELECT * INTO STRICT actual FROM public.destination_videos
+    WHERE destination_id=r->>'destination_id' AND video_url IN (r->>'replace_url',r->>'video_url')
+    FOR UPDATE;
+   END IF;
    IF NOT FOUND OR actual.destination_id IS DISTINCT FROM r->>'destination_id' OR actual.video_url NOT IN (r->>'replace_url',r->>'video_url') THEN
     RAISE EXCEPTION 'La Maison video changed since selection';
    END IF;

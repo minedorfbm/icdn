@@ -11,7 +11,9 @@ UPDATE public.levels SET clusters = ARRAY['DINE', 'DISCOVER']
 WHERE id = 'sky';
 
 -- PLAY remains temporarily while existing Earth destinations are reassigned.
-UPDATE public.levels SET clusters = ARRAY['EAT', 'MOVE', 'FAMILY', 'DISCOVER', 'PLAY']
+-- Yoga Pavilion is still on Earth in the original seed; permit its WELLNESS
+-- assignment here so a fresh replay does not depend on a later editorial move.
+UPDATE public.levels SET clusters = ARRAY['EAT', 'MOVE', 'FAMILY', 'DISCOVER', 'PLAY', 'WELLNESS']
 WHERE id = 'earth';
 
 UPDATE public.levels SET clusters = ARRAY['WELLNESS', 'BEACH', 'DISCOVER']
@@ -67,7 +69,7 @@ WHERE d.id = collection.id AND d.cluster IS DISTINCT FROM collection.cluster;
 
 -- Existing EAT/MOVE places keep their assignment. Retain PLAY only if an
 -- editor has added an unlisted destination to it since this migration was made.
-UPDATE public.levels SET clusters = ARRAY['EAT', 'MOVE', 'FAMILY', 'DISCOVER']
+UPDATE public.levels SET clusters = ARRAY['EAT', 'MOVE', 'FAMILY', 'DISCOVER', 'WELLNESS']
 WHERE id = 'earth'
   AND NOT EXISTS (
     SELECT 1 FROM public.destinations

@@ -114,8 +114,15 @@ BEGIN
     "reason": "Masquer le menu Lunch historique en attendant confirmation : la page actuelle ne publie que Dinner Menu et annonce uniquement le dîner du mardi au dimanche."
   }
 ]$changes$::jsonb) LOOP
-   SELECT destination_id, url, kind::text AS kind, label, active INTO actual
+   SELECT id, destination_id, url, kind::text AS kind, label, active INTO actual
    FROM public.destination_links WHERE id=(p->>'id')::uuid FOR UPDATE;
+   IF NOT FOUND THEN
+     SELECT l.id,l.destination_id,l.url,l.kind::text AS kind,l.label,l.active INTO STRICT actual
+     FROM public.destination_links l
+     WHERE l.destination_id=p->>'destination_id'
+       AND jsonb_build_object('url',l.url,'kind',l.kind,'label',l.label,'active',l.active) IN (p->'old',p->'new')
+     FOR UPDATE;
+   END IF;
    IF NOT FOUND OR actual.destination_id IS DISTINCT FROM p->>'destination_id' THEN
      RAISE EXCEPTION 'Menu link owner changed: %',p->>'id';
    END IF;
@@ -126,7 +133,7 @@ BEGIN
      UPDATE public.destination_links
      SET url=p->'new'->>'url', kind=(p->'new'->>'kind')::public.destination_link_type,
        label=p->'new'->>'label', active=(p->'new'->>'active')::boolean
-     WHERE id=(p->>'id')::uuid;
+     WHERE id=actual.id;
    END IF;
  END LOOP;
 END;
