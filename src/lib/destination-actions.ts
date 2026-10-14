@@ -20,6 +20,7 @@ export function instagramUrl(dest: Destination) {
 
 export interface DestinationAction {
   id?: string;
+  benefitsId?: string;
   kind: string;
   url: string;
   label?: string;
