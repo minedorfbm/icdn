@@ -60,9 +60,13 @@ La prochaine étape est une réconciliation sur sauvegarde/clone : comparer chaq
 
 Les protections d'encadrement, de base d'URL et d'objets sont bloquantes. La politique des ressources reste en mode rapport et n'a pas de collecte serveur. La rendre entièrement bloquante demande une validation des scripts Instagram/YouTube et des réservations réelles ; le faire sans cette étape pourrait supprimer des fonctionnalités. L'audit ne résout pas les limites d'Instagram, ses refus d'embed ou les ouvertures de son application.
 
-### Analyse SonarCloud — priorité moyenne
+### Analyse SonarCloud — revue complémentaire
 
-Le contrôle de `main` est marqué `cancelled` avec « analysis failed ». La cause du service externe n'est pas établie ici ; ce contrôle ne constitue donc pas une preuve de réussite de l'audit. Knip, TypeScript, ESLint, l'audit des paquets et les tests ont été exécutés indépendamment.
+Le contrôle de la révision de départ de `main` était marqué `cancelled` avec « analysis failed ». L'analyse de la PR 107 réussit ensuite son Quality Gate, avec zéro Security Hotspot. Les 11 remarques ont été consultées dans la session SonarQube connectée : elles concernent toutes la maintenabilité, pas une vulnérabilité détectée.
+
+Cinq corrections sont ajoutées : props Instagram en lecture seule, trois gardes TypeScript utilisant l'accès optionnel, et ordre SQL `ASC` explicite. Les six remarques restantes portent sur des littéraux SQL répétés : quatre dans les requêtes administratives indépendantes de l'audit et deux dans la migration historique des descriptions. Les premières rendent chaque requête lisible et exécutable séparément ; les secondes sont conservées pour garder le SQL historique identique. Aucun avertissement n'est masqué ni marqué résolu artificiellement.
+
+Le scanner affiche également un avertissement d'encodage. La relecture UTF-8 des fichiers texte suivis ne révèle aucun fichier invalide ; la cause précise demande les journaux du scanner et reste à confirmer.
 
 ### Maintenabilité — priorité basse
 
@@ -80,9 +84,20 @@ Les fichiers les plus longs concernent surtout l'illustration SVG et la géomét
 - Knip après nettoyage : **0 problème signalé**. Aucun nouveau paquet ajouté.
 - Contrôle des migrations : **59 fichiers, aucun identifiant en double**, nouvelle migration comprise.
 - SQL : test transactionnel de la restriction des droits, lectures anonymes et conservation des droits d'administration ; annulation ensuite. Aucun contenu modifié.
+- Après la revue SonarQube : les 125 tests unitaires, TypeScript, ESLint et le build passent à nouveau ; les cinq tests mobiles ciblés Instagram et swipe réussissent.
 
 ## Mise en production et retour arrière
 
 La PR regroupe le code, les tests, la documentation et la nouvelle migration. Elle n'est pas fusionnée automatiquement dans le cadre de cet audit. Pour la base existante, exécuter uniquement la migration de restriction des droits après sauvegarde des privilèges et vérifier avec `supabase/manual/audit-public-security.sql`. Ne pas lancer toute la chaîne historique.
 
 Un retour applicatif utilise un commit de revert normal. Le renommage SQL ne modifie pas les descriptions. Les changements de permissions sont indépendants du rendu et n'enlèvent ni contenus, ni traductions, ni liens.
+
+## Requêtes Cloudflare au repos
+
+Contrôle complémentaire sur le site de production le 14 octobre, dans deux navigateurs WebKit au format iPhone : accueil et La Maison avec les cinq embeds Instagram chargés. Après le chargement initial, chaque page reste sans interaction pendant 150 secondes, au-delà du TTL du cache. Aucune nouvelle requête vers le domaine du hub n'est observée. L'accueil ne déclenche aucune requête supplémentaire ; La Maison déclenche six requêtes supplémentaires directement vers Instagram et son CDN, dont quatre vers son endpoint `/ajax/bz`.
+
+Le code ne configure ni polling réseau, ni rafraîchissement de jeton Supabase, ni tâche cron. Le cache de 120 secondes expire passivement : seule une nouvelle demande charge à nouveau les données si nécessaire. La recherche travaille sur le catalogue déjà reçu. Les médias se chargent pour la card ouverte ; les appels des iframes Instagram vont au fournisseur. Ce constat ne mesure pas tous les accès au compte Cloudflare : visiteurs, robots et éventuels moniteurs configurés hors du dépôt nécessitent les statistiques du compte.
+
+## PR de contenus encore ouvertes
+
+Les PR 97 à 101 ajoutent uniquement des migrations de contenu, déjà appliquées en production selon leur historique. Une vérification indépendante de l'API publique confirme les 54 associations attendues : 20 vidéos pour la PR 97, 22 posts pour la 98, six posts pour la 99, trois posts pour la 100 et trois vidéos pour la 101. Toutes sont actives, uniques par association et conservent les métadonnées prévues. Leur état ouvert correspond donc à une absence de fusion dans Git, pas à une absence de publication de ces contenus. Leur fusion devra enregistrer ces scripts sans réimporter aveuglément les données ni rejouer la chaîne historique.

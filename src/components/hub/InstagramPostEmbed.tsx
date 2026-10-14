@@ -74,7 +74,7 @@ function processEmbeds(): Promise<void> {
 }
 
 /** Official embed with the shared caption preview and an offline fallback. */
-export function InstagramPostEmbed({ post }: { post: DestinationPost }) {
+export function InstagramPostEmbed({ post }: Readonly<{ post: DestinationPost }>) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
   const bounds = useRef<HTMLDivElement>(null);

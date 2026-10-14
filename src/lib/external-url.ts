@@ -5,7 +5,8 @@ function parseUrl(value: string | undefined): URL | undefined {
   // URL() silently removes control characters and treats backslashes as slashes.
   // Reject these ambiguous forms before inspecting the actual destination.
   // eslint-disable-next-line no-control-regex -- This guard deliberately rejects URL control characters.
-  if (!value || value.trim() !== value || /[\u0000-\u001f\u007f\\]/.test(value)) return undefined;
+  if (!value?.length || value.trim() !== value || /[\u0000-\u001f\u007f\\]/.test(value))
+    return undefined;
   try {
     const url = new URL(value);
     return url.username || url.password ? undefined : url;
@@ -23,7 +24,7 @@ export function safeExternalUrl(value: string | undefined): string | undefined {
 /** Exact hosts only for integrations; ordinary HTTPS links may use other hosts. */
 export function httpsUrl(value: string | undefined, hosts?: readonly string[]): URL | undefined {
   const url = parseUrl(value);
-  if (!url || url.protocol !== "https:") return undefined;
+  if (url?.protocol !== "https:") return undefined;
   if (hosts && (url.port || !hosts.includes(url.hostname))) return undefined;
   return url;
 }

@@ -31,4 +31,4 @@ SELECT role, has_schema_privilege(role, 'public', 'CREATE') AS can_create
 FROM (VALUES ('anon'), ('authenticated')) AS roles(role);
 
 -- Compare this ledger with Git; never fill missing versions just from filenames.
-SELECT version, name FROM supabase_migrations.schema_migrations ORDER BY version;
+SELECT version, name FROM supabase_migrations.schema_migrations ORDER BY version ASC;

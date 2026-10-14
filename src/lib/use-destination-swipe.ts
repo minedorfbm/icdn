@@ -45,7 +45,7 @@ function bindSwipe(node: HTMLElement, navigate: (direction: 1 | -1) => void) {
     const completed = gesture;
     cancel();
     const touch = event.changedTouches[0];
-    if (!completed?.horizontal || !touch || touch.identifier !== completed.id) return;
+    if (!completed?.horizontal || touch?.identifier !== completed.id) return;
     if (event.timeStamp - completed.time > 900 || window.getSelection()?.isCollapsed === false)
       return;
     const dx = touch.clientX - completed.x;
