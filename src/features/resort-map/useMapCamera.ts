@@ -11,31 +11,17 @@ import {
 import type { MapPoint } from "./map.types";
 import { MAP_SIZE } from "./map.geometry";
 
-const { width: MAP_WIDTH, height: MAP_HEIGHT } = MAP_SIZE;
-const MIN_SCALE = 1;
-const MAX_SCALE = 8;
-const HORIZONTAL_OVERSCAN = 460;
-const VERTICAL_OVERSCAN = 180;
-
-export type MapCamera = { x: number; y: number; scale: number };
-
-const clamp = (value: number, minimum: number, maximum: number) =>
-  Math.min(maximum, Math.max(minimum, value));
-
-type Viewport = { x: number; y: number; width: number; height: number };
-const clampCamera = ({ x, y, scale }: MapCamera, viewport: Viewport): MapCamera => ({
-  scale,
-  x: clamp(
-    x,
-    viewport.x - MAP_WIDTH * scale + viewport.width * 0.25 - HORIZONTAL_OVERSCAN,
-    viewport.x + viewport.width * 0.75 + HORIZONTAL_OVERSCAN,
-  ),
-  y: clamp(
-    y,
-    viewport.y - MAP_HEIGHT * scale + viewport.height * 0.2 - VERTICAL_OVERSCAN,
-    viewport.y + viewport.height * 0.65 + VERTICAL_OVERSCAN,
-  ),
-});
+import {
+  clamp,
+  constrainMapCamera,
+  fitMapCamera,
+  focusMapCamera,
+  overviewScale,
+  MAX_MAP_SCALE,
+  type MapCamera,
+  type MapViewport,
+} from "./map-camera";
+export type { MapCamera } from "./map-camera";
 
 const distance = (a: MapPoint, b: MapPoint) => Math.hypot(a.x - b.x, a.y - b.y);
 
@@ -60,44 +46,53 @@ export function useMapCamera() {
   const lastMidpoint = useRef<MapPoint | null>(null);
   const lastDistance = useRef<number | null>(null);
   const moved = useRef(false);
-  const viewport = useRef<Viewport>({ x: 0, y: 0, ...MAP_SIZE });
-  const initialView = useRef(true);
-  const onViewportChange = useCallback(
-    (next: Viewport) => {
-      const previous = viewport.current;
-      viewport.current = next;
-      if (initialView.current && typeof window !== "undefined" && window.innerWidth <= 600) {
-        // Start close enough to read the resort on a phone; the overview control
-        // still restores the full plan. This changes only the camera, not geography.
-        setCamera({
-          scale: 1.5,
-          x: next.x + next.width * 0.5 - 800 * 1.5,
-          y: next.y + next.height * 0.46 - 450 * 1.5,
-        });
-      }
-      if (!initialView.current) {
-        // Preserve the visible map center when rotating or resizing the viewport.
-        setCamera((current) =>
-          clampCamera(
-            {
-              ...current,
-              x: current.x + next.x + next.width / 2 - previous.x - previous.width / 2,
-              y: current.y + next.y + next.height * 0.34 - previous.y - previous.height * 0.34,
-            },
-            next,
-          ),
-        );
-      }
-      initialView.current = false;
-    },
-    [setCamera],
+  const viewport = useRef<MapViewport>({
+    x: 0,
+    y: 0,
+    ...MAP_SIZE,
+    frame: { x: 0, y: 0, ...MAP_SIZE },
+  });
+  const viewMode = useRef<"overview" | "focus" | "manual">("overview");
+  const focused = useRef<{ point: MapPoint; scale: number } | null>(null);
+  const onViewportChange = useCallback((next: MapViewport) => {
+    const previous = viewport.current;
+    viewport.current = next;
+    if (viewMode.current === "overview") setCamera(fitMapCamera(next));
+    else if (viewMode.current === "focus" && focused.current) {
+      setCamera(focusMapCamera(focused.current.point, focused.current.scale, next));
+    } else {
+      setCamera((current) =>
+        constrainMapCamera(
+          {
+            ...current,
+            x:
+              current.x +
+              next.frame.x +
+              next.frame.width / 2 -
+              previous.frame.x -
+              previous.frame.width / 2,
+            y:
+              current.y +
+              next.frame.y +
+              next.frame.height / 2 -
+              previous.frame.y -
+              previous.frame.height / 2,
+          },
+          next,
+        ),
+      );
+    }
+  }, []);
+  const constrain = useCallback(
+    (next: MapCamera) => constrainMapCamera(next, viewport.current),
+    [],
   );
-  const constrain = useCallback((next: MapCamera) => clampCamera(next, viewport.current), []);
 
   const zoomAt = useCallback(
     (nextScale: number, anchor: MapPoint) => {
+      viewMode.current = "manual";
       setCamera((current) => {
-        const scale = clamp(nextScale, MIN_SCALE, MAX_SCALE);
+        const scale = clamp(nextScale, overviewScale(viewport.current), MAX_MAP_SCALE);
         const ratio = scale / current.scale;
         return constrain({
           scale,
@@ -111,12 +106,13 @@ export function useMapCamera() {
 
   const zoomBy = useCallback(
     (amount: number) => {
+      viewMode.current = "manual";
       setCamera((current) => {
-        const scale = clamp(current.scale + amount, MIN_SCALE, MAX_SCALE);
+        const scale = clamp(current.scale + amount, overviewScale(viewport.current), MAX_MAP_SCALE);
         const ratio = scale / current.scale;
         const anchor = {
-          x: viewport.current.x + viewport.current.width * 0.5,
-          y: viewport.current.y + viewport.current.height * 0.34,
+          x: viewport.current.frame.x + viewport.current.frame.width / 2,
+          y: viewport.current.frame.y + viewport.current.frame.height / 2,
         };
         return constrain({
           scale,
@@ -129,37 +125,32 @@ export function useMapCamera() {
   );
 
   const fit = useCallback(() => {
-    setCamera({ x: 0, y: 0, scale: 1 });
-  }, [setCamera]);
+    viewMode.current = "overview";
+    setCamera(fitMapCamera(viewport.current));
+  }, []);
 
-  const focusOn = useCallback(
-    (point: MapPoint, scale = 1.8) => {
-      const compact = typeof window !== "undefined" && window.innerWidth <= 820;
-      const nextScale = clamp(scale * (compact ? 1.45 : 1), MIN_SCALE, MAX_SCALE);
-      // A requested place must not be replaced by the initial mobile overview.
-      initialView.current = false;
-      setCamera(
-        constrain({
-          scale: nextScale,
-          x:
-            viewport.current.x +
-            viewport.current.width * (compact ? 0.5 : 0.43) -
-            point.x * nextScale,
-          y:
-            viewport.current.y +
-            viewport.current.height * (compact ? 0.34 : 0.46) -
-            point.y * nextScale,
-        }),
-      );
-    },
-    [constrain, setCamera],
-  );
+  const focusOn = useCallback((point: MapPoint, scale = 1.8) => {
+    const compact = typeof window !== "undefined" && window.innerWidth <= 820;
+    const nextScale = clamp(
+      scale * (compact ? 1.45 : 1),
+      overviewScale(viewport.current),
+      MAX_MAP_SCALE,
+    );
+    viewMode.current = "focus";
+    focused.current = { point, scale: nextScale };
+    setCamera(focusMapCamera(point, nextScale, viewport.current));
+  }, []);
 
   const onWheel = useCallback(
     (event: ReactWheelEvent<SVGSVGElement>) => {
+      viewMode.current = "manual";
       const point = eventPoint(event.currentTarget, event.clientX, event.clientY);
       setCamera((current) => {
-        const scale = clamp(current.scale * Math.exp(-event.deltaY * 0.0014), MIN_SCALE, MAX_SCALE);
+        const scale = clamp(
+          current.scale * Math.exp(-event.deltaY * 0.0014),
+          overviewScale(viewport.current),
+          MAX_MAP_SCALE,
+        );
         const ratio = scale / current.scale;
         return constrain({
           scale,
@@ -193,6 +184,7 @@ export function useMapCamera() {
   const onPointerMove = useCallback(
     (event: ReactPointerEvent<SVGSVGElement>) => {
       if (!pointers.current.has(event.pointerId)) return;
+      viewMode.current = "manual";
       const point = eventPoint(event.currentTarget, event.clientX, event.clientY);
       pointers.current.set(event.pointerId, point);
       const active = [...pointers.current.values()];
@@ -225,8 +217,8 @@ export function useMapCamera() {
         setCamera((current) => {
           const scale = clamp(
             current.scale * (nextDistance / previousDistance),
-            MIN_SCALE,
-            MAX_SCALE,
+            overviewScale(viewport.current),
+            MAX_MAP_SCALE,
           );
           const ratio = scale / current.scale;
           return constrain({
@@ -272,6 +264,7 @@ export function useMapCamera() {
         fit();
       } else if (event.key.startsWith("Arrow")) {
         event.preventDefault();
+        viewMode.current = "manual";
         setCamera((current) =>
           constrain({
             ...current,

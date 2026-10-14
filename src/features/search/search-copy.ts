@@ -81,6 +81,14 @@ const copy = {
     "예술, 자연 & 액티비티",
     "アート・自然・アクティビティ",
   ],
+  accommodation: [
+    "Rooms, suites & villas",
+    "Phòng nghỉ, suite & biệt thự",
+    "Номера, люксы и виллы",
+    "客房、套房与别墅",
+    "객실, 스위트 & 빌라",
+    "客室・スイート・ヴィラ",
+  ],
 } satisfies Record<string, readonly [string, string, string, string, string, string]>;
 export const searchCopy = (lang: Lang, key: keyof typeof copy): string =>
   copy[key][languageIndex[lang]]!;

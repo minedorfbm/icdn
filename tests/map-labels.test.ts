@@ -35,3 +35,11 @@ test("unselected labels do not obscure another pin below them", () => {
     ).has("a"),
   ).toBe(false);
 });
+
+test("place labels leave room for Nam Tram station signs", () => {
+  expect(
+    visibleMapLabels([{ id: "a", x: 100, y: 100 }], null, 4, 1, [
+      { x: 50, y: 120, width: 100, height: 30 },
+    ]).size,
+  ).toBe(0);
+});

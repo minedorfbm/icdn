@@ -13,6 +13,9 @@ import { ArchitectureArtwork } from "./ArchitectureArtwork";
 import { bensleyTour } from "./map.data";
 import { useI18n } from "@/i18n";
 import { mapCopy } from "./map-copy";
+import { ResortLevelIcon } from "@/components/hub/ResortLevelIcon";
+import type { Level } from "@/data/resort";
+import { layoutTramLabels } from "./tram-labels";
 import { visibleMapLabels } from "./map-labels";
 import {
   MAP_SIZE,
@@ -33,6 +36,7 @@ import {
 } from "./map.geometry";
 import type { PlaceCategory, Place } from "./map.types";
 import type { MapCamera } from "./useMapCamera";
+import type { MapViewport } from "./map-camera";
 import { photoSpots, walkingTimes, type LegendLayers } from "./map.legend";
 
 const collectionIcons = {
@@ -57,7 +61,7 @@ type MapArtworkProps = {
   selectedPhotoId: string | null;
   layers: LegendLayers;
   onSelectPhoto: (id: string) => void;
-  onViewportChange: (viewport: ViewBox) => void;
+  onViewportChange: (viewport: MapViewport) => void;
   onSelectPlace: (id: string) => void;
   interactionProps: SVGProps<SVGSVGElement>;
 };
@@ -90,7 +94,7 @@ export function MapArtwork({
     const svg = svgRef.current;
     if (!svg) return;
     const update = () => {
-      const { width, height } = svg.getBoundingClientRect();
+      const { width, height, left, top } = svg.getBoundingClientRect();
       if (!width || !height) return;
       const ratio = width / height;
       const nextWidth = ratio > 1.5 ? MAP_SIZE.height * ratio : MAP_SIZE.width;
@@ -103,13 +107,36 @@ export function MapArtwork({
       };
       setViewBox(next);
       setPixelScale(nextWidth / width);
-      onViewportChange(next);
+      const unit = nextWidth / width;
+      const atlas = svg.closest(".hub-atlas");
+      const dock = atlas?.querySelector(".atlas-bottom")?.getBoundingClientRect();
+      const preview = atlas?.querySelector(".atlas-preview")?.getBoundingClientRect();
+      let right = width - 24;
+      let bottom = (dock ? dock.top - top : height) - 24;
+      if (preview) {
+        if (preview.left - left > width / 2) right = Math.min(right, preview.left - left - 24);
+        else bottom = Math.min(bottom, preview.top - top - 60);
+      }
+      // Frame the map in the space actually visible between its controls and sheet.
+      onViewportChange({
+        ...next,
+        frame: {
+          x: next.x + 24 * unit,
+          y: next.y + 24 * unit,
+          width: Math.max(80, right - 24) * unit,
+          height: Math.max(80, bottom - 24) * unit,
+        },
+      });
     };
     update();
     const observer = new ResizeObserver(update);
     observer.observe(svg);
+    svg
+      .closest(".hub-atlas")
+      ?.querySelectorAll(".atlas-bottom, .atlas-preview")
+      .forEach((element) => observer.observe(element));
     return () => observer.disconnect();
-  }, [onViewportChange]);
+  }, [onViewportChange, selectedId, mode, selectedPhotoId, lang]);
 
   const hotspotsRef = useRef<SVGGElement>(null);
   const interactivePlaces = useMemo(
@@ -122,6 +149,52 @@ export function MapArtwork({
           (mode !== "tour" || bensleyTour.some((stop) => stop.placeId === place.id)),
       ),
     [places, visibleIds, activeFilters, mode],
+  );
+  const screenScale = camera.scale / pixelScale;
+  const stationNames = stations.map((station) => ({
+    ...station,
+    name: levelLabel(station.label.toLowerCase()),
+  }));
+  const stationWidth = Math.max(
+    100,
+    ...stationNames.map((station) => station.name.length * 8 + 40),
+  );
+  const stationSigns = layoutTramLabels(
+    stationNames.map((station) => ({
+      ...station,
+      x: station.x * screenScale,
+      y: station.y * screenScale,
+    })),
+    stationWidth,
+    [
+      ...interactivePlaces.map((place) => ({
+        x: place.point.x * screenScale - 20,
+        y: place.point.y * screenScale - 20,
+        width: 40,
+        height: place.id === selectedId ? 72 : 40,
+      })),
+      ...interactivePlaces
+        .filter((place) => place.id === selectedId)
+        .map((place) => ({
+          x: place.point.x * screenScale - 96,
+          y: place.point.y * screenScale + 19,
+          width: 192,
+          height: 34,
+        })),
+      // Keep station signs away from the zoom toolbar.
+      {
+        x: (viewBox.x + viewBox.width - camera.x) / pixelScale - 70,
+        y: (viewBox.y - camera.y) / pixelScale,
+        width: 70,
+        height: 160,
+      },
+    ],
+    {
+      x: (viewBox.x - camera.x) / pixelScale,
+      y: (viewBox.y - camera.y) / pixelScale,
+      width: viewBox.width / pixelScale,
+      height: viewBox.height / pixelScale,
+    },
   );
   const labelIds = visibleMapLabels(
     interactivePlaces
@@ -138,7 +211,8 @@ export function MapArtwork({
       .map((place) => ({ id: place.id, ...place.point })),
     selectedId,
     camera.scale,
-    camera.scale / pixelScale,
+    screenScale,
+    stationSigns.map((sign) => sign.box),
   );
   const selectNearestPlace = (event: MouseEvent<SVGGElement>, fallback: Place) => {
     const matrix = hotspotsRef.current?.getScreenCTM();
@@ -462,12 +536,7 @@ export function MapArtwork({
             <g className="tram-station-v2" key={label} transform={`translate(${x} ${y})`}>
               <circle className="station-outer" r="7" />
               <circle className="station-inner" r="2.8" />
-              <g className="station-plaque" transform="translate(13 -4) scale(.8)">
-                <rect width="72" height="22" rx="11" />
-                <text x="10" y="14">
-                  {levelLabel(label.toLowerCase())}
-                </text>
-              </g>
+              <title>{levelLabel(label.toLowerCase())}</title>
             </g>
           ))}
           <g
@@ -528,7 +597,7 @@ export function MapArtwork({
                   transform={`translate(${place.point.x} ${place.point.y})`}
                   role="button"
                   tabIndex={photosVisible || dimmed ? -1 : 0}
-                  aria-label={`${place.accommodationGroup ? mapCopy(lang, place.accommodationGroup) : place.name} · ${(place.accommodationGroup ? place.coveredLevels : [place.level]).map(levelLabel).join(" / ")}`}
+                  aria-label={`${place.accommodationGroup ? mapCopy(lang, place.accommodationGroup) : place.name} · ${(place.accommodationGroup ? place.coveredLevels : [place.level]).map((level) => levelLabel(level)).join(" / ")}`}
                   aria-pressed={place.id === selectedId}
                   aria-disabled={dimmed}
                   onClick={(event) => {
@@ -571,6 +640,37 @@ export function MapArtwork({
                 </g>
               );
             })}
+        </g>
+
+        <g
+          className="tram-signs"
+          transform={`scale(${pixelScale / camera.scale})`}
+          pointerEvents="none"
+        >
+          {stationSigns.map(({ x, y, label, name, box }) => {
+            const edge = box.x > x ? box.x : box.x + box.width;
+            return (
+              <g key={label} className="tram-sign" aria-label={`Nam Tram · ${name}`}>
+                <path
+                  className="station-leader"
+                  d={`M${x} ${y}H${edge + (edge > x ? -8 : 8)}L${edge} ${box.y + 15}`}
+                />
+                <g className="station-plaque" transform={`translate(${box.x} ${box.y})`}>
+                  <rect width={box.width} height={box.height} rx="15" />
+                  <ResortLevelIcon
+                    level={label.toLowerCase() as Level}
+                    x={8}
+                    y={5}
+                    width={20}
+                    height={20}
+                  />
+                  <text x={36} y={19}>
+                    {name}
+                  </text>
+                </g>
+              </g>
+            );
+          })}
         </g>
 
         {photosVisible && (

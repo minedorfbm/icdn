@@ -48,7 +48,7 @@ export default function ResortMap({
   onDestination: (id: string) => void;
 }>) {
   const { mapPlaces, mapLinks, destinations } = useHub();
-  const { lang, t, cluster, levelLabel } = useI18n();
+  const { lang, t, cluster, levelLabel, typeLabel } = useI18n();
   const copy = useCallback((key: Parameters<typeof mapCopy>[1]) => mapCopy(lang, key), [lang]);
   const places = useMemo(
     () => liveMapPlaces(mapPlaces, mapLinks, destinations),
@@ -114,9 +114,9 @@ export default function ResortMap({
     if (id) select(id);
     else {
       setSelectedId(null);
-      focusOn({ x: 800, y: 450 }, 1.25);
+      fit();
     }
-  }, [request, select, focusOn, tourStops]);
+  }, [request, select, fit, tourStops]);
   const changeMode = (next: MapMode) => {
     setMode(next);
     setSelectedId(null);
@@ -324,7 +324,7 @@ export default function ResortMap({
                       fit();
                     }}
                   >
-                    {c === "accommodation" ? copy("accommodation") : cluster(c.toUpperCase())}
+                    {c === "accommodation" ? typeLabel("accommodation") : cluster(c.toUpperCase())}
                   </button>
                 ))}
               </div>
@@ -379,6 +379,11 @@ function MapPreview({
   const dragStart = useRef<number | null>(null);
   const dragged = useRef(false);
   const primary = destinations[0];
+  let previewKicker = primary ? levelLabel(primary.level) : mapCopy(lang, "landmark");
+  if (area) previewKicker = area.coveredLevels.map((level) => levelLabel(level)).join(" / ");
+  let numberLabel: "roomNumbers" | "penthouseNumbers" | "villaNumbers" = "villaNumbers";
+  if (area?.accommodationGroup === "rooms") numberLabel = "roomNumbers";
+  else if (area?.accommodationGroup === "penthouses") numberLabel = "penthouseNumbers";
   return (
     <section className="atlas-preview" data-expanded={expanded} aria-label={title}>
       <button
@@ -421,28 +426,13 @@ function MapPreview({
       <div className="atlas-preview-heading">
         {primary && <img src={primary.image} alt="" width={64} height={64} decoding="async" />}
         <div>
-          <p>
-            {kicker ??
-              (area
-                ? area.coveredLevels.map(levelLabel).join(" / ")
-                : primary
-                  ? levelLabel(primary.level)
-                  : mapCopy(lang, "landmark"))}
-          </p>
+          <p>{kicker ?? previewKicker}</p>
           <h3>{title}</h3>
         </div>
       </div>
       {area?.roomNumbers && (
         <p className="atlas-description">
-          {mapCopy(
-            lang,
-            area.accommodationGroup === "rooms"
-              ? "roomNumbers"
-              : area.accommodationGroup === "penthouses"
-                ? "penthouseNumbers"
-                : "villaNumbers",
-          )}
-          : {area.roomNumbers}
+          {mapCopy(lang, numberLabel)}: {area.roomNumbers}
         </p>
       )}
       {primary && !area && (

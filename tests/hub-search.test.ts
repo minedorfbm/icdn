@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { normalizeSearch, searchEntries } from "../src/features/search/search";
+import { normalizeSearch, searchCollection, searchEntries } from "../src/features/search/search";
 import { searchCopy } from "../src/features/search/search-copy";
 import { LANGUAGES } from "../src/i18n/dictionary";
 
@@ -177,6 +177,7 @@ test("search interface copy is available in every supported language", () => {
       "dining",
       "wellness",
       "experiences",
+      "accommodation",
       "moods",
       "relax",
       "romantic",
@@ -188,6 +189,25 @@ test("search interface copy is available in every supported language", () => {
       expect(searchCopy(code, key).length).toBeGreaterThan(0);
     }
   }
+});
+
+test("accommodation is a separate search collection regardless of its stored cluster", () => {
+  const destinations = [
+    { type: "accommodation", cluster: "EXPERIENCES", name: "Resort room" },
+    { type: "accommodation", cluster: null, name: "Beach villa" },
+    { type: "experience", cluster: "EXPERIENCES", name: "Design tour" },
+    { type: "restaurant", cluster: "DINING", name: "Citron" },
+  ].map((d) => ({ item: d.name, name: d.name, text: d.name, collection: searchCollection(d) }));
+  expect(searchEntries(destinations, "", "ACCOMMODATION").map((d) => d.item)).toEqual([
+    "Resort room",
+    "Beach villa",
+  ]);
+  expect(searchEntries(destinations, "", "EXPERIENCES").map((d) => d.item)).toEqual([
+    "Design tour",
+  ]);
+  expect(searchEntries(destinations, "Beach villa", "ACCOMMODATION").map((d) => d.item)).toEqual([
+    "Beach villa",
+  ]);
 });
 
 test("every translated mood suggestion is understood by the search vocabulary", () => {

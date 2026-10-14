@@ -1,12 +1,14 @@
 import type { Level } from "@/data/resort";
+import type { SVGProps } from "react";
 
 /** Resort signage redrawn from the supplied references; inherits the level palette. */
 export function ResortLevelIcon({
   level,
   className,
-}: Readonly<{ level: Level; className?: string }>) {
+  ...props
+}: Readonly<{ level: Level } & SVGProps<SVGSVGElement>>) {
   return (
-    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true" className={className}>
+    <svg {...props} viewBox="0 0 64 64" fill="none" aria-hidden="true" className={className}>
       {level === "heaven" && (
         <g stroke="currentColor" strokeWidth="3.4" strokeLinecap="round">
           <ellipse cx="32" cy="10.5" rx="15.5" ry="4.5" />

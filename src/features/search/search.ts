@@ -1,7 +1,11 @@
 import { SEARCH_FILLERS, SEARCH_INTENTS, type SearchIntent } from "./search-intents";
 
-export const SEARCH_COLLECTIONS = ["DINING", "WELLNESS", "EXPERIENCES"] as const;
+export const SEARCH_COLLECTIONS = ["DINING", "WELLNESS", "EXPERIENCES", "ACCOMMODATION"] as const;
 export type SearchCollection = (typeof SEARCH_COLLECTIONS)[number];
+
+// Accommodation has its own search category even when stored in the Experiences cluster.
+export const searchCollection = (destination: { type: string; cluster?: string | null }) =>
+  destination.type === "accommodation" ? "ACCOMMODATION" : (destination.cluster ?? "");
 
 export function normalizeSearch(value: string): string {
   return value
