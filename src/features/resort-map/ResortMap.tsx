@@ -402,7 +402,15 @@ function MapPreview({
       </div>
       {area?.roomNumbers && (
         <p className="atlas-description">
-          {mapCopy(lang, "planNumbers")}: {area.roomNumbers}
+          {mapCopy(
+            lang,
+            area.accommodationGroup === "rooms"
+              ? "roomNumbers"
+              : area.accommodationGroup === "penthouses"
+                ? "penthouseNumbers"
+                : "villaNumbers",
+          )}
+          : {area.roomNumbers}
         </p>
       )}
       {primary && !area && (
