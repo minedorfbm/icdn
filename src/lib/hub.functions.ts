@@ -99,7 +99,7 @@ const mediaSchema = z.object({
 });
 export type DestinationMediaData = z.infer<typeof mediaSchema>;
 export const getDestinationMedia = createServerFn({ method: "GET" })
-  .inputValidator(
+  .validator(
     z
       .string()
       .min(1)

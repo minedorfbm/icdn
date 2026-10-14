@@ -244,21 +244,18 @@ export function CardStack({
                   e.stopPropagation();
                 }
               }}
-              onClick={(e) => {
-                if (moved.current) return;
-                if ((e.target as HTMLElement).closest("a, button")) return;
-                if (active) {
-                  e.currentTarget
-                    .querySelector<HTMLButtonElement>("h3 button")
-                    ?.focus({ preventScroll: true });
-                  openDestination(
-                    dest.id,
-                    items.map((item) => item.id),
-                  );
-                } else onIndexChange(i);
-              }}
             >
               {panels[i]}
+              {!active && (
+                <button
+                  type="button"
+                  aria-label={dest.name}
+                  aria-hidden
+                  tabIndex={-1}
+                  className="absolute inset-0 rounded-[18px]"
+                  onClick={() => onIndexChange(i)}
+                />
+              )}
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0 rounded-[18px] bg-black"

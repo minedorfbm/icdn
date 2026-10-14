@@ -4,7 +4,7 @@ import type { HubData } from "@/lib/hub.functions";
 
 const HubContext = createContext<HubValue | null>(null);
 
-export function HubProvider({ data, children }: { data?: HubData; children: ReactNode }) {
+export function HubProvider({ data, children }: Readonly<{ data?: HubData; children: ReactNode }>) {
   const value = useMemo(() => createHubValue(data), [data]);
   return <HubContext.Provider value={value}>{children}</HubContext.Provider>;
 }

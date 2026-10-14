@@ -6,7 +6,7 @@ import { InstagramPostEmbed } from "./InstagramPostEmbed";
  * Horizontal, snap-scrolled carousel of up to 5 official Instagram post embeds.
  * A single post renders exactly like before (no dots, no scrolling).
  */
-export function InstagramPostCarousel({ posts }: { posts: DestinationPost[] }) {
+export function InstagramPostCarousel({ posts }: Readonly<{ posts: DestinationPost[] }>) {
   const items = posts.slice(0, 5);
   const track = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);

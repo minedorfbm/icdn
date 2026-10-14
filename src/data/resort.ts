@@ -164,7 +164,7 @@ export function youtubeVideoId(value: string): string | null {
     } else if (host === "youtube.com" || host === "www.youtube.com" || host === "m.youtube.com") {
       if (url.pathname === "/watch") id = url.searchParams.get("v");
       else {
-        const match = url.pathname.match(/^\/(?:shorts|live|embed)\/([^/]+)\/?$/);
+        const match = /^\/(?:shorts|live|embed)\/([^/]+)\/?$/.exec(url.pathname);
         id = match?.[1] ?? null;
       }
     }
@@ -179,7 +179,9 @@ export function groupVideos(rows: DestinationVideoRow[]): Record<string, Destina
   for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
     const video_id = youtubeVideoId(row.video_url);
     if (!video_id) continue;
-    (out[row.destination_id] ??= []).push({
+    const destinationId = row.destination_id;
+    out[destinationId] ??= [];
+    out[destinationId].push({
       video_id,
       format: new URL(row.video_url).pathname.startsWith("/shorts/") ? "short" : "video",
       title: row.title,
@@ -196,7 +198,9 @@ export function groupPosts(rows: DestinationPostRow[]): Record<string, Destinati
     const postUrl = instagramLink(row.post_url);
     if (!postUrl) continue;
     const image = row.image_url ? resolveImage(row.image_url) : "";
-    (out[row.destination_id] ??= []).push({
+    const destinationId = row.destination_id;
+    out[destinationId] ??= [];
+    out[destinationId].push({
       post_url: postUrl,
       ...(row.account ? { account: row.account } : {}),
       ...(row.caption ? { caption: row.caption } : {}),
@@ -310,7 +314,9 @@ export function groupPhotos(rows: DestinationPhotoRow[]): Record<string, Destina
   for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
     const image = resolveImage(row.image_url);
     if (!image) continue;
-    (out[row.destination_id] ??= []).push({
+    const destinationId = row.destination_id;
+    out[destinationId] ??= [];
+    out[destinationId].push({
       image,
       ...(row.caption ? { caption: row.caption } : {}),
       ...(row.post_url ? { post_url: row.post_url } : {}),
@@ -330,7 +336,9 @@ export function groupLinks(
   const out: Record<string, DestinationLink[]> = {};
   for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
     if (!row.url) continue;
-    (out[row.destination_id] ??= []).push({
+    const destinationId = row.destination_id;
+    out[destinationId] ??= [];
+    out[destinationId].push({
       ...(row.id ? { id: row.id } : {}),
       kind: row.kind,
       url: row.url,
@@ -349,7 +357,9 @@ export function groupLinks(
 export function groupEvents(rows: DestinationEventRow[]): Record<string, DestinationEvent[]> {
   const out: Record<string, DestinationEvent[]> = {};
   for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
-    (out[row.destination_id] ??= []).push({
+    const destinationId = row.destination_id;
+    out[destinationId] ??= [];
+    out[destinationId].push({
       ...(row.id ? { id: row.id } : {}),
       title: row.title,
       schedule: row.schedule ?? [],

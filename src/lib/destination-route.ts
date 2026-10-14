@@ -8,11 +8,8 @@ export function findPublicDestination<T extends { id: string; active: boolean }>
   destinations: readonly T[],
   id: string,
 ): T | undefined {
-  const destinationId =
-    id === "summit-auditorium"
-      ? "summit-cinema"
-      : id === "nature-discovery-guide"
-        ? "nature-experiences"
-        : id;
+  let destinationId = id;
+  if (id === "summit-auditorium") destinationId = "summit-cinema";
+  else if (id === "nature-discovery-guide") destinationId = "nature-experiences";
   return destinations.find((destination) => destination.active && destination.id === destinationId);
 }

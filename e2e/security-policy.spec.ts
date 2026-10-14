@@ -1,4 +1,35 @@
 import { expect, test } from "@playwright/test";
+import { execFileSync } from "node:child_process";
+import { resolve } from "node:path";
+
+test("the actual fallback error page can retry under the Worker policy", async ({
+  page,
+  request,
+}) => {
+  const policy = (await request.get("/")).headers()["content-security-policy"]!;
+  // Load the actual renderer and its JSON dictionaries with the project's Bun runtime.
+  const errorHtml = execFileSync(
+    "bun",
+    [
+      "-e",
+      'import { renderErrorPage } from "./src/lib/error-page.ts"; process.stdout.write(renderErrorPage("en"));',
+    ],
+    { cwd: resolve(import.meta.dirname, ".."), encoding: "utf8" },
+  );
+  let loads = 0;
+  await page.route("**/csp-error-page", (route) => {
+    loads++;
+    return route.fulfill({
+      status: loads === 1 ? 500 : 200,
+      headers: { "content-type": "text/html", "content-security-policy": policy },
+      body: loads === 1 ? errorHtml : "<p>Recovered</p>",
+    });
+  });
+  await page.goto("/csp-error-page");
+  await page.locator("#error-retry").click();
+  await expect(page.getByText("Recovered", { exact: true })).toBeVisible();
+  expect(loads).toBe(2);
+});
 
 test("the Worker policy allows approved embeds and blocks an unknown frame and inline handlers", async ({
   page,

@@ -13,12 +13,12 @@ interface Props {
 function handleOf(url?: string): string | null {
   if (!url) return null;
   const m = /instagram\.com\/([A-Za-z0-9._]+)\/?(?:$|\?)/.exec(url);
-  if (!m || !m[1] || m[1] === "p" || m[1] === "reel") return null;
+  if (!m?.[1] || m[1] === "p" || m[1] === "reel") return null;
   return `@${m[1]}`;
 }
 
 /** Horizontal editorial photo strip shown inside a destination detail sheet. */
-export function InstagramStrip({ photos, instagramUrl, label }: Props) {
+export function InstagramStrip({ photos, instagramUrl, label }: Readonly<Props>) {
   const [open, setOpen] = useState<number | null>(null);
   if (photos.length === 0) return null;
   const handle = handleOf(instagramUrl);
