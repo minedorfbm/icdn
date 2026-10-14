@@ -53,6 +53,7 @@ type MapArtworkProps = {
   visibleIds: Set<string>;
   camera: MapCamera;
   selectedId: string | null;
+  selectedStation: string | null;
   activeFilters: Set<PlaceCategory>;
   mode: "explore" | "tour";
   activeTourIndex: number;
@@ -63,6 +64,7 @@ type MapArtworkProps = {
   onSelectPhoto: (id: string) => void;
   onViewportChange: (viewport: MapViewport) => void;
   onSelectPlace: (id: string) => void;
+  onSelectStation: (label: string) => void;
   interactionProps: SVGProps<SVGSVGElement>;
 };
 
@@ -73,6 +75,7 @@ export function MapArtwork({
   places,
   visibleIds,
   selectedId,
+  selectedStation,
   activeFilters,
   mode,
   activeTourIndex,
@@ -83,6 +86,7 @@ export function MapArtwork({
   onSelectPhoto,
   onViewportChange,
   onSelectPlace,
+  onSelectStation,
   interactionProps,
 }: Readonly<MapArtworkProps>) {
   const { lang, levelLabel } = useI18n();
@@ -160,11 +164,14 @@ export function MapArtwork({
     ...stationNames.map((station) => station.name.length * 8 + 40),
   );
   const stationSigns = layoutTramLabels(
-    stationNames.map((station) => ({
-      ...station,
-      x: station.x * screenScale,
-      y: station.y * screenScale,
-    })),
+    stationNames
+      // Reveal names only when the stops are well separated on screen, or on demand.
+      .filter((station) => station.label === selectedStation || screenScale >= 1.5)
+      .map((station) => ({
+        ...station,
+        x: station.x * screenScale,
+        y: station.y * screenScale,
+      })),
     stationWidth,
     [
       ...interactivePlaces.map((place) => ({
@@ -225,6 +232,23 @@ export function MapArtwork({
       fallback,
     );
     onSelectPlace(nearest.id);
+  };
+  const selectNearestStation = (event: MouseEvent<SVGGElement>, fallback: string) => {
+    if (event.detail === 0) return onSelectStation(fallback);
+    const matrix = svgRef.current?.getScreenCTM();
+    if (!matrix) return onSelectStation(fallback);
+    const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
+    const distance = (station: (typeof stations)[number]) =>
+      Math.hypot(
+        station.x - (point.x - camera.x) / camera.scale,
+        station.y - (point.y - camera.y) / camera.scale,
+      );
+    // Touch areas can overlap at overview scale; select the stop closest to the tap.
+    const nearest = stations.reduce(
+      (best, station) => (distance(station) < distance(best) ? station : best),
+      stations[0]!,
+    );
+    onSelectStation(nearest.label);
   };
 
   const tramCar = useMemo(() => {
@@ -640,6 +664,31 @@ export function MapArtwork({
                 </g>
               );
             })}
+        </g>
+
+        <g className="tram-station-targets">
+          {stationNames.map(({ x, y, label, name }) => (
+            // SVG stops use the same accessible button behavior as place markers.
+            <g
+              key={label}
+              className="tram-station-target"
+              transform={`translate(${x} ${y}) scale(${pixelScale / camera.scale})`}
+              role="button"
+              tabIndex={0}
+              aria-label={`Nam Tram · ${name}`}
+              aria-pressed={selectedStation === label}
+              onClick={(event) => selectNearestStation(event, label)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onSelectStation(label);
+                }
+              }}
+            >
+              <circle className="station-hit" r="22" />
+              <circle className="station-focus" r="14" />
+            </g>
+          ))}
         </g>
 
         <g

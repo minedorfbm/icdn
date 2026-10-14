@@ -666,6 +666,24 @@
 .hub-atlas .tram-signs {
   color: #e9d49c;
 }
+.hub-atlas .tram-station-target {
+  cursor: pointer;
+  outline: none;
+}
+.hub-atlas .station-hit {
+  fill: transparent;
+}
+.hub-atlas .station-focus {
+  fill: none;
+  stroke: #f0d692;
+  stroke-width: 1.5;
+  opacity: 0;
+  pointer-events: none;
+}
+.hub-atlas .tram-station-target[aria-pressed="true"] .station-focus,
+.hub-atlas .tram-station-target:focus-visible .station-focus {
+  opacity: 1;
+}
 .hub-atlas .station-leader {
   fill: none;
   stroke: #d8c396;
