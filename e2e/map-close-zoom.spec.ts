@@ -10,6 +10,23 @@ test("card map entry focuses the venue above its panel and supports closer zoom"
   const scale = async () =>
     Number((await scene.getAttribute("transform"))?.match(/scale\(([^)]+)\)/)?.[1]);
   await expect.poll(scale).toBeGreaterThan(4.2);
+  await expect(map.locator(".hotspot-v2.is-selected .hotspot-name")).toContainText("Citron");
+  const sheet = map.locator(".atlas-preview");
+  const grip = sheet.locator(".atlas-sheet-handle");
+  await expect(sheet).toHaveAttribute("data-expanded", "false");
+  await grip.click();
+  await expect(sheet).toHaveAttribute("data-expanded", "true");
+  const handle = await grip.boundingBox();
+  await page.mouse.move(handle!.x + handle!.width / 2, handle!.y + handle!.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(handle!.x + handle!.width / 2, handle!.y + handle!.height / 2 + 80, {
+    steps: 8,
+  });
+  await page.mouse.up();
+  await expect(sheet).toHaveAttribute("data-expanded", "false");
+  await page.screenshot({
+    path: "/Users/mac/Documents/Codex/2026-09-21/j/outputs/map-mobile-improvements.png",
+  });
   const pin = map.getByRole("button", { name: /^Citron ·/ });
   const bounds = await pin.boundingBox();
   const panel = await map.locator(".atlas-preview").boundingBox();

@@ -901,3 +901,26 @@
     transition: none !important;
   }
 }
+
+.hub-atlas .hotspot-name {
+  pointer-events: none;
+}
+.hub-atlas .hotspot-name rect {
+  fill: #061920;
+  stroke: #cfc2a0;
+  stroke-width: 1;
+}
+.hub-atlas .hotspot-name text {
+  fill: #f7f1e4;
+  font-size: 11px;
+  font-family: var(--font-sans), sans-serif;
+}
+.hub-atlas .hotspot-v2.is-selected .hotspot-name rect {
+  fill: #f7f1e4;
+  stroke: #d6b86d;
+  stroke-width: 2;
+}
+.hub-atlas .hotspot-v2.is-selected .hotspot-name text {
+  fill: #061920;
+  font-weight: 600;
+}

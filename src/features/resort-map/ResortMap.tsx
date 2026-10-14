@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowUpRight,
   Camera,
@@ -376,9 +376,40 @@ function MapPreview({
 }>) {
   const { lang, description, levelLabel } = useI18n();
   const [expanded, setExpanded] = useState(false);
+  const dragStart = useRef<number | null>(null);
+  const dragged = useRef(false);
   const primary = destinations[0];
   return (
     <section className="atlas-preview" data-expanded={expanded} aria-label={title}>
+      <button
+        type="button"
+        className="atlas-sheet-handle"
+        aria-label={mapCopy(lang, expanded ? "collapse" : "expand")}
+        aria-expanded={expanded}
+        onPointerDown={(event) => {
+          dragStart.current = event.clientY;
+          dragged.current = false;
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerUp={(event) => {
+          if (dragStart.current !== null) {
+            const delta = event.clientY - dragStart.current;
+            dragged.current = Math.abs(delta) > 24;
+            if (dragged.current) setExpanded(delta < 0);
+          }
+          dragStart.current = null;
+        }}
+        onPointerCancel={() => {
+          dragStart.current = null;
+          dragged.current = false;
+        }}
+        onClick={() => {
+          if (!dragged.current) setExpanded((value) => !value);
+          dragged.current = false;
+        }}
+      >
+        <span aria-hidden="true" />
+      </button>
       <button
         type="button"
         className="atlas-preview-close"

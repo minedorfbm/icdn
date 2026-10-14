@@ -13,6 +13,7 @@ import { ArchitectureArtwork } from "./ArchitectureArtwork";
 import { bensleyTour } from "./map.data";
 import { useI18n } from "@/i18n";
 import { mapCopy } from "./map-copy";
+import { visibleMapLabels } from "./map-labels";
 import {
   MAP_SIZE,
   REFERENCE_IMAGE,
@@ -121,6 +122,23 @@ export function MapArtwork({
           (mode !== "tour" || bensleyTour.some((stop) => stop.placeId === place.id)),
       ),
     [places, visibleIds, activeFilters, mode],
+  );
+  const labelIds = visibleMapLabels(
+    interactivePlaces
+      .filter((place) => {
+        const x = place.point.x * camera.scale + camera.x;
+        const y = place.point.y * camera.scale + camera.y;
+        return (
+          x > viewBox.x + 96 * pixelScale &&
+          x < viewBox.x + viewBox.width - 96 * pixelScale &&
+          y > viewBox.y + 24 * pixelScale &&
+          y < viewBox.y + viewBox.height - 54 * pixelScale
+        );
+      })
+      .map((place) => ({ id: place.id, ...place.point })),
+    selectedId,
+    camera.scale,
+    camera.scale / pixelScale,
   );
   const selectNearestPlace = (event: MouseEvent<SVGGElement>, fallback: Place) => {
     const matrix = hotspotsRef.current?.getScreenCTM();
@@ -493,47 +511,66 @@ export function MapArtwork({
           visibility={photosVisible ? "hidden" : "visible"}
           aria-hidden={photosVisible}
         >
-          {places.map((place) => {
-            const dimmed = !interactivePlaces.includes(place);
-            const Icon = collectionIcons[place.categories[0] ?? "beach"];
-            return (
-              // SVG groups cannot be HTML buttons; keyboard behavior mirrors one.
-              <g
-                key={place.id}
-                className={`hotspot-v2 ${place.id === selectedId ? "is-selected" : ""} ${dimmed ? "is-dimmed" : ""}`}
-                transform={`translate(${place.point.x} ${place.point.y})`}
-                role="button"
-                tabIndex={photosVisible || dimmed ? -1 : 0}
-                aria-label={`${place.accommodationGroup ? mapCopy(lang, place.accommodationGroup) : place.name} · ${(place.accommodationGroup ? place.coveredLevels : [place.level]).map(levelLabel).join(" / ")}`}
-                aria-pressed={place.id === selectedId}
-                aria-disabled={dimmed}
-                onClick={(event) => {
-                  if (!dimmed) selectNearestPlace(event, place);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    if (!dimmed) onSelectPlace(place.id);
-                  }
-                }}
-              >
-                <g transform={`scale(${pixelScale / camera.scale})`}>
-                  <circle className="hotspot-hit" r="22" />
-                  <circle className="hotspot-pulse" r="15" />
-                  <circle className="hotspot-medallion" r="12" />
-                  <Icon
-                    className="hotspot-icon"
-                    x={-7}
-                    y={-7}
-                    width={14}
-                    height={14}
-                    strokeWidth={1.6}
-                    aria-hidden="true"
-                  />
+          {[...places]
+            .sort((a, b) => Number(a.id === selectedId) - Number(b.id === selectedId))
+            .map((place) => {
+              const dimmed = !interactivePlaces.includes(place);
+              const Icon = collectionIcons[place.categories[0] ?? "beach"];
+              const labelName = place.accommodationGroup
+                ? mapCopy(lang, place.accommodationGroup)
+                : place.name;
+              const labelWidth = Math.min(184, Math.max(88, labelName.length * 7 + 24));
+              return (
+                // SVG groups cannot be HTML buttons; keyboard behavior mirrors one.
+                <g
+                  key={place.id}
+                  className={`hotspot-v2 ${place.id === selectedId ? "is-selected" : ""} ${dimmed ? "is-dimmed" : ""}`}
+                  transform={`translate(${place.point.x} ${place.point.y})`}
+                  role="button"
+                  tabIndex={photosVisible || dimmed ? -1 : 0}
+                  aria-label={`${place.accommodationGroup ? mapCopy(lang, place.accommodationGroup) : place.name} · ${(place.accommodationGroup ? place.coveredLevels : [place.level]).map(levelLabel).join(" / ")}`}
+                  aria-pressed={place.id === selectedId}
+                  aria-disabled={dimmed}
+                  onClick={(event) => {
+                    if (!dimmed) selectNearestPlace(event, place);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      if (!dimmed) onSelectPlace(place.id);
+                    }
+                  }}
+                >
+                  <g transform={`scale(${pixelScale / camera.scale})`}>
+                    {labelIds.has(place.id) && !dimmed && (
+                      <g className="hotspot-name" aria-hidden="true">
+                        <rect x={-labelWidth / 2} y={23} width={labelWidth} height={26} rx={13} />
+                        <text x={0} y={40} textAnchor="middle">
+                          {(() => {
+                            const name = place.accommodationGroup
+                              ? mapCopy(lang, place.accommodationGroup)
+                              : place.name;
+                            return name.length > 25 ? `${name.slice(0, 24)}…` : name;
+                          })()}
+                        </text>
+                      </g>
+                    )}
+                    <circle className="hotspot-hit" r="22" />
+                    <circle className="hotspot-pulse" r="15" />
+                    <circle className="hotspot-medallion" r="12" />
+                    <Icon
+                      className="hotspot-icon"
+                      x={-7}
+                      y={-7}
+                      width={14}
+                      height={14}
+                      strokeWidth={1.6}
+                      aria-hidden="true"
+                    />
+                  </g>
                 </g>
-              </g>
-            );
-          })}
+              );
+            })}
         </g>
 
         {photosVisible && (
