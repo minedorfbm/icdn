@@ -234,7 +234,7 @@ export function InstagramPostEmbed({ post }: Readonly<{ post: DestinationPost }>
 }
 
 /** Published preview and safe Instagram link when the embed cannot render. */
-function PostCard({ post, handle }: { post: DestinationPost; handle: string | null }) {
+function PostCard({ post, handle }: Readonly<{ post: DestinationPost; handle: string | null }>) {
   const { t } = useI18n();
   return (
     <article className="overflow-hidden rounded-[18px] border border-current/12 bg-current/[0.04]">

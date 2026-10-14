@@ -53,3 +53,22 @@ Les 16 autres projets SonarCloud ont été supprimés après demande et confirma
 Les futures migrations doivent être appliquées par le flux de déploiement qui enregistre leur version. Pour une intervention manuelle, conserver la preuve des préconditions, appliquer le SQL puis enregistrer immédiatement cette seule version. Ne pas relancer une chaîne de migrations de contenu sur une production déjà éditée.
 
 Une base reconstruite retrouve le schéma et les seeds versionnés ; elle ne constitue pas une sauvegarde du catalogue vivant. Les sauvegardes Supabase restent nécessaires pour les éditions faites dans le CMS.
+
+## Analyse complète après fusion de la PR 108
+
+La PR 108 est fusionnée en `d54d158495fe499eb1b19312e05e876fdaea294b`. Cloudflare, Supabase et la validation GitHub réussissent. Une lecture HTTP de la production confirme les nouvelles directives CSP bloquantes. L’analyse complète SonarCloud de ce commit réussit le 14 octobre à 23:22, heure de Danang (tâche `AaE7OJw1An0_fsDEdh_6`), après les précédents échecs de quota.
+
+Le périmètre est d’environ 26 000 lignes. Sonar relève 238 issues distinctes : 0 de sécurité, 2 de fiabilité et 237 de maintenabilité (une issue relève de deux qualités). Aucun Security Hotspot. L’inventaire intégral des 238 lignes a été consulté : 198 concernent les SQL, 40 les sources applicatives, un fichier généré et les scripts. Le taux de duplication est de 0,8 %. Ces chiffres décrivent le contrôle statique, pas une garantie d’absence de vulnérabilité. La couverture de tests n’est pas importée dans SonarCloud.
+
+Le Quality Gate de main reste « Not computed » pour une autre raison que le quota : aucune définition du nouveau code n’était choisie. Le projet est désormais configuré sur les 30 derniers jours, adapté à ses déploiements continus. Ce réglage prendra effet à la prochaine analyse ; les seuils du Quality Gate et les alertes existantes restent inchangés.
+
+### Corrections applicatives complémentaires
+
+- La surface des cards utilise le bouton HTML natif du titre, étendu visuellement à la card. Le conteneur générique ne déclenche plus l’ouverture. Les liens indépendants, les aperçus voisins, la restauration du focus et le rejet du clic consécutif au swipe sont conservés. Cette correction cible les deux issues de fiabilité.
+- La page de secours SSR conservait un `onclick` en HTML, désormais bloqué par la CSP de la PR 108. Le bouton Réessayer utilise maintenant un gestionnaire enregistré par le script de la page. Un test WebKit applique la vraie politique du Worker au vrai HTML de secours et vérifie le rechargement. Les traductions restent testées, y compris lorsque le stockage local est refusé.
+- Deux usages obsolètes de `inputValidator` passent à `validator`, qui appelle exactement la même fonction dans la version TanStack installée. Les schémas de validation et les contrôles de publication restent identiques.
+- Les props non mutées sont déclarées en lecture seule ; les affectations de groupes de médias, les alias de routes et la mise en forme des erreurs sont rendus explicites. Les règles CSS des filtres de map sont regroupées avec leurs valeurs effectives existantes. Aucun contenu de base de données n’est modifié.
+
+Les anciennes migrations ne sont pas réécrites pour retirer des littéraux éditoriaux répétés. Les autres observations à faible portée sont conservées visibles : fichier de routes généré, chargements séquentiels nécessaires, annonces `role="status"`, clés de listes sans état et nom volontaire du setter de langue. Elles n’ont pas été déclarées résolues ou exclues artificiellement. Le test des migrations doit rester séquentiel, car chaque migration dépend des précédentes.
+
+Validation de ce suivi : 125 tests unitaires réussis, 50 tests mobiles WebKit réussis, TypeScript, ESLint, build et préparation Cloudflare réussis. Les deux tests supplémentaires couvrent l’activation native des cards et le bouton de récupération sous CSP. Les suites existantes vérifient aussi les quatre palettes, les médias, les relations, les langues, les filtres et le cadrage de la map. Aucun nouveau paquet ni nouvelle migration n’est ajouté.

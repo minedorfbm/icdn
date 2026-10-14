@@ -68,14 +68,18 @@ export function DestinationPanel({
         </div>
 
         <div className="shrink-0">
-          <h3 className="font-serif text-[clamp(26px,6.5vw,48px)] leading-[0.98] tracking-[0.01em] drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">
+          <h3 className="font-serif text-[clamp(26px,6.5vw,48px)] leading-[0.98] tracking-[0.01em]">
+            {/* Stretch the native button over the card without nesting its separate links. */}
             <button
               type="button"
-              onClick={onOpen}
+              onClick={(event) => {
+                event.currentTarget.focus({ preventScroll: true });
+                onOpen();
+              }}
               tabIndex={active ? 0 : -1}
-              className="text-left focus-visible:outline-2 focus-visible:outline-offset-4"
+              className="text-left after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-4"
             >
-              {dest.name}
+              <span className="drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">{dest.name}</span>
             </button>
           </h3>
           <p className="mt-3 max-w-[30ch] font-serif text-[15px] italic leading-snug opacity-85">
@@ -83,14 +87,14 @@ export function DestinationPanel({
           </p>
         </div>
 
-        <div className="mt-auto flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/25 pt-3">
+        <div className="pointer-events-none relative mt-auto flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/25 pt-3">
           {actions.map((a, i) => (
             <ResortLink
               key={`${a.kind}-${i}`}
               href={a.url}
               pageTitle={`${dest.name} · ${a.label ?? action(a.kind)}`}
               tabIndex={active ? 0 : -1}
-              className="inline-flex min-h-11 max-w-full items-center py-2 text-[10px] leading-relaxed tracking-[0.2em] text-white transition-colors hover:text-[#e5d3aa] focus-visible:outline-2 focus-visible:outline-offset-4"
+              className="pointer-events-auto inline-flex min-h-11 max-w-full items-center py-2 text-[10px] leading-relaxed tracking-[0.2em] text-white transition-colors hover:text-[#e5d3aa] focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               {a.label ?? action(a.kind)}
             </ResortLink>
@@ -102,7 +106,7 @@ export function DestinationPanel({
               rel="noreferrer"
               aria-label={`${dest.name} on Instagram`}
               tabIndex={active ? 0 : -1}
-              className="grid size-11 place-items-center rounded-full border border-background/25 bg-foreground/65 text-background shadow-md backdrop-blur-md transition-colors hover:bg-foreground/80"
+              className="pointer-events-auto grid size-11 place-items-center rounded-full border border-background/25 bg-foreground/65 text-background shadow-md backdrop-blur-md transition-colors hover:bg-foreground/80"
             >
               <Instagram className="size-3.5" strokeWidth={1.5} />
             </a>

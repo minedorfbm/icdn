@@ -6,7 +6,7 @@ import { benefitContent, benefitRow, benefitTranslationRow } from "./accommodati
 
 /** Requested only when Benefits is opened; anonymous RLS checks visible card ownership. */
 export const getAccommodationBenefits = createServerFn({ method: "GET" })
-  .inputValidator(
+  .validator(
     z
       .string()
       .min(1)

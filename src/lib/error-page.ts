@@ -13,7 +13,7 @@ export function renderErrorPage(lang: Lang = "en"): string {
       },
     ]),
   );
-  const serialized = JSON.stringify(translations).replaceAll("<", "\\u003c");
+  const serialized = JSON.stringify(translations).replaceAll("<", String.raw`\u003c`);
   return `<!doctype html>
 <html lang="${lang}">
   <head>
@@ -36,12 +36,13 @@ export function renderErrorPage(lang: Lang = "en"): string {
       <h1 id="error-title">${copy.error_page_title}</h1>
       <p id="error-body">${copy.error_page_body}</p>
       <div class="actions">
-        <button id="error-retry" class="primary" onclick="location.reload()">${copy.retry}</button>
+        <button id="error-retry" class="primary">${copy.retry}</button>
         <a id="error-home" class="secondary" href="/">${copy.go_home}</a>
       </div>
     </div>
     <script>
       (() => {
+        document.getElementById("error-retry").addEventListener("click", () => location.reload());
         const translations = ${serialized};
         let saved;
         try { saved = localStorage.getItem("adj-lang"); } catch {}

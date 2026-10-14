@@ -21,18 +21,31 @@ describe("language recovery outside the hub", () => {
       expect(page).toContain(UI[code].error_page_title);
       expect(page).toContain(UI[code].retry);
       expect(page).toContain(UI[code].go_home);
+      expect(page).not.toContain("onclick=");
     }
     const script = renderErrorPage().match(/<script>([\s\S]*?)<\/script>/)![1]!;
     for (const stored of ["ru", null, "<script>invalid</script>", "constructor", "__proto__"]) {
-      const fields: Record<string, { textContent: string }> = {};
+      let retry: (() => void) | undefined;
+      let reloads = 0;
+      const fields: Record<
+        string,
+        { textContent: string; addEventListener: (type: string, listener: () => void) => void }
+      > = {};
       const document = {
         documentElement: { lang: "en" },
         title: "",
-        getElementById: (id: string) => (fields[id] ??= { textContent: "" }),
+        getElementById: (id: string) =>
+          (fields[id] ??= {
+            textContent: "",
+            addEventListener: (type, listener) => {
+              if (id === "error-retry" && type === "click") retry = listener;
+            },
+          }),
       };
       runInNewContext(script, {
         document,
         navigator: { language: "ja-JP" },
+        location: { reload: () => reloads++ },
         localStorage: {
           getItem: () => {
             if (stored === null) throw new Error("denied");
@@ -44,6 +57,9 @@ describe("language recovery outside the hub", () => {
       expect(document.documentElement.lang).toBe(locale);
       expect(fields["error-title"]?.textContent).toBe(UI[locale].error_page_title);
       expect(fields["error-home"]?.textContent).toBe(UI[locale].go_home);
+      expect(retry).toBeDefined();
+      retry?.();
+      expect(reloads).toBe(1);
     }
   });
 });

@@ -11,7 +11,7 @@ interface Props {
 }
 
 /** Full-screen photo viewer: swipe left/right between photos, swipe down to close. */
-export function PhotoLightbox({ photos, index, onClose }: Props) {
+export function PhotoLightbox({ photos, index, onClose }: Readonly<Props>) {
   const { t } = useI18n();
   const [current, setCurrent] = useState(index);
   const [drag, setDrag] = useState({ x: 0, y: 0 });

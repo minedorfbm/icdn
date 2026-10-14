@@ -37,8 +37,7 @@ export function useDestinationMedia(id: string) {
   return {
     media,
     pending: data === undefined,
-    failed:
-      data === null || (data !== undefined && Object.values(data).some((rows) => rows === null)),
+    failed: data === null || (data !== undefined && Object.values(data).includes(null)),
     retry: () => setAttempt((value) => value + 1),
   };
 }

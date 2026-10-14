@@ -329,6 +329,33 @@ test("Surprise me fits the viewport without counters or overlapping contact cont
   await expect(page.getByRole("dialog", { name: "TINGARA", exact: true })).toBeVisible();
 });
 
+test("card surfaces open with touch and keyboard while their menu links stay independent", async ({
+  page,
+}) => {
+  await page.route("**/api/resort-pdf?*", (route) =>
+    route.fulfill({ contentType: "application/pdf", body: menuPdf() }),
+  );
+  await page.goto("/");
+  const active = page.locator('#heaven article[aria-hidden="false"]');
+  const opener = active.getByRole("button", { name: "Citron", exact: true });
+  const card = page.getByRole("dialog", { name: "Citron", exact: true });
+  await active.scrollIntoViewIfNeeded();
+  // Tap the image above the title: the native title button covers the whole card surface.
+  await active.tap({ position: { x: 100, y: 100 } });
+  await expect(card).toBeVisible();
+  await card.getByRole("button", { name: "BACK", exact: true }).click();
+  await expect(opener).toBeFocused();
+  for (const key of ["Enter", "Space"]) {
+    await opener.press(key);
+    await expect(card).toBeVisible();
+    await card.getByRole("button", { name: "BACK", exact: true }).click();
+    await expect(opener).toBeFocused();
+  }
+  await active.getByRole("link", { name: "Test menu", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: /Test menu/ })).toBeVisible();
+  await expect(card).toHaveCount(0);
+});
+
 test("the card deck advances and returns after horizontal pointer gestures", async ({ page }) => {
   await page.goto("/");
   const stage = page.locator("#heaven .touch-pan-y").first();
@@ -364,6 +391,14 @@ test("the card deck advances and returns after horizontal pointer gestures", asy
   await expect(active).toContainText("TINGARA");
   await swipe(50, 300);
   await expect(active).toContainText("Citron");
+  // The click emitted after a drag must not open the newly active card.
+  await active.getByRole("button", { name: "Citron", exact: true }).dispatchEvent("click", {
+    detail: 1,
+  });
+  await expect(page.getByRole("dialog", { name: "Citron", exact: true })).toHaveCount(0);
+  // Keyboard activation remains available immediately after a swipe.
+  await active.getByRole("button", { name: "Citron", exact: true }).press("Enter");
+  await expect(page.getByRole("dialog", { name: "Citron", exact: true })).toBeVisible();
 });
 
 test("expanded cards show localized hours and service days below the description", async ({

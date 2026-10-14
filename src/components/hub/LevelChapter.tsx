@@ -13,7 +13,7 @@ interface Props {
   clusters?: string[];
 }
 
-export function LevelChapter({ id, title, line, image, clusters }: Props) {
+export function LevelChapter({ id, title, line, image, clusters }: Readonly<Props>) {
   const [cluster, setCluster] = useState(clusters?.[0]);
   const [cardIndex, setCardIndex] = useState(0);
   const [indexOpen, setIndexOpen] = useState(false);

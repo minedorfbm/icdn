@@ -93,7 +93,7 @@ export function useJourneyMotion(
       );
       const active = sections[station]!.id;
       const first = sections[0]!;
-      const last = sections[sections.length - 1]!;
+      const last = sections.at(-1)!;
       const visible =
         y + viewport * 0.7 >= first.top && y < last.top + last.height - viewport * 0.3;
       const railProgress = reducedMotion.matches
