@@ -22,7 +22,7 @@ Le replay a révélé trois dépendances historiques manquantes :
 
 Les audits Discover, menus et remplacement vidéo utilisaient des UUID propres à la production. Ils gardent leurs contrôles sur ces UUID lorsqu’ils existent ; sinon, ils exigent une correspondance unique par destination et contenu audité. Une modification concurrente ou une correspondance ambiguë continue d’arrêter la migration.
 
-Les deux nouveaux seeds ont été exécutés sur une copie exacte des contenus publiés : aucun changement dans les 21 tables. Les migrations historiques corrigées ne doivent pas être rejouées en production ; les corrections servent aux bases neuves. L’ensemble comporte désormais 66 migrations.
+Les deux blocs de bootstrap ont été vérifiés sur une copie exacte des contenus publiés : aucun changement dans les 21 tables. Ils sont intégrés aux migrations historiques correspondantes, déjà enregistrées dans le journal, pour servir uniquement aux reconstructions neuves. Aucune nouvelle migration antidatée n’est ajoutée à appliquer en production. Les migrations historiques corrigées ne doivent pas être rejouées en production. L’ensemble conserve 64 migrations.
 
 ## Protections des contenus intégrés
 
@@ -38,13 +38,13 @@ Le panneau de lieu est isolé dans `MapPreview.tsx`. Son ouverture, le glissemen
 
 Cause confirmée de l’échec de l’analyse complète : quota de l’organisation. Le dernier échec indique 44 427 lignes utilisées sur 50 000, pour une analyse du hub de 24 935 lignes, remplaçant une ancienne analyse d’environ 5 600 lignes. Les analyses de PR réussies ne prouvaient pas que l’analyse complète était à jour. Aucun fichier applicatif ou SQL de sécurité n’est exclu pour masquer ce dépassement.
 
-Les 16 autres projets SonarCloud ont été supprimés après demande et confirmation explicites de l’utilisateur. La liste de l’organisation affiche désormais uniquement `icdn`. La page de quota affiche 15 543 lignes utilisées sur 50 000 et 34 457 disponibles. Les dépôts GitHub et les déploiements sont conservés. La nouvelle analyse complète reste à vérifier ; les anciens résultats de `main` datent encore du 25 septembre.
+Les 16 autres projets SonarCloud ont été supprimés après demande et confirmation explicites de l’utilisateur. La liste de l’organisation affiche désormais uniquement `icdn`. La page de quota affiche 15 543 lignes utilisées sur 50 000 et 34 457 disponibles. Les dépôts GitHub et les déploiements sont conservés. Le Quality Gate de la PR 108 réussit. Les 19 remarques consultées concernent des littéraux répétés dans les SQL et un `await` séquentiel dans le test des migrations : ce dernier est indispensable aux dépendances entre migrations. Elles ne sont pas masquées ; aucun Security Hotspot n’est signalé. La relance de `main` a été demandée dans GitHub mais aucun nouveau résultat complet n’est encore confirmé ; son ancien résultat remonte au 25 septembre. La fusion déclenchera une nouvelle analyse complète.
 
 ## Validation
 
-- 66 migrations reconstruites ; contrôle des privilèges et du rejet des liens ambigus réussi.
+- 64 migrations reconstruites ; contrôle des privilèges et du rejet des liens ambigus réussi.
 - 125 tests unitaires réussis ; TypeScript, ESLint, traductions et images validés.
-- 47/48 tests mobiles réussis au premier passage ; le test de retour au contexte d’accueil a présenté un échec intermittent sur une transition, puis réussi trois fois consécutives sans modification. Le nouveau test CSP et les parcours map/PDF/Instagram/YouTube réussissent.
+- 47/48 tests mobiles réussis au premier passage ; le test de retour au contexte d’accueil a présenté un échec intermittent sur une transition, puis réussi trois fois consécutives sans modification. Le nouveau test CSP et les parcours map/PDF/Instagram/YouTube réussissent. Le passage CI complet suivant a réussi les 48 tests.
 - Build et préparation Cloudflare réussis.
 - Audit npm autorisé par l’utilisateur : aucune vulnérabilité connue parmi 451 paquets au moment du contrôle.
 

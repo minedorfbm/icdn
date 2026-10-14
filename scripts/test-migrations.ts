@@ -10,6 +10,7 @@ const files = readdirSync(directory)
 const db = new PGlite();
 try {
   await db.exec("CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role BYPASSRLS;");
+  // Migrations depend on preceding schema/data changes; they must run sequentially.
   for (const file of files) {
     try {
       await db.exec(readFileSync(new URL(file, directory), "utf8"));
