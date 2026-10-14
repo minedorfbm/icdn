@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 
 test("overview cannot drift out of the resort; station signs fit their text and icons", async ({
   page,
-}) => {
+}, testInfo) => {
+  // This stress test sends hundreds of key presses to reach every pan boundary.
+  test.setTimeout(60_000);
   await page.goto("/");
   await page.getByRole("button", { name: /Explore the resort map/ }).click();
   const map = page.getByRole("dialog", { name: "Resort map" });
@@ -24,7 +26,7 @@ test("overview cannot drift out of the resort; station signs fit their text and 
     await expect(scene).toHaveAttribute("transform", start!);
   }
   await page.screenshot({
-    path: "/Users/mac/Documents/Codex/2026-09-21/j/outputs/map-constrained-overview.png",
+    path: testInfo.outputPath("map-constrained-overview.png"),
   });
   for (let i = 0; i < 9; i++)
     await map.getByRole("button", { name: "Zoom in", exact: true }).click();

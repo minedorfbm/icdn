@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("card map entry focuses the venue above its panel and supports closer zoom", async ({
   page,
-}) => {
+}, testInfo) => {
   await page.goto("/citron");
   await page.getByRole("button", { name: "View on map", exact: true }).click();
   const map = page.getByRole("dialog", { name: "Resort map" });
@@ -25,7 +25,7 @@ test("card map entry focuses the venue above its panel and supports closer zoom"
   await page.mouse.up();
   await expect(sheet).toHaveAttribute("data-expanded", "false");
   await page.screenshot({
-    path: "/Users/mac/Documents/Codex/2026-09-21/j/outputs/map-mobile-improvements.png",
+    path: testInfo.outputPath("map-mobile-improvements.png"),
   });
   const pin = map.getByRole("button", { name: /^Citron ·/ });
   const bounds = await pin.boundingBox();
