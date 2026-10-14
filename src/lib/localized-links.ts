@@ -1,4 +1,5 @@
 import { LANGUAGES, type Lang } from "@/i18n/dictionary";
+import { httpsUrl } from "./external-url";
 
 export type LinkTranslations = Partial<Record<Lang, string>>;
 
@@ -12,10 +13,6 @@ export interface DestinationLinkTranslationRow extends LinkTranslationRow {
   link_id: string;
 }
 
-export interface SiteLinkTranslationRow extends LinkTranslationRow {
-  setting_key: string;
-}
-
 /** Menus, booking links and all other action kinds keep their shared URL. */
 export function localizedLinkUrl(
   kind: string,
@@ -25,14 +22,7 @@ export function localizedLinkUrl(
 ): string {
   if (kind !== "DISCOVER" && kind !== "WEBSITE") return url;
   const translated = translations?.[locale];
-  if (!translated) return url;
-  try {
-    const parsed = new URL(translated);
-    if (parsed.protocol === "https:" && !parsed.username && !parsed.password) return translated;
-  } catch {
-    // A malformed optional variant must never break the original action.
-  }
-  return url;
+  return translated && httpsUrl(translated) ? translated : url;
 }
 
 /** Discard translations of an earlier URL, including during mixed cache/deployment states. */

@@ -99,10 +99,23 @@ test("leaving the viewer aborts the upstream request and releases the response s
 test("HTML and redirects are rejected instead of being proxied as documents", async () => {
   for (const upstream of [
     new Response("<html>oops</html>", { headers: { "content-type": "text/html" } }),
+    new Response("not a PDF", { headers: { "content-type": "application/pdf-spoof" } }),
     Response.redirect("https://example.com/menu.pdf"),
   ]) {
     expect(
       (await serveResortPdf(proxy(source), (async () => upstream) as typeof fetch)).status,
     ).toBe(502);
   }
+});
+
+test("PDF content type accepts case-insensitive MIME with valid parameters", async () => {
+  const result = await serveResortPdf(
+    proxy(source),
+    (async () =>
+      new Response("%PDF-1.4", {
+        headers: { "content-type": "Application/PDF; charset=binary" },
+      })) as typeof fetch,
+  );
+  expect(result.status).toBe(200);
+  expect(await result.text()).toBe("%PDF-1.4");
 });

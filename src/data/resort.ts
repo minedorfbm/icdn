@@ -39,6 +39,7 @@ import gBarDetail from "@/assets/g-bar-detail.webp";
 import gArchitectureDetail from "@/assets/g-architecture-detail.webp";
 import gTerraceDetail from "@/assets/g-terrace-detail.webp";
 import type { DestinationEvent } from "@/data/events";
+import { httpsUrl, instagramLink } from "@/lib/external-url";
 
 export type { DestinationEvent };
 
@@ -46,7 +47,7 @@ export type { DestinationEvent };
 
 export type Level = "heaven" | "sky" | "earth" | "sea";
 
-export type DestinationType =
+type DestinationType =
   | "restaurant"
   | "bar"
   | "spa"
@@ -61,8 +62,8 @@ export type DestinationType =
   | "beach"
   | "recreation";
 
-export type DestinationContentFamily = "resort" | "offer" | "storytelling";
-export type DestinationAudience = "adult" | "all" | "kids";
+type DestinationContentFamily = "resort" | "offer" | "storytelling";
+type DestinationAudience = "adult" | "all" | "kids";
 
 export interface Destination {
   id: string;
@@ -154,8 +155,8 @@ export type DestinationVideoRow = z.infer<typeof videoRow>;
 /** Accept only video IDs from known YouTube URL formats before building an embed URL. */
 export function youtubeVideoId(value: string): string | null {
   try {
-    const url = new URL(value);
-    if (url.protocol !== "https:") return null;
+    const url = httpsUrl(value, ["youtu.be", "youtube.com", "www.youtube.com", "m.youtube.com"]);
+    if (!url) return null;
     const host = url.hostname.toLowerCase();
     let id: string | null = null;
     if (host === "youtu.be") {
@@ -192,10 +193,11 @@ export function groupVideos(rows: DestinationVideoRow[]): Record<string, Destina
 export function groupPosts(rows: DestinationPostRow[]): Record<string, DestinationPost[]> {
   const out: Record<string, DestinationPost[]> = {};
   for (const row of [...rows].sort((a, b) => a.display_order - b.display_order)) {
-    if (!row.post_url) continue;
+    const postUrl = instagramLink(row.post_url);
+    if (!postUrl) continue;
     const image = row.image_url ? resolveImage(row.image_url) : "";
     (out[row.destination_id] ??= []).push({
-      post_url: row.post_url,
+      post_url: postUrl,
       ...(row.account ? { account: row.account } : {}),
       ...(row.caption ? { caption: row.caption } : {}),
       ...(image ? { image } : {}),
@@ -267,7 +269,7 @@ const TYPE_IMAGE: Record<DestinationType, string> = {
 };
 
 /** Asset registry — maps a CMS `image_key` to the bundled photography. */
-export const ASSET_BY_KEY: Record<string, string> = {
+const ASSET_BY_KEY: Record<string, string> = {
   "offer-enchanted": offerEnchanted,
   "offer-bensley": offerBensley,
   "offer-wedding": offerWedding,

@@ -1,22 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DestinationPost } from "@/data/resort";
-import { useI18n } from "@/i18n";
 import { InstagramPostEmbed } from "./InstagramPostEmbed";
 
 /**
  * Horizontal, snap-scrolled carousel of up to 5 official Instagram post embeds.
  * A single post renders exactly like before (no dots, no scrolling).
  */
-export function InstagramPostCarousel({
-  posts,
-  embedded = false,
-  fitToScreen = false,
-}: {
-  posts: DestinationPost[];
-  embedded?: boolean;
-  fitToScreen?: boolean;
-}) {
-  const { t } = useI18n();
+export function InstagramPostCarousel({ posts }: { posts: DestinationPost[] }) {
   const items = posts.slice(0, 5);
   const track = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -50,29 +40,20 @@ export function InstagramPostCarousel({
   }, []);
 
   if (items.length === 0) return null;
-  if (items.length === 1 && items[0])
-    return <InstagramPostEmbed post={items[0]} bare={embedded} fitToScreen={fitToScreen} />;
+  if (items.length === 1 && items[0]) return <InstagramPostEmbed post={items[0]} />;
 
   return (
-    <section
-      className={embedded ? undefined : "mt-12"}
-      aria-label={embedded ? undefined : t("latest_posts")}
-    >
-      {!embedded && <p className="text-[9px] tracking-[0.38em] opacity-45">{t("latest_posts")}</p>}
-
+    <div>
       <div
         ref={track}
         onScroll={onScroll}
         data-instagram-track
-        className={`${embedded ? "editorial-media-track" : "-mx-6 mt-5 px-6"} flex items-start snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden`}
+        className="editorial-media-track flex items-start snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden"
         style={{ scrollbarWidth: "none", height }}
       >
         {items.map((post) => (
-          <div
-            key={post.post_url}
-            className={`${fitToScreen ? "" : "w-full"} shrink-0 snap-center`}
-          >
-            <InstagramPostEmbed post={post} bare fitToScreen={fitToScreen} />
+          <div key={post.post_url} className="shrink-0 snap-center">
+            <InstagramPostEmbed post={post} />
           </div>
         ))}
       </div>
@@ -111,6 +92,6 @@ export function InstagramPostCarousel({
           </button>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

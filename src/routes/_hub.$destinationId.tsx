@@ -39,14 +39,13 @@ export const Route = createFileRoute("/_hub/$destinationId")({
 
 function DestinationRoute() {
   const destination = Route.useLoaderData();
-  const { closeDestination, neutral } = useDestinationNavigation();
+  const { closeDestination } = useDestinationNavigation();
   return (
     <DestinationDetail
       key={destination.id}
       dest={destination}
       onClose={closeDestination}
       aboveMap
-      neutral={neutral}
       portalled={false}
     />
   );

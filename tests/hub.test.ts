@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { createHubValue, resolveHeroImage } from "../src/data/hub-value";
-import { actionsFor, instagramUrl, safeExternalUrl } from "../src/lib/destination-actions";
+import { actionsFor, instagramUrl } from "../src/lib/destination-actions";
+import { safeExternalUrl } from "../src/lib/external-url";
 import { LEVELS, toDestination, youtubeVideoId, type DestinationRow } from "../src/data/resort";
 import { destinationRow } from "../src/lib/hub-schema";
 import type { HubData } from "../src/lib/hub.functions";

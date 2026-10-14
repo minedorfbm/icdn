@@ -19,7 +19,8 @@ export async function serveResortPdf(
     const upstream = await fetchPdf(pdfUrl, { redirect: "manual", signal });
     if (
       !upstream.ok ||
-      !upstream.headers.get("content-type")?.toLowerCase().startsWith("application/pdf") ||
+      upstream.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase() !==
+        "application/pdf" ||
       !upstream.body
     ) {
       await upstream.body?.cancel();

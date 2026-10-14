@@ -1,5 +1,5 @@
-export const MIN_PDF_ZOOM = 1;
-export const MAX_PDF_ZOOM = 3;
+const MIN_PDF_ZOOM = 1;
+const MAX_PDF_ZOOM = 3;
 
 export type Point = Readonly<{ x: number; y: number }>;
 

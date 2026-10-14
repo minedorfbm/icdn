@@ -1,7 +1,7 @@
 import { LANGUAGES, type Lang } from "./dictionary";
 
 export const LANGUAGE_STORAGE_KEY = "adj-lang";
-export function isLang(value: string | null): value is Lang {
+function isLang(value: string | null): value is Lang {
   return LANGUAGES.some(({ code }) => code === value);
 }
 export function preferredLanguage(stored: string | null, browserLanguage: string): Lang {

@@ -16,7 +16,7 @@ import {
 import receptionHero from "@/assets/hero-reception-20260925.webp";
 import type { HubData } from "@/lib/hub.functions";
 
-export interface HubLevel {
+interface HubLevel {
   id: Level;
   title: string;
   line: string;

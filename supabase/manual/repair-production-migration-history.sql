@@ -1,3 +1,5 @@
+-- HISTORICAL ONLY: this September repair is no longer applicable. The ledger is
+-- nonempty and the catalogue has evolved. See docs/audits/code-security-2026-10-14.md.
 -- One-time history repair for the existing cxcffaegqyvbhrpzpowa production DB.
 -- The original schema and later SQL scripts were installed manually, so the
 -- migration ledger is empty. Run only on main after checking the preconditions.

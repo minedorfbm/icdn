@@ -119,7 +119,7 @@ export function SearchDialog({
     onClose();
     onBeforeNavigate?.();
     if (onSelectDestination) onSelectDestination(destination);
-    else openDestination(destination.id, true, []);
+    else openDestination(destination.id, []);
   };
   const categoryNotes = {
     DINING: "dining",

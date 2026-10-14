@@ -16,6 +16,7 @@
     "deploy": "wrangler deploy --config .output/server/wrangler.json",
     "deploy:check": "wrangler deploy --dry-run --config .output/server/wrangler.json",
     "security:audit": "bun audit",
+    "migrations:check": "bun scripts/check-migrations.ts",
     "i18n:check": "bun scripts/check-translations.ts",
     "i18n:export": "bun scripts/export-translation-seed.ts",
     "i18n:audit": "bun scripts/check-translations.ts --live",

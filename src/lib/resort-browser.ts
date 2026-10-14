@@ -1,3 +1,5 @@
+import { httpsUrl } from "./external-url";
+
 const RESORT_HOSTS = new Set(["danang.intercontinental.com", "www.danang.intercontinental.com"]);
 const BOOKING_HOSTS = new Set(["tablecheck.com", "www.tablecheck.com"]);
 const RESORT_BOOKING =
@@ -6,8 +8,8 @@ const RESORT_BOOKING =
 /** Only the resort website and its identified restaurant booking pages open inside the hub. */
 export function embeddedResortUrl(value: string): string | undefined {
   try {
-    const url = new URL(value);
-    if (url.protocol !== "https:" || url.username || url.password || url.port) return undefined;
+    const url = httpsUrl(value, [...RESORT_HOSTS, ...BOOKING_HOSTS]);
+    if (!url) return undefined;
     if (RESORT_HOSTS.has(url.hostname)) return url.href;
     if (BOOKING_HOSTS.has(url.hostname) && RESORT_BOOKING.test(url.pathname)) return url.href;
   } catch {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const openingService = z.enum([
+const openingService = z.enum([
   "opening",
   "breakfast",
   "lunch",

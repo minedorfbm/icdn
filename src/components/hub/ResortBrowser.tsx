@@ -10,7 +10,7 @@ import {
 } from "react";
 import { ExternalLink, X } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
-import { safeExternalUrl } from "@/lib/destination-actions";
+import { safeExternalUrl } from "@/lib/external-url";
 import { embeddedResortUrl, isResortPdf } from "@/lib/resort-browser";
 import { useI18n } from "@/i18n";
 import { HubSearch } from "@/features/search/HubSearch";

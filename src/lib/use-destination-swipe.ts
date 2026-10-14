@@ -45,7 +45,7 @@ function bindSwipe(node: HTMLElement, navigate: (direction: 1 | -1) => void) {
     const completed = gesture;
     cancel();
     const touch = event.changedTouches[0];
-    if (!completed?.horizontal || !touch || touch.identifier !== completed.id) return;
+    if (!completed?.horizontal || touch?.identifier !== completed.id) return;
     if (event.timeStamp - completed.time > 900 || window.getSelection()?.isCollapsed === false)
       return;
     const dx = touch.clientX - completed.x;
@@ -69,15 +69,15 @@ function bindSwipe(node: HTMLElement, navigate: (direction: 1 | -1) => void) {
 export function useDestinationSwipe(id: string) {
   const ref = useRef<HTMLDivElement>(null);
   const { destinations } = useHub();
-  const { sequence, openDestination, neutral, previousCard, openPreviousDestination } =
+  const { sequence, openDestination, previousCard, openPreviousDestination } =
     useDestinationNavigation();
   const next = adjacentDestination(id, destinations, sequence);
   const previous = previousCard ? findPublicDestination(destinations, previousCard) : undefined;
   const nextId = next?.id;
   const previousId = previous?.id;
   const openNext = useCallback(() => {
-    if (nextId) openDestination(nextId, neutral);
-  }, [nextId, openDestination, neutral]);
+    if (nextId) openDestination(nextId);
+  }, [nextId, openDestination]);
   useEffect(() => {
     const node = ref.current;
     if (!node || (!nextId && !previousId)) return;
