@@ -5,7 +5,12 @@ import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { useDestinationNavigation } from "@/lib/use-destination-navigation";
 import type { Destination } from "@/data/resort";
-import { SEARCH_COLLECTIONS, searchEntries, type SearchCollection } from "./search";
+import {
+  SEARCH_COLLECTIONS,
+  searchCollection,
+  searchEntries,
+  type SearchCollection,
+} from "./search";
 import { searchCopy } from "./search-copy";
 import { ConciergeContact } from "@/components/hub/ConciergeContact";
 import "./search.css";
@@ -71,7 +76,7 @@ export function SearchDialog({
         .map((d) => ({
           item: d,
           name: d.name,
-          collection: d.cluster ?? "",
+          collection: searchCollection(d),
           keywords: d.searchKeywords ?? [],
           text: [
             d.id,
@@ -120,13 +125,16 @@ export function SearchDialog({
     DINING: "dining",
     WELLNESS: "wellness",
     EXPERIENCES: "experiences",
+    ACCOMMODATION: "accommodation",
   } as const;
+  const collectionLabel = (key: string) =>
+    key === "ACCOMMODATION" ? typeLabel("accommodation") : cluster(key);
   const groups = query.trim()
     ? [{ key: "results", label: copy("results"), note: "", items: results }]
     : [...SEARCH_COLLECTIONS, ""]
         .map((key) => ({
           key,
-          label: key ? cluster(key) : t("all_places"),
+          label: key ? collectionLabel(key) : t("all_places"),
           note: key ? copy(categoryNotes[key as SearchCollection]) : "",
           items: results.filter((entry) =>
             key
@@ -178,7 +186,7 @@ export function SearchDialog({
                 aria-pressed={collection === key}
                 onClick={() => setCollection((current) => (current === key ? "" : key))}
               >
-                {cluster(key)}
+                {collectionLabel(key)}
               </button>
             ))}
           </nav>

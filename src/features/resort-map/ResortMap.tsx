@@ -48,7 +48,7 @@ export default function ResortMap({
   onDestination: (id: string) => void;
 }>) {
   const { mapPlaces, mapLinks, destinations } = useHub();
-  const { lang, t, cluster, levelLabel } = useI18n();
+  const { lang, t, cluster, levelLabel, typeLabel } = useI18n();
   const copy = useCallback((key: Parameters<typeof mapCopy>[1]) => mapCopy(lang, key), [lang]);
   const places = useMemo(
     () => liveMapPlaces(mapPlaces, mapLinks, destinations),
@@ -114,9 +114,9 @@ export default function ResortMap({
     if (id) select(id);
     else {
       setSelectedId(null);
-      focusOn({ x: 800, y: 450 }, 1.25);
+      fit();
     }
-  }, [request, select, focusOn, tourStops]);
+  }, [request, select, fit, tourStops]);
   const changeMode = (next: MapMode) => {
     setMode(next);
     setSelectedId(null);
@@ -324,7 +324,7 @@ export default function ResortMap({
                       fit();
                     }}
                   >
-                    {c === "accommodation" ? copy("accommodation") : cluster(c.toUpperCase())}
+                    {c === "accommodation" ? typeLabel("accommodation") : cluster(c.toUpperCase())}
                   </button>
                 ))}
               </div>

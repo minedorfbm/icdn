@@ -6,7 +6,7 @@
 
 `map_places` contient uniquement les repères illustrés : identifiant, nom de repère de secours, niveau de repère, numéro, coordonnées x/y, zoom et publication. Les coordonnées correspondent au plan dessiné (pas à des coordonnées GPS). `map_destination_links` relie un repère à une ou plusieurs destinations existantes. `display_order` sélectionne la card principale et ordonne les autres ; `is_primary` choisit la position ouverte depuis une card possédant plusieurs repères, comme Mi Sol Spa.
 
-Les repères publics utilisent une icône de collection issue des cards associées (ou un repère neutre sans collection). Les numéros restent des références internes en base. Les noms apparaissent dans la recherche et dans la fiche après sélection, jamais en étiquettes permanentes sur le dessin. Les boutons conservent leur nom accessible pour les lecteurs d’écran.
+Les repères publics utilisent une icône de collection issue des cards associées (ou un repère neutre sans collection). Les numéros restent des références internes en base. Les noms apparaissent dans la recherche et dans la fiche après sélection. Sur le dessin, le lieu sélectionné est prioritaire ; les autres étiquettes apparaissent en zoom rapproché si elles n'empiètent pas sur un repère ou un arrêt du Nam Tram. Les boutons conservent leur nom accessible pour les lecteurs d’écran.
 
 ## Modifier un lieu
 
@@ -30,6 +30,14 @@ Le dessin, les coordonnées et le parcours proviennent du dépôt privé `minedo
 ## Validation
 
 Exécuter les contrôles habituels du README et `supabase/manual/verify-resort-map.sql`. Tester un repère partagé, une card masquée, la recherche, le zoom/déplacement, le retour card → carte et l’ouverture des PDF/vidéos au-dessus de la carte. Vérifier les formats téléphone portrait/paysage et tablette, puis les gestes sur un véritable iPhone. La migration est rejouable sans écraser les réglages existants.
+
+## Cadrage, stations et recherche — 14 octobre 2026
+
+Les limites de déplacement suivent l'enveloppe du resort et retirent les coins vides du canevas. La vue d'ensemble reste centrée dans l'espace disponible au-dessus du dock et de la fiche ouverte. Le zoom maximal reste à 8 ; les gestes, boutons, clavier et recadrages utilisent les mêmes limites. Les stations gardent leurs coordonnées : leurs étiquettes à taille écran, reliées aux arrêts, utilisent les quatre icônes du resort et évitent les repères proches.
+
+Le filtre hébergements reprend le libellé traduit en capitales des cards. La recherche globale et celle de la carte disposent d'une catégorie dédiée aux destinations de type `accommodation`, indépendamment de leur cluster en base. Les quatre filtres occupent deux colonnes sur mobile.
+
+Moulin Rouge conserve le repère 7 près de Citron. Le [plan officiel du resort](https://www.danang.intercontinental.com/wp-content/uploads/2025/12/InterContinental-Danang-Resort-Map-VN.pdf) distingue ce repère du Summit / cinéma / M Club au repère 2. Aucun déplacement ni changement de données géographiques n'est appliqué dans cette mise à jour.
 
 ## Zones des hébergements — 13 octobre 2026
 

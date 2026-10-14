@@ -22,7 +22,7 @@ test("accommodation zones connect cards and map without claiming a precise build
   await preview.getByRole("button", { name: "Close place preview", exact: true }).click();
   const filter = map
     .locator(".atlas-collections")
-    .getByRole("button", { name: "Accommodation", exact: true });
+    .getByRole("button", { name: "ACCOMMODATION", exact: true });
   await filter.scrollIntoViewIfNeeded();
   await filter.click();
   await expect(filter).toHaveAttribute("aria-pressed", "true");

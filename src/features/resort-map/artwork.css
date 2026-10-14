@@ -663,17 +663,26 @@
   fill: #f0d692;
   filter: url(#gold-glow-v2);
 }
+.hub-atlas .tram-signs {
+  color: #e9d49c;
+}
+.hub-atlas .station-leader {
+  fill: none;
+  stroke: #d8c396;
+  stroke-width: 1;
+  opacity: 0.7;
+}
 .hub-atlas .station-plaque rect {
-  fill: rgba(4, 21, 28, 0.9);
-  stroke: rgba(216, 195, 150, 0.4);
+  fill: #071b21;
+  stroke: #d8c396;
   stroke-width: 1;
 }
 .hub-atlas .station-plaque text {
   fill: #e9d49c;
-  font:
-    400 8px/1 var(--font-jost),
-    sans-serif;
-  letter-spacing: 0.12em;
+  font-family: var(--font-jost), sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
 }
 .hub-atlas .tram-car-v2 {
   transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
