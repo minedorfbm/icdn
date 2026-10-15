@@ -26,12 +26,14 @@
     "images:audit": "bun scripts/check-images.ts --remote",
     "images:cache": "bun scripts/update-image-cache.ts",
     "images:cache:apply": "bun scripts/update-image-cache.ts --apply",
-    "test:mobile": "node node_modules/@playwright/test/cli.js test",
+    "test:mobile": "bun run test:mobile:iphone && bun run test:mobile:android",
     "test:mobile:install": "node node_modules/@playwright/test/cli.js install --with-deps webkit chromium",
     "migrations:test": "bun scripts/test-migrations.ts",
     "build:coverage": "HUB_BROWSER_COVERAGE=1 vite build",
     "test:mobile:coverage": "bun -e 'require(\"node:fs\").rmSync(\"coverage/browser\", { recursive: true, force: true })' && bun run build:coverage && HUB_BROWSER_COVERAGE=1 bun run test:mobile && bun scripts/report-browser-coverage.ts",
-    "coverage:check-production": "bun scripts/check-production-coverage.ts"
+    "coverage:check-production": "bun scripts/check-production-coverage.ts",
+    "test:mobile:iphone": "HUB_TEST_PROJECT=iphone-webkit node node_modules/@playwright/test/cli.js test --project=iphone-webkit",
+    "test:mobile:android": "HUB_TEST_PROJECT=android-chrome node node_modules/@playwright/test/cli.js test --project=android-chrome"
   },
   "overrides": {
     "source-map-js": "1.2.2",

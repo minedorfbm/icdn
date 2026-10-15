@@ -5,6 +5,7 @@ const browserCoverage = process.env["HUB_BROWSER_COVERAGE"] === "1";
 
 export default defineConfig({
   testDir: "./e2e",
+  outputDir: `test-results/${process.env["HUB_TEST_PROJECT"] ?? "all"}`,
   testMatch: "**/*.spec.ts",
   fullyParallel: false,
   workers: 1,
