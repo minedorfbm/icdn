@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./validation";
 
 // Validate at the server boundary; frontend types are inferred, never asserted from JSON.
 const text = z.string();
@@ -132,8 +132,8 @@ export const mapPlaceRow = z.object({
   name: text,
   level_id: levelId,
   pin: order,
-  x: z.number().finite(),
-  y: z.number().finite(),
+  x: z.number(),
+  y: z.number(),
   zoom: z.number().positive(),
   active: z.boolean(),
 });

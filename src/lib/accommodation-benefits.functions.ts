@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
+import { z } from "./validation";
 import { publicReader } from "./public-collection.server";
 import { publicCache, readPublicSnapshot } from "./hub-cache.server";
 import { benefitContent, benefitRow, benefitTranslationRow } from "./accommodation-benefits";

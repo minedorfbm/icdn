@@ -2,6 +2,52 @@ import { expect, test } from "./fixtures";
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 
+test("cards and benefits validate without dynamic evaluation under the candidate policy", async ({
+  page,
+}) => {
+  const violations: unknown[] = [];
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.exposeFunction("recordPolicyViolation", (report: unknown) => violations.push(report));
+  await page.addInitScript(() => {
+    document.addEventListener("securitypolicyviolation", (event) => {
+      if (event.blockedURI !== "eval") return;
+      (
+        window as unknown as {
+          recordPolicyViolation: (report: unknown) => void;
+        }
+      ).recordPolicyViolation({ directive: event.effectiveDirective, file: event.sourceFile });
+    });
+  });
+  // Exercise the real application under the candidate, without live provider dependencies.
+  await page.route("https://www.instagram.com/embed.js", (route) =>
+    route.fulfill({ contentType: "application/javascript", body: "" }),
+  );
+  await page.route("http://127.0.0.1:4173/**", async (route) => {
+    if (!route.request().isNavigationRequest()) return route.continue();
+    const response = await route.fetch();
+    const headers = response.headers();
+    const candidate = headers["content-security-policy-report-only"];
+    expect(candidate).toBeTruthy();
+    headers["content-security-policy"] += `, ${candidate}`;
+    delete headers["content-security-policy-report-only"];
+    return route.fulfill({ response, headers });
+  });
+  await page.goto("/rooms");
+  await page.getByRole("button", { name: "Benefits", exact: true }).click();
+  const benefits = page.getByRole("dialog", {
+    name: "Resort Classic Room Oceanview · Benefits",
+    exact: true,
+  });
+  await expect(benefits.getByRole("listitem")).toHaveCount(9);
+  await benefits.getByRole("button", { name: "Close", exact: true }).click();
+  await page.goto("/citron");
+  await expect(page.getByRole("dialog", { name: "Citron", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Test video/ })).toBeVisible();
+  expect(violations).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
 test("the candidate Worker policy restricts scripts and requests while allowing providers and local data", async ({
   page,
   request,

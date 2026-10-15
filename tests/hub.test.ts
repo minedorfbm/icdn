@@ -3,7 +3,7 @@ import { createHubValue, resolveHeroImage } from "../src/data/hub-value";
 import { actionsFor, instagramUrl } from "../src/lib/destination-actions";
 import { safeExternalUrl } from "../src/lib/external-url";
 import { LEVELS, toDestination, youtubeVideoId, type DestinationRow } from "../src/data/resort";
-import { destinationRow } from "../src/lib/hub-schema";
+import { destinationRow, mapPlaceRow } from "../src/lib/hub-schema";
 import type { HubData } from "../src/lib/hub.functions";
 
 const row: DestinationRow = {
@@ -32,6 +32,24 @@ const ready: HubData = {
 };
 
 describe("database authority", () => {
+  test("map coordinates stay numeric and finite without changing their precision", () => {
+    const place = {
+      id: "test-place",
+      name: "Test place",
+      level_id: "heaven",
+      pin: 1,
+      x: 0.123456789,
+      y: 0,
+      zoom: 2,
+      active: true,
+    };
+    expect(mapPlaceRow.parse(place)).toEqual(place);
+    for (const field of ["x", "y"]) {
+      for (const value of [NaN, Infinity, -Infinity, "0.5", null, undefined]) {
+        expect(mapPlaceRow.safeParse({ ...place, [field]: value }).success).toBe(false);
+      }
+    }
+  });
   test("editorial metadata overrides the legacy binary classification", () => {
     const card = toDestination({
       ...row,
