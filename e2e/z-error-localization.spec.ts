@@ -24,3 +24,47 @@ for (const { code } of LANGUAGES) {
     }
   });
 }
+
+test("a failed page retries in the chosen language without clearing its fallback early", async ({
+  page,
+}) => {
+  const copy = UI.ja;
+  await page.addInitScript(() => localStorage.setItem("adj-lang", "ja"));
+  await page.goto("/");
+  await expect(page.locator("#heaven")).toHaveCount(1);
+  let phase = "fail";
+  let releaseRequest!: () => void;
+  const pending = new Promise<void>((resolve) => {
+    releaseRequest = resolve;
+  });
+  await page.route("**/_serverFn/**", async (route) => {
+    if (phase === "success") return route.continue();
+    if (phase === "pending") await pending;
+    return route.abort();
+  });
+  await page.locator("#heaven").getByRole("button", { name: "Citron", exact: true }).click();
+  const title = page.getByRole("heading", { name: copy.error_page_title, exact: true });
+  const retry = page.getByRole("button", { name: copy.retry, exact: true });
+  await expect(title).toBeVisible();
+  phase = "pending";
+  await retry.click();
+  try {
+    const loading = page.getByRole("button", { name: copy.page_loading, exact: true });
+    await expect(loading).toBeDisabled();
+    await expect(loading).toHaveAttribute("aria-busy", "true");
+    await expect(title).toBeVisible();
+    await expect(page.getByRole("link", { name: copy.go_home, exact: true })).toHaveAttribute(
+      "href",
+      "/",
+    );
+  } finally {
+    releaseRequest();
+  }
+  await expect(retry).toBeEnabled();
+  await expect(title).toBeVisible();
+  phase = "success";
+  await retry.click();
+  await expect(page.getByRole("dialog", { name: "Citron", exact: true })).toBeVisible();
+  await expect(title).toHaveCount(0);
+  await expect(page.locator("html")).toHaveAttribute("lang", "ja");
+});

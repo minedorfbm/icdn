@@ -66,7 +66,17 @@ The [PR 114 validation](https://github.com/minedorfbm/icdn/actions/runs/38736871
 
 The hosted runner observed in PR 114 was 2.337.0, above the Node 24 minimum of 2.327.1. Checkout retains full history and its safe default for fork PRs. The workflow uses `pull_request`, not a privileged `pull_request_target` checkout. Setup-node still installs Node 22 for project tools; the action's runtime is separate. Its newly automatic npm cache is explicitly disabled because dependencies are installed with Bun. No registry authentication inputs are used, so removal of setup-node's dummy authentication token does not affect this workflow. Coverage remains a ZIP archive with the same name, directory, missing-file failure and 14-day retention.
 
-The existing Bun and Sonar action pins already declare Node 24 and remain unchanged. Read-only repository permissions, scanner signature verification, fork secret restrictions, quality-gate settings and every validation step are preserved. The maintenance change requires a successful run of the full existing workflow, including artifact upload and Sonar analysis; local YAML validation alone cannot establish runner compatibility.
+The existing Bun and Sonar action pins already declare Node 24 and remain unchanged. Read-only repository permissions, scanner signature verification, fork secret restrictions, quality-gate settings and every validation step are preserved. PR 115 passed the full existing workflow, including artifact upload and Sonar analysis, with 128 unit tests and 59 mobile scenarios on each engine in both ordinary and instrumented builds. The Node 20 action warnings disappeared. It was merged as `b75b8c8150fce052f71066ab7fb639d51bd8c46a`; its [main validation](https://github.com/minedorfbm/icdn/actions/runs/38744508190) and Cloudflare deployment also succeeded.
+
+## Root error-page recovery
+
+Sonar issue `AaE-Y3DPCjk8dMEb0Efg` identified the unhandled promise returned by the root error page's `router.invalidate()`. The click handler also called `reset()` immediately, before reloading finished. The page now awaits `invalidate({ sync: true })`, which coordinates the route reload and boundary reset, and handles an unexpected rejection. Loader errors remain the router's responsibility; they do not necessarily reject the invalidation promise.
+
+While reloading, the existing translated loading label replaces Try again, the button is disabled and exposes `aria-busy`, and the home link remains available. There is no automatic retry loop or additional backend polling. Error reporting uses the existing editor integration. Console reporting moved into the effect so loading-state renders do not log the same original error again.
+
+The browser regression opens Citron from the homepage, fails its data request, holds a manual retry, fails it again, and finally restores the request. It verifies the pending state, retained fallback and home link, renewed retry action, recovered card and preserved Japanese language. The pending-state assertion failed against the previous implementation and passes with this fix. Existing unknown-page checks still cover all six supported languages. These controlled failures test hub recovery, not live provider availability.
+
+Reference: [TanStack error recovery and loader invalidation](https://tanstack.com/router/latest/docs/guide/data-loading).
 
 ## Validation
 
@@ -85,8 +95,7 @@ References: [Sonar JavaScript coverage](https://docs.sonarsource.com/sonarqube-c
 ## Remaining work
 
 1. Attribute remaining candidate-policy violations before enforcing further script/connect restrictions. The film's confirmed recovery defects are addressed above; the initial intermittent provider load still has no conclusive cause. Keep provider availability distinct from hub defects; do not remove catalogue associations based on a transient embed failure.
-2. Validate and merge the GitHub Actions runtime maintenance described above; all action references retain immutable commit pins.
-3. Continue prioritising actionable Sonar issues using the now-passing main coverage gate; retain the existing threshold and scope.
-4. Resume the private catalogue export and test an isolated restore only when the owner is ready. The PostgreSQL export is postponed after authentication failures; it is not a completed backup. Storage file bytes require a separate copy.
+2. Continue prioritising actionable Sonar issues using the now-passing main coverage gate; retain the existing threshold and scope. The root error-page recovery is the next proposed fix.
+3. Resume the private catalogue export and test an isolated restore only when the owner is ready. The PostgreSQL export is postponed after authentication failures; it is not a completed backup. Storage file bytes require a separate copy.
 
 Historical SQL literal duplication, justified Instagram/reduced-motion overrides and generated route files do not warrant cosmetic rewrites. No recurring Cloudflare polling was found in the prior idle checks; third-party iframe requests go directly to their providers.
