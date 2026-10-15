@@ -150,7 +150,7 @@ export function CardStack({
 
   const onMove = (e: React.PointerEvent) => {
     const s = start.current;
-    if (!s || s.pointerId !== e.pointerId) return;
+    if (s?.pointerId !== e.pointerId) return;
     const dx = e.clientX - s.x;
     const dy = e.clientY - s.y;
     if (s.locked === null) {
@@ -175,17 +175,15 @@ export function CardStack({
     const atEnd = index === last && dx < 0;
     pendingDrag.current =
       atStart || atEnd ? dx * 0.25 : Math.max(-travel.current, Math.min(travel.current, dx));
-    if (frame.current === null) {
-      frame.current = requestAnimationFrame(() => {
-        frame.current = null;
-        setDrag(pendingDrag.current);
-      });
-    }
+    frame.current ??= requestAnimationFrame(() => {
+      frame.current = null;
+      setDrag(pendingDrag.current);
+    });
   };
 
   const finish = (e: React.PointerEvent, cancelled = false) => {
     const s = start.current;
-    if (!s || s.pointerId !== e.pointerId) return;
+    if (s?.pointerId !== e.pointerId) return;
     cancelFrame();
     start.current = null;
     setDragging(false);

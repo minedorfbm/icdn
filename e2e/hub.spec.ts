@@ -484,6 +484,77 @@ test("expanded cards show localized hours and service days below the description
   expect((await hours.boundingBox())!.y).toBeGreaterThan((await description.boundingBox())!.y);
 });
 
+test("notice translations show only current copy and fall back together when either source changes", async ({
+  page,
+}) => {
+  await page.addInitScript(() => localStorage.setItem("adj-lang", "ja"));
+  await page.goto("/nature-experiences");
+  const card = page.getByRole("dialog", { name: "Nature Discovery", exact: true });
+  await expect(card.getByRole("heading", { name: "お知らせ current", exact: true })).toBeVisible();
+  await expect(card.getByText("最新情報 current", { exact: true })).toBeVisible();
+  for (const id of ["changed-title", "changed-body", "untranslated"]) {
+    await expect(card.getByRole("heading", { name: `Update ${id}`, exact: true })).toBeVisible();
+    await expect(card.getByText(`Current information ${id}`, { exact: true })).toBeVisible();
+    await expect(card.getByText(`お知らせ ${id}`, { exact: true })).toHaveCount(0);
+    await expect(card.getByText(`最新情報 ${id}`, { exact: true })).toHaveCount(0);
+  }
+});
+
+test("the card deck ignores stray pointers, coalesces moves and recovers from cancellation", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const stage = page.locator("#heaven .touch-pan-y").first();
+  await stage.scrollIntoViewIfNeeded();
+  const active = stage.locator('article[aria-hidden="false"]');
+  await expect(active).toContainText("Citron");
+  const front = stage.locator('[data-destination-id="citron"]');
+  const restingTransform = await front.evaluate((el) => el.style.transform);
+  const pointer = { pointerId: 1, pointerType: "touch", isPrimary: true, button: 0, clientY: 200 };
+  // Hover/release events without a matching start must not create a gesture.
+  await stage.dispatchEvent("pointermove", { ...pointer, clientX: 50 });
+  await stage.dispatchEvent("pointerup", { ...pointer, clientX: 50 });
+  await expect(active).toContainText("Citron");
+  await stage.dispatchEvent("pointerdown", { ...pointer, clientX: 300 });
+  // A second finger cannot move or end the primary finger's gesture.
+  await stage.dispatchEvent("pointermove", {
+    ...pointer,
+    pointerId: 2,
+    isPrimary: false,
+    clientX: 50,
+  });
+  await stage.dispatchEvent("pointerup", {
+    ...pointer,
+    pointerId: 2,
+    isPrimary: false,
+    clientX: 50,
+  });
+  expect(await front.evaluate((el) => el.style.transform)).toBe(restingTransform);
+  // Both moves arrive in one frame; render the latest position and retain the active card until release.
+  await stage.evaluate((el, init) => {
+    el.dispatchEvent(new PointerEvent("pointermove", { ...init, bubbles: true, clientX: 220 }));
+    el.dispatchEvent(new PointerEvent("pointermove", { ...init, bubbles: true, clientX: 50 }));
+  }, pointer);
+  await expect.poll(() => front.evaluate((el) => el.style.transform)).not.toBe(restingTransform);
+  await expect(active).toContainText("Citron");
+  await stage.dispatchEvent("pointercancel", { ...pointer, clientX: 50 });
+  await expect.poll(() => front.evaluate((el) => el.style.transform)).toBe(restingTransform);
+  await expect(active).toContainText("Citron");
+  await stage.dispatchEvent("pointerdown", { ...pointer, clientX: 300 });
+  await stage.dispatchEvent("pointermove", { ...pointer, clientX: 50 });
+  await stage.dispatchEvent("pointerup", {
+    ...pointer,
+    pointerId: 2,
+    isPrimary: false,
+    clientX: 50,
+  });
+  await expect(active).toContainText("Citron");
+  await stage.dispatchEvent("pointerup", { ...pointer, clientX: 50 });
+  await expect(active).toContainText("TINGARA");
+  await stage.dispatchEvent("pointerup", { ...pointer, clientX: 50 });
+  await expect(active).toContainText("TINGARA");
+});
+
 const instagramTestScript = (delay: number) => `
 window.instgrm = { Embeds: { process() {
   document.querySelectorAll('.instagram-media').forEach((post) => {

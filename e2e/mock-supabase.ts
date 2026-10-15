@@ -114,6 +114,30 @@ const tables: Record<string, unknown[]> = {
       source_description: destinations[0]!.short_description,
     },
   ],
+  published_destination_notices: ["current", "changed-title", "changed-body", "untranslated"].map(
+    (id, display_order) => ({
+      id,
+      destination_id: "nature-experiences",
+      kind: "information",
+      title: `Update ${id}`,
+      body: `Current information ${id}`,
+      starts_at: "2020-01-01T00:00:00Z",
+      ends_at: null,
+      display_order,
+      translations:
+        id === "untranslated"
+          ? []
+          : [
+              {
+                locale: "ja",
+                title: `お知らせ ${id}`,
+                body: `最新情報 ${id}`,
+                source_title: id === "changed-title" ? "Old title" : `Update ${id}`,
+                source_body: id === "changed-body" ? "Old body" : `Current information ${id}`,
+              },
+            ],
+    }),
+  ),
   destination_opening_hours: [
     {
       id: "citron-breakfast",

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Instagram } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { InstagramIcon } from "@/components/ui/instagram-icon";
 import type { DestinationPost } from "@/data/resort";
 import { useI18n } from "@/i18n";
 import { instagramEmbedUrl, instagramLink } from "@/lib/external-url";
@@ -246,7 +247,7 @@ function PostCard({ post, handle }: Readonly<{ post: DestinationPost; handle: st
     <article className="overflow-hidden rounded-[18px] border border-current/12 bg-current/[0.04]">
       <header className="flex items-center gap-3 px-4 py-3.5">
         <span className="grid size-8 place-items-center rounded-full border border-current/25">
-          <Instagram className="size-3.5" strokeWidth={1.5} />
+          <InstagramIcon className="size-3.5" strokeWidth={1.5} />
         </span>
         <span className="text-[11px] tracking-[0.18em] opacity-85">{handle ?? "instagram"}</span>
       </header>
