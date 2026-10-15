@@ -2,7 +2,7 @@ import { expect, test } from "./fixtures";
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 
-test("cards and benefits validate without dynamic evaluation under the candidate policy", async ({
+test("cards and benefits validate without dynamic evaluation under the enforced Worker policy", async ({
   page,
 }) => {
   const violations: unknown[] = [];
@@ -11,7 +11,6 @@ test("cards and benefits validate without dynamic evaluation under the candidate
   await page.exposeFunction("recordPolicyViolation", (report: unknown) => violations.push(report));
   await page.addInitScript(() => {
     document.addEventListener("securitypolicyviolation", (event) => {
-      if (event.blockedURI !== "eval") return;
       (
         window as unknown as {
           recordPolicyViolation: (report: unknown) => void;
@@ -19,20 +18,10 @@ test("cards and benefits validate without dynamic evaluation under the candidate
       ).recordPolicyViolation({ directive: event.effectiveDirective, file: event.sourceFile });
     });
   });
-  // Exercise the real application under the candidate, without live provider dependencies.
+  // Exercise the real response headers, without overriding them or loading live providers.
   await page.route("https://www.instagram.com/embed.js", (route) =>
     route.fulfill({ contentType: "application/javascript", body: "" }),
   );
-  await page.route("http://127.0.0.1:4173/**", async (route) => {
-    if (!route.request().isNavigationRequest()) return route.continue();
-    const response = await route.fetch();
-    const headers = response.headers();
-    const candidate = headers["content-security-policy-report-only"];
-    expect(candidate).toBeTruthy();
-    headers["content-security-policy"] += `, ${candidate}`;
-    delete headers["content-security-policy-report-only"];
-    return route.fulfill({ response, headers });
-  });
   await page.goto("/rooms");
   await page.getByRole("button", { name: "Benefits", exact: true }).click();
   const benefits = page.getByRole("dialog", {
@@ -48,12 +37,13 @@ test("cards and benefits validate without dynamic evaluation under the candidate
   expect(errors).toEqual([]);
 });
 
-test("the candidate Worker policy restricts scripts and requests while allowing providers and local data", async ({
+test("the enforced Worker policy restricts scripts and requests while allowing providers and local data", async ({
   page,
   request,
 }) => {
-  // Exercise the report-only candidate as an enforced policy in this isolated page.
-  const policy = (await request.get("/")).headers()["content-security-policy-report-only"]!;
+  const headers = (await request.get("/")).headers();
+  const policy = headers["content-security-policy"]!;
+  expect(headers["content-security-policy-report-only"]).toBeUndefined();
   let unexpectedRequests = 0;
   await page.route("https://unapproved.example/**", (route) => {
     unexpectedRequests++;
@@ -67,6 +57,12 @@ test("the candidate Worker policy restricts scripts and requests while allowing 
       }),
     );
   }
+  await page.route("https://www.instagram.com/security-connection-check", (route) =>
+    route.fulfill({
+      body: "Instagram connection allowed",
+      headers: { "access-control-allow-origin": "*" },
+    }),
+  );
   await page.route("**/security-local-data", (route) =>
     route.fulfill({ body: "Local data loaded" }),
   );
@@ -81,6 +77,7 @@ test("the candidate Worker policy restricts scripts and requests while allowing 
           document.body.append(result);
         });
         fetch('/security-local-data').then(r => r.text()).then(text => document.body.append(text));
+        fetch('https://www.instagram.com/security-connection-check').then(r => r.text()).then(text => document.body.append(text));
         fetch('https://unapproved.example/data').catch(() => {});
         try { new Function('document.body.append("Unsafe evaluation executed")')(); } catch {}
       </script>
@@ -94,6 +91,7 @@ test("the candidate Worker policy restricts scripts and requests while allowing 
   await expect(page.locator("body")).toContainText("www.instagram.com loaded");
   await expect(page.locator("body")).toContainText("www.youtube.com loaded");
   await expect(page.locator("body")).toContainText("Local data loaded");
+  await expect(page.locator("body")).toContainText("Instagram connection allowed");
   await expect(page.locator("output", { hasText: "connect-src:" })).toHaveCount(1);
   await expect(
     page.locator("output", { hasText: "https://unapproved.example/script.js" }),

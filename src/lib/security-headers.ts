@@ -1,15 +1,15 @@
-// Frame/worker restrictions are enforced. Script and connection restrictions
-// remain report-only until live provider checks are conclusive. SSR needs inline scripts.
+// Enforce the provider policy validated against live embeds and local data.
+// SSR still needs inline scripts; inline handlers and dynamic evaluation stay blocked.
 const FRAME_POLICY =
   "frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.instagram.com https://danang.intercontinental.com https://www.danang.intercontinental.com https://tablecheck.com https://www.tablecheck.com";
 const WORKER_POLICY = "worker-src 'self' blob:";
 const SCRIPT_POLICY =
   "script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.youtube.com";
 const CONNECT_POLICY = "connect-src 'self' https://www.instagram.com";
-const ENFORCED_RESOURCES = `${FRAME_POLICY}; ${WORKER_POLICY}; script-src-attr 'none'`;
 const RESOURCE_POLICY = [
   "default-src 'self'",
   SCRIPT_POLICY,
+  "script-src-attr 'none'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' https://fonts.gstatic.com",
@@ -20,8 +20,7 @@ const RESOURCE_POLICY = [
 ].join("; ");
 
 const SECURITY_HEADERS = {
-  "content-security-policy": `frame-ancestors 'self'; base-uri 'self'; object-src 'none'; ${ENFORCED_RESOURCES}`,
-  "content-security-policy-report-only": RESOURCE_POLICY,
+  "content-security-policy": `frame-ancestors 'self'; base-uri 'self'; object-src 'none'; ${RESOURCE_POLICY}`,
   "x-frame-options": "SAMEORIGIN",
   "strict-transport-security": "max-age=31536000; includeSubDomains",
   "x-content-type-options": "nosniff",
@@ -32,6 +31,8 @@ const SECURITY_HEADERS = {
 /** Add safe baseline headers to dynamic Worker responses without changing their body. */
 export function withSecurityHeaders(response: Response, request?: Request): Response {
   const headers = new Headers(response.headers);
+  // Supersede the observation header if an upstream response still carries it.
+  headers.delete("content-security-policy-report-only");
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
     headers.set(name, value);
   }
@@ -48,7 +49,7 @@ export function withSecurityHeaders(response: Response, request?: Request): Resp
   ) {
     headers.set(
       "content-security-policy",
-      `frame-ancestors 'self' https://artdigitaljourney.com; base-uri 'self'; object-src 'none'; ${ENFORCED_RESOURCES}`,
+      `frame-ancestors 'self' https://artdigitaljourney.com; base-uri 'self'; object-src 'none'; ${RESOURCE_POLICY}`,
     );
     // CSP supplies the exact parent allowlist; SAMEORIGIN would conflict with it.
     headers.delete("x-frame-options");

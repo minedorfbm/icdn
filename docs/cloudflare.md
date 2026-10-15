@@ -1,6 +1,6 @@
 # Hébergement Cloudflare Workers
 
-Le hub est déjà en production sur <https://icdnd.artdigitaljourney.com/>. Le Worker `icdnd` est relié au dépôt `minedorfbm/icdnd`, branche `main`. Cloudflare sert à la fois le rendu serveur TanStack Start et les fichiers statiques. La landing page `artdigitaljourney.com` relève d’un autre dépôt et d’un autre Worker.
+Le hub est déjà en production sur <https://icdn.artdigitaljourney.com/>. Le Worker `icdnd` est relié au dépôt `minedorfbm/icdn`, branche `main`. Cloudflare sert à la fois le rendu serveur TanStack Start et les fichiers statiques. La landing page `artdigitaljourney.com` relève d’un autre dépôt et d’un autre Worker.
 
 ## Construction et déploiement
 
@@ -28,3 +28,11 @@ Le preset Nitro est `cloudflare-module`. `@lovable.dev/vite-tanstack-config` res
 ## Dépendances de construction
 
 `@lovable.dev/vite-tanstack-config` compose Vite, React, Tailwind, TanStack Start et Nitro. Nitro cible `cloudflare-module` ; sa version beta est verrouillée par `bun.lock`. Cette configuration est active, pas du code mort : ne pas doubler ses plugins. Une extraction future doit être une migration dédiée, validée par le build Worker et les tests WebKit. Aucun changement de moteur de construction n’est nécessaire pour le nettoyage actuel.
+
+## Politique de sécurité des contenus
+
+Le Worker applique les restrictions de ressources précédemment testées en observation : scripts locaux, Instagram et YouTube ; connexions locales et Instagram ; iframes limitées aux fournisseurs approuvés. Les PDF passent par le serveur du hub, les lectures Supabase restent côté serveur et le lecteur PDF utilise un worker local/blob. Les styles Google Fonts et leurs polices restent autorisés. Les images et médias HTTPS restent possibles pour le catalogue.
+
+Le rendu serveur nécessite encore les scripts inline. Les gestionnaires inline (`onclick`, etc.) et l’évaluation dynamique (`eval`/`Function`) restent bloqués. Cette politique limite les ressources chargées ; elle ne garantit ni l’absence de vulnérabilité ni la disponibilité des services tiers.
+
+L’ancien en-tête `Content-Security-Policy-Report-Only` est retiré. Aucun collecteur de rapports, suivi supplémentaire ou requête récurrente n’est ajouté. L’exception d’intégration par `artdigitaljourney.com` reste limitée aux deux pages de démonstration prévues. Toute nouvelle origine de script, connexion ou iframe doit être vérifiée avant d’être autorisée dans `src/lib/security-headers.ts`.

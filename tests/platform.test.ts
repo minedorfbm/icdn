@@ -2,20 +2,29 @@ import { describe, expect, test } from "bun:test";
 import { withSecurityHeaders } from "../src/lib/security-headers";
 
 describe("Worker response security", () => {
-  test("adds baseline headers and preserves the response", async () => {
+  test("enforces resource restrictions, removes the observation header and preserves the response", async () => {
     const response = withSecurityHeaders(
-      new Response("ok", { status: 201, headers: { "cache-control": "public" } }),
+      new Response("ok", {
+        status: 201,
+        headers: {
+          "cache-control": "public",
+          "content-security-policy-report-only": "default-src 'none'",
+        },
+      }),
     );
     expect(response.headers.get("content-security-policy")).toContain("frame-ancestors 'self'");
-    expect(response.headers.get("content-security-policy-report-only")).toContain(
-      "worker-src 'self' blob:",
-    );
+    expect(response.headers.has("content-security-policy-report-only")).toBe(false);
     const policy = response.headers.get("content-security-policy")!;
     expect(policy).toContain("frame-src https://www.youtube-nocookie.com");
     expect(policy).toContain("https://www.instagram.com");
     expect(policy).toContain("https://www.tablecheck.com");
     expect(policy).toContain("worker-src 'self' blob:");
     expect(policy).toContain("script-src-attr 'none'");
+    expect(policy).toContain(
+      "script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.youtube.com",
+    );
+    expect(policy).toContain("connect-src 'self' https://www.instagram.com");
+    expect(policy).not.toContain("'unsafe-eval'");
     expect(response.status).toBe(201);
     expect(await response.text()).toBe("ok");
     expect(response.headers.get("cache-control")).toBe("public");
@@ -35,9 +44,7 @@ describe("Worker response security", () => {
       );
       expect(response.headers.has("x-frame-options")).toBe(false);
       expect(response.headers.get("permissions-policy")).toContain("camera=()");
-      expect(response.headers.get("content-security-policy-report-only")).toContain(
-        "default-src 'self'",
-      );
+      expect(response.headers.get("content-security-policy")).toContain("default-src 'self'");
     },
   );
 
