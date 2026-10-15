@@ -78,6 +78,24 @@ The browser regression opens Citron from the homepage, fails its data request, h
 
 Reference: [TanStack error recovery and loader invalidation](https://tanstack.com/router/latest/docs/guide/data-loading).
 
+## Deprecated validation and component APIs
+
+Seven obsolete API usages are replaced without changing the dependency versions or catalogue contract. Notice timestamps use `z.iso.datetime({ offset: true })`; explicit time-zone offsets and a nullable end remain required as before. Map coordinates use `z.number()` directly: the installed Zod 4 implementation already rejects non-finite values, and its deprecated `.finite()` method returns the schema unchanged. Three sheet ref types use `React.ComponentRef`, which is exactly what the installed deprecated `ElementRef` alias resolves to. The rendered sheet markup, classes, focus management and Radix behavior are unchanged.
+
+Two compatibility tests pass both before and after the replacements. They exercise UTC and positive/negative offsets, fractional seconds, open-ended notices, malformed dates, missing time zones, missing values, numeric precision, non-finite coordinates and numeric strings. All 130 unit tests, typecheck, lint and production build pass. This is dependency-compatibility maintenance, not a newly discovered security vulnerability; the data-validation boundary remains in place.
+
+Reference: [Zod 4 migration guide](https://zod.dev/v4/changelog).
+
+### CSP evaluation probe
+
+A local Chromium diagnostic on the production build reproduced `script-src` / `eval` at the generated card bundle's Zod `allowsEval` probe. This identifies a reproducible hub-side source, not necessarily every violation seen in the earlier live-provider audit. The installed library probes `Function("")` when constructing object schemas, even if a caught failure allows validation to continue.
+
+All six runtime Zod imports now go through one configured module that calls `z.config({ jitless: true })` before constructing application schemas. This selects the library's regular validator and skips dynamic code generation and its capability probe. Type-only imports remain type-only. The installed implementation already avoids dynamic evaluation on Cloudflare; no database constraints, publication checks or allowed URL rules are relaxed. No `unsafe-eval` permission, new dependency or production security-header change is introduced.
+
+A new browser regression enforces the candidate policy only in the local test, opens accommodation Benefits and Citron, and records CSP evaluation violations and unhandled errors. Before this configuration it recorded two evaluation violations; with the configuration it passes on both Android/Chromium and iPhone/WebKit. All six targeted security and Benefits scenarios pass on each engine. Approved provider scripts/frames, rejected unknown resources, error-page recovery and Benefits retry remain covered by the existing tests. Provider scripts are controlled fixtures in this test; it does not certify the current live Instagram or YouTube services or justify enforcing the full candidate policy in production yet.
+
+Reference: [Zod's CSP guidance](https://zod.dev/compile) and [maintainer guidance on configuring before schema creation](https://github.com/colinhacks/zod/issues/4461).
+
 ## Validation
 
 PR 112 was merged as `0b80c2846f4c3960818acd53e51040f546e3e69a`. Its [main validation](https://github.com/minedorfbm/icdn/actions/runs/38714497762) passed with both coverage reports imported; the broader main quality gate now passes (85.3% new-code coverage, 0.9% duplication, zero security hotspots). The ordinary build passed 55 mobile scenarios on each browser engine and 128 unit tests. One instrumented WebKit scenario passed on retry after a browser crash. Production deployment of that revision was confirmed.
@@ -94,7 +112,7 @@ References: [Sonar JavaScript coverage](https://docs.sonarsource.com/sonarqube-c
 
 ## Remaining work
 
-1. Attribute remaining candidate-policy violations before enforcing further script/connect restrictions. The film's confirmed recovery defects are addressed above; the initial intermittent provider load still has no conclusive cause. Keep provider availability distinct from hub defects; do not remove catalogue associations based on a transient embed failure.
+1. Complete live provider checks before enforcing further script/connect restrictions. The reproducible hub-side evaluation probe is attributed and addressed above; other provider violations and the initial intermittent film load still require separate evidence. Keep provider availability distinct from hub defects; do not remove catalogue associations based on a transient embed failure.
 2. Continue prioritising actionable Sonar issues using the now-passing main coverage gate; retain the existing threshold and scope. The root error-page recovery is the next proposed fix.
 3. Resume the private catalogue export and test an isolated restore only when the owner is ready. The PostgreSQL export is postponed after authentication failures; it is not a completed backup. Storage file bytes require a separate copy.
 

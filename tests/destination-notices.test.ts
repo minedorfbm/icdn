@@ -1,5 +1,10 @@
 import { expect, test } from "bun:test";
-import { currentNotices, noticeCopy, type DestinationNotice } from "../src/lib/destination-notices";
+import {
+  currentNotices,
+  destinationNoticeRow,
+  noticeCopy,
+  type DestinationNotice,
+} from "../src/lib/destination-notices";
 const notice: DestinationNotice = {
   id: "temporary",
   destination_id: "la-maison-1888",
@@ -19,6 +24,35 @@ const notice: DestinationNotice = {
     },
   ],
 };
+test("notice timestamps preserve explicit offsets and reject ambiguous or invalid dates", () => {
+  for (const timestamp of [
+    "2026-10-06T00:00:00Z",
+    "2026-10-06T07:00:00+07:00",
+    "2026-10-05T20:00:00-04:00",
+    "2026-10-06T07:00:00.123456+07:00",
+  ]) {
+    const parsed = destinationNoticeRow.parse({ ...notice, starts_at: timestamp, ends_at: null });
+    expect(parsed.starts_at).toBe(timestamp);
+    expect(parsed.ends_at).toBeNull();
+    expect(currentNotices([parsed], Date.parse(timestamp))).toEqual([parsed]);
+    expect(destinationNoticeRow.parse({ ...notice, ends_at: timestamp }).ends_at).toBe(timestamp);
+  }
+  for (const timestamp of [
+    "2026-10-06",
+    "2026-10-06T07:00:00",
+    "2026-02-30T07:00:00Z",
+    "2026-10-06T25:00:00Z",
+    "tomorrow",
+    "",
+    1791244800000,
+    undefined,
+  ]) {
+    for (const field of ["starts_at", "ends_at"]) {
+      expect(destinationNoticeRow.safeParse({ ...notice, [field]: timestamp }).success).toBe(false);
+    }
+  }
+  expect(destinationNoticeRow.safeParse({ ...notice, starts_at: null }).success).toBe(false);
+});
 test("notices respect start and exclusive end, including cached expired notices", () => {
   expect(currentNotices([notice], Date.parse("2026-10-05T23:59:59Z"))).toEqual([]);
   expect(currentNotices([notice], Date.parse(notice.starts_at))).toEqual([notice]);

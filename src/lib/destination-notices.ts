@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "./validation";
 
 const localizedNotice = z.object({
   locale: z.enum(["vi", "ru", "zh", "ko", "ja"]),
@@ -13,8 +13,8 @@ export const destinationNoticeRow = z.object({
   kind: z.enum(["information", "relocation", "closure"]),
   title: z.string().min(1),
   body: z.string().min(1),
-  starts_at: z.string().datetime({ offset: true }),
-  ends_at: z.string().datetime({ offset: true }).nullable(),
+  starts_at: z.iso.datetime({ offset: true }),
+  ends_at: z.iso.datetime({ offset: true }).nullable(),
   display_order: z.number().int(),
   translations: z.array(localizedNotice),
 });

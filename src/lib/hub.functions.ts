@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
+import { z } from "./validation";
 import { destinationNoticeRow } from "./destination-notices";
 import { openingHoursRow } from "./opening-hours";
 import { publicReader } from "./public-collection.server";
