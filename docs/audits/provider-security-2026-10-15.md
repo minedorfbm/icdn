@@ -98,9 +98,19 @@ The package marks only `src/lib/validation.ts` as side-effectful so its initiali
 
 A new browser regression enforces the candidate policy only in the local test, opens accommodation Benefits and Citron, and records CSP evaluation violations and unhandled errors. Before this configuration it recorded two evaluation violations; with the configuration it passes on both Android/Chromium and iPhone/WebKit. All six targeted security and Benefits scenarios pass on each engine. Approved provider scripts/frames, rejected unknown resources, error-page recovery and Benefits retry remain covered by the existing tests. Provider scripts are controlled fixtures in this test; it does not certify the current live Instagram or YouTube services or justify enforcing the full candidate policy in production yet.
 
-With the initialization preserved, the new CSP check, both Benefits cases and root error recovery also pass in the instrumented build on both engines. The final ordinary build passes all six targeted security/Benefits cases on each engine, typecheck, lint, 130 unit tests and the production coverage-isolation guard. The complete CI suite remains the final check on PR 117.
+With the initialization preserved, the new CSP check, both Benefits cases and root error recovery also pass in the instrumented build on both engines. The final ordinary build passes all six targeted security/Benefits cases on each engine, typecheck, lint, 130 unit tests and the production coverage-isolation guard. [PR 117 CI](https://github.com/minedorfbm/icdn/actions/runs/38755022168) passed all 61 mobile scenarios on each engine in both builds, with 100% new-code coverage, zero new issues and zero security hotspots. The PR was merged as `21fadb3514452d643846d51fafb5047e49eecc0f`.
 
 Reference: [Zod's CSP guidance](https://zod.dev/compile) and [maintainer guidance on configuring before schema creation](https://github.com/colinhacks/zod/issues/4461).
+
+### Retained Instagram icon and remaining triage
+
+The authenticated SonarCloud main view after PR 116 showed 233 open issues, including 34 TypeScript/CSS issues. Seven of those API warnings are addressed by PR 117. The follow-up removes five references to Lucide's deprecated Instagram brand export and simplifies four redundant guards/assignments in card gestures and translated notices. These are maintenance findings, not discovered vulnerabilities.
+
+Lucide's installed types announce removal of brand exports in v1. The hub retains the exact existing Instagram outline in a small local component built with the supported `createLucideIcon` factory. Geometry, CSS classes, stroke widths, sizes and decorative accessibility behavior are preserved, with the upstream ISC/MIT license in `licenses/lucide.txt`. This does not replace official Instagram embeds or add a dependency. A direct server-render comparison against the installed original produces identical SVG for all four checked prop combinations. Reference: [Lucide's brand-icon policy](https://github.com/lucide-icons/lucide/issues/670).
+
+The pointer-ID guards still ignore unrelated pointers and the animation-frame assignment still schedules at most one pending update, including a valid handle of zero. Notice translations still require matching title and body sources. All 130 unit tests, typecheck, lint and production build pass. Four existing mobile cases pass on each engine: independent card/menu activation, forward/back deck gestures, failed Instagram script retry and stalled-player retry without restarting neighbouring posts.
+
+The other 18 TypeScript/CSS findings in that review are deliberately retained: one generated route-file lint directive; ten CSS priority overrides for provider inline styles and reduced motion; four ordered/bounded-concurrency loops; the language setter's internal name, which distinguishes it from the persistence wrapper; and two index-key lists of stateless benefit text and photo indicators without persisted row identity. Creating synthetic IDs or changing catalogue schemas solely for these two warnings would add complexity without fixing a demonstrated behavior defect. No findings are hidden, excluded or marked accepted through this review.
 
 ## Validation
 
@@ -119,7 +129,7 @@ References: [Sonar JavaScript coverage](https://docs.sonarsource.com/sonarqube-c
 ## Remaining work
 
 1. Complete live provider checks before enforcing further script/connect restrictions. The reproducible hub-side evaluation probe is attributed and addressed above; other provider violations and the initial intermittent film load still require separate evidence. Keep provider availability distinct from hub defects; do not remove catalogue associations based on a transient embed failure.
-2. Continue prioritising actionable Sonar issues using the now-passing main coverage gate; retain the existing threshold and scope. Root error-page recovery is deployed; the validation and deprecated-API follow-up is proposed in PR 117.
+2. Continue prioritising actionable Sonar issues using the now-passing main coverage gate; retain the existing threshold and scope. Root error-page recovery and PR 117 are merged. The next follow-up retains the Instagram icon and simplifies four application conditions; the remaining intentional findings are documented above.
 3. Resume the private catalogue export and test an isolated restore only when the owner is ready. The PostgreSQL export is postponed after authentication failures; it is not a completed backup. Storage file bytes require a separate copy.
 
 Historical SQL literal duplication, justified Instagram/reduced-motion overrides and generated route files do not warrant cosmetic rewrites. No recurring Cloudflare polling was found in the prior idle checks; third-party iframe requests go directly to their providers.

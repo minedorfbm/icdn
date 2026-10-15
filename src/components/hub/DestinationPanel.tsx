@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Instagram } from "lucide-react";
+import { InstagramIcon } from "@/components/ui/instagram-icon";
 import { useI18n } from "@/i18n";
 import type { Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
@@ -62,7 +62,7 @@ export function DestinationPanel({
               aria-label={t("instagram_spot")}
               className="grid size-7 shrink-0 place-items-center rounded-full border border-white/30 bg-black/30 text-white"
             >
-              <Instagram className="size-2.5" strokeWidth={1.6} />
+              <InstagramIcon className="size-2.5" strokeWidth={1.6} />
             </span>
           )}
         </div>
@@ -108,7 +108,7 @@ export function DestinationPanel({
               tabIndex={active ? 0 : -1}
               className="pointer-events-auto grid size-11 place-items-center rounded-full border border-background/25 bg-foreground/65 text-background shadow-md backdrop-blur-md transition-colors hover:bg-foreground/80"
             >
-              <Instagram className="size-3.5" strokeWidth={1.5} />
+              <InstagramIcon className="size-3.5" strokeWidth={1.5} />
             </a>
           )}
         </div>

@@ -28,7 +28,7 @@ export function currentNotices(notices: DestinationNotice[], now = Date.now()) {
 }
 export function noticeCopy(notice: DestinationNotice, locale: string) {
   const row = notice.translations.find((item) => item.locale === locale);
-  return row && row.source_title === notice.title && row.source_body === notice.body
+  return row?.source_title === notice.title && row.source_body === notice.body
     ? { title: row.title, body: row.body }
     : { title: notice.title, body: notice.body };
 }
