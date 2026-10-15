@@ -551,6 +551,55 @@ test("Instagram can retry a failed script without reloading the card", async ({
   }
 });
 
+test("Instagram retry replaces a stalled player without restarting neighbouring posts", async ({
+  page,
+}) => {
+  let scripts = 0;
+  await page.route("https://www.instagram.com/embed.js", (route) => {
+    scripts++;
+    return route.fulfill({
+      contentType: "application/javascript",
+      body: `const attempts = new Map();
+      window.instgrm = { Embeds: { process() {
+        document.querySelectorAll('blockquote.instagram-media').forEach((post) => {
+          if (post.dataset.processed) return;
+          post.dataset.processed = 'true';
+          const url = post.dataset.instgrmPermalink;
+          const count = (attempts.get(url) || 0) + 1;
+          attempts.set(url, count);
+          const first = url.includes('/SHORT/');
+          const stalled = first && count === 1;
+          const frame = document.createElement('iframe');
+          frame.title = first ? 'Retryable post' : 'Neighbour post';
+          frame.dataset.attempt = String(count);
+          frame.style.cssText = 'display:block;width:100%;border:0;height:' + (stalled ? 0 : 500) + 'px';
+          if (stalled) frame.style.position = 'absolute';
+          frame.srcdoc = '<p>Official Instagram post</p>';
+          post.before(frame);
+          post.style.display = 'none';
+        });
+      } } };`,
+    });
+  });
+  await page.goto("/la-maison-1888");
+  const card = page.getByRole("dialog", { name: "La Maison 1888", exact: true });
+  await card.locator("[data-instagram-track]").scrollIntoViewIfNeeded();
+  const first = card.locator(".instagram-post").first();
+  const retry = first.getByRole("button", { name: "Try again", exact: true });
+  await expect(retry).toBeVisible({ timeout: 15000 });
+  await expect(first.getByRole("link", { name: "VIEW ON INSTAGRAM", exact: true })).toBeVisible();
+  const neighbour = card.locator('iframe[title="Neighbour post"]');
+  await expect(neighbour).toHaveAttribute("data-attempt", "1");
+  await retry.click();
+  const recovered = first.locator('iframe[title="Retryable post"]');
+  await expect(recovered).toHaveAttribute("data-attempt", "2");
+  await expect(recovered).toBeVisible();
+  await expect(retry).toHaveCount(0);
+  await expect(first.locator("iframe")).toHaveCount(1);
+  await expect(neighbour).toHaveAttribute("data-attempt", "1");
+  expect(scripts).toBe(1);
+});
+
 async function openInstagramCarousel(page: Page, path: string, name: string) {
   let loads = 0;
   await page.route("https://www.instagram.com/embed.js", (route) => {
@@ -666,6 +715,12 @@ for (const [path, name] of [
       await expectInstagramPagination(card);
     };
     await expectHeight(260);
+    // Focusing an embedded control can vertically scroll even an overflow-y:hidden
+    // track. Keep the post header visible instead of retaining that hidden offset.
+    await track.evaluate((el) => {
+      el.scrollTop = 37;
+    });
+    await expect.poll(() => track.evaluate((el) => el.scrollTop)).toBe(0);
     await card.getByRole("button", { name: "2 / 2", exact: true }).click();
     await expectHeight(920);
     for (const size of [

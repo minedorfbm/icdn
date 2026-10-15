@@ -31,6 +31,9 @@ export function InstagramPostCarousel({ posts }: Readonly<{ posts: DestinationPo
   const onScroll = useCallback(() => {
     const node = track.current;
     if (!node) return;
+    // Focus/resize can scroll the hidden vertical axis and crop the post header.
+    // This carousel scrolls horizontally only; keep its visible content top-aligned.
+    if (node.scrollTop !== 0) node.scrollTop = 0;
     const center = node.getBoundingClientRect().left + node.clientWidth / 2;
     const distances = Array.from(node.children, (slide) => {
       const rect = slide.getBoundingClientRect();

@@ -198,7 +198,13 @@ export function InstagramPostEmbed({ post }: Readonly<{ post: DestinationPost }>
             ready ? { width: fit.width, height: fit.height } : { height: 1, pointerEvents: "none" }
           }
         >
-          <div className="instagram-post-content" style={{ transform: `scale(${fit.scale})` }}>
+          <div
+            // Instagram marks processed placeholders and inserts its own player.
+            // A retry needs fresh markup; process() ignores a stalled, already processed post.
+            key={`${post.post_url}:${attempt}`}
+            className="instagram-post-content"
+            style={{ transform: `scale(${fit.scale})` }}
+          >
             <blockquote
               className="instagram-media"
               data-instgrm-permalink={permalink}
