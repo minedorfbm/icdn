@@ -40,8 +40,8 @@ const report = [
     "A file absent here may be exercised by those scenarios. Type declarations and the generated route tree " +
     "are omitted from this inventory; no hand-written application source is excluded.",
   "",
-  "SonarCloud currently uses automatic analysis and does not import this report. " +
-    "Import requires CI-based analysis with sonar.javascript.lcov.reportPaths=coverage/lcov.info.",
+  "SonarCloud imports this LCOV report when CI analysis is enabled (SONAR_CI_ENABLED=true). " +
+    "Until the authenticated CI migration is activated, the existing automatic analysis does not import coverage.",
   "",
   "<details><summary>Sources not measured by the unit-test run</summary>",
   "",

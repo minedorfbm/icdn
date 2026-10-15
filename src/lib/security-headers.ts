@@ -1,16 +1,19 @@
-// Enforce frame/worker destinations first. Keep scripts, fonts and connections in
-// report-only until production provider checks cover their full resource chains.
+// Frame/worker restrictions are enforced. Script and connection restrictions
+// remain report-only until live provider checks are conclusive. SSR needs inline scripts.
 const FRAME_POLICY =
   "frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.instagram.com https://danang.intercontinental.com https://www.danang.intercontinental.com https://tablecheck.com https://www.tablecheck.com";
 const WORKER_POLICY = "worker-src 'self' blob:";
+const SCRIPT_POLICY =
+  "script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.youtube.com";
+const CONNECT_POLICY = "connect-src 'self' https://www.instagram.com";
 const ENFORCED_RESOURCES = `${FRAME_POLICY}; ${WORKER_POLICY}; script-src-attr 'none'`;
 const RESOURCE_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.youtube.com",
+  SCRIPT_POLICY,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' https://fonts.gstatic.com",
-  "connect-src 'self' https://*.supabase.co https://www.instagram.com",
+  CONNECT_POLICY,
   FRAME_POLICY,
   WORKER_POLICY,
   "media-src 'self' blob: https:",
