@@ -74,7 +74,9 @@ Sonar issue `AaE-Y3DPCjk8dMEb0Efg` identified the unhandled promise returned by 
 
 While reloading, the existing translated loading label replaces Try again, the button is disabled and exposes `aria-busy`, and the home link remains available. There is no automatic retry loop or additional backend polling. Error reporting uses the existing editor integration. Console reporting moved into the effect so loading-state renders do not log the same original error again.
 
-The browser regression opens Citron from the homepage, fails its data request, holds a manual retry, fails it again, and finally restores the request. It verifies the pending state, retained fallback and home link, renewed retry action, recovered card and preserved Japanese language. The pending-state assertion failed against the previous implementation and passes with this fix. Existing unknown-page checks still cover all six supported languages. These controlled failures test hub recovery, not live provider availability.
+The browser regression opens Citron from the homepage, fails its data request, injects an unexpected invalidation rejection, holds a manual retry, fails it again, and finally restores the request. It verifies the pending state, retained fallback and home link, renewed retry action, absence of an unhandled rejection, recovered card and preserved Japanese language. The pending-state assertion failed against the previous implementation and passes with this fix. Existing unknown-page checks still cover all six supported languages. These controlled failures test hub recovery, not live provider availability.
+
+PR 116 was merged as `263e9871bae1a6829f3f5488a2888bcea84d702a`. Its [final validation](https://github.com/minedorfbm/icdn/actions/runs/38751133081) passed with 128 unit tests and 60 mobile scenarios on each engine in both ordinary and instrumented builds. Sonar reported 92.9% new-code coverage, no new issues, no security hotspots and no duplication. The initial 78.6% coverage failure was resolved by testing the unexpected rejection path; the 80% gate was retained. Cloudflare confirmed the production build `c2f2191f-9fa0-4966-9322-7125dc49555e`, version `3caee253-e64e-4257-a364-938c27b8fb40`.
 
 Reference: [TanStack error recovery and loader invalidation](https://tanstack.com/router/latest/docs/guide/data-loading).
 
@@ -92,7 +94,11 @@ A local Chromium diagnostic on the production build reproduced `script-src` / `e
 
 All six runtime Zod imports now go through one configured module that calls `z.config({ jitless: true })` before constructing application schemas. This selects the library's regular validator and skips dynamic code generation and its capability probe. Type-only imports remain type-only. The installed implementation already avoids dynamic evaluation on Cloudflare; no database constraints, publication checks or allowed URL rules are relaxed. No `unsafe-eval` permission, new dependency or production security-header change is introduced.
 
+The package marks only `src/lib/validation.ts` as side-effectful so its initialization survives bundling of re-exported imports. Without this declaration, the instrumented build dropped the configuration and the new regression again reported two evaluation violations. The configuration is application behavior, so both ordinary and instrumented builds must preserve it; instrumentation does not bypass the policy or alter this setting.
+
 A new browser regression enforces the candidate policy only in the local test, opens accommodation Benefits and Citron, and records CSP evaluation violations and unhandled errors. Before this configuration it recorded two evaluation violations; with the configuration it passes on both Android/Chromium and iPhone/WebKit. All six targeted security and Benefits scenarios pass on each engine. Approved provider scripts/frames, rejected unknown resources, error-page recovery and Benefits retry remain covered by the existing tests. Provider scripts are controlled fixtures in this test; it does not certify the current live Instagram or YouTube services or justify enforcing the full candidate policy in production yet.
+
+With the initialization preserved, the new CSP check, both Benefits cases and root error recovery also pass in the instrumented build on both engines. The final ordinary build passes all six targeted security/Benefits cases on each engine, typecheck, lint, 130 unit tests and the production coverage-isolation guard. The complete CI suite remains the final check on PR 117.
 
 Reference: [Zod's CSP guidance](https://zod.dev/compile) and [maintainer guidance on configuring before schema creation](https://github.com/colinhacks/zod/issues/4461).
 
@@ -113,7 +119,7 @@ References: [Sonar JavaScript coverage](https://docs.sonarsource.com/sonarqube-c
 ## Remaining work
 
 1. Complete live provider checks before enforcing further script/connect restrictions. The reproducible hub-side evaluation probe is attributed and addressed above; other provider violations and the initial intermittent film load still require separate evidence. Keep provider availability distinct from hub defects; do not remove catalogue associations based on a transient embed failure.
-2. Continue prioritising actionable Sonar issues using the now-passing main coverage gate; retain the existing threshold and scope. The root error-page recovery is the next proposed fix.
+2. Continue prioritising actionable Sonar issues using the now-passing main coverage gate; retain the existing threshold and scope. Root error-page recovery is deployed; the validation and deprecated-API follow-up is proposed in PR 117.
 3. Resume the private catalogue export and test an isolated restore only when the owner is ready. The PostgreSQL export is postponed after authentication failures; it is not a completed backup. Storage file bytes require a separate copy.
 
 Historical SQL literal duplication, justified Instagram/reduced-motion overrides and generated route files do not warrant cosmetic rewrites. No recurring Cloudflare polling was found in the prior idle checks; third-party iframe requests go directly to their providers.
