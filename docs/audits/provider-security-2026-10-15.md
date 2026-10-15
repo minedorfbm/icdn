@@ -13,15 +13,13 @@ Frame, worker, inline-event-handler and baseline protections remain enforced. Sc
 
 ## SonarCloud
 
-The latest main analysis visible on 15 October was successful (01:36), with 216 open maintenance issues, 0.8% duplication and no imported coverage. The latest background-task row offered scanner context but no warning action; this does not prove the earlier encoding warning is resolved. CI explicitly uses UTF-8.
+Before CI activation, the last confirmed main analysis (15 October, 01:36) reported 216 open maintenance issues and 0.8% duplication. These are the pre-transition figures, not a new measurement after the scanner change.
 
-The existing automatic analysis cannot import LCOV. The workflow now prepares authenticated CI analysis using the pinned official action, full Git history, scanner signature verification and `coverage/lcov.info`. Application, tooling and SQL remain in scope. Tests are classified separately. Existing editorial duplication exceptions are preserved; no new debt exclusions were added.
+The existing automatic analysis cannot import LCOV. The workflow now prepares authenticated CI analysis using the pinned official action, full Git history, scanner signature verification and `coverage/lcov.info`. Application, tooling and SQL remain in scope. Tests are classified separately. Existing editorial duplication exceptions are preserved. Only binary WebP, PNG and ICO images are additionally excluded from source scanning; SVG, application code, SQL and tooling remain analyzed.
 
-GitHub's repository secrets page showed no secrets. Therefore the new step is opt-in and has not run against SonarCloud. Activation requires:
+The owner added `SONAR_TOKEN`, and `SONAR_CI_ENABLED=true` was configured on 15 October. Automatic analysis was replaced by CI analysis. [PR 111 validation attempt 2](https://github.com/minedorfbm/icdn/actions/runs/38691694398) passed, including signature verification and authenticated analysis. The scanner explicitly imported `coverage/lcov.info` and reported `QUALITY GATE STATUS: PASSED`. PR 111 was merged in `9d1c1c77dc70dcdf0aca5ad70ec5715bd365a481`; the main analysis is checked separately from the PR result.
 
-1. The owner creates a limited Sonar analysis credential and stores it as the GitHub Actions secret `SONAR_TOKEN`, without sharing it in chat.
-2. Once this workflow is available, disable automatic analysis for this Sonar project, set repository variable `SONAR_CI_ENABLED=true`, then run Validate hub.
-3. Verify a successful CI analysis and imported coverage. If activation fails, turn the variable off and restore automatic analysis while investigating.
+The scanner logs also identified the previous encoding warning: 34 binary image assets were being interpreted as UTF-8 text. The fix excludes only their three binary extensions, not their directories or source neighbors. Images remain shipped by the application and checked by the existing image audit. No translation file is converted or discarded. The PL/SQL analyzer's missing data-dictionary warning is separate; this is a PostgreSQL project, and SQL remains in scope without pretending that the analyzer validates all PostgreSQL semantics.
 
 Fork PRs never receive the Sonar secret. Missing authentication fails clearly when CI analysis is enabled. Coverage remains partial: Bun measures imported modules; the generated report lists unmeasured application files. No whole-application coverage claim is made.
 
@@ -31,6 +29,15 @@ The prior triage remains applicable: historical SQL constants are not rewritten 
 
 ## Validation
 
-125 unit tests, typecheck, lint and production build passed. The 52-test mobile suite passed with the candidate policy initially enforced. After retaining report-only rollout, the three targeted policy tests also passed. Live-provider limitations above remain open, as does authenticated Sonar activation.
+125 unit tests, typecheck, lint and production build passed. The 52-test mobile suite passed with the candidate policy initially enforced. After retaining report-only rollout, the three targeted policy tests also passed. Authenticated Sonar activation is verified. Live-provider limitations above remain open.
 
 References: [Sonar JavaScript coverage](https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/test-coverage/javascript-typescript-test-coverage), [official scan action](https://github.com/SonarSource/sonarqube-scan-action).
+
+## Remaining work
+
+1. Verify a clean encoding scan with the binary-asset correction. Keep application and security-related SQL in scope.
+2. Complete live Instagram and reservation checks before enforcing further script/connect restrictions. Provider availability and CSP failures must be distinguished.
+3. Resume the private catalogue export and test an isolated restore when the owner is ready. The PostgreSQL export is postponed after authentication failures; it is not a completed backup. Storage file bytes require a separate copy.
+4. Refresh the pinned GitHub Actions that still target deprecated Node 20 runtimes in a separate CI maintenance change, preserving immutable commit pins.
+
+Historical SQL literal duplication, justified Instagram/reduced-motion overrides and generated route files do not warrant cosmetic rewrites. No recurring Cloudflare polling was found in the prior idle checks; third-party iframe requests go directly to their providers.
