@@ -13,17 +13,29 @@ Frame, worker, inline-event-handler and baseline protections remain enforced. Sc
 
 ## SonarCloud
 
-The latest main analysis visible on 15 October was successful (01:36), with 216 open maintenance issues, 0.8% duplication and no imported coverage. The latest background-task row offered scanner context but no warning action; this does not prove the earlier encoding warning is resolved. CI explicitly uses UTF-8.
+Before CI activation, the last confirmed main analysis (15 October, 01:36) reported 216 open maintenance issues and 0.8% duplication. These are the pre-transition figures, not a new measurement after the scanner change.
 
-The existing automatic analysis cannot import LCOV. The workflow now prepares authenticated CI analysis using the pinned official action, full Git history, scanner signature verification and `coverage/lcov.info`. Application, tooling and SQL remain in scope. Tests are classified separately. Existing editorial duplication exceptions are preserved; no new debt exclusions were added.
+The existing automatic analysis cannot import LCOV. The workflow now prepares authenticated CI analysis using the pinned official action, full Git history, scanner signature verification and `coverage/lcov.info`. Application, tooling and SQL remain in scope. Tests are classified separately. Existing editorial duplication exceptions are preserved. Only binary WebP, PNG and ICO images are additionally excluded from source scanning; SVG, application code, SQL and tooling remain analyzed.
 
-GitHub's repository secrets page showed no secrets. Therefore the new step is opt-in and has not run against SonarCloud. Activation requires:
+The owner added `SONAR_TOKEN`, and `SONAR_CI_ENABLED=true` was configured on 15 October. Automatic analysis was replaced by CI analysis. [PR 111 validation attempt 2](https://github.com/minedorfbm/icdn/actions/runs/38691694398) passed, including signature verification and authenticated analysis. The scanner explicitly imported `coverage/lcov.info` and reported `QUALITY GATE STATUS: PASSED`. PR 111 was merged in `9d1c1c77dc70dcdf0aca5ad70ec5715bd365a481`.
 
-1. The owner creates a limited Sonar analysis credential and stores it as the GitHub Actions secret `SONAR_TOKEN`, without sharing it in chat.
-2. Once this workflow is available, disable automatic analysis for this Sonar project, set repository variable `SONAR_CI_ENABLED=true`, then run Validate hub.
-3. Verify a successful CI analysis and imported coverage. If activation fails, turn the variable off and restore automatic analysis while investigating.
+The [subsequent main run](https://github.com/minedorfbm/icdn/actions/runs/38696013331) passed its tests and build but failed the Sonar quality gate: coverage on new code was 56.64%, below the configured 80% threshold (3,554 lines to cover; 1,541 uncovered). Overall coverage was 57.4%. LCOV import succeeded, so this was a coverage gap, not an authentication failure. At that revision, the 52 passing WebKit mobile tests did not contribute instrumented coverage.
+
+The scanner logs also identified the previous encoding warning: 34 binary image assets were being interpreted as UTF-8 text. The fix excludes only their three binary extensions, not their directories or source neighbors. Images remain shipped by the application and checked by the existing image audit. No translation file is converted or discarded. The PL/SQL analyzer's missing data-dictionary warning is separate; this is a PostgreSQL project, and SQL remains in scope without pretending that the analyzer validates all PostgreSQL semantics.
 
 Fork PRs never receive the Sonar secret. Missing authentication fails clearly when CI analysis is enabled. Coverage remains partial: Bun measures imported modules; the generated report lists unmeasured application files. No whole-application coverage claim is made.
+
+## Browser coverage and Android follow-up
+
+The follow-up runs the same 55 mobile scenarios on iPhone/WebKit and Pixel 7/Chromium. Three additional cases exercise PDF load failure/reopening, pinch commit/cancellation, and map modes/filters/tour navigation. Android emulation checks responsive layout and browser interactions; it does not certify every physical Android device or third-party provider state.
+
+The test-only build enables Istanbul explicitly with `HUB_BROWSER_COVERAGE=1` and writes to `.output/browser-coverage`, separately from production. Playwright collects snapshots on document navigation and context teardown. Reports remap execution back to TypeScript source lines and fail if key lazy features were not measured. Sonar imports both unit and browser LCOV, retaining the existing scope and 80% new-code threshold. Unmeasured server execution and provider internals are not claimed as browser coverage.
+
+CI checks the ordinary production build on both browser engines, then repeats those assertions with instrumentation. A separate guard rejects coverage counters in production JavaScript. Tests of the reporting tools verify that uncovered lines remain uncovered, paths stay within application source, and missing/inert collection fails clearly. Generated coverage, browser output and local Worker caches are ignored by lint, while all hand-written source stays included.
+
+The cross-browser run exposed two stacking problems: card description text could intercept the expanded-card opener on Chromium, and the map canvas intercepted the photo-index buttons on both engines. Explicit stacking keeps the opener above descriptive text, separate action links above the opener, and the photo index above the map artwork. Colors and card content are unchanged.
+
+The new coverage plugin brought a legacy YAML parser chain containing unpatched `sprintf-js` (GHSA-hp3w-g68c-fv3c). Pinning the already-used `js-yaml` 4.3.2 removes that obsolete chain. The coverage loader's YAML configuration path was verified with the retained `load` API; the resulting dependency audit reports no known vulnerabilities.
 
 ## Debt disposition
 
@@ -31,6 +43,17 @@ The prior triage remains applicable: historical SQL constants are not rewritten 
 
 ## Validation
 
-125 unit tests, typecheck, lint and production build passed. The 52-test mobile suite passed with the candidate policy initially enforced. After retaining report-only rollout, the three targeted policy tests also passed. Live-provider limitations above remain open, as does authenticated Sonar activation.
+125 unit tests, typecheck, lint and production build passed. The 52-test mobile suite passed with the candidate policy initially enforced. After retaining report-only rollout, the three targeted policy tests also passed. Authenticated Sonar activation is verified. Live-provider limitations above remain open.
+
+[PR 112 validation](https://github.com/minedorfbm/icdn/actions/runs/38696825294), at revision `ded19397e45838afa66cc817553e83ed544d8281`, passed all 125 unit tests, 52 mobile tests and its Sonar quality gate. The scanner imported LCOV and no longer reported invalid UTF-8 characters in binary images. The separate PL/SQL data-dictionary warning remains. A passing PR gate does not resolve the broader main-branch coverage condition above.
 
 References: [Sonar JavaScript coverage](https://docs.sonarsource.com/sonarqube-cloud/analyzing-source-code/test-coverage/javascript-typescript-test-coverage), [official scan action](https://github.com/SonarSource/sonarqube-scan-action).
+
+## Remaining work
+
+1. Verify the broader main-branch gate after importing both reports. The browser collector and focused PDF/map cases are included in PR 112; any remaining coverage gaps must be measured after the new scan, without lowering the threshold. PR 112 awaits merge.
+2. Complete live Instagram and reservation checks before enforcing further script/connect restrictions. Provider availability and CSP failures must be distinguished.
+3. Resume the private catalogue export and test an isolated restore when the owner is ready. The PostgreSQL export is postponed after authentication failures; it is not a completed backup. Storage file bytes require a separate copy.
+4. Refresh the pinned GitHub Actions that still target deprecated Node 20 runtimes in a separate CI maintenance change, preserving immutable commit pins.
+
+Historical SQL literal duplication, justified Instagram/reduced-motion overrides and generated route files do not warrant cosmetic rewrites. No recurring Cloudflare polling was found in the prior idle checks; third-party iframe requests go directly to their providers.

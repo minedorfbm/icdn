@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test("overview cannot drift out of the resort and keeps station names hidden", async ({
   page,

@@ -77,7 +77,7 @@ export function DestinationPanel({
                 onOpen();
               }}
               tabIndex={active ? 0 : -1}
-              className="text-left after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-4"
+              className="text-left after:absolute after:inset-0 after:z-10 focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               <span className="drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">{dest.name}</span>
             </button>
@@ -87,7 +87,7 @@ export function DestinationPanel({
           </p>
         </div>
 
-        <div className="pointer-events-none relative mt-auto flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/25 pt-3">
+        <div className="pointer-events-none relative z-20 mt-auto flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/25 pt-3">
           {actions.map((a, i) => (
             <ResortLink
               key={`${a.kind}-${i}`}

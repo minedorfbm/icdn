@@ -6,10 +6,24 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// Only the dedicated test build loads instrumentation. Production stays untouched.
+const browserCoverage = process.env["HUB_BROWSER_COVERAGE"] === "1";
+const coveragePlugins = browserCoverage
+  ? [
+      (await import("vite-plugin-istanbul")).default({
+        include: "src/**/*",
+        forceBuildInstrument: true,
+      }),
+    ]
+  : [];
+
 export default defineConfig({
+  plugins: coveragePlugins,
+  vite: browserCoverage ? { build: { sourcemap: "hidden" } } : {},
   nitro: {
     preset: "cloudflare-module",
     cloudflare: { nodeCompat: true, deployConfig: true },
+    ...(browserCoverage ? { output: { dir: ".output/browser-coverage" } } : {}),
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).

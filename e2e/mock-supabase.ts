@@ -60,6 +60,16 @@ const tables: Record<string, unknown[]> = {
   destinations,
   map_places: [
     {
+      id: "la-maison-1888",
+      name: "La Maison 1888",
+      level_id: "sky",
+      pin: 12,
+      x: 700,
+      y: 440,
+      zoom: 2,
+      active: true,
+    },
+    {
       id: "citron",
       name: "Citron",
       level_id: "heaven",
@@ -71,6 +81,13 @@ const tables: Record<string, unknown[]> = {
     },
   ],
   map_destination_links: [
+    {
+      place_id: "la-maison-1888",
+      destination_id: "la-maison-1888",
+      display_order: 0,
+      is_primary: true,
+      active: true,
+    },
     {
       place_id: "citron",
       destination_id: "citron",

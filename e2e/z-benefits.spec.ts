@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 test("Benefits announces loading and failure, then recovers without leaving the card", async ({
   page,
