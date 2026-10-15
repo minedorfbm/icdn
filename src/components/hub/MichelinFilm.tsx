@@ -13,12 +13,15 @@ function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
   const host = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     let player: YouTubePlayer | undefined;
     const container = host.current;
     if (!container) return;
+    setLoading(true);
+    setFailed(false);
     const unavailable = () => {
       if (!cancelled) {
         setLoading(false);
@@ -48,11 +51,13 @@ function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
             onReady: ({ target }) => {
               if (cancelled) return;
               window.clearTimeout(timeout);
+              // A slow player may become ready after the fallback is already visible.
+              setFailed(false);
+              setLoading(false);
               target.getIframe().title = "One MICHELIN Key — InterContinental Danang";
               target.setVolume(20);
               target.unMute();
               target.playVideo();
-              setLoading(false);
             },
             onStateChange: ({ data }) => {
               if (!cancelled && data === 0) onClose();
@@ -64,7 +69,10 @@ function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
             onAutoplayBlocked: () => {
               // Keep YouTube's own play control usable when the browser refuses autoplay.
               window.clearTimeout(timeout);
-              if (!cancelled) setLoading(false);
+              if (!cancelled) {
+                setFailed(false);
+                setLoading(false);
+              }
             },
           },
         });
@@ -79,7 +87,7 @@ function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
       player?.destroy();
       container.replaceChildren();
     };
-  }, [onClose]);
+  }, [onClose, attempt]);
 
   return (
     <div className="relative h-full w-full max-w-[calc(100dvh*9/16)]">
@@ -90,14 +98,23 @@ function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
         </output>
       )}
       {failed && (
-        <a
-          href={FILM_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="absolute inset-0 flex items-center justify-center gap-3 bg-black text-sm underline underline-offset-4"
-        >
-          {t("play_video")} <ExternalLink className="size-4" aria-hidden />
-        </a>
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-black p-6 text-sm">
+          <button
+            type="button"
+            onClick={() => setAttempt((previous) => previous + 1)}
+            className="min-h-11 rounded-full border border-white/50 px-6 py-3 focus-visible:outline-2 focus-visible:outline-offset-4"
+          >
+            {t("retry")}
+          </button>
+          <a
+            href={FILM_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="flex min-h-11 items-center gap-3 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4"
+          >
+            {t("play_video")} <ExternalLink className="size-4" aria-hidden />
+          </a>
+        </div>
       )}
     </div>
   );
