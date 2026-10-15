@@ -54,6 +54,20 @@ The new coverage plugin brought a legacy YAML parser chain containing unpatched 
 
 The prior triage remains applicable: historical SQL constants are not rewritten for cosmetic scoring, third-party embed/reduced-motion overrides remain intentional, generated route files remain generated, and sequential operations are not parallelized when ordering is required. No production migration or backup operation is included.
 
+## GitHub Actions runtime maintenance
+
+The [PR 114 validation](https://github.com/minedorfbm/icdn/actions/runs/38736871602) passed but warned that three actions still declared Node 20 and were being forced onto Node 24 by the runner. Their replacements use official releases with verified commit signatures and explicit `node24` manifests:
+
+| Action | Release | Immutable commit |
+| --- | --- | --- |
+| `actions/checkout` | [v7.0.1](https://github.com/actions/checkout/releases/tag/v7.0.1) | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
+| `actions/setup-node` | [v7.1.0](https://github.com/actions/setup-node/releases/tag/v7.1.0) | `949feb2413d6458794dcd2491c4babbbce0c15c1` |
+| `actions/upload-artifact` | [v7.0.2](https://github.com/actions/upload-artifact/releases/tag/v7.0.2) | `cf430e030ddbb5b0abf93d22962f4752f3646cd9` |
+
+The hosted runner observed in PR 114 was 2.337.0, above the Node 24 minimum of 2.327.1. Checkout retains full history and its safe default for fork PRs. The workflow uses `pull_request`, not a privileged `pull_request_target` checkout. Setup-node still installs Node 22 for project tools; the action's runtime is separate. Its newly automatic npm cache is explicitly disabled because dependencies are installed with Bun. No registry authentication inputs are used, so removal of setup-node's dummy authentication token does not affect this workflow. Coverage remains a ZIP archive with the same name, directory, missing-file failure and 14-day retention.
+
+The existing Bun and Sonar action pins already declare Node 24 and remain unchanged. Read-only repository permissions, scanner signature verification, fork secret restrictions, quality-gate settings and every validation step are preserved. The maintenance change requires a successful run of the full existing workflow, including artifact upload and Sonar analysis; local YAML validation alone cannot establish runner compatibility.
+
 ## Validation
 
 PR 112 was merged as `0b80c2846f4c3960818acd53e51040f546e3e69a`. Its [main validation](https://github.com/minedorfbm/icdn/actions/runs/38714497762) passed with both coverage reports imported; the broader main quality gate now passes (85.3% new-code coverage, 0.9% duplication, zero security hotspots). The ordinary build passed 55 mobile scenarios on each browser engine and 128 unit tests. One instrumented WebKit scenario passed on retry after a browser crash. Production deployment of that revision was confirmed.
@@ -71,7 +85,7 @@ References: [Sonar JavaScript coverage](https://docs.sonarsource.com/sonarqube-c
 ## Remaining work
 
 1. Attribute remaining candidate-policy violations before enforcing further script/connect restrictions. The film's confirmed recovery defects are addressed above; the initial intermittent provider load still has no conclusive cause. Keep provider availability distinct from hub defects; do not remove catalogue associations based on a transient embed failure.
-2. Refresh the pinned GitHub Actions that still target deprecated Node 20 runtimes in a separate CI maintenance change, preserving immutable commit pins.
+2. Validate and merge the GitHub Actions runtime maintenance described above; all action references retain immutable commit pins.
 3. Continue prioritising actionable Sonar issues using the now-passing main coverage gate; retain the existing threshold and scope.
 4. Resume the private catalogue export and test an isolated restore only when the owner is ready. The PostgreSQL export is postponed after authentication failures; it is not a completed backup. Storage file bytes require a separate copy.
 
