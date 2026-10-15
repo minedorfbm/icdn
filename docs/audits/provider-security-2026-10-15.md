@@ -14,6 +14,16 @@ Read-only checks on La Maison 1888 used the live catalogue. No booking was submi
 
 Frame, worker, inline-event-handler and baseline protections remain enforced. Script/connect restrictions remain report-only pending conclusive provider checks. The candidate connect policy no longer lists Supabase: catalogue requests go through same-origin Worker endpoints. An isolated browser regression test enforces the candidate policy and checks allowed provider scripts/local requests, rejected unknown scripts/requests and rejected dynamic evaluation. It does not substitute for live provider validation.
 
+### Home film recovery follow-up
+
+After PR 113, a fresh production opening again left the official player blank. Closing and reopening then loaded the same film and allowed playback. A separate local diagnostic loaded both this film and La Maison through the official API, including with the enforced frame/worker/inline-handler restrictions. This establishes intermittent loading, not a deleted video or a demonstrated CSP cause. No security header changes are included.
+
+A deterministic regression test exposed a hub defect independently of that network behaviour: after the 20-second fallback, a late `onReady` started playback but left the opaque fallback covering the player. Ready and autoplay-blocked events now clear that stale fallback. The error view also offers the existing translated Try again action, which destroys the previous player and creates one fresh attempt within the same dialog. It reuses an available API and retries its download only after a script failure. There is no automatic retry loop; the original external video link remains available.
+
+The [official YouTube API reference](https://developers.google.com/youtube/iframe_api_reference) distinguishes player readiness from autoplay permission. Browser refusal to autoplay therefore leaves YouTube's manual controls accessible. The existing quiet-volume initialization, manual close, end-of-film close and focus return are preserved.
+
+The late-response regression failed before the fix because the fallback link remained after playback started. All five film scenarios pass on both iPhone/WebKit and Pixel 7/Chromium: opening/closing/reopening, API download retry, late readiness, blocked autoplay, and retrying an already-loaded but stalled player. Typecheck, lint, production build and all 128 unit tests also pass. A live check of the updated local hub reproduced the blank initial frame, then loaded the actual film through Try again and returned to the home page after playback. These checks do not guarantee network or YouTube availability.
+
 ## SonarCloud
 
 Before CI activation, the last confirmed main analysis (15 October, 01:36) reported 216 open maintenance issues and 0.8% duplication. These are the pre-transition figures, not a new measurement after the scanner change.
@@ -60,7 +70,7 @@ References: [Sonar JavaScript coverage](https://docs.sonarsource.com/sonarqube-c
 
 ## Remaining work
 
-1. Diagnose the home film's API-driven player and attribute remaining candidate-policy violations before enforcing further script/connect restrictions. Keep provider availability distinct from hub defects; do not remove catalogue associations based on a transient embed failure.
+1. Attribute remaining candidate-policy violations before enforcing further script/connect restrictions. The film's confirmed recovery defects are addressed above; the initial intermittent provider load still has no conclusive cause. Keep provider availability distinct from hub defects; do not remove catalogue associations based on a transient embed failure.
 2. Refresh the pinned GitHub Actions that still target deprecated Node 20 runtimes in a separate CI maintenance change, preserving immutable commit pins.
 3. Continue prioritising actionable Sonar issues using the now-passing main coverage gate; retain the existing threshold and scope.
 4. Resume the private catalogue export and test an isolated restore only when the owner is ready. The PostgreSQL export is postponed after authentication failures; it is not a completed backup. Storage file bytes require a separate copy.
