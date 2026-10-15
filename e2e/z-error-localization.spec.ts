@@ -46,6 +46,21 @@ test("a failed page retries in the chosen language without clearing its fallback
   const title = page.getByRole("heading", { name: copy.error_page_title, exact: true });
   const retry = page.getByRole("button", { name: copy.retry, exact: true });
   await expect(title).toBeVisible();
+  const unhandled: string[] = [];
+  page.on("pageerror", (error) => unhandled.push(error.message));
+  // A loader error is handled by the router, so separately inject a rejection
+  // at its existing browser API to exercise a failed invalidation itself.
+  await page.evaluate(() => {
+    const router = window.__TSR_ROUTER__!;
+    const invalidate = router.invalidate;
+    router.invalidate = async () => {
+      router.invalidate = invalidate;
+      throw new Error("Test invalidation rejected");
+    };
+  });
+  await retry.click();
+  await expect(retry).toBeEnabled();
+  await expect(title).toBeVisible();
   phase = "pending";
   await retry.click();
   try {
@@ -67,4 +82,5 @@ test("a failed page retries in the chosen language without clearing its fallback
   await expect(page.getByRole("dialog", { name: "Citron", exact: true })).toBeVisible();
   await expect(title).toHaveCount(0);
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
+  expect(unhandled).toEqual([]);
 });
