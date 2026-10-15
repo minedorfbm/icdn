@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 test("accommodation zones connect cards and map without claiming a precise building", async ({
   page,

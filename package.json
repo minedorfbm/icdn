@@ -27,14 +27,18 @@
     "images:cache": "bun scripts/update-image-cache.ts",
     "images:cache:apply": "bun scripts/update-image-cache.ts --apply",
     "test:mobile": "node node_modules/@playwright/test/cli.js test",
-    "test:mobile:install": "node node_modules/@playwright/test/cli.js install --with-deps webkit",
-    "migrations:test": "bun scripts/test-migrations.ts"
+    "test:mobile:install": "node node_modules/@playwright/test/cli.js install --with-deps webkit chromium",
+    "migrations:test": "bun scripts/test-migrations.ts",
+    "build:coverage": "HUB_BROWSER_COVERAGE=1 vite build",
+    "test:mobile:coverage": "bun -e 'require(\"node:fs\").rmSync(\"coverage/browser\", { recursive: true, force: true })' && bun run build:coverage && HUB_BROWSER_COVERAGE=1 bun run test:mobile && bun scripts/report-browser-coverage.ts",
+    "coverage:check-production": "bun scripts/check-production-coverage.ts"
   },
   "overrides": {
     "source-map-js": "1.2.2",
     "rolldown": "1.2.1",
     "undici": "7.29.1",
-    "sharp": "0.35.5"
+    "sharp": "0.35.5",
+    "js-yaml": "4.3.2"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",
@@ -58,6 +62,10 @@
     "@eslint/js": "^9.39.5",
     "@lovable.dev/vite-tanstack-config": "^2.24.0",
     "@playwright/test": "^1.63.0",
+    "@types/istanbul-lib-coverage": "2.0.6",
+    "@types/istanbul-lib-report": "3.0.3",
+    "@types/istanbul-lib-source-maps": "4.0.4",
+    "@types/istanbul-reports": "3.0.4",
     "@types/node": "^22.20.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -68,11 +76,16 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.26",
     "globals": "^15.15.0",
+    "istanbul-lib-coverage": "3.2.2",
+    "istanbul-lib-report": "3.0.1",
+    "istanbul-lib-source-maps": "5.0.6",
+    "istanbul-reports": "3.2.0",
     "nitro": "3.0.260603-beta",
     "prettier": "^3.9.8",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.70.1",
     "vite": "8.1.5",
+    "vite-plugin-istanbul": "9.0.1",
     "wrangler": "4.135.0"
   }
 }

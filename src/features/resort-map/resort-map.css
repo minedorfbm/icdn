@@ -309,6 +309,7 @@
 .hub-atlas .atlas-context,
 .hub-atlas .atlas-photo-index {
   position: absolute;
+  z-index: 2;
   left: 14px;
   right: 14px;
   bottom: calc(var(--atlas-bottom) + 85px);

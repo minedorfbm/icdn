@@ -19,11 +19,23 @@ The existing automatic analysis cannot import LCOV. The workflow now prepares au
 
 The owner added `SONAR_TOKEN`, and `SONAR_CI_ENABLED=true` was configured on 15 October. Automatic analysis was replaced by CI analysis. [PR 111 validation attempt 2](https://github.com/minedorfbm/icdn/actions/runs/38691694398) passed, including signature verification and authenticated analysis. The scanner explicitly imported `coverage/lcov.info` and reported `QUALITY GATE STATUS: PASSED`. PR 111 was merged in `9d1c1c77dc70dcdf0aca5ad70ec5715bd365a481`.
 
-The [subsequent main run](https://github.com/minedorfbm/icdn/actions/runs/38696013331) passed its tests and build but failed the Sonar quality gate: coverage on new code was 56.64%, below the configured 80% threshold (3,554 lines to cover; 1,541 uncovered). Overall coverage was 57.4%. LCOV import succeeded, so this is a coverage gap, not an authentication failure. The 52 WebKit mobile tests pass but do not currently contribute instrumented coverage. Prioritize meaningful coverage of map navigation, PDF handling, Instagram loading and swipe behavior; do not lower the threshold or exclude application code to hide the gap.
+The [subsequent main run](https://github.com/minedorfbm/icdn/actions/runs/38696013331) passed its tests and build but failed the Sonar quality gate: coverage on new code was 56.64%, below the configured 80% threshold (3,554 lines to cover; 1,541 uncovered). Overall coverage was 57.4%. LCOV import succeeded, so this was a coverage gap, not an authentication failure. At that revision, the 52 passing WebKit mobile tests did not contribute instrumented coverage.
 
 The scanner logs also identified the previous encoding warning: 34 binary image assets were being interpreted as UTF-8 text. The fix excludes only their three binary extensions, not their directories or source neighbors. Images remain shipped by the application and checked by the existing image audit. No translation file is converted or discarded. The PL/SQL analyzer's missing data-dictionary warning is separate; this is a PostgreSQL project, and SQL remains in scope without pretending that the analyzer validates all PostgreSQL semantics.
 
 Fork PRs never receive the Sonar secret. Missing authentication fails clearly when CI analysis is enabled. Coverage remains partial: Bun measures imported modules; the generated report lists unmeasured application files. No whole-application coverage claim is made.
+
+## Browser coverage and Android follow-up
+
+The follow-up runs the same 55 mobile scenarios on iPhone/WebKit and Pixel 7/Chromium. Three additional cases exercise PDF load failure/reopening, pinch commit/cancellation, and map modes/filters/tour navigation. Android emulation checks responsive layout and browser interactions; it does not certify every physical Android device or third-party provider state.
+
+The test-only build enables Istanbul explicitly with `HUB_BROWSER_COVERAGE=1` and writes to `.output/browser-coverage`, separately from production. Playwright collects snapshots on document navigation and context teardown. Reports remap execution back to TypeScript source lines and fail if key lazy features were not measured. Sonar imports both unit and browser LCOV, retaining the existing scope and 80% new-code threshold. Unmeasured server execution and provider internals are not claimed as browser coverage.
+
+CI checks the ordinary production build on both browser engines, then repeats those assertions with instrumentation. A separate guard rejects coverage counters in production JavaScript. Tests of the reporting tools verify that uncovered lines remain uncovered, paths stay within application source, and missing/inert collection fails clearly. Generated coverage, browser output and local Worker caches are ignored by lint, while all hand-written source stays included.
+
+The cross-browser run exposed two stacking problems: card description text could intercept the expanded-card opener on Chromium, and the map canvas intercepted the photo-index buttons on both engines. Explicit stacking keeps the opener above descriptive text, separate action links above the opener, and the photo index above the map artwork. Colors and card content are unchanged.
+
+The new coverage plugin brought a legacy YAML parser chain containing unpatched `sprintf-js` (GHSA-hp3w-g68c-fv3c). Pinning the already-used `js-yaml` 4.3.2 removes that obsolete chain. The coverage loader's YAML configuration path was verified with the retained `load` API; the resulting dependency audit reports no known vulnerabilities.
 
 ## Debt disposition
 
@@ -39,7 +51,7 @@ References: [Sonar JavaScript coverage](https://docs.sonarsource.com/sonarqube-c
 
 ## Remaining work
 
-1. Extend coverage collection to UI behavior and add meaningful tests for remaining gaps, prioritizing map navigation, PDF handling, Instagram loading and swipe behavior. Recheck the main-branch 80% new-code threshold without lowering it. The binary-asset correction is verified in PR 112 and awaits merge.
+1. Verify the broader main-branch gate after importing both reports. The browser collector and focused PDF/map cases are included in PR 112; any remaining coverage gaps must be measured after the new scan, without lowering the threshold. PR 112 awaits merge.
 2. Complete live Instagram and reservation checks before enforcing further script/connect restrictions. Provider availability and CSP failures must be distinguished.
 3. Resume the private catalogue export and test an isolated restore when the owner is ready. The PostgreSQL export is postponed after authentication failures; it is not a completed backup. Storage file bytes require a separate copy.
 4. Refresh the pinned GitHub Actions that still target deprecated Node 20 runtimes in a separate CI maintenance change, preserving immutable commit pins.

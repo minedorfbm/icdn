@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test, type Locator } from "./fixtures";
 
 test.beforeEach(async ({ page }) => {
   await page.route("https://www.instagram.com/embed.js", (route) =>

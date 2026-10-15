@@ -36,12 +36,11 @@ const report = [
   `- Source files not measured by this run: **${unmeasured.length}** (listed below).`,
   "",
   "This is not whole-application coverage. Bun only instruments modules loaded by unit tests. " +
-    "Mobile WebKit scenarios and migration replay run separately and are not included in this LCOV report. " +
+    "Mobile browser scenarios and migration replay run separately and are not included in this unit LCOV report. " +
     "A file absent here may be exercised by those scenarios. Type declarations and the generated route tree " +
     "are omitted from this inventory; no hand-written application source is excluded.",
   "",
-  "SonarCloud imports this LCOV report when CI analysis is enabled (SONAR_CI_ENABLED=true). " +
-    "Until the authenticated CI migration is activated, the existing automatic analysis does not import coverage.",
+  "SonarCloud imports this unit LCOV report alongside coverage/browser/lcov.info when CI analysis is enabled (SONAR_CI_ENABLED=true).",
   "",
   "<details><summary>Sources not measured by the unit-test run</summary>",
   "",

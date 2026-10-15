@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "./fixtures";
 
 // Instagram is external; focused tests below replace this route with a deterministic script.
 test.beforeEach(async ({ page }) => {
@@ -143,6 +143,76 @@ test("direct card, two-page PDF, zoom and return preserve navigation", async ({ 
   await card.getByRole("button", { name: "BACK", exact: true }).click();
   await expect(page).toHaveURL("/");
   expect(errors).toEqual([]);
+});
+
+test("a broken PDF offers its original link and reopening can recover", async ({ page }) => {
+  let fail = true;
+  await page.route("**/api/resort-pdf?*", (route) =>
+    route.fulfill(
+      fail
+        ? { status: 503, body: "Temporarily unavailable" }
+        : { contentType: "application/pdf", body: menuPdf() },
+    ),
+  );
+  await page.goto("/citron");
+  const card = page.getByRole("dialog", { name: "Citron", exact: true });
+  await card.getByRole("link", { name: "Test menu", exact: true }).click();
+  const viewer = page.getByRole("dialog", { name: /Test menu/ });
+  await expect(viewer).toContainText("This document could not be displayed");
+  await expect(viewer.getByRole("button", { name: "Zoom in", exact: true })).toHaveCount(0);
+  await expect(viewer.locator('a[href$="/test-menu.pdf"]')).toBeVisible();
+  await viewer.getByRole("button", { name: "Close", exact: true }).click();
+  fail = false;
+  await card.getByRole("link", { name: "Test menu", exact: true }).click();
+  await expect(viewer.locator("[data-pdf-page]")).toHaveCount(2);
+});
+
+test("PDF pinch zoom commits around the gesture and cancellation preserves the reading scale", async ({
+  page,
+}) => {
+  await page.route("**/api/resort-pdf?*", (route) =>
+    route.fulfill({ contentType: "application/pdf", body: menuPdf() }),
+  );
+  await page.goto("/citron");
+  await page.getByRole("link", { name: "Test menu", exact: true }).click();
+  const viewer = page.getByRole("dialog", { name: /Test menu/ });
+  const first = viewer.locator('[data-pdf-page="1"]');
+  await expect(first.locator("canvas")).toBeVisible();
+  const initialWidth = await first.evaluate((el) => el.getBoundingClientRect().width);
+  const pinch = async (cancel: boolean) =>
+    first.evaluate((node, cancelled) => {
+      const target = node.parentElement!.parentElement!;
+      const box = node.getBoundingClientRect();
+      const dispatch = (type: string, distance: number) => {
+        const event = new Event(type, { bubbles: true, cancelable: true });
+        const touches =
+          type === "touchend" || type === "touchcancel"
+            ? []
+            : [
+                { clientX: box.left + 80, clientY: box.top + 100 },
+                { clientX: box.left + 80 + distance, clientY: box.top + 100 },
+              ];
+        Object.defineProperty(event, "touches", { value: touches });
+        target.dispatchEvent(event);
+      };
+      dispatch("touchstart", 60);
+      dispatch("touchmove", 120);
+      dispatch(cancelled ? "touchcancel" : "touchend", 120);
+    }, cancel);
+  await pinch(true);
+  expect(await first.evaluate((el) => el.getBoundingClientRect().width)).toBeCloseTo(
+    initialWidth,
+    1,
+  );
+  await pinch(false);
+  await expect(viewer.getByRole("button", { name: "Zoom out", exact: true })).toBeVisible();
+  await expect
+    .poll(() => first.evaluate((el) => el.getBoundingClientRect().width))
+    .toBeGreaterThan(initialWidth * 1.8);
+  await viewer.getByRole("button", { name: "Zoom out", exact: true }).click();
+  await expect
+    .poll(() => first.evaluate((el) => el.getBoundingClientRect().width))
+    .toBeCloseTo(initialWidth, 1);
 });
 
 test("a direct card is visible before JavaScript starts and does not render the homepage", async ({

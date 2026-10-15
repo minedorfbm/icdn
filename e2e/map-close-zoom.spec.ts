@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 test("card map entry focuses the venue above its panel and supports closer zoom", async ({
   page,
