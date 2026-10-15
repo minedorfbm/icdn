@@ -2,6 +2,60 @@ import { expect, test } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 
+test("the candidate Worker policy restricts scripts and requests while allowing providers and local data", async ({
+  page,
+  request,
+}) => {
+  // Exercise the report-only candidate as an enforced policy in this isolated page.
+  const policy = (await request.get("/")).headers()["content-security-policy-report-only"]!;
+  let unexpectedRequests = 0;
+  await page.route("https://unapproved.example/**", (route) => {
+    unexpectedRequests++;
+    return route.fulfill({ body: "Unexpected request" });
+  });
+  for (const host of ["www.instagram.com", "www.youtube.com"]) {
+    await page.route(`https://${host}/security-check.js`, (route) =>
+      route.fulfill({
+        contentType: "application/javascript",
+        body: `document.body.append("${host} loaded");`,
+      }),
+    );
+  }
+  await page.route("**/security-local-data", (route) =>
+    route.fulfill({ body: "Local data loaded" }),
+  );
+  await page.route("**/security-resource-check", (route) =>
+    route.fulfill({
+      headers: { "content-type": "text/html", "content-security-policy": policy },
+      body: `<!doctype html><html><body>
+      <script>
+        document.addEventListener('securitypolicyviolation', event => {
+          const result = document.createElement('output');
+          result.textContent = event.effectiveDirective + ':' + event.blockedURI;
+          document.body.append(result);
+        });
+        fetch('/security-local-data').then(r => r.text()).then(text => document.body.append(text));
+        fetch('https://unapproved.example/data').catch(() => {});
+        try { new Function('document.body.append("Unsafe evaluation executed")')(); } catch {}
+      </script>
+      <script src="https://www.instagram.com/security-check.js"></script>
+      <script src="https://www.youtube.com/security-check.js"></script>
+      <script src="https://unapproved.example/script.js"></script>
+    </body></html>`,
+    }),
+  );
+  await page.goto("/security-resource-check");
+  await expect(page.locator("body")).toContainText("www.instagram.com loaded");
+  await expect(page.locator("body")).toContainText("www.youtube.com loaded");
+  await expect(page.locator("body")).toContainText("Local data loaded");
+  await expect(page.locator("output", { hasText: "connect-src:" })).toHaveCount(1);
+  await expect(
+    page.locator("output", { hasText: "https://unapproved.example/script.js" }),
+  ).toHaveCount(1);
+  await expect(page.locator("output", { hasText: "eval" })).toHaveCount(1);
+  expect(unexpectedRequests).toBe(0);
+});
+
 test("the actual fallback error page can retry under the Worker policy", async ({
   page,
   request,
