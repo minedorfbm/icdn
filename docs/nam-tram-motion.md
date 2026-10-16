@@ -6,9 +6,12 @@ The four chapters use native vertical scrolling. The rail cabin stays at each st
 
 ## Artwork
 
-`src/assets/nam-tram-signature.webp` replaces the former illustration in both the rail and the station selector. The source was the user-provided `singesmajnamtram.png`. ImageGen's built-in tool prepared a transparent cutout; the output was then resized to 640px wide and encoded as WebP with alpha (about 79KB).
+Two owner-supplied illustrations have separate roles:
 
-The edit prompt was: “Use case: background-extraction. Edit target: the attached Nam Tram illustration. Remove ONLY the white background, including all white openings inside the cabin behind and between the posts and monkeys. Produce a real transparent alpha background, not a checkerboard or solid fill. Preserve exactly the cabin silhouette, straw roof, dark woven boat hull, metal posts and rails, three monkeys with their exact see-no-evil/hear-no-evil/speak-no-evil poses, and the small monkey ornament on the left. Preserve their colors, fine texture, frontal composition and proportions. No added objects, no shadow outside the object, no text. Entire cabin must stay within frame. This is an existing website asset replacement; do not redesign.”
+- `src/assets/nam-tram-rail.webp`: angled view from `nam tram illustration 2.png`, 240 × 219 px, about 21 KB. It follows the scroll position on the navigation rail.
+- `src/assets/nam-tram-selector.webp`: horizontal front view from `nam tram illustration.png`, 900 × 600 px, about 155 KB. It appears when the visitor opens the station selector.
+
+Both WebP files preserve the original alpha transparency and composition. The rail loads only its compact illustration; the larger selector artwork is mounted when the panel opens. Image dimensions reserve the correct aspect ratio. The previous three-monkey asset is no longer referenced.
 
 ## Validation
 

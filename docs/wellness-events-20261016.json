@@ -4,7 +4,7 @@
     "https://www.danang.intercontinental.com/spa-and-wellbeing/",
     "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf"
   ],
-  "schedule_note": "Yoga Flow: detailed schedule lists Monday and Wednesday–Saturday. Tuesday and Sunday are Yoga Wheel Stretch; the overview webpage says daily. Detailed venue/day allocations take precedence; flag the discrepancy for resort confirmation.",
+  "schedule_note": "Yoga Flow and Yoga Wheel Stretch are two separate activities, as clarified by the owner. The detailed schedule places Yoga Flow Monday and Wednesday–Saturday, and Yoga Wheel Stretch Tuesday/Sunday, both 07:30–08:30, at Yoga Pavilion.",
   "events": [
     {
       "key": "yoga-flow",
@@ -40,6 +40,41 @@
         ]
       },
       "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf"
+    },
+    {
+      "key": "yoga-wheel-stretch",
+      "destination_id": "yoga-pavilion",
+      "title": "Yoga Wheel Stretch",
+      "schedule": ["TUESDAY AND SUNDAY", "07:30 – 08:30"],
+      "description": "Explore supported stretches using a yoga wheel at the beachside Yoga Pavilion. Register with the Concierge by 17:00 the day before.",
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf",
+      "translations": {
+        "vi": [
+          "Giãn cơ với vòng yoga",
+          ["THỨ BA VÀ CHỦ NHẬT", "07:30 – 08:30"],
+          "Khám phá các động tác giãn cơ có hỗ trợ bằng vòng yoga tại Yoga Pavilion bên biển. Đăng ký với bộ phận Concierge trước 17:00 ngày hôm trước."
+        ],
+        "ru": [
+          "Растяжка с колесом для йоги",
+          ["ВТОРНИК И ВОСКРЕСЕНЬЕ", "07:30 – 08:30"],
+          "Попробуйте растяжку с опорой на колесо для йоги в павильоне у пляжа. Запишитесь у консьержа до 17:00 накануне."
+        ],
+        "zh": [
+          "瑜伽轮伸展",
+          ["周二及周日", "07:30 – 08:30"],
+          "在海滨瑜伽亭体验使用瑜伽轮辅助的伸展练习。请于前一天17:00前向礼宾部报名。"
+        ],
+        "ko": [
+          "요가 휠 스트레칭",
+          ["화요일·일요일", "07:30 – 08:30"],
+          "해변의 요가 파빌리온에서 요가 휠을 활용한 스트레칭을 경험하세요. 전날 17:00까지 컨시어지에 신청해 주세요."
+        ],
+        "ja": [
+          "ヨガホイールストレッチ",
+          ["火曜・日曜", "07:30 – 08:30"],
+          "ビーチサイドのヨガパビリオンで、ヨガホイールを使ったストレッチを体験してください。前日の17:00までにコンシェルジュへお申し込みください。"
+        ]
+      }
     },
     {
       "key": "aerial-yoga",

@@ -42,6 +42,23 @@ try {
       AND privilege_type IN ('INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER')
   `);
   assert.equal(rows[0]?.unsafe, 0, "Visitors must not receive editorial write permissions");
+  const selectedPhotoMigration = readFileSync(
+    new URL("20261016190000_selected_weddings_shuttle_photos.sql", directory),
+    "utf8",
+  );
+  const selectedPhotoState = async () =>
+    (
+      await db.query(
+        "SELECT to_jsonb(d) AS destination FROM destinations d WHERE id IN ('weddings','shuttle','nail-hair') ORDER BY id",
+      )
+    ).rows;
+  const beforePhotoReplay = await selectedPhotoState();
+  await db.exec(selectedPhotoMigration);
+  assert.deepEqual(
+    await selectedPhotoState(),
+    beforePhotoReplay,
+    "Selected photos replay without changing card content",
+  );
   const wellnessMigration = readFileSync(
     new URL("20261016170000_wellness_events_by_venue.sql", directory),
     "utf8",
@@ -52,6 +69,29 @@ try {
     (SELECT jsonb_agg(e ORDER BY id) FROM destination_events e) AS events,
     (SELECT jsonb_agg(t ORDER BY event_id,locale) FROM event_translations t) AS translations`)
     ).rows;
+  const wheelMigration = readFileSync(
+    new URL("20261016180000_yoga_wheel_stretch.sql", directory),
+    "utf8",
+  );
+  const beforeWheelReplay = await wellnessState();
+  await db.exec(wheelMigration);
+  assert.deepEqual(
+    await wellnessState(),
+    beforeWheelReplay,
+    "Yoga Wheel must not duplicate or reorder classes on replay",
+  );
+  assert.deepEqual(
+    (
+      await db.query(`SELECT title,schedule FROM destination_events
+    WHERE destination_id='yoga-pavilion' AND title IN ('Yoga Flow','Yoga Wheel Stretch')
+    ORDER BY display_order`)
+    ).rows,
+    [
+      { title: "Yoga Flow", schedule: ["MONDAY & WEDNESDAY–SATURDAY", "07:30 – 08:30"] },
+      { title: "Yoga Wheel Stretch", schedule: ["TUESDAY AND SUNDAY", "07:30 – 08:30"] },
+    ],
+    "Preserve the two distinct classes and their own days",
+  );
   const beforeWellnessReplay = await wellnessState();
   await db.exec(wellnessMigration);
   assert.deepEqual(
@@ -70,7 +110,7 @@ try {
     [
       { destination_id: "mi-sol-spa", count: 1 },
       { destination_id: "nail-hair", count: 1 },
-      { destination_id: "yoga-pavilion", count: 3 },
+      { destination_id: "yoga-pavilion", count: 4 },
     ],
     "Assign classes to the beach pavilion and workshops to their actual venues",
   );
@@ -82,7 +122,7 @@ try {
       AND t.published AND t.source_title=e.title AND t.source_schedule=e.schedule
       AND t.source_description=e.description`)
     ).rows[0]?.count,
-    25,
+    30,
   );
   assert.deepEqual(
     (

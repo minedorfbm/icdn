@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { LEVELS, type Level } from "@/data/resort";
 import { useI18n } from "@/i18n";
-import tramIllustration from "@/assets/nam-tram-signature.webp";
+import tramIllustration from "@/assets/nam-tram-selector.webp";
 import { NamTramCabin } from "./NamTramCabin";
 import { NamTramStation } from "./NamTramStation";
 import "./nam-tram.css";
@@ -89,8 +89,8 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
           <img
             src={tramIllustration}
             alt=""
-            width={640}
-            height={482}
+            width={900}
+            height={600}
             loading="lazy"
             decoding="async"
           />
