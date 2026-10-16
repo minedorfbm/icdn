@@ -1,14 +1,14 @@
-import tramIllustration from "@/assets/nam-tram-signature.webp";
+import tramIllustration from "@/assets/nam-tram-rail.webp";
 
-/** The same transparent cabin artwork is shared by the rail and station selector. */
+/** Angled transparent artwork follows the journey along the navigation rail. */
 export function NamTramCabin() {
   return (
     <img
       src={tramIllustration}
       alt=""
       aria-hidden="true"
-      width={640}
-      height={482}
+      width={240}
+      height={219}
       fetchPriority="low"
       decoding="async"
       className="nam-tram-cabin"

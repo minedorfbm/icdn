@@ -53,6 +53,11 @@ export const destinationRow = z.object({
     .nullable()
     .optional(),
   image_key: optionalText,
+  image_position: z
+    .string()
+    .regex(/^(?:100|\d{1,2})% (?:100|\d{1,2})%$/)
+    .nullable()
+    .optional(),
   detail_image_key: optionalText.optional(),
   // Binary classification retained only for rolling-deployment compatibility.
   content_kind: z.enum(["place", "offer"]).optional(),

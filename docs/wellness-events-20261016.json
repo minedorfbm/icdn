@@ -1,0 +1,220 @@
+{
+  "verified_on": "2026-10-16",
+  "sources": [
+    "https://www.danang.intercontinental.com/spa-and-wellbeing/",
+    "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf"
+  ],
+  "schedule_note": "Yoga Flow and Yoga Wheel Stretch are two separate activities, as clarified by the owner. The detailed schedule places Yoga Flow Monday and Wednesday–Saturday, and Yoga Wheel Stretch Tuesday/Sunday, both 07:30–08:30, at Yoga Pavilion.",
+  "events": [
+    {
+      "key": "yoga-flow",
+      "destination_id": "yoga-pavilion",
+      "title": "Yoga Flow",
+      "schedule": ["MONDAY & WEDNESDAY–SATURDAY", "07:30 – 08:30"],
+      "description": "A complimentary morning yoga class with the resort’s wellness team, welcoming beginners and experienced practitioners. Register with the Concierge by 17:00 the day before.",
+      "translations": {
+        "vi": [
+          "Yoga Flow",
+          ["THỨ HAI & THỨ TƯ–THỨ BẢY", "07:30 – 08:30"],
+          "Lớp yoga buổi sáng miễn phí cùng đội ngũ chăm sóc sức khỏe của khu nghỉ dưỡng, phù hợp với cả người mới bắt đầu và người đã có kinh nghiệm. Đăng ký với bộ phận Concierge trước 17:00 ngày hôm trước."
+        ],
+        "ru": [
+          "Йога-флоу",
+          ["ПОНЕДЕЛЬНИК И СРЕДА–СУББОТА", "07:30 – 08:30"],
+          "Бесплатное утреннее занятие йогой с командой велнес-специалистов курорта для начинающих и опытных участников. Запишитесь у консьержа до 17:00 накануне."
+        ],
+        "zh": [
+          "流瑜伽",
+          ["周一及周三至周六", "07:30 – 08:30"],
+          "与度假村康养团队一起参加免费晨间瑜伽课程，初学者和有经验的练习者均可参加。请于前一天17:00前向礼宾部报名。"
+        ],
+        "ko": [
+          "요가 플로우",
+          ["월요일 및 수요일–토요일", "07:30 – 08:30"],
+          "리조트 웰니스 팀과 함께하는 무료 아침 요가 수업입니다. 초보자부터 숙련자까지 참여할 수 있습니다. 전날 17:00까지 컨시어지에 신청해 주세요."
+        ],
+        "ja": [
+          "ヨガフロー",
+          ["月曜・水曜～土曜", "07:30 – 08:30"],
+          "リゾートのウェルネスチームによる無料の朝ヨガです。初心者から経験者までご参加いただけます。前日の17:00までにコンシェルジュへお申し込みください。"
+        ]
+      },
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf"
+    },
+    {
+      "key": "yoga-wheel-stretch",
+      "destination_id": "yoga-pavilion",
+      "title": "Yoga Wheel Stretch",
+      "schedule": ["TUESDAY AND SUNDAY", "07:30 – 08:30"],
+      "description": "Explore supported stretches using a yoga wheel at the beachside Yoga Pavilion. Register with the Concierge by 17:00 the day before.",
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf",
+      "translations": {
+        "vi": [
+          "Giãn cơ với vòng yoga",
+          ["THỨ BA VÀ CHỦ NHẬT", "07:30 – 08:30"],
+          "Khám phá các động tác giãn cơ có hỗ trợ bằng vòng yoga tại Yoga Pavilion bên biển. Đăng ký với bộ phận Concierge trước 17:00 ngày hôm trước."
+        ],
+        "ru": [
+          "Растяжка с колесом для йоги",
+          ["ВТОРНИК И ВОСКРЕСЕНЬЕ", "07:30 – 08:30"],
+          "Попробуйте растяжку с опорой на колесо для йоги в павильоне у пляжа. Запишитесь у консьержа до 17:00 накануне."
+        ],
+        "zh": [
+          "瑜伽轮伸展",
+          ["周二及周日", "07:30 – 08:30"],
+          "在海滨瑜伽亭体验使用瑜伽轮辅助的伸展练习。请于前一天17:00前向礼宾部报名。"
+        ],
+        "ko": [
+          "요가 휠 스트레칭",
+          ["화요일·일요일", "07:30 – 08:30"],
+          "해변의 요가 파빌리온에서 요가 휠을 활용한 스트레칭을 경험하세요. 전날 17:00까지 컨시어지에 신청해 주세요."
+        ],
+        "ja": [
+          "ヨガホイールストレッチ",
+          ["火曜・日曜", "07:30 – 08:30"],
+          "ビーチサイドのヨガパビリオンで、ヨガホイールを使ったストレッチを体験してください。前日の17:00までにコンシェルジュへお申し込みください。"
+        ]
+      }
+    },
+    {
+      "key": "aerial-yoga",
+      "destination_id": "yoga-pavilion",
+      "title": "Aerial Yoga",
+      "schedule": ["EVERY DAY", "10:30 – 11:30"],
+      "description": "Explore supported stretches and balance at the beachside Yoga Pavilion. Register with the Concierge by 17:00 the day before.",
+      "translations": {
+        "vi": [
+          "Yoga bay",
+          ["HẰNG NGÀY", "10:30 – 11:30"],
+          "Khám phá các động tác giãn cơ có hỗ trợ và rèn luyện thăng bằng tại Yoga Pavilion bên biển. Đăng ký với bộ phận Concierge trước 17:00 ngày hôm trước."
+        ],
+        "ru": [
+          "Аэройога",
+          ["ЕЖЕДНЕВНО", "10:30 – 11:30"],
+          "Откройте для себя растяжку с поддержкой и упражнения на равновесие в павильоне йоги у пляжа. Запишитесь у консьержа до 17:00 накануне."
+        ],
+        "zh": [
+          "空中瑜伽",
+          ["每日", "10:30 – 11:30"],
+          "在海滨瑜伽亭体验辅助伸展与平衡练习。请于前一天17:00前向礼宾部报名。"
+        ],
+        "ko": [
+          "에어리얼 요가",
+          ["매일", "10:30 – 11:30"],
+          "해변의 요가 파빌리온에서 지지 도구를 활용한 스트레칭과 균형 운동을 경험하세요. 전날 17:00까지 컨시어지에 신청해 주세요."
+        ],
+        "ja": [
+          "エアリアルヨガ",
+          ["毎日", "10:30 – 11:30"],
+          "ビーチサイドのヨガパビリオンで、サポートを使ったストレッチとバランスの練習を体験してください。前日の17:00までにコンシェルジュへお申し込みください。"
+        ]
+      },
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf"
+    },
+    {
+      "key": "tai-chi",
+      "destination_id": "yoga-pavilion",
+      "title": "Tai Chi with a Master",
+      "schedule": ["TUESDAY, THURSDAY AND SATURDAY", "15:00 – 16:00"],
+      "description": "Practice balance, mindful movement and focus with an experienced Tai Chi master. Private sessions are also available on request. Register with the Concierge by 17:00 the day before.",
+      "translations": {
+        "vi": [
+          "Thái Cực Quyền cùng chuyên gia",
+          ["THỨ BA, THỨ NĂM VÀ THỨ BẢY", "15:00 – 16:00"],
+          "Rèn luyện sự thăng bằng, chuyển động có ý thức và khả năng tập trung cùng chuyên gia Thái Cực Quyền giàu kinh nghiệm. Có lớp riêng theo yêu cầu. Đăng ký với bộ phận Concierge trước 17:00 ngày hôm trước."
+        ],
+        "ru": [
+          "Тайцзи с мастером",
+          ["ВТОРНИК, ЧЕТВЕРГ И СУББОТА", "15:00 – 16:00"],
+          "Развивайте равновесие, осознанность движений и концентрацию с опытным мастером тайцзи. По запросу доступны индивидуальные занятия. Запишитесь у консьержа до 17:00 накануне."
+        ],
+        "zh": [
+          "太极大师课程",
+          ["周二、周四及周六", "15:00 – 16:00"],
+          "跟随经验丰富的太极老师练习平衡、专注与身心协调。亦可预约私人课程。请于前一天17:00前向礼宾部报名。"
+        ],
+        "ko": [
+          "마스터와 함께하는 태극권",
+          ["화요일·목요일·토요일", "15:00 – 16:00"],
+          "숙련된 태극권 마스터와 함께 균형감, 의식적인 움직임, 집중력을 기르세요. 요청 시 개인 수업도 가능합니다. 전날 17:00까지 컨시어지에 신청해 주세요."
+        ],
+        "ja": [
+          "マスターと学ぶ太極拳",
+          ["火曜・木曜・土曜", "15:00 – 16:00"],
+          "経験豊かな太極拳の指導者と、バランス、意識的な動き、集中力を養いましょう。プライベートレッスンも承ります。前日の17:00までにコンシェルジュへお申し込みください。"
+        ]
+      },
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf"
+    },
+    {
+      "key": "spa-workshops",
+      "destination_id": "mi-sol-spa",
+      "title": "Complimentary Wellness & Beauty Experiences",
+      "schedule": ["MONDAY–THURSDAY", "12:15 – 13:00"],
+      "description": "Complimentary spa workshops at Mi Sol Spa reception, with a different ritual from Monday to Thursday. Register by 17:00 the day before with the Concierge or Mi Sol Spa.",
+      "translations": {
+        "vi": [
+          "Trải nghiệm chăm sóc sức khỏe & sắc đẹp miễn phí",
+          ["THỨ HAI–THỨ NĂM", "12:15 – 13:00"],
+          "Các buổi hướng dẫn spa miễn phí tại quầy lễ tân Mi Sol Spa, với một nghi thức khác nhau từ thứ Hai đến thứ Năm. Đăng ký trước 17:00 ngày hôm trước với bộ phận Concierge hoặc Mi Sol Spa."
+        ],
+        "ru": [
+          "Бесплатные велнес- и бьюти-практики",
+          ["ПОНЕДЕЛЬНИК–ЧЕТВЕРГ", "12:15 – 13:00"],
+          "Бесплатные спа-мастер-классы у стойки регистрации Mi Sol Spa: с понедельника по четверг каждый день посвящён новой практике. Запишитесь до 17:00 накануне у консьержа или в Mi Sol Spa."
+        ],
+        "zh": [
+          "免费康养与美容体验",
+          ["周一至周四", "12:15 – 13:00"],
+          "在 Mi Sol Spa 接待处参加免费水疗工作坊，周一至周四每天体验不同的护理仪式。请于前一天17:00前向礼宾部或 Mi Sol Spa 报名。"
+        ],
+        "ko": [
+          "무료 웰니스 & 뷰티 체험",
+          ["월요일–목요일", "12:15 – 13:00"],
+          "Mi Sol Spa 리셉션에서 월요일부터 목요일까지 매일 다른 스파 케어를 배우는 무료 워크숍입니다. 전날 17:00까지 컨시어지 또는 Mi Sol Spa에 신청해 주세요."
+        ],
+        "ja": [
+          "無料ウェルネス＆ビューティー体験",
+          ["月曜～木曜", "12:15 – 13:00"],
+          "Mi Sol Spaのレセプションで、月曜から木曜まで日替わりの無料スパワークショップを開催します。前日の17:00までにコンシェルジュまたはMi Sol Spaへお申し込みください。"
+        ]
+      },
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf"
+    },
+    {
+      "key": "beauty-workshops",
+      "destination_id": "nail-hair",
+      "title": "Complimentary Wellness & Beauty Experiences",
+      "schedule": ["FRIDAY–SUNDAY", "12:15 – 13:00"],
+      "description": "Complimentary beauty and self-care workshops at The Nail & Hair Studio from Friday to Sunday. Register by 17:00 the day before with the Concierge or Mi Sol Spa.",
+      "translations": {
+        "vi": [
+          "Trải nghiệm chăm sóc sức khỏe & sắc đẹp miễn phí",
+          ["THỨ SÁU–CHỦ NHẬT", "12:15 – 13:00"],
+          "Các buổi hướng dẫn làm đẹp và tự chăm sóc miễn phí tại The Nail & Hair Studio từ thứ Sáu đến Chủ nhật. Đăng ký trước 17:00 ngày hôm trước với bộ phận Concierge hoặc Mi Sol Spa."
+        ],
+        "ru": [
+          "Бесплатные велнес- и бьюти-практики",
+          ["ПЯТНИЦА–ВОСКРЕСЕНЬЕ", "12:15 – 13:00"],
+          "Бесплатные мастер-классы по красоте и уходу за собой в The Nail & Hair Studio с пятницы по воскресенье. Запишитесь до 17:00 накануне у консьержа или в Mi Sol Spa."
+        ],
+        "zh": [
+          "免费康养与美容体验",
+          ["周五至周日", "12:15 – 13:00"],
+          "周五至周日在 The Nail & Hair Studio 参加免费的美容及自我护理工作坊。请于前一天17:00前向礼宾部或 Mi Sol Spa 报名。"
+        ],
+        "ko": [
+          "무료 웰니스 & 뷰티 체험",
+          ["금요일–일요일", "12:15 – 13:00"],
+          "금요일부터 일요일까지 The Nail & Hair Studio에서 열리는 무료 뷰티 및 셀프 케어 워크숍입니다. 전날 17:00까지 컨시어지 또는 Mi Sol Spa에 신청해 주세요."
+        ],
+        "ja": [
+          "無料ウェルネス＆ビューティー体験",
+          ["金曜～日曜", "12:15 – 13:00"],
+          "金曜から日曜まで、The Nail & Hair Studioで無料のビューティー＆セルフケアワークショップを開催します。前日の17:00までにコンシェルジュまたはMi Sol Spaへお申し込みください。"
+        ]
+      },
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf"
+    }
+  ]
+}

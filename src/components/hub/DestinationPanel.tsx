@@ -19,7 +19,7 @@ export function DestinationPanel({
   near?: boolean;
   onOpen: () => void;
 }>) {
-  const { lang, t, typeLabel, levelLabel, action, description } = useI18n();
+  const { lang, t, typeLabel, levelLabel, action, linkLabel, description } = useI18n();
   const actions = actionsFor(dest, 3, lang);
   const [loaded, setLoaded] = useState(false);
 
@@ -43,6 +43,7 @@ export function DestinationPanel({
         width={768}
         height={1152}
         sizes="75vw"
+        style={{ objectPosition: dest.imagePosition }}
         className={`absolute inset-0 h-full w-full select-none object-cover transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           loaded ? "opacity-100" : "opacity-0"
         } ${active ? "scale-100" : "scale-[1.03] saturate-[0.9]"}`}
@@ -92,11 +93,11 @@ export function DestinationPanel({
             <ResortLink
               key={`${a.kind}-${i}`}
               href={a.url}
-              pageTitle={`${dest.name} · ${a.label ?? action(a.kind)}`}
+              pageTitle={`${dest.name} · ${a.label ? linkLabel(a.label) : action(a.kind)}`}
               tabIndex={active ? 0 : -1}
               className="pointer-events-auto inline-flex min-h-11 max-w-full items-center py-2 text-[10px] leading-relaxed tracking-[0.2em] text-white transition-colors hover:text-[#e5d3aa] focus-visible:outline-2 focus-visible:outline-offset-4"
             >
-              {a.label ?? action(a.kind)}
+              {a.label ? linkLabel(a.label) : action(a.kind)}
             </ResortLink>
           ))}
           {instagramUrl(dest) && (
