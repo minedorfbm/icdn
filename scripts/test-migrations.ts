@@ -42,6 +42,68 @@ try {
       AND privilege_type IN ('INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER')
   `);
   assert.equal(rows[0]?.unsafe, 0, "Visitors must not receive editorial write permissions");
+  const wellnessMigration = readFileSync(
+    new URL("20261016170000_wellness_events_by_venue.sql", directory),
+    "utf8",
+  );
+  const wellnessState = async () =>
+    (
+      await db.query(`SELECT
+    (SELECT jsonb_agg(e ORDER BY id) FROM destination_events e) AS events,
+    (SELECT jsonb_agg(t ORDER BY event_id,locale) FROM event_translations t) AS translations`)
+    ).rows;
+  const beforeWellnessReplay = await wellnessState();
+  await db.exec(wellnessMigration);
+  assert.deepEqual(
+    await wellnessState(),
+    beforeWellnessReplay,
+    "Wellness imports must be idempotent, including order and translations",
+  );
+  const wellnessCards = (
+    await db.query<{ destination_id: string; count: number }>(`
+    SELECT destination_id,count(*)::int FROM destination_events
+    WHERE destination_id IN ('yoga-pavilion','mi-sol-spa','nail-hair','relaxation-pavilion') AND active
+    GROUP BY destination_id ORDER BY destination_id`)
+  ).rows;
+  assert.deepEqual(
+    wellnessCards,
+    [
+      { destination_id: "mi-sol-spa", count: 1 },
+      { destination_id: "nail-hair", count: 1 },
+      { destination_id: "yoga-pavilion", count: 3 },
+    ],
+    "Assign classes to the beach pavilion and workshops to their actual venues",
+  );
+  assert.equal(
+    (
+      await db.query(`SELECT count(*)::int AS count FROM event_translations t
+    JOIN destination_events e ON e.id=t.event_id
+    WHERE e.destination_id IN ('yoga-pavilion','mi-sol-spa','nail-hair')
+      AND t.published AND t.source_title=e.title AND t.source_schedule=e.schedule
+      AND t.source_description=e.description`)
+    ).rows[0]?.count,
+    25,
+  );
+  assert.deepEqual(
+    (
+      await db.query(`SELECT destination_id,schedule FROM destination_events
+    WHERE title='Complimentary Wellness & Beauty Experiences' ORDER BY destination_id`)
+    ).rows,
+    [
+      { destination_id: "mi-sol-spa", schedule: ["MONDAY–THURSDAY", "12:15 – 13:00"] },
+      { destination_id: "nail-hair", schedule: ["FRIDAY–SUNDAY", "12:15 – 13:00"] },
+    ],
+    "Beauty workshops must not advertise seven days at either venue",
+  );
+  await db.exec(
+    "BEGIN; UPDATE destination_events SET description='A newer editorial revision' WHERE title='Yoga Flow' AND destination_id='yoga-pavilion'",
+  );
+  await assert.rejects(
+    db.exec(wellnessMigration),
+    /Wellness event changed since selection/,
+    "Preserve newer wellness edits",
+  );
+  await db.exec("ROLLBACK");
   const refreshMigration = readFileSync(
     new URL("20261016160000_reviewed_catalogue_refresh.sql", directory),
     "utf8",
