@@ -56,6 +56,26 @@ try {
     FROM destination_posts
   `);
   assert.deepEqual(media[0], { links: 6, replacement: 1, otherWatersports: 3 });
+  const thingsToDoMigration = readFileSync(
+    new URL("20261016130000_things_to_do_instagram_additions.sql", directory),
+    "utf8",
+  );
+  const beforeThingsToDoReplay = await mediaState();
+  await db.exec(thingsToDoMigration);
+  assert.deepEqual(
+    await mediaState(),
+    beforeThingsToDoReplay,
+    "Instagram additions must be idempotent",
+  );
+  const { rows: thingsToDoPosts } = await db.query<{ shortcode: string }>(`
+    SELECT (regexp_match(post_url, '/(?:p|reel|reels)/([A-Za-z0-9_-]+)(?:/|[?]|$)'))[1] AS shortcode
+    FROM destination_posts WHERE destination_id='things-to-do' AND active ORDER BY display_order
+  `);
+  assert.deepEqual(
+    thingsToDoPosts.map((post) => post.shortcode),
+    ["Dc2etiKCC_C", "DeB5v5MjKSV", "DThay1Lksbj", "DQOWKlCj7-M", "DLrapcEP3SQ"],
+    "Keep watersports first and append the four selected posts in order",
+  );
   await db.exec(`UPDATE destination_links SET url='https://example.com/newer-schedule.pdf'
     WHERE destination_id='things-to-do' AND kind='DAILY_SCHEDULE' AND active`);
   await assert.rejects(
