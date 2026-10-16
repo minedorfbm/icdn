@@ -112,6 +112,8 @@ export const postRow = z.object({
   caption: optionalText,
   image_url: optionalText,
   posted_at: optionalText,
+  // Optional while the database migration and frontend deploy independently.
+  embed_mode: z.enum(["embed", "link"]).optional(),
   display_order: order,
 });
 export const videoRow = z.object({

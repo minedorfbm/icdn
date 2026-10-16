@@ -161,6 +161,16 @@ const tables: Record<string, unknown[]> = {
     },
   ],
   destination_posts: [
+    ...["WINDOW0", "WINDOW1", "WINDOW2", "DIRECT3", "WINDOW4"].map((post, display_order) => ({
+      destination_id: "tingara",
+      post_url: `https://www.instagram.com/p/${post}/`,
+      embed_mode: post === "DIRECT3" ? "link" : "embed",
+      account: "intercontinentaldanang",
+      caption: null,
+      image_url: null,
+      posted_at: null,
+      display_order,
+    })),
     ...["SHORT", "TALL"].map((post, display_order) => ({
       destination_id: "nature-experiences",
       post_url: `https://www.instagram.com/p/${post}/`,

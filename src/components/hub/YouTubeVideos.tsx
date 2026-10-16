@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Play } from "lucide-react";
+import { Play, ExternalLink } from "lucide-react";
 import type { DestinationVideo } from "@/data/resort";
 import { useI18n } from "@/i18n";
+import { useYouTubePlayback } from "@/lib/use-youtube-playback";
 
 function YouTubeVideo({
   video,
@@ -21,15 +22,7 @@ function YouTubeVideo({
         className={`relative overflow-hidden rounded-[18px] bg-black ${isShort ? "aspect-[9/16]" : "aspect-video"}`}
       >
         {playing ? (
-          <iframe
-            className="absolute inset-0 size-full"
-            src={`https://www.youtube-nocookie.com/embed/${video.video_id}?autoplay=1`}
-            title={title}
-            loading="lazy"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          />
+          <CardVideoPlayer video={video} title={title} />
         ) : (
           <button
             type="button"
@@ -68,5 +61,40 @@ export function YouTubeVideos({ videos }: Readonly<{ videos: DestinationVideo[] 
         <YouTubeVideo key={video.video_id} video={video} showTitle={videos.length > 1} />
       ))}
     </div>
+  );
+}
+
+function CardVideoPlayer({ video, title }: Readonly<{ video: DestinationVideo; title: string }>) {
+  const { t } = useI18n();
+  const { host, loading, failed, retry } = useYouTubePlayback({ videoId: video.video_id, title });
+  return (
+    <>
+      <div ref={host} className="absolute inset-0 [&_iframe]:size-full [&_iframe]:border-0" />
+      {loading && (
+        <output className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-white">
+          {t("page_loading")}
+        </output>
+      )}
+      {failed && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black p-4 text-center text-sm text-white">
+          <p role="status">{t("content_unavailable")}</p>
+          <button
+            type="button"
+            onClick={retry}
+            className="min-h-11 rounded-full border border-white/50 px-6 py-2 focus-visible:outline-2"
+          >
+            {t("retry")}
+          </button>
+          <a
+            href={`https://www.youtube.com/watch?v=${video.video_id}`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex min-h-11 items-center gap-2 underline underline-offset-4 focus-visible:outline-2"
+          >
+            {t("play_video")} · YouTube <ExternalLink className="size-4" aria-hidden />
+          </a>
+        </div>
+      )}
+    </>
   );
 }

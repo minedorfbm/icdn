@@ -75,13 +75,16 @@ function processEmbeds(): Promise<void> {
 }
 
 /** Official embed with the shared caption preview and an offline fallback. */
-export function InstagramPostEmbed({ post }: Readonly<{ post: DestinationPost }>) {
+export function InstagramPostEmbed({
+  post,
+  enabled = true,
+}: Readonly<{ post: DestinationPost; enabled?: boolean }>) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
   const bounds = useRef<HTMLDivElement>(null);
   // Only single posts/reels can be embedded; account links show the post card.
   const permalink = instagramEmbedUrl(post.post_url);
-  const embeddable = !!permalink;
+  const embeddable = !!permalink && post.embed_mode !== "link";
   const [failed, setFailed] = useState(!embeddable);
   const [ready, setReady] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -91,7 +94,7 @@ export function InstagramPostEmbed({ post }: Readonly<{ post: DestinationPost }>
     setFailed(!embeddable);
     setReady(false);
     const node = host.current;
-    if (!node || !embeddable) return;
+    if (!node || !embeddable || !enabled) return;
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -177,7 +180,7 @@ export function InstagramPostEmbed({ post }: Readonly<{ post: DestinationPost }>
       sizes.disconnect();
       if (timer) clearTimeout(timer);
     };
-  }, [post.post_url, embeddable, attempt]);
+  }, [post.post_url, embeddable, enabled, attempt]);
 
   const handle = post.account ? `@${post.account.replace(/^@/, "")}` : null;
 
@@ -189,7 +192,7 @@ export function InstagramPostEmbed({ post }: Readonly<{ post: DestinationPost }>
       style={ready && !failed ? { width: fit.width } : undefined}
     >
       <div ref={bounds} className="instagram-post-bounds" aria-hidden />
-      {embeddable && (
+      {embeddable && enabled && (
         <div
           data-caption-preview={(ready && fit.clipped) || undefined}
           className={`instagram-post-viewport overflow-hidden rounded-[18px] bg-white transition-opacity [&_blockquote]:invisible ${
