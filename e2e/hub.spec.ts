@@ -58,8 +58,17 @@ test("the hero displays before a slow catalogue and media waits for an opened ca
   page,
   request,
 }) => {
-  await request.post("http://127.0.0.1:54329/control", {
-    data: { delay: 3500, failCatalogue: true },
+  const initialReads = await (await request.get("http://127.0.0.1:54329/control")).json();
+  const calls: URL[] = [];
+  let unavailable = true;
+  // Fail the browser request even when another test has warmed the server cache.
+  await page.route("**/_serverFn/**", async (route) => {
+    calls.push(new URL(route.request().url()));
+    if (unavailable) {
+      await new Promise((resolve) => setTimeout(resolve, 3500));
+      return route.fulfill({ status: 503, contentType: "text/plain", body: "Test offline" });
+    }
+    return route.continue();
   });
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
@@ -74,50 +83,47 @@ test("the hero displays before a slow catalogue and media waits for an opened ca
   await expect(page.getByRole("button", { name: "再試行", exact: true })).toBeVisible({
     timeout: 15000,
   });
-  await request.post("http://127.0.0.1:54329/control", { data: { delay: 0 } });
+  unavailable = false;
   await page.getByRole("button", { name: "再試行", exact: true }).click();
   await expect(page.locator("#heaven")).toHaveCount(1);
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
   const before = await (await request.get("http://127.0.0.1:54329/control")).json();
   expect(
-    before.reads.filter((read: string) =>
-      /destination_(photos|posts|videos|opening_hours)/.test(read),
-    ),
+    before.reads
+      .slice(initialReads.reads.length)
+      .filter((read: string) => /destination_(photos|posts|videos|opening_hours)/.test(read)),
   ).toEqual([]);
+  expect(calls.every((url) => !url.searchParams.has("payload"))).toBe(true);
   // Offscreen card and backdrop images do not compete with the hero.
   await expect(page.locator("#sea img[src]")).toHaveCount(0);
   await page.locator("#heaven").getByRole("button", { name: "Citron", exact: true }).click();
   const card = page.getByRole("dialog", { name: "Citron", exact: true });
   await expect(card).toBeVisible();
   await expect(card.getByRole("button", { name: /Test video/ })).toBeVisible();
-  const after = await (await request.get("http://127.0.0.1:54329/control")).json();
-  for (const table of [
-    "destination_photos",
-    "destination_posts",
-    "destination_videos",
-    "destination_opening_hours",
-  ]) {
-    expect(
-      after.reads.some(
-        (read: string) => read.includes(table) && read.includes("destination_id=eq.citron"),
-      ),
-    ).toBe(true);
-  }
+  // A cached media response still requires an opened card's explicit request.
+  expect(calls.filter((url) => url.searchParams.get("payload")?.includes("citron"))).toHaveLength(
+    1,
+  );
   expect(errors).toEqual([]);
-  await request.post("http://127.0.0.1:54329/control", { data: { delay: 0 } });
 });
 
-test("a failed card media request can be retried without losing the card", async ({
-  page,
-  request,
-}) => {
-  await request.post("http://127.0.0.1:54329/control", { data: { failMediaOnce: true } });
+test("a failed card media request can be retried without losing the card", async ({ page }) => {
+  let mediaCalls = 0;
+  await page.route("**/_serverFn/**", (route) => {
+    const payload = new URL(route.request().url()).searchParams.get("payload");
+    if (!payload?.includes("tingara")) return route.continue();
+    mediaCalls++;
+    return mediaCalls === 1
+      ? route.fulfill({ status: 503, contentType: "text/plain", body: "Test media offline" })
+      : route.continue();
+  });
   await page.goto("/tingara");
   const card = page.getByRole("dialog", { name: "TINGARA", exact: true });
   await expect(card).toBeVisible();
   await card.getByRole("button", { name: "Try again", exact: true }).click();
   await expect(card.getByRole("status")).toHaveCount(0);
   await expect(card).toBeVisible();
+  expect(mediaCalls).toBe(2);
 });
 
 test("direct card, two-page PDF, zoom and return preserve navigation", async ({ page }) => {
