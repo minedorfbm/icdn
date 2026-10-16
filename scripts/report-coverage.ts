@@ -36,7 +36,8 @@ const report = [
   `- Source files not measured by this run: **${unmeasured.length}** (listed below).`,
   "",
   "This is not whole-application coverage. Bun only instruments modules loaded by unit tests. " +
-    "Mobile browser scenarios and migration replay run separately and are not included in this unit LCOV report. " +
+    "Mobile browser scenarios run separately and are not included in this unit LCOV report. " +
+    "The unit suite also replays catalogue migrations in an isolated PostgreSQL instance. " +
     "A file absent here may be exercised by those scenarios. Type declarations and the generated route tree " +
     "are omitted from this inventory; no hand-written application source is excluded.",
   "",

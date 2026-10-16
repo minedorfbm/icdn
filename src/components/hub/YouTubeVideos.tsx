@@ -77,7 +77,7 @@ function CardVideoPlayer({ video, title }: Readonly<{ video: DestinationVideo; t
       )}
       {failed && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black p-4 text-center text-sm text-white">
-          <p role="status">{t("content_unavailable")}</p>
+          <output>{t("content_unavailable")}</output>
           <button
             type="button"
             onClick={retry}
