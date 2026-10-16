@@ -31,6 +31,10 @@ Destination videos now share the homepage film's bounded player lifecycle: load 
 - X: clear only the audited `https://x.com/ICdanang` setting, whose profile is unavailable. Preserve the key for a confirmed replacement.
 - Keep the six IHG links whose pages work in Chrome despite automated 403 responses, and the working redirects.
 
+## Dependency security gate
+
+The PR security gate reported [GHSA-qx66-fv34-fjm8](https://github.com/advisories/GHSA-qx66-fv34-fjm8) in the existing TanStack Start dependency. Upgrade React Start to the first patched version, `1.168.60`, and align React Router with its required `1.170.41`; the lockfile now resolves `start-server-core@1.169.39`. Accept the router's `unknown` error type at the root boundary, retaining its existing generic, translated message. The dependency audit passes with no reported vulnerabilities after this update.
+
 ## Release order
 
 Apply the additive migration and record it in the Supabase migration ledger in the same transaction, then deploy the frontend through the PR. The old frontend ignores the new field until deployment. Older database responses remain accepted while rollout proceeds. Production before/after snapshots are retained locally with the audit evidence; they contain public catalogue data only.

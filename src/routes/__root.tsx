@@ -7,7 +7,7 @@ import { NotFoundPage } from "../components/NotFoundPage";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
-function ErrorComponent({ error }: Readonly<{ error: Error }>) {
+function ErrorComponent({ error }: Readonly<{ error: unknown }>) {
   const router = useRouter();
   const copy = useErrorCopy();
   const [retrying, setRetrying] = useState(false);
