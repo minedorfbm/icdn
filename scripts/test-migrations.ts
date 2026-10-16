@@ -8,12 +8,30 @@ const files = readdirSync(directory)
   .filter((name) => name.endsWith(".sql"))
   .sort();
 const db = new PGlite();
+const marineRemoval = "20261016140000_remove_duplicate_marine_centre.sql";
+const seasideState = async () =>
+  (
+    await db.query(`SELECT
+      (SELECT to_jsonb(d) FROM destinations d WHERE id='sea-experiences') AS destination,
+      (SELECT jsonb_agg(p ORDER BY id) FROM destination_posts p WHERE destination_id='sea-experiences') AS posts,
+      (SELECT jsonb_agg(l ORDER BY id) FROM destination_links l WHERE destination_id='sea-experiences') AS links,
+      (SELECT jsonb_agg(t ORDER BY locale) FROM destination_translations t WHERE destination_id='sea-experiences') AS translations,
+      (SELECT to_jsonb(m) FROM map_places m WHERE id='beach-activity-centre') AS map_place`)
+  ).rows;
 try {
   await db.exec("CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role BYPASSRLS;");
   // Migrations depend on preceding schema/data changes; they must run sequentially.
   for (const file of files) {
     try {
+      const beforeRemoval = file === marineRemoval ? await seasideState() : undefined;
       await db.exec(readFileSync(new URL(file, directory), "utf8"));
+      if (beforeRemoval) {
+        assert.deepEqual(
+          await seasideState(),
+          beforeRemoval,
+          "Keep Seaside content and official map point unchanged",
+        );
+      }
     } catch (cause) {
       throw new Error(`Migration failed on a fresh database: ${file}`, { cause });
     }
@@ -55,7 +73,7 @@ try {
         AND post_url LIKE '%/Dc2etiKCC_C/')::int AS "otherWatersports"
     FROM destination_posts
   `);
-  assert.deepEqual(media[0], { links: 6, replacement: 1, otherWatersports: 3 });
+  assert.deepEqual(media[0], { links: 6, replacement: 1, otherWatersports: 2 });
   const thingsToDoMigration = readFileSync(
     new URL("20261016130000_things_to_do_instagram_additions.sql", directory),
     "utf8",
@@ -76,6 +94,23 @@ try {
     ["Dc2etiKCC_C", "DeB5v5MjKSV", "DThay1Lksbj", "DQOWKlCj7-M", "DLrapcEP3SQ"],
     "Keep watersports first and append the four selected posts in order",
   );
+  const beforeRemovalReplay = await seasideState();
+  await db.exec(readFileSync(new URL(marineRemoval, directory), "utf8"));
+  assert.deepEqual(
+    await seasideState(),
+    beforeRemovalReplay,
+    "Duplicate removal must be idempotent",
+  );
+  const { rows: removedCard } = await db.query(
+    `SELECT id FROM destinations WHERE id='marine-centre'`,
+  );
+  assert.deepEqual(removedCard, []);
+  const { rows: beachMap } = await db.query(`
+    SELECT destination_id, active, is_primary FROM map_destination_links WHERE place_id='beach-activity-centre'
+  `);
+  assert.deepEqual(beachMap, [
+    { destination_id: "sea-experiences", active: true, is_primary: true },
+  ]);
   await db.exec(`UPDATE destination_links SET url='https://example.com/newer-schedule.pdf'
     WHERE destination_id='things-to-do' AND kind='DAILY_SCHEDULE' AND active`);
   await assert.rejects(
