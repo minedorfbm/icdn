@@ -59,6 +59,27 @@ describe("external content boundaries", () => {
     expect(instagramEmbedUrl("https://instagram.com/p/Abc123/extra")).toBeUndefined();
   });
 
+  test("explicit direct links survive grouping while older rows still use embeds", () => {
+    const common = {
+      destination_id: "citron",
+      account: null,
+      caption: null,
+      image_url: null,
+      posted_at: null,
+    };
+    const posts = groupPosts([
+      { ...common, post_url: "https://www.instagram.com/p/Embed/", display_order: 0 },
+      {
+        ...common,
+        post_url: "https://www.instagram.com/p/Direct/",
+        display_order: 1,
+        embed_mode: "link",
+      },
+    ])["citron"]!;
+    expect(posts[0]!.embed_mode).toBeUndefined();
+    expect(posts[1]!.embed_mode).toBe("link");
+  });
+
   test("bad published post links are omitted without losing valid posts or their order", () => {
     const rows = [
       { post_url: "https://www.instagram.com/reel/Abc123/", display_order: 2 },

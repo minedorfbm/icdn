@@ -138,6 +138,7 @@ export interface DestinationPost {
   caption?: string;
   image?: string;
   posted_at?: string;
+  embed_mode?: "embed" | "link";
 }
 
 /** Row shape returned by the `destination_posts` table. */
@@ -206,6 +207,7 @@ export function groupPosts(rows: DestinationPostRow[]): Record<string, Destinati
       ...(row.caption ? { caption: row.caption } : {}),
       ...(image ? { image } : {}),
       ...(row.posted_at ? { posted_at: row.posted_at } : {}),
+      ...(row.embed_mode ? { embed_mode: row.embed_mode } : {}),
     });
   }
   return out;

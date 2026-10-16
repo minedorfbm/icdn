@@ -161,6 +161,16 @@ const tables: Record<string, unknown[]> = {
     },
   ],
   destination_posts: [
+    ...["WINDOW0", "WINDOW1", "WINDOW2", "DIRECT3", "WINDOW4"].map((post, display_order) => ({
+      destination_id: "tingara",
+      post_url: `https://www.instagram.com/p/${post}/`,
+      embed_mode: post === "DIRECT3" ? "link" : "embed",
+      account: "intercontinentaldanang",
+      caption: null,
+      image_url: null,
+      posted_at: null,
+      display_order,
+    })),
     ...["SHORT", "TALL"].map((post, display_order) => ({
       destination_id: "nature-experiences",
       post_url: `https://www.instagram.com/p/${post}/`,
@@ -268,8 +278,6 @@ tables["destination_links"]!.push(
   },
 );
 let delay = 0;
-let failCatalogue = false;
-let failMediaOnce = false;
 const reads: string[] = [];
 serve({
   hostname: "127.0.0.1",
@@ -280,8 +288,6 @@ serve({
       if (request.method === "POST") {
         const config = await request.json();
         delay = config.delay ?? 0;
-        failCatalogue = config.failCatalogue ?? false;
-        failMediaOnce = config.failMediaOnce ?? false;
       }
       return Response.json({ reads });
     }
@@ -289,12 +295,6 @@ serve({
 
     const table = new URL(request.url).pathname.split("/").at(-1)!;
     if (table === "destinations" && delay) await Bun.sleep(delay);
-    if (table === "destinations" && failCatalogue)
-      return Response.json({ message: "test offline" }, { status: 503 });
-    if (table === "destination_videos" && failMediaOnce) {
-      failMediaOnce = false;
-      return Response.json({ message: "test media offline" }, { status: 503 });
-    }
     let rows = tables[table] ?? [];
     for (const column of ["destination_id", "id", "benefits_id"]) {
       const filter = url.searchParams.get(column);

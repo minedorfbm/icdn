@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react";
 import { ExternalLink, X } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import { useI18n } from "@/i18n";
-import { loadYouTubePlayer, type YouTubePlayer } from "@/lib/youtube-player";
+import { useYouTubePlayback } from "@/lib/use-youtube-playback";
 
 const FILM_ID = "dLBRyZ0SIdg";
 const FILM_URL = `https://www.youtube.com/shorts/${FILM_ID}`;
@@ -10,84 +9,12 @@ const FILM_URL = `https://www.youtube.com/shorts/${FILM_ID}`;
 // Mount inside the dialog portal: the player container must exist before its effect runs.
 function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
   const { t } = useI18n();
-  const host = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState(true);
-  const [failed, setFailed] = useState(false);
-  const [attempt, setAttempt] = useState(0);
-
-  useEffect(() => {
-    let cancelled = false;
-    let player: YouTubePlayer | undefined;
-    const container = host.current;
-    if (!container) return;
-    setLoading(true);
-    setFailed(false);
-    const unavailable = () => {
-      if (!cancelled) {
-        setLoading(false);
-        setFailed(true);
-      }
-    };
-    const timeout = window.setTimeout(unavailable, 20_000);
-    // The API replaces its mount element; keep React's container intact for reopen/cleanup.
-    const mount = document.createElement("div");
-    container.append(mount);
-    loadYouTubePlayer()
-      .then((Player) => {
-        if (cancelled) return;
-        player = new Player(mount, {
-          host: "https://www.youtube-nocookie.com",
-          videoId: FILM_ID,
-          width: "100%",
-          height: "100%",
-          playerVars: {
-            // Start from onReady, after setting a quiet volume, rather than at YouTube's default.
-            autoplay: 0,
-            playsinline: 1,
-            rel: 0,
-            origin: window.location.origin,
-          },
-          events: {
-            onReady: ({ target }) => {
-              if (cancelled) return;
-              window.clearTimeout(timeout);
-              // A slow player may become ready after the fallback is already visible.
-              setFailed(false);
-              setLoading(false);
-              target.getIframe().title = "One MICHELIN Key — InterContinental Danang";
-              target.setVolume(20);
-              target.unMute();
-              target.playVideo();
-            },
-            onStateChange: ({ data }) => {
-              if (!cancelled && data === 0) onClose();
-            },
-            onError: () => {
-              window.clearTimeout(timeout);
-              unavailable();
-            },
-            onAutoplayBlocked: () => {
-              // Keep YouTube's own play control usable when the browser refuses autoplay.
-              window.clearTimeout(timeout);
-              if (!cancelled) {
-                setFailed(false);
-                setLoading(false);
-              }
-            },
-          },
-        });
-      })
-      .catch(() => {
-        window.clearTimeout(timeout);
-        unavailable();
-      });
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timeout);
-      player?.destroy();
-      container.replaceChildren();
-    };
-  }, [onClose, attempt]);
+  const { host, loading, failed, retry } = useYouTubePlayback({
+    videoId: FILM_ID,
+    title: "One MICHELIN Key — InterContinental Danang",
+    volume: 20,
+    onEnded: onClose,
+  });
 
   return (
     <div className="relative h-full w-full max-w-[calc(100dvh*9/16)]">
@@ -101,7 +28,7 @@ function MichelinPlayer({ onClose }: Readonly<{ onClose: () => void }>) {
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-black p-6 text-sm">
           <button
             type="button"
-            onClick={() => setAttempt((previous) => previous + 1)}
+            onClick={retry}
             className="min-h-11 rounded-full border border-white/50 px-6 py-3 focus-visible:outline-2 focus-visible:outline-offset-4"
           >
             {t("retry")}

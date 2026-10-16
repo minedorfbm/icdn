@@ -11,6 +11,16 @@ export function InstagramPostCarousel({ posts }: Readonly<{ posts: DestinationPo
   const track = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [height, setHeight] = useState<number>();
+  const [visited, setVisited] = useState<string[]>([]);
+  // Only expose the current and next placeholders to Instagram's global process().
+  // Keep visited players mounted so returning to a post never restarts it.
+  const current = items[index]?.post_url;
+  const next = items[index + 1]?.post_url;
+  useEffect(() => {
+    setVisited((previous) =>
+      Array.from(new Set([...previous, current, next].filter((url): url is string => !!url))),
+    );
+  }, [current, next]);
 
   useEffect(() => {
     const node = track.current;
@@ -56,7 +66,14 @@ export function InstagramPostCarousel({ posts }: Readonly<{ posts: DestinationPo
       >
         {items.map((post) => (
           <div key={post.post_url} className="shrink-0 snap-center">
-            <InstagramPostEmbed post={post} />
+            <InstagramPostEmbed
+              post={post}
+              enabled={
+                post.post_url === current ||
+                post.post_url === next ||
+                visited.includes(post.post_url)
+              }
+            />
           </div>
         ))}
       </div>
