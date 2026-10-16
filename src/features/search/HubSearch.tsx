@@ -228,6 +228,7 @@ export function SearchDialog({
                   >
                     <img
                       src={d.image}
+                      style={{ objectPosition: d.imagePosition }}
                       alt=""
                       width={56}
                       height={70}

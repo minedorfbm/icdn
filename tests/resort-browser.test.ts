@@ -43,3 +43,12 @@ test("lookalike domains, credentials, unsafe schemes and unrelated bookings are 
   ];
   for (const url of links) expect(embeddedResortUrl(url)).toBeUndefined();
 });
+
+test("IHG Rewards and app downloads keep ordinary external-browser navigation", () => {
+  for (const url of [
+    "https://www.ihg.com/onerewards/content/us/en/home",
+    "https://apps.apple.com/fr/app/h%C3%B4tels-ihg-r%C3%A9compenses/id368217298",
+    "https://play.google.com/store/apps/details?id=com.ihg.apps.android",
+  ])
+    expect(embeddedResortUrl(url)).toBeUndefined();
+});

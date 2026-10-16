@@ -57,6 +57,7 @@ export function DestinationIndex({
                 >
                   <img
                     src={destination.image}
+                    style={{ objectPosition: destination.imagePosition }}
                     alt=""
                     loading="lazy"
                     decoding="async"

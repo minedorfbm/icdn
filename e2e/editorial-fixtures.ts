@@ -10,6 +10,7 @@ const editorialDestinations = [
   level_id,
   type,
   image_key,
+  image_position: index === 1 ? "55% 50%" : null,
   detail_image_key: image_key,
   cluster: type === "spa" ? "WELLNESS" : "DINING",
   short_description: "A short card introduction.",
@@ -93,7 +94,7 @@ export const editorialTables: Record<string, unknown[]> = {
     last_order_minutes: null,
     display_order: 0,
   })),
-  destination_events: [
+  published_destination_events: [
     {
       id: "pilot-event",
       destination_id: "pilot-citron",
@@ -103,6 +104,15 @@ export const editorialTables: Record<string, unknown[]> = {
       url: "https://www.danang.intercontinental.com/dining/",
       display_order: 0,
     },
+    ...["la-maison-1888", "wine-cellar"].map((destination_id) => ({
+      id: "shared-wine-event",
+      destination_id,
+      title: "Souvenirs de France Wine Tasting",
+      schedule: ["Monday, Wednesday and Friday", "16:00 – 17:00"],
+      description: "A single tasting event shared by two related places.",
+      url: "https://www.danang.intercontinental.com/dining/la-maison-1888/",
+      display_order: 0,
+    })),
   ],
   destination_videos: editorialDestinations.map(({ id }) => ({
     destination_id: id,

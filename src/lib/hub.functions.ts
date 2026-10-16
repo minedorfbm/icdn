@@ -62,7 +62,7 @@ async function readHubData(): Promise<HubData> {
     read("levels", levelRow, undefined, "display_order"),
     read("destinations", destinationRow, "active", "display_order"),
     read("destination_links", linkRow, "active", "display_order"),
-    read("destination_events", eventRow, "active", "display_order"),
+    read("published_destination_events", eventRow, "active", "display_order"),
     read("map_places", mapPlaceRow, "active", "pin"),
     read("map_destination_links", mapLinkRow, "active", "display_order"),
     read("destination_link_translations", linkTranslationRow, "active"),

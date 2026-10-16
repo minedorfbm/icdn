@@ -19,7 +19,15 @@ export function RelatedDestinations({ id }: Readonly<{ id: string }>) {
       <div className="destination-related">
         {related.map((item) => (
           <button key={item.id} type="button" onClick={() => openDestination(item.id)}>
-            <img src={item.image} alt="" width={88} height={88} loading="lazy" decoding="async" />
+            <img
+              src={item.image}
+              style={{ objectPosition: item.imagePosition }}
+              alt=""
+              width={88}
+              height={88}
+              loading="lazy"
+              decoding="async"
+            />
             <span>{item.name}</span>
             <ArrowRight size={21} strokeWidth={1.4} aria-hidden />
           </button>

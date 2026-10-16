@@ -111,3 +111,22 @@ describe("editorial translation authority", () => {
     expect(translatedEvent("ru", changed, [row])).toEqual(changed);
   });
 });
+
+test("new collection labels cover every supported language", async () => {
+  const { LINK_LABEL } = await import("../src/i18n/dictionary");
+  for (const { code } of LANGUAGES) {
+    for (const key of [
+      "Discovery guide",
+      "Festive programme",
+      "Festive brochure",
+      "Sculpture guide",
+      "A History of Vietnam",
+      "Gallery catalogue",
+      "Download on the App Store",
+      "Get it on Google Play",
+      "Nam Tram Dining",
+    ]) {
+      expect(LINK_LABEL[code][key]?.trim()).toBeTruthy();
+    }
+  }
+});

@@ -88,6 +88,8 @@ export interface Destination {
   maximumAge?: number;
   /** Photography used by cards, search results and previews. */
   image: string;
+  /** Focal position for cropped card and preview photography, managed with its image. */
+  imagePosition?: string;
   /** Independent cover photography for the expanded destination page. */
   detailImage: string;
   /** Marked as one of the resort's official Instagram photo spots. */
@@ -416,6 +418,7 @@ export function toDestination(
     ...(row.minimum_age != null ? { minimumAge: row.minimum_age } : {}),
     ...(row.maximum_age != null ? { maximumAge: row.maximum_age } : {}),
     image,
+    ...(row.image_position ? { imagePosition: row.image_position } : {}),
     detailImage: resolveImage(row.detail_image_key ?? "") || image,
     ...(row.instagram_spot ? { instagram_spot: true } : {}),
     ...(photos !== undefined ? { photos } : {}),

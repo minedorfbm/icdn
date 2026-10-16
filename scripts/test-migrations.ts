@@ -42,6 +42,77 @@ try {
       AND privilege_type IN ('INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER')
   `);
   assert.equal(rows[0]?.unsafe, 0, "Visitors must not receive editorial write permissions");
+  const refreshMigration = readFileSync(
+    new URL("20261016160000_reviewed_catalogue_refresh.sql", directory),
+    "utf8",
+  );
+  const refreshedState = async () =>
+    (
+      await db.query(`SELECT
+      (SELECT jsonb_agg(to_jsonb(d)-'updated_at' ORDER BY id) FROM destinations d) AS cards,
+      (SELECT jsonb_agg(to_jsonb(l)-'updated_at' ORDER BY id) FROM destination_links l) AS links,
+      (SELECT jsonb_agg(r ORDER BY destination_id,related_destination_id) FROM destination_relations r) AS relations,
+      (SELECT jsonb_agg(e ORDER BY id,destination_id) FROM published_destination_events e) AS events`)
+    ).rows;
+  const beforeRefreshReplay = await refreshedState();
+  await db.exec(refreshMigration);
+  assert.deepEqual(
+    await refreshedState(),
+    beforeRefreshReplay,
+    "Catalogue refresh must not swap photos twice or duplicate links",
+  );
+  const sharedEvents = (
+    await db.query<{ id: string; destination_id: string }>(`
+    SELECT id,destination_id FROM published_destination_events
+    WHERE title='Souvenirs de France Wine Tasting' ORDER BY destination_id`)
+  ).rows;
+  assert.deepEqual(
+    sharedEvents.map((e) => e.destination_id),
+    ["la-maison-1888", "wine-cellar"],
+  );
+  assert.equal(
+    sharedEvents[0]?.id,
+    sharedEvents[1]?.id,
+    "Both cards must use one event and its translations",
+  );
+  await db.exec("BEGIN; SET LOCAL ROLE anon");
+  assert.equal(
+    (
+      await db.query(
+        "SELECT id FROM published_destination_events WHERE destination_id='wine-cellar'",
+      )
+    ).rows.length,
+    1,
+  );
+  await assert.rejects(
+    db.exec(
+      "INSERT INTO destination_event_links SELECT id,'citron' FROM destination_events LIMIT 1",
+    ),
+    /permission denied/,
+  );
+  await db.exec("ROLLBACK");
+  await db.exec(
+    "BEGIN; UPDATE destination_events SET active=false WHERE destination_id='la-maison-1888'; SET LOCAL ROLE anon",
+  );
+  assert.equal(
+    (
+      await db.query(
+        "SELECT id FROM published_destination_events WHERE destination_id='wine-cellar'",
+      )
+    ).rows.length,
+    0,
+    "Unpublishing the source event hides it everywhere",
+  );
+  await db.exec("ROLLBACK");
+  await db.exec(
+    "BEGIN; UPDATE destinations SET image_key='https://example.com/newer-photo.webp' WHERE id='citron'",
+  );
+  await assert.rejects(
+    db.exec(refreshMigration),
+    /Catalogue changed since review/,
+    "Preserve a newer editorial photograph",
+  );
+  await db.exec("ROLLBACK");
   const mediaMigration = readFileSync(
     new URL("20261016120000_external_media_reliability.sql", directory),
     "utf8",

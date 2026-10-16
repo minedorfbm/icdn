@@ -27,3 +27,16 @@ Les objets du bucket sont lisibles publiquement, mais l’écriture reste réser
 Supabase peut mettre un moment à diffuser les nouveaux en-têtes de cache sur tous ses nœuds. Vérifier ensuite une URL d’image publique avec `curl -I` et contrôler son en-tête `cache-control`.
 
 Documentation : https://supabase.com/docs/guides/storage/quickstart
+
+## Cadrage des cards
+
+`destinations.image_position` accepte deux pourcentages, par exemple `28% 50%`.
+Le cadrage s'applique à la photo d'accueil et à ses aperçus ; la couverture agrandie
+reste indépendante. La valeur vide centre la photo. Lors du remplacement de
+`image_key`, réexaminer aussi ce cadrage pour éviter de reprendre le point focal
+de l'ancienne photo.
+
+L'import du 16 octobre 2026 est décrit dans `docs/catalogue-refresh-20261016.json`.
+Les 19 nouveaux WebP ont été téléversés sous des noms versionnés et vérifiés par
+empreinte. L'interface Storage leur attribue un cache d'une heure ; les anciens
+fichiers ont été conservés.

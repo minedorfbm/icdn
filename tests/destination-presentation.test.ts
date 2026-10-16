@@ -105,9 +105,15 @@ test("catalogue rows preserve independent images without a presentation switch",
     short_description: "Intro",
     image_key: "d-citron",
     detail_image_key: "d-spa",
+    image_position: "28% 50%",
     active: true,
     display_order: 0,
   });
   expect(toDestination(row)).not.toHaveProperty("detailLayout");
   expect(toDestination(row).image).not.toBe(toDestination(row).detailImage);
+  expect(toDestination(row).imagePosition).toBe("28% 50%");
+  expect(destinationRow.safeParse({ ...row, image_position: "101% 50%" }).success).toBe(false);
+  expect(
+    destinationRow.safeParse({ ...row, image_position: "url(https://example.com)" }).success,
+  ).toBe(false);
 });

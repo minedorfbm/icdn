@@ -343,3 +343,22 @@ test("vertical gestures, screen edges, controls, Instagram and cancelled swipes 
   expect(await swipe(track, [290, 280], [80, 283])).toBe(false);
   await expect(page).toHaveURL("/mi-sol-spa");
 });
+
+test("shared wine tasting follows the related card with its schedule intact", async ({ page }) => {
+  await page.goto("/la-maison-1888");
+  const event = page.locator(".editorial-detail details");
+  await expect(event).toHaveCount(1);
+  await expect(event.locator("summary")).toContainText("Souvenirs de France Wine Tasting");
+  await expect(event.locator("summary")).toContainText("16:00 – 17:00");
+  await page
+    .locator(".destination-related")
+    .getByRole("button", { name: "Wine Cellar", exact: true })
+    .click();
+  await expect(page).toHaveURL("/wine-cellar");
+  await expect(event).toHaveCount(1);
+  await expect(event.locator("summary")).toContainText("Souvenirs de France Wine Tasting");
+  await expect(event.locator("summary")).toContainText("16:00 – 17:00");
+  await event.locator("summary").click();
+  await expect(event).toContainText("A single tasting event shared by two related places.");
+  await expect(page.locator(".destination-related img")).toHaveCSS("object-position", "55% 50%");
+});
