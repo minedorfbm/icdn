@@ -55,9 +55,6 @@ test("La Maison prepares one player near the viewport without autoplay or an ext
 test("the prepared player can retry after a provider load failure and still waits for a click", async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    Reflect.deleteProperty(window, "IntersectionObserver");
-  });
   let attempts = 0;
   await page.route("https://www.youtube.com/iframe_api", (route) =>
     ++attempts === 1
