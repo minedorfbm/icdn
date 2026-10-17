@@ -59,8 +59,8 @@ test("Insta spot guide opens the Top 9 card and the pool marker proposes only th
   await expect(page).toHaveURL("/instagram-spots");
   await expect(map).toHaveCount(0);
   await page.getByRole("button", { name: "BACK", exact: true }).click();
-  await page.getByRole("button", { name: /Explore the resort map/ }).click();
   map = page.getByRole("dialog", { name: "Resort map", exact: true });
+  await expect(map).toBeVisible();
   await map.getByRole("button", { name: "Insta spot", exact: true }).click();
   await map
     .locator(".photo-hotspots")
