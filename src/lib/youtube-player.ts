@@ -30,7 +30,7 @@ type YouTubeWindow = Window & {
 };
 let pending: Promise<PlayerConstructor> | undefined;
 
-/** Download the official player API only after a visitor opens a film. */
+/** Share the official player API between opened films and the near-viewport pilot. */
 export function loadYouTubePlayer(): Promise<PlayerConstructor> {
   const browser = window as YouTubeWindow;
   if (browser.YT?.Player) return Promise.resolve(browser.YT.Player);

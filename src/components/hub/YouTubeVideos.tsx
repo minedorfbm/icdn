@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Play, ExternalLink } from "lucide-react";
 import type { DestinationVideo } from "@/data/resort";
 import { useI18n } from "@/i18n";
@@ -7,7 +7,8 @@ import { useYouTubePlayback } from "@/lib/use-youtube-playback";
 function YouTubeVideo({
   video,
   showTitle = true,
-}: Readonly<{ video: DestinationVideo; showTitle?: boolean }>) {
+  prepareOnApproach = false,
+}: Readonly<{ video: DestinationVideo; showTitle?: boolean; prepareOnApproach?: boolean }>) {
   const { t, lang } = useI18n();
   const [playing, setPlaying] = useState(false);
   const isShort = video.format === "short";
@@ -21,7 +22,9 @@ function YouTubeVideo({
       <div
         className={`relative overflow-hidden rounded-[18px] bg-black ${isShort ? "aspect-[9/16]" : "aspect-video"}`}
       >
-        {playing ? (
+        {prepareOnApproach ? (
+          <PreparedCardVideo video={video} title={title} />
+        ) : playing ? (
           <CardVideoPlayer video={video} title={title} />
         ) : (
           <button
@@ -53,20 +56,76 @@ function YouTubeVideo({
   );
 }
 
-export function YouTubeVideos({ videos }: Readonly<{ videos: DestinationVideo[] }>) {
+export function YouTubeVideos({
+  videos,
+  destinationId,
+}: Readonly<{ videos: DestinationVideo[]; destinationId?: string }>) {
   if (videos.length === 0) return null;
   return (
     <div className="editorial-media-track flex snap-x snap-mandatory items-start gap-4 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      {videos.map((video) => (
-        <YouTubeVideo key={video.video_id} video={video} showTitle={videos.length > 1} />
+      {videos.map((video, index) => (
+        <YouTubeVideo
+          key={video.video_id}
+          video={video}
+          showTitle={videos.length > 1}
+          prepareOnApproach={destinationId === "la-maison-1888" && index === 0}
+        />
       ))}
     </div>
   );
 }
 
-function CardVideoPlayer({ video, title }: Readonly<{ video: DestinationVideo; title: string }>) {
+/** One-card pilot: expose YouTube's own play control before the visitor clicks. */
+function PreparedCardVideo({ video, title }: Readonly<{ video: DestinationVideo; title: string }>) {
+  const container = useRef<HTMLDivElement>(null);
+  const [nearby, setNearby] = useState(false);
+  useEffect(() => {
+    if (!container.current) return;
+    if (!("IntersectionObserver" in window)) {
+      setNearby(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setNearby(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(container.current);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div ref={container} className="absolute inset-0" data-youtube-pilot>
+      {nearby ? (
+        <CardVideoPlayer video={video} title={title} autoplay={false} />
+      ) : (
+        <img
+          src={`https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`}
+          alt=""
+          width={480}
+          height={360}
+          loading="lazy"
+          className="size-full object-cover"
+        />
+      )}
+    </div>
+  );
+}
+
+function CardVideoPlayer({
+  video,
+  title,
+  autoplay = true,
+}: Readonly<{ video: DestinationVideo; title: string; autoplay?: boolean }>) {
   const { t } = useI18n();
-  const { host, loading, failed, retry } = useYouTubePlayback({ videoId: video.video_id, title });
+  const { host, loading, failed, retry } = useYouTubePlayback({
+    videoId: video.video_id,
+    title,
+    autoplay,
+  });
   return (
     <>
       <div ref={host} className="absolute inset-0 [&_iframe]:size-full [&_iframe]:border-0" />

@@ -749,7 +749,7 @@ for (const [path, name] of [
       const size = page.viewportSize()!;
       const postIndex = naturalHeight >= 920 ? 1 : 0;
       const post = card.locator(".instagram-post").nth(postIndex);
-      const frame = card.locator("iframe").nth(postIndex);
+      const frame = post.locator("iframe");
       const viewport = post.locator(".instagram-post-viewport");
       const bounds = post.locator(".instagram-post-bounds");
       await expect
