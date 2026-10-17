@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Play, ExternalLink } from "lucide-react";
 import type { DestinationVideo } from "@/data/resort";
 import { useI18n } from "@/i18n";
-import { useYouTubePlayback } from "@/lib/use-youtube-playback";
 
 function YouTubeVideo({
   video,
@@ -25,7 +24,7 @@ function YouTubeVideo({
         {prepareOnApproach ? (
           <PreparedCardVideo video={video} title={title} />
         ) : playing ? (
-          <CardVideoPlayer video={video} title={title} />
+          <CardVideoPlayer video={video} title={title} autoplay />
         ) : (
           <button
             type="button"
@@ -51,7 +50,7 @@ function YouTubeVideo({
           </button>
         )}
       </div>
-      {prepareOnApproach && (
+      {(prepareOnApproach || playing) && (
         <a
           href={`https://www.youtube.com/watch?v=${video.video_id}`}
           target="_blank"
@@ -110,14 +109,7 @@ function PreparedCardVideo({ video, title }: Readonly<{ video: DestinationVideo;
   return (
     <div ref={container} className="absolute inset-0" data-youtube-pilot>
       {nearby ? (
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${video.video_id}?autoplay=0&playsinline=1&rel=0`}
-          title={title}
-          className="size-full border-0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
+        <CardVideoPlayer video={video} title={title} autoplay={false} />
       ) : (
         <img
           src={`https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`}
@@ -132,40 +124,23 @@ function PreparedCardVideo({ video, title }: Readonly<{ video: DestinationVideo;
   );
 }
 
-function CardVideoPlayer({ video, title }: Readonly<{ video: DestinationVideo; title: string }>) {
-  const { t } = useI18n();
-  const { host, loading, failed, retry } = useYouTubePlayback({
-    videoId: video.video_id,
-    title,
-  });
+function CardVideoPlayer({
+  video,
+  title,
+  autoplay,
+}: Readonly<{
+  video: DestinationVideo;
+  title: string;
+  autoplay: boolean;
+}>) {
   return (
-    <>
-      <div ref={host} className="absolute inset-0 [&_iframe]:size-full [&_iframe]:border-0" />
-      {loading && (
-        <output className="pointer-events-none absolute inset-0 grid place-items-center text-sm text-white">
-          {t("page_loading")}
-        </output>
-      )}
-      {failed && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black p-4 text-center text-sm text-white">
-          <output>{t("content_unavailable")}</output>
-          <button
-            type="button"
-            onClick={retry}
-            className="min-h-11 rounded-full border border-white/50 px-6 py-2 focus-visible:outline-2"
-          >
-            {t("retry")}
-          </button>
-          <a
-            href={`https://www.youtube.com/watch?v=${video.video_id}`}
-            target="_blank"
-            rel="noreferrer"
-            className="flex min-h-11 items-center gap-2 underline underline-offset-4 focus-visible:outline-2"
-          >
-            {t("play_video")} · YouTube <ExternalLink className="size-4" aria-hidden />
-          </a>
-        </div>
-      )}
-    </>
+    <iframe
+      src={`https://www.youtube-nocookie.com/embed/${video.video_id}?autoplay=${autoplay ? 1 : 0}&playsinline=1&rel=0`}
+      title={title}
+      className="size-full border-0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerPolicy="strict-origin-when-cross-origin"
+      allowFullScreen
+    />
   );
 }
