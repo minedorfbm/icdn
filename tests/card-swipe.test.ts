@@ -1,5 +1,10 @@
 import { expect, test } from "bun:test";
-import { cardPosition, swipeStep } from "../src/lib/card-swipe";
+import {
+  cardPosition,
+  swipeStep,
+  destinationSwipeAxis,
+  destinationSwipeStep,
+} from "../src/lib/card-swipe";
 
 test("a short flick advances but a paused short drag returns to the same card", () => {
   expect(swipeStep(-30, 300, -0.6, 10)).toBe(1);
@@ -26,4 +31,24 @@ test("both swipe directions reach the same slots as their committed index", () =
     expect(cardPosition(0, -travel / 2, travel)).toBe(-0.5);
     expect(cardPosition(0, 0, travel)).toBe(0);
   }
+});
+
+test("expanded cards accept shorter drags and quick flicks in either direction", () => {
+  expect(destinationSwipeStep(-50, 8, 390, 500)).toBe(1);
+  expect(destinationSwipeStep(50, 8, 390, 500)).toBe(-1);
+  expect(destinationSwipeStep(-28, 3, 390, 70)).toBe(1);
+  expect(destinationSwipeStep(28, 3, 390, 70)).toBe(-1);
+  expect(destinationSwipeStep(-28, 3, 390, 500)).toBe(0);
+  expect(destinationSwipeStep(-12, 0, 390, 10)).toBe(0);
+  expect(destinationSwipeStep(-100, 2, 390, 1000)).toBe(0);
+});
+
+test("diagonal starts can resolve horizontally while vertical scroll keeps priority", () => {
+  expect(destinationSwipeAxis(7, 4)).toBeNull();
+  expect(destinationSwipeAxis(11, 10)).toBeNull();
+  expect(destinationSwipeAxis(28, 16)).toBe("horizontal");
+  expect(destinationSwipeAxis(6, 14)).toBe("vertical");
+  expect(destinationSwipeAxis(26, 25)).toBe("vertical");
+  expect(destinationSwipeStep(50, 45, 390, 70)).toBe(0);
+  expect(destinationSwipeStep(10, 100, 390, 70)).toBe(0);
 });

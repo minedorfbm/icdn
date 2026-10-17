@@ -3,6 +3,7 @@ import { useHub } from "@/data/hub-context";
 import { adjacentDestination } from "./destination-presentation";
 import { useDestinationNavigation } from "./use-destination-navigation";
 import { findPublicDestination } from "./destination-route";
+import { destinationSwipeAxis, destinationSwipeStep } from "./card-swipe";
 
 const INTERACTIVE =
   'a,button,input,select,textarea,summary,iframe,video,[contenteditable]:not([contenteditable="false"]),[data-instagram-track],[data-destination-swipe-ignore]';
@@ -35,8 +36,9 @@ function bindSwipe(node: HTMLElement, navigate: (direction: 1 | -1) => void) {
     const dx = Math.abs(touch.clientX - gesture.x);
     const dy = Math.abs(touch.clientY - gesture.y);
     if (!gesture.horizontal) {
-      if (Math.max(dx, dy) < 10) return;
-      if (dx <= dy * 1.4) return cancel();
+      const axis = destinationSwipeAxis(dx, dy);
+      if (!axis) return;
+      if (axis === "vertical") return cancel();
       gesture.horizontal = true;
     }
     if (event.cancelable) event.preventDefault();
@@ -46,13 +48,11 @@ function bindSwipe(node: HTMLElement, navigate: (direction: 1 | -1) => void) {
     cancel();
     const touch = event.changedTouches[0];
     if (!completed?.horizontal || touch?.identifier !== completed.id) return;
-    if (event.timeStamp - completed.time > 900 || window.getSelection()?.isCollapsed === false)
-      return;
+    if (window.getSelection()?.isCollapsed === false) return;
     const dx = touch.clientX - completed.x;
     const dy = touch.clientY - completed.y;
-    const threshold = Math.min(96, Math.max(56, node.clientWidth * 0.18));
-    if (Math.abs(dx) < threshold || Math.abs(dx) <= Math.abs(dy) * 1.4) return;
-    navigate(dx < 0 ? 1 : -1);
+    const step = destinationSwipeStep(dx, dy, node.clientWidth, event.timeStamp - completed.time);
+    if (step) navigate(step);
   };
   node.addEventListener("touchstart", start, { passive: true });
   node.addEventListener("touchmove", move, { passive: false });
