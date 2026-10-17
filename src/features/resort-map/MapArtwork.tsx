@@ -727,28 +727,35 @@ export function MapArtwork({
             {photoSpots.map((spot) => (
               <g
                 key={spot.id}
-                role="button"
-                tabIndex={0}
-                aria-label={`${mapCopy(lang, "photos")} ${spot.id}`}
-                aria-pressed={selectedPhotoId === spot.id}
-                className={`photo-hotspot ${selectedPhotoId === spot.id ? "is-selected" : ""}`}
                 transform={`translate(${spot.point.x} ${spot.point.y}) scale(${pixelScale / camera.scale})`}
-                onClick={() => onSelectPhoto(spot.id)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onSelectPhoto(spot.id);
-                  }
-                }}
               >
-                <title>
-                  {spot.id} ·{" "}
-                  {places.find((place) => place.id === spot.parentId)?.name ??
-                    mapCopy(lang, "photos")}
-                </title>
-                <circle className="photo-anchor" r="3" />
-                <path className="photo-leader" d={`M0 0L${spot.offset.x} ${spot.offset.y}`} />
-                <g transform={`translate(${spot.offset.x} ${spot.offset.y})`}>
+                <circle className="photo-anchor" r="3" pointerEvents="none" aria-hidden />
+                <path
+                  className="photo-leader"
+                  d={`M0 0L${spot.offset.x} ${spot.offset.y}`}
+                  pointerEvents="none"
+                  aria-hidden
+                />
+                <g
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`${mapCopy(lang, "photos")} ${spot.id}`}
+                  aria-pressed={selectedPhotoId === spot.id}
+                  className={`photo-hotspot ${selectedPhotoId === spot.id ? "is-selected" : ""}`}
+                  transform={`translate(${spot.offset.x} ${spot.offset.y})`}
+                  onClick={() => onSelectPhoto(spot.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onSelectPhoto(spot.id);
+                    }
+                  }}
+                >
+                  <title>
+                    {spot.id} ·{" "}
+                    {places.find((place) => place.id === spot.parentId)?.name ??
+                      mapCopy(lang, "photos")}
+                  </title>
                   <circle className="photo-hit" r="22" />
                   <rect className="photo-marker" x="-15" y="-17" width="30" height="34" rx="8" />
                   <text textAnchor="middle" y="5">
