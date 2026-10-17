@@ -307,7 +307,7 @@
   text-underline-offset: 5px;
 }
 .hub-atlas .atlas-context,
-.hub-atlas .atlas-photo-index {
+.hub-atlas .atlas-photo-guide {
   position: absolute;
   z-index: 2;
   left: 14px;
@@ -320,16 +320,16 @@
   font-size: 12px;
   line-height: 1.5;
 }
-.hub-atlas .atlas-photo-index {
+.hub-atlas .atlas-photo-guide {
   display: flex;
-  overflow: auto;
-  padding: 5px;
-  gap: 1px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  text-align: left;
 }
-.hub-atlas .atlas-photo-index button {
-  min-width: 44px;
-  min-height: 44px;
-  color: var(--atlas-gold);
+.hub-atlas .atlas-photo-guide svg {
+  flex-shrink: 0;
 }
 .hub-atlas .atlas-footnote {
   display: none;
@@ -381,7 +381,7 @@
     border-left: 1px solid var(--brand-border);
   }
   .hub-atlas .atlas-context,
-  .hub-atlas .atlas-photo-index {
+  .hub-atlas .atlas-photo-guide {
     width: 400px;
     left: 24px;
     right: auto;

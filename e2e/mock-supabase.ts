@@ -216,6 +216,26 @@ const tables: Record<string, unknown[]> = {
 for (const [table, rows] of Object.entries(editorialTables)) {
   tables[table] = [...(tables[table] ?? []), ...rows];
 }
+// The bar and pool share a map venue, but their Instagram letters select distinct cards.
+tables["map_places"]!.push({
+  id: "long-bar",
+  name: "L_O_N_G Bar & Pool",
+  level_id: "earth",
+  pin: 17,
+  x: 882.6,
+  y: 303.8,
+  zoom: 2,
+  active: true,
+});
+for (const [display_order, destination_id] of ["long-bar", "long-pool"].entries()) {
+  tables["map_destination_links"]!.push({
+    place_id: "long-bar",
+    destination_id,
+    display_order,
+    is_primary: true,
+    active: true,
+  });
+}
 for (const [index, id] of ["rooms", "club-panoramic-room-oceanview"].entries()) {
   tables["destinations"]!.push({
     ...destinations[0],

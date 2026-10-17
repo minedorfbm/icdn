@@ -44,3 +44,33 @@ export function visibleMapLabels(
   }
   return labels;
 }
+
+/** Separate letter buttons in screen pixels while keeping their map anchors fixed. */
+export function layoutPhotoSpots(
+  spots: { id: string; point: { x: number; y: number }; offset: { x: number; y: number } }[],
+  pixelsPerMapUnit: number,
+): Map<string, { x: number; y: number }> {
+  const offsets = new Map<string, { x: number; y: number }>();
+  const occupied: MapRect[] = [];
+  const shifts = Array.from({ length: 13 }, (_, row) =>
+    Array.from({ length: 13 }, (_, col) => ({ x: (col - 6) * 24, y: (row - 6) * 24 })),
+  )
+    .flat()
+    .sort((a, b) => a.x * a.x + a.y * a.y - b.x * b.x - b.y * b.y);
+  for (const spot of spots) {
+    for (const shift of shifts) {
+      const offset = { x: spot.offset.x + shift.x, y: spot.offset.y + shift.y };
+      const box = {
+        x: spot.point.x * pixelsPerMapUnit + offset.x - 25,
+        y: spot.point.y * pixelsPerMapUnit + offset.y - 25,
+        width: 50,
+        height: 50,
+      };
+      if (occupied.some((other) => overlaps(box, other))) continue;
+      occupied.push(box);
+      offsets.set(spot.id, offset);
+      break;
+    }
+  }
+  return offsets;
+}

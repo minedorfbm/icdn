@@ -1,5 +1,7 @@
+import { photoSpots } from "../src/features/resort-map/map.legend";
+import { overlaps } from "../src/features/resort-map/tram-labels";
 import { test, expect } from "bun:test";
-import { visibleMapLabels } from "../src/features/resort-map/map-labels";
+import { layoutPhotoSpots, visibleMapLabels } from "../src/features/resort-map/map-labels";
 
 test("overview prioritizes selected label without changing pin coordinates", () => {
   expect([
@@ -42,4 +44,23 @@ test("place labels leave room for Nam Tram station signs", () => {
       { x: 50, y: 120, width: 100, height: 30 },
     ]).size,
   ).toBe(0);
+});
+
+test("all nine Insta spot buttons remain separate from overview to close zoom", () => {
+  for (const scale of [0.15, 0.2, 0.257, 0.5, 1, 2, 4]) {
+    const offsets = layoutPhotoSpots(photoSpots, scale);
+    expect(offsets.size).toBe(9);
+    const boxes = photoSpots.map((spot) => {
+      const offset = offsets.get(spot.id)!;
+      return {
+        x: spot.point.x * scale + offset.x - 22,
+        y: spot.point.y * scale + offset.y - 22,
+        width: 44,
+        height: 44,
+      };
+    });
+    for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) expect(overlaps(boxes[i]!, boxes[j]!)).toBe(false);
+    }
+  }
 });

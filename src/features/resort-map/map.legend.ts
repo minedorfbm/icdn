@@ -7,58 +7,68 @@ export type PhotoSpot = {
   point: MapPoint;
   offset: MapPoint;
   parentId?: string;
+  destinationId: string;
 };
 export const photoSpots: PhotoSpot[] = [
   {
     id: "A",
+    destinationId: "the-summit",
     point: fromOfficialPlan(1529.5, 1145),
     offset: { x: -12, y: 0 },
     parentId: "summit",
   },
   {
     id: "B",
+    destinationId: "reception",
     point: fromOfficialPlan(1350, 928.5),
     offset: { x: 12, y: 24 },
     parentId: "lobby",
   },
   {
     id: "C",
+    destinationId: "citron",
     point: fromOfficialPlan(1248, 851),
     offset: { x: -24, y: -12 },
     parentId: "citron",
   },
   {
     id: "D",
+    destinationId: "la-maison-1888",
     point: fromOfficialPlan(1318.5, 676.5),
     offset: { x: -26, y: 0 },
     parentId: "la-maison-1888",
   },
   {
     id: "E",
+    destinationId: "wall-of-lanterns",
     parentId: "wall-of-lanterns",
     point: fromOfficialPlan(1447.5, 613),
     offset: { x: -8, y: 28 },
   },
   {
     id: "F",
+    destinationId: "garden-jacuzzi",
     point: fromOfficialPlan(1426, 517.5),
     offset: { x: -18, y: -28 },
     parentId: "garden-pool",
   },
   {
     id: "G",
+    destinationId: "long-bar",
     point: fromOfficialPlan(1528, 557),
     offset: { x: -8, y: -32 },
     parentId: "long-bar",
   },
   {
     id: "H",
+    destinationId: "long-pool",
     point: fromOfficialPlan(1573, 563.5),
     offset: { x: 20, y: 21 },
     parentId: "long-bar",
   },
   {
     id: "I",
+    destinationId: "coconut-beach",
     parentId: "coconut-beach",
     point: fromOfficialPlan(1720.5, 360),
     offset: { x: 0, y: -24 },

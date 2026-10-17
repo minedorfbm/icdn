@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ArrowUpRight,
   Camera,
   ChevronLeft,
   ChevronRight,
@@ -66,10 +67,17 @@ export default function ResortMap({
   const { camera, onViewportChange, focusOn, zoomBy, fit, allowPlaceClick, handlers } =
     useMapCamera();
   const selected = places.find((p) => p.id === selectedId);
-  const related = useMemo(
-    () => (selectedId ? linkedDestinations(selectedId, mapLinks, destinations) : []),
-    [selectedId, mapLinks, destinations],
+  const photoDestinationId =
+    mode === "photos" ? photoSpots.find((spot) => spot.id === photoId)?.destinationId : undefined;
+  const photoGuide = destinations.find(
+    (destination) => destination.id === "instagram-spots" && destination.active,
   );
+  const related = useMemo(() => {
+    const linked = selectedId ? linkedDestinations(selectedId, mapLinks, destinations) : [];
+    return photoDestinationId
+      ? linked.filter((destination) => destination.id === photoDestinationId)
+      : linked;
+  }, [selectedId, mapLinks, destinations, photoDestinationId]);
   const tourStops = useMemo(
     () => bensleyTour.filter((s) => places.some((p) => p.id === s.placeId)),
     [places],
@@ -290,25 +298,25 @@ export default function ResortMap({
             </button>
           </div>
           {mode === "walk" && !hasPreview && <p className="atlas-context">{copy("walkNote")}</p>}
-          {mode === "photos" && !hasPreview && (
-            <div className="atlas-photo-index" aria-label={copy("photos")}>
-              {photoSpots.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => choosePhoto(p.id)}
-                  aria-label={`${copy("photos")} ${p.id}`}
-                >
-                  {p.id}
-                </button>
-              ))}
-            </div>
+          {mode === "photos" && !hasPreview && !searchOpen && photoGuide && (
+            <button
+              type="button"
+              className="atlas-photo-guide"
+              onClick={() => onDestination(photoGuide.id)}
+            >
+              <span>{photoGuide.name}</span>
+              <ArrowUpRight size={18} aria-hidden />
+            </button>
           )}
           {hasPreview && (
             <MapPreview
               key={selected.id}
               title={
-                selected.accommodationGroup ? copy(selected.accommodationGroup) : selected.name
+                selected.accommodationGroup
+                  ? copy(selected.accommodationGroup)
+                  : photoDestinationId && related[0]
+                    ? related[0].name
+                    : selected.name
               }
               area={selected.accommodationGroup ? selected : undefined}
               destinations={related}
