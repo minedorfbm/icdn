@@ -264,7 +264,7 @@ export function DestinationDetail({
             {media.videos.length > 0 && (
               <section className="editorial-section" aria-label={t("in_motion")}>
                 <SectionHeading label={t("in_motion")} title={detailHeading(dest, "video", lang)} />
-                <YouTubeVideos videos={media.videos} destinationId={dest.id} />
+                <YouTubeVideos videos={media.videos} />
               </section>
             )}
             <EditorialInstagram dest={dest} media={media} />

@@ -50,7 +50,7 @@ for (const [path, name] of [
   ["citron", "Citron"],
   ["tingara", "TINGARA"],
 ]) {
-  test(`${name} loads its native YouTube player on demand with an external fallback and closes cleanly`, async ({
+  test(`${name} prepares its native YouTube player near the viewport with an external fallback and closes cleanly`, async ({
     page,
   }) => {
     let scripts = 0;
@@ -63,16 +63,18 @@ for (const [path, name] of [
     );
     await page.goto(`/${path}`);
     const card = page.getByRole("dialog", { name, exact: true });
-    const play = card.getByRole("button", { name: "Play video: Test video", exact: true });
-    await expect(play).toBeAttached();
+    const player = card.locator("[data-youtube-player]").first();
     await expect(card.locator('iframe[src*="youtube-nocookie"]')).toHaveCount(0);
-    await play.click();
-    const frame = card.locator('iframe[src*="youtube-nocookie"]');
+    await player.scrollIntoViewIfNeeded();
+    const frame = player.locator("iframe");
+    await expect(
+      card.getByRole("button", { name: "Play video: Test video", exact: true }),
+    ).toHaveCount(0);
     await expect(frame).toHaveAttribute("title", "Test video");
-    await expect(frame).toHaveAttribute("src", /autoplay=1&playsinline=1/);
+    await expect(frame).toHaveAttribute("src", /autoplay=0&playsinline=1/);
     await expect(frame).toHaveAttribute("referrerpolicy", "strict-origin-when-cross-origin");
     await expect(
-      card.getByRole("link", { name: "Play video · YouTube", exact: true }),
+      card.getByRole("link", { name: "Play video · YouTube", exact: true }).first(),
     ).toHaveAttribute("href", "https://www.youtube.com/watch?v=PVN005yvGpY");
     expect(scripts).toBe(0);
     await card.getByRole("button", { name: "BACK", exact: true }).click();

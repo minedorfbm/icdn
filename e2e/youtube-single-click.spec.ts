@@ -16,7 +16,7 @@ test("La Maison prepares a native player without loading the JavaScript API or r
   );
   await page.goto("/la-maison-1888");
   const card = page.getByRole("dialog", { name: "La Maison 1888", exact: true });
-  const pilot = card.locator("[data-youtube-pilot]");
+  const pilot = card.locator("[data-youtube-player]");
   await expect(pilot).toHaveCount(1);
   await expect(pilot.locator("iframe")).toHaveCount(0);
   await pilot.scrollIntoViewIfNeeded();
@@ -50,19 +50,43 @@ test("a slow native player is not covered by a hub error after twenty seconds", 
   });
   await page.goto("/la-maison-1888");
   const card = page.getByRole("dialog", { name: "La Maison 1888", exact: true });
-  const pilot = card.locator("[data-youtube-pilot]");
+  const pilot = card.locator("[data-youtube-player]");
   await pilot.scrollIntoViewIfNeeded();
   await expect(pilot.locator("iframe")).toHaveCount(1);
   await page.clock.fastForward(25_000);
-  await expect(card.getByText("Content is temporarily unavailable.", { exact: true })).toHaveCount(
+  await expect(pilot.getByText("Content is temporarily unavailable.", { exact: true })).toHaveCount(
     0,
   );
-  await expect(card.getByRole("button", { name: "Try again", exact: true })).toHaveCount(0);
+  await expect(pilot.getByRole("button", { name: "Try again", exact: true })).toHaveCount(0);
   await expect(
     card.getByRole("link", { name: "Play video · YouTube", exact: true }),
   ).toHaveAttribute("href", "https://www.youtube.com/watch?v=PVN005yvGpY");
   releasePlayer();
   const provider = page.frameLocator('iframe[title="Resort video"]');
+  await provider.getByRole("button", { name: "YouTube Play", exact: true }).click();
+  await expect(provider.locator("body")).toHaveAttribute("data-playing", "true");
+});
+
+test("distant carousel videos wait until approached and remain paused until a native click", async ({
+  page,
+}) => {
+  await page.route("https://www.youtube.com/iframe_api", (route) => route.abort());
+  await page.route("https://www.youtube-nocookie.com/embed/**", (route) =>
+    route.fulfill({ contentType: "text/html", body: playerHtml }),
+  );
+  await page.goto("/citron");
+  const card = page.getByRole("dialog", { name: "Citron", exact: true });
+  const players = card.locator("[data-youtube-player]");
+  await expect(players).toHaveCount(4);
+  await expect(players.locator("iframe")).toHaveCount(0);
+  await players.first().scrollIntoViewIfNeeded();
+  await expect(players.first().locator("iframe")).toBeVisible();
+  await expect(players.nth(3).locator("iframe")).toHaveCount(0);
+  await players.nth(3).scrollIntoViewIfNeeded();
+  const last = players.nth(3).locator("iframe");
+  await expect(last).toHaveAttribute("title", "Carousel video 4");
+  await expect(last).toHaveAttribute("src", /autoplay=0&playsinline=1/);
+  const provider = page.frameLocator('iframe[title="Carousel video 4"]');
   await provider.getByRole("button", { name: "YouTube Play", exact: true }).click();
   await expect(provider.locator("body")).toHaveAttribute("data-playing", "true");
 });

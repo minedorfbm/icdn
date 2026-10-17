@@ -190,13 +190,22 @@ const tables: Record<string, unknown[]> = {
       display_order: 0,
     },
   ],
-  destination_videos: ["citron", "tingara"].map((destination_id) => ({
-    destination_id,
-    video_url: "https://www.youtube.com/watch?v=PVN005yvGpY",
-    title: "Test video",
-    title_translations: {},
-    display_order: 0,
-  })),
+  destination_videos: [
+    ...["citron", "tingara"].map((destination_id) => ({
+      destination_id,
+      video_url: "https://www.youtube.com/watch?v=PVN005yvGpY",
+      title: "Test video",
+      title_translations: {},
+      display_order: 0,
+    })),
+    ...["-ujKdRnRmOs", "u2N6FLjmAJs", "Ie7tYHeQ1AY"].map((id, index) => ({
+      destination_id: "citron",
+      video_url: `https://www.youtube.com/watch?v=${id}`,
+      title: `Carousel video ${index + 2}`,
+      title_translations: {},
+      display_order: index + 1,
+    })),
+  ],
   site_settings: [
     { key: "hero_image", value: "/intercontinental-touch-icon.png" },
     { key: "contact", value: "tel:+842363938888" },
