@@ -98,7 +98,7 @@ export function MapArtwork({
     const svg = svgRef.current;
     if (!svg) return;
     const update = () => {
-      const { width, height, left, top } = svg.getBoundingClientRect();
+      const { width, height, top } = svg.getBoundingClientRect();
       if (!width || !height) return;
       const ratio = width / height;
       const nextWidth = ratio > 1.5 ? MAP_SIZE.height * ratio : MAP_SIZE.width;
@@ -118,8 +118,11 @@ export function MapArtwork({
       let right = width - 24;
       let bottom = (dock ? dock.top - top : height) - 24;
       if (preview) {
-        if (preview.left - left > width / 2) right = Math.min(right, preview.left - left - 24);
-        else bottom = Math.min(bottom, preview.top - top - 60);
+        // Reserve a stable space from the bubble's size, not its moving position.
+        // Otherwise anchoring the bubble to the camera would create a feedback loop.
+        if (width > 820 || (height < 560 && width > 560))
+          right = Math.min(right, width - preview.width - 48);
+        else bottom = Math.min(bottom, height - preview.height - 170);
       }
       // Frame the map in the space actually visible between its controls and sheet.
       onViewportChange({

@@ -40,3 +40,27 @@ test("card map entry focuses the venue above its panel and supports closer zoom"
   await map.getByRole("button", { name: "Zoom out", exact: true }).click();
   await expect.poll(scale).toBeLessThan(8);
 });
+
+test("photo bubbles keep grouped cards available and align the category with the close control", async ({
+  page,
+}) => {
+  await page.goto("/long-bar");
+  await page.getByRole("button", { name: "View on map", exact: true }).click();
+  const map = page.getByRole("dialog", { name: "Resort map", exact: true });
+  const bubble = map.locator(".atlas-preview");
+  await expect(bubble).toHaveAttribute("data-photo", "true");
+  await expect(bubble.locator(".atlas-preview-background img")).toBeVisible();
+  await expect(bubble.locator(".atlas-sheet-handle")).toContainText("BAR");
+  await expect(bubble.getByRole("button", { name: "L_O_N_G Pool", exact: true })).toBeVisible();
+  const header = await bubble.locator(".atlas-sheet-handle").boundingBox();
+  const close = await bubble
+    .getByRole("button", { name: "Close place preview", exact: true })
+    .boundingBox();
+  expect(Math.abs(header!.y + header!.height / 2 - close!.y - close!.height / 2)).toBeLessThan(2);
+  const box = await bubble.boundingBox();
+  const dock = await map.locator(".atlas-bottom").boundingBox();
+  expect(box!.x).toBeGreaterThanOrEqual(12);
+  expect(box!.y + box!.height).toBeLessThan(dock!.y);
+  await bubble.getByRole("button", { name: "L_O_N_G Pool", exact: true }).click();
+  await expect(page).toHaveURL("/long-pool");
+});
