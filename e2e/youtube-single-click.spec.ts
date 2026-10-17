@@ -58,9 +58,9 @@ test("a slow native player is not covered by a hub error after twenty seconds", 
     0,
   );
   await expect(pilot.getByRole("button", { name: "Try again", exact: true })).toHaveCount(0);
-  await expect(
-    card.getByRole("link", { name: "Play video · YouTube", exact: true }),
-  ).toHaveAttribute("href", "https://www.youtube.com/watch?v=PVN005yvGpY");
+  await expect(card.getByRole("link", { name: "Play video · YouTube", exact: true })).toHaveCount(
+    0,
+  );
   releasePlayer();
   const provider = page.frameLocator('iframe[title="Resort video"]');
   await provider.getByRole("button", { name: "YouTube Play", exact: true }).click();

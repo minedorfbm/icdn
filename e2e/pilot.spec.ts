@@ -96,7 +96,12 @@ test("events retain their schedule, unfold on demand and precede both media sect
   await expect(event.locator(".editorial-event-content")).toBeVisible();
   await expect(card.getByRole("region", { name: "IN MOTION", exact: true })).toHaveCount(1);
   await expect(card.getByRole("region", { name: "FROM OUR WORLD", exact: true })).toHaveCount(1);
-  await expect(card.locator("iframe[src*='youtube']")).toHaveCount(0);
+  const motion = card.getByRole("region", { name: "IN MOTION", exact: true });
+  await motion.scrollIntoViewIfNeeded();
+  await expect(motion.locator("iframe").first()).toHaveAttribute(
+    "src",
+    /youtube-nocookie\.com\/embed\/.*autoplay=0&playsinline=1/,
+  );
   const track = card.locator("[data-instagram-track]");
   await track.scrollIntoViewIfNeeded();
   await expect(card.locator('iframe[title="Instagram test post"]').first()).toBeVisible();

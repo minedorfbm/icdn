@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { ExternalLink } from "lucide-react";
 import type { DestinationVideo } from "@/data/resort";
 import { useI18n } from "@/i18n";
 
@@ -7,7 +6,7 @@ function YouTubeVideo({
   video,
   showTitle,
 }: Readonly<{ video: DestinationVideo; showTitle: boolean }>) {
-  const { t, lang } = useI18n();
+  const { lang } = useI18n();
   const isShort = video.format === "short";
   const title = video.title_translations[lang] || video.title;
   return (
@@ -19,14 +18,6 @@ function YouTubeVideo({
       >
         <DeferredYouTubePlayer video={video} title={title} />
       </div>
-      <a
-        href={`https://www.youtube.com/watch?v=${video.video_id}`}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-3 flex min-h-11 items-center gap-2 text-sm underline underline-offset-4 focus-visible:outline-2"
-      >
-        {t("play_video")} · YouTube <ExternalLink className="size-4" aria-hidden />
-      </a>
       {showTitle && <h4 className="mt-3 font-serif text-[18px] leading-snug">{title}</h4>}
     </article>
   );
