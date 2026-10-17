@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { loadYouTubePlayer, type YouTubePlayer } from "./youtube-player";
 
-/** Mount only after a visitor chooses a video; share recovery across card and home players. */
+/** Share player recovery; callers choose when to mount and whether to request playback. */
 export function useYouTubePlayback({
   videoId,
   title,
   volume,
   onEnded,
+  autoplay = true,
 }: Readonly<{
   videoId: string;
   title: string;
   volume?: number;
   onEnded?: () => void;
+  autoplay?: boolean;
 }>) {
   const host = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +61,7 @@ export function useYouTubePlayback({
                 target.setVolume(volume);
                 target.unMute();
               }
-              target.playVideo();
+              if (autoplay) target.playVideo();
             },
             onStateChange: ({ data }) => {
               if (!cancelled && data === 0) onEnded?.();
@@ -83,7 +85,7 @@ export function useYouTubePlayback({
       player?.destroy();
       container.replaceChildren();
     };
-  }, [videoId, title, volume, onEnded, attempt]);
+  }, [videoId, title, volume, onEnded, autoplay, attempt]);
 
   return { host, loading, failed, retry: () => setAttempt((previous) => previous + 1) };
 }
