@@ -32,7 +32,7 @@ test("cards and benefits validate without dynamic evaluation under the enforced 
   await benefits.getByRole("button", { name: "Close", exact: true }).click();
   await page.goto("/citron");
   await expect(page.getByRole("dialog", { name: "Citron", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: /Test video/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Test video", exact: true })).toBeVisible();
   expect(violations).toEqual([]);
   expect(errors).toEqual([]);
 });

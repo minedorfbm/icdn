@@ -99,7 +99,7 @@ test("the hero displays before a slow catalogue and media waits for an opened ca
   await page.locator("#heaven").getByRole("button", { name: "Citron", exact: true }).click();
   const card = page.getByRole("dialog", { name: "Citron", exact: true });
   await expect(card).toBeVisible();
-  await expect(card.getByRole("button", { name: /Test video/ })).toBeVisible();
+  await expect(card.getByRole("heading", { name: "Test video", exact: true })).toBeVisible();
   // A cached media response still requires an opened card's explicit request.
   expect(calls.filter((url) => url.searchParams.get("payload")?.includes("citron"))).toHaveLength(
     1,
