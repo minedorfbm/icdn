@@ -46,52 +46,39 @@ test("Instagram loads the current and next post, retains visited players and ski
   expect(scripts).toBe(1);
 });
 
-test("a card loads YouTube on demand, offers recovery after a player error and cleans up on close", async ({
-  page,
-}) => {
-  let scripts = 0;
-  await page.route("https://www.youtube.com/iframe_api", (route) => {
-    scripts++;
-    return route.fulfill({
-      contentType: "application/javascript",
-      body: `
-      let attempts = 0;
-      window.YT = { Player: class {
-        constructor(mount, options) {
-          this.frame = document.createElement('iframe');
-          this.frame.src = 'https://www.youtube-nocookie.com/embed/' + options.videoId;
-          mount.replaceWith(this.frame);
-          const attempt = ++attempts;
-          this.frame.dataset.attempt = String(attempt);
-          setTimeout(() => attempt === 1 ? options.events.onError() : options.events.onReady({ target: this }), 0);
-        }
-        getIframe() { return this.frame; }
-        playVideo() { this.frame.dataset.playing = 'true'; }
-        destroy() { document.body.dataset.cardVideoDestroyed = String(Number(document.body.dataset.cardVideoDestroyed || 0) + 1); this.frame.remove(); }
-      }};
-      window.onYouTubeIframeAPIReady();`,
+for (const [path, name] of [
+  ["citron", "Citron"],
+  ["tingara", "TINGARA"],
+]) {
+  test(`${name} prepares its native YouTube player near the viewport with an external fallback and closes cleanly`, async ({
+    page,
+  }) => {
+    let scripts = 0;
+    await page.route("https://www.youtube.com/iframe_api", (route) => {
+      scripts++;
+      return route.abort();
     });
+    await page.route("https://www.youtube-nocookie.com/embed/**", (route) =>
+      route.fulfill({ contentType: "text/html", body: "<p>YouTube native player</p>" }),
+    );
+    await page.goto(`/${path}`);
+    const card = page.getByRole("dialog", { name, exact: true });
+    const player = card.locator("[data-youtube-player]").first();
+    await expect(card.locator('iframe[src*="youtube-nocookie"]')).toHaveCount(0);
+    await player.scrollIntoViewIfNeeded();
+    const frame = player.locator("iframe");
+    await expect(
+      card.getByRole("button", { name: "Play video: Test video", exact: true }),
+    ).toHaveCount(0);
+    await expect(frame).toHaveAttribute("title", "Test video");
+    await expect(frame).toHaveAttribute("src", /autoplay=0&playsinline=1/);
+    await expect(frame).toHaveAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+    await expect(
+      card.getByRole("link", { name: "Play video · YouTube", exact: true }).first(),
+    ).toHaveAttribute("href", "https://www.youtube.com/watch?v=PVN005yvGpY");
+    expect(scripts).toBe(0);
+    await card.getByRole("button", { name: "BACK", exact: true }).click();
+    await expect(card).toHaveCount(0);
+    await expect(page.locator('iframe[src*="youtube-nocookie"]')).toHaveCount(0);
   });
-  await page.route("https://www.youtube-nocookie.com/embed/**", (route) =>
-    route.fulfill({ contentType: "text/html", body: "<p>YouTube player</p>" }),
-  );
-  await page.goto("/citron");
-  const card = page.getByRole("dialog", { name: "Citron", exact: true });
-  await expect(
-    card.getByRole("button", { name: "Play video: Test video", exact: true }),
-  ).toBeAttached();
-  expect(scripts).toBe(0);
-  await card.getByRole("button", { name: "Play video: Test video", exact: true }).click();
-  const fallback = card.getByRole("link", { name: "Play video · YouTube", exact: true });
-  await expect(fallback).toHaveAttribute("href", "https://www.youtube.com/watch?v=PVN005yvGpY");
-  await card.getByRole("button", { name: "Try again", exact: true }).click();
-  const frame = card.locator('iframe[src*="youtube-nocookie"]');
-  await expect(frame).toHaveAttribute("data-playing", "true");
-  await expect(frame).toHaveAttribute("title", "Test video");
-  await expect(frame).toHaveAttribute("data-attempt", "2");
-  await expect(fallback).toHaveCount(0);
-  expect(scripts).toBe(1);
-  await card.getByRole("button", { name: "BACK", exact: true }).click();
-  await expect(card).toHaveCount(0);
-  await expect(page.locator("body")).toHaveAttribute("data-card-video-destroyed", "2");
-});
+}

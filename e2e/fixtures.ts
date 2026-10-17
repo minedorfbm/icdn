@@ -13,6 +13,10 @@ declare global {
 
 export const test = base.extend({
   context: async ({ context }, runWithContext) => {
+    // Keep browser regressions deterministic. Playback-specific page routes override this.
+    await context.route("https://www.youtube-nocookie.com/embed/**", (route) =>
+      route.fulfill({ contentType: "text/html", body: "<button>YouTube Play</button>" }),
+    );
     if (process.env["HUB_BROWSER_COVERAGE"] !== "1") {
       await runWithContext(context);
       return;
