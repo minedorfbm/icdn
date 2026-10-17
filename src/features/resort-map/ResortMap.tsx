@@ -310,7 +310,13 @@ export default function ResortMap({
           )}
           {hasPreview && (
             <MapPreview
-              key={selected.id}
+              key={`${selected.id}:${photoId ?? ""}`}
+              anchor={
+                mode === "photos"
+                  ? (photoSpots.find((spot) => spot.id === photoId)?.point ?? selected.point)
+                  : selected.point
+              }
+              camera={camera}
               title={
                 selected.accommodationGroup
                   ? copy(selected.accommodationGroup)
