@@ -98,7 +98,7 @@ export function MapArtwork({
     const svg = svgRef.current;
     if (!svg) return;
     const update = () => {
-      const { width, height, left, top } = svg.getBoundingClientRect();
+      const { width, height, top } = svg.getBoundingClientRect();
       if (!width || !height) return;
       const ratio = width / height;
       const nextWidth = ratio > 1.5 ? MAP_SIZE.height * ratio : MAP_SIZE.width;
