@@ -51,6 +51,16 @@ function YouTubeVideo({
           </button>
         )}
       </div>
+      {prepareOnApproach && (
+        <a
+          href={`https://www.youtube.com/watch?v=${video.video_id}`}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 flex min-h-11 items-center gap-2 text-sm underline underline-offset-4 focus-visible:outline-2"
+        >
+          {t("play_video")} · YouTube <ExternalLink className="size-4" aria-hidden />
+        </a>
+      )}
       {showTitle && <h4 className="mt-3 font-serif text-[18px] leading-snug">{title}</h4>}
     </article>
   );
@@ -100,7 +110,14 @@ function PreparedCardVideo({ video, title }: Readonly<{ video: DestinationVideo;
   return (
     <div ref={container} className="absolute inset-0" data-youtube-pilot>
       {nearby ? (
-        <CardVideoPlayer video={video} title={title} autoplay={false} />
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${video.video_id}?autoplay=0&playsinline=1&rel=0`}
+          title={title}
+          className="size-full border-0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
       ) : (
         <img
           src={`https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`}
@@ -115,16 +132,11 @@ function PreparedCardVideo({ video, title }: Readonly<{ video: DestinationVideo;
   );
 }
 
-function CardVideoPlayer({
-  video,
-  title,
-  autoplay = true,
-}: Readonly<{ video: DestinationVideo; title: string; autoplay?: boolean }>) {
+function CardVideoPlayer({ video, title }: Readonly<{ video: DestinationVideo; title: string }>) {
   const { t } = useI18n();
   const { host, loading, failed, retry } = useYouTubePlayback({
     videoId: video.video_id,
     title,
-    autoplay,
   });
   return (
     <>
