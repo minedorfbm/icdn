@@ -50,7 +50,7 @@ for (const [path, name] of [
   ["citron", "Citron"],
   ["tingara", "TINGARA"],
 ]) {
-  test(`${name} prepares its native YouTube player near the viewport with an external fallback and closes cleanly`, async ({
+  test(`${name} prepares its native YouTube player near the viewport and closes cleanly`, async ({
     page,
   }) => {
     let scripts = 0;
@@ -73,9 +73,9 @@ for (const [path, name] of [
     await expect(frame).toHaveAttribute("title", "Test video");
     await expect(frame).toHaveAttribute("src", /autoplay=0&playsinline=1/);
     await expect(frame).toHaveAttribute("referrerpolicy", "strict-origin-when-cross-origin");
-    await expect(
-      card.getByRole("link", { name: "Play video · YouTube", exact: true }).first(),
-    ).toHaveAttribute("href", "https://www.youtube.com/watch?v=PVN005yvGpY");
+    await expect(card.getByRole("link", { name: "Play video · YouTube", exact: true })).toHaveCount(
+      0,
+    );
     expect(scripts).toBe(0);
     await card.getByRole("button", { name: "BACK", exact: true }).click();
     await expect(card).toHaveCount(0);
