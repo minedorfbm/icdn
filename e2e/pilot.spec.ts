@@ -170,6 +170,8 @@ async function swipe(
   from: [number, number],
   to: [number, number],
   cancel = false,
+  duration = 400,
+  via?: [number, number],
 ) {
   return target.evaluate(
     (node, input) => {
@@ -180,10 +182,11 @@ async function swipe(
         clientX: point[0],
         clientY: point[1],
       });
-      const dispatch = (type: string, point: [number, number], ended = false) => {
+      const dispatch = (type: string, point: [number, number], time: number, ended = false) => {
         const changed = touch(point);
         const event = new Event(type, { bubbles: true, cancelable: true });
         Object.defineProperties(event, {
+          timeStamp: { value: time },
           touches: { value: ended ? [] : [changed] },
           targetTouches: { value: ended ? [] : [changed] },
           changedTouches: { value: [changed] },
@@ -199,12 +202,13 @@ async function swipe(
         scroller.removeEventListener(type, observe);
         return prevented;
       };
-      dispatch("touchstart", input.from);
-      const prevented = dispatch("touchmove", input.to);
-      dispatch(input.cancel ? "touchcancel" : "touchend", input.to, true);
+      dispatch("touchstart", input.from, 0);
+      if (input.via) dispatch("touchmove", input.via, input.duration / 2);
+      const prevented = dispatch("touchmove", input.to, input.duration);
+      dispatch(input.cancel ? "touchcancel" : "touchend", input.to, input.duration, true);
       return prevented;
     },
-    { from, to, cancel },
+    { from, to, cancel, duration, via },
   );
 }
 
@@ -221,6 +225,21 @@ test("horizontal swipes navigate forward and back across current and legacy cata
   await swipe(nextHero, [80, 280], [290, 283]);
   await expect(page).toHaveURL("/la-maison-1888");
   await expect(page.locator("[data-destination-scroll]")).toHaveJSProperty("scrollTop", 0);
+});
+
+test("short flicks and gently diagonal drags navigate expanded cards", async ({ page }) => {
+  await page.goto("/la-maison-1888");
+  let hero = page.locator(".editorial-hero img");
+  await expect(hero).toBeVisible();
+  await swipe(hero, [220, 280], [192, 283], false, 70);
+  await expect(page).toHaveURL("/wine-cellar");
+  hero = page.locator(".editorial-hero img");
+  await expect(hero).toBeVisible();
+  await swipe(hero, [160, 280], [210, 306], false, 500, [171, 290]);
+  await expect(page).toHaveURL("/la-maison-1888");
+  // The same small movement made slowly should not turn a card.
+  await swipe(page.locator(".editorial-hero img"), [220, 280], [192, 283], false, 500);
+  await expect(page).toHaveURL("/la-maison-1888");
 });
 
 test("previous discovery follows visited relationships and is absent on the first card", async ({
@@ -340,7 +359,7 @@ test("vertical gestures, screen edges, controls, Instagram and cancelled swipes 
   await expect(hero).toBeVisible();
   expect(await swipe(hero, [200, 400], [205, 170])).toBe(false);
   expect(await swipe(hero, [5, 280], [290, 283])).toBe(false);
-  expect(await swipe(hero, [290, 280], [240, 281])).toBe(true);
+  expect(await swipe(hero, [290, 280], [270, 281])).toBe(true);
   await swipe(hero, [290, 280], [80, 283], true);
   expect(await swipe(page.locator(".editorial-primary"), [290, 280], [80, 283])).toBe(false);
   const track = page.locator("[data-instagram-track]");
