@@ -36,6 +36,15 @@ export const editorialTables: Record<string, unknown[]> = {
   destinations: [
     ...editorialDestinations,
     {
+      ...editorialDestinations[0],
+      id: "instagram-spots",
+      name: "Top 9 Instagram Spots",
+      type: "experience",
+      cluster: "EXPERIENCES",
+      primary_link_id: null,
+      display_order: 100,
+    },
+    {
       ...editorialDestinations[1],
       id: "wine-cellar",
       name: "Wine Cellar",

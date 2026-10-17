@@ -101,7 +101,14 @@ const copy = {
   ],
   all: ["All places", "Tất cả địa điểm", "Все места", "所有地点", "모든 장소", "すべての場所"],
   explore: ["Explore", "Khám phá", "Обзор", "探索", "둘러보기", "探索"],
-  photos: ["Photo spots", "Điểm chụp ảnh", "Фотоместа", "拍照点", "포토 스폿", "撮影スポット"],
+  photos: [
+    "Insta spot",
+    "Điểm Instagram",
+    "Инста-спот",
+    "Instagram 打卡点",
+    "인스타 스폿",
+    "インスタスポット",
+  ],
   walk: ["Walk", "Đi bộ", "Прогулка", "步行", "산책", "散策"],
   tour: [
     "Bensley Tour",
