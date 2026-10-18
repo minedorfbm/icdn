@@ -11,7 +11,7 @@ import {
 import { ExternalLink, X } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import { safeExternalUrl } from "@/lib/external-url";
-import { embeddedResortUrl, isResortPdf } from "@/lib/resort-browser";
+import { embeddedResortUrl, isResortPdf, resortLinkTarget } from "@/lib/resort-browser";
 import { useI18n } from "@/i18n";
 import { HubSearch } from "@/features/search/HubSearch";
 import { ConciergeContact } from "./ConciergeContact";
@@ -42,7 +42,7 @@ export function ResortLink({
   const embeddedUrl = embeddedResortUrl(href);
   return (
     <a
-      target="_blank"
+      target={resortLinkTarget(href)}
       rel="noreferrer"
       {...props}
       href={safeExternalUrl(href)}

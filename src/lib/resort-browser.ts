@@ -5,6 +5,12 @@ const BOOKING_HOSTS = new Set(["tablecheck.com", "www.tablecheck.com"]);
 const RESORT_BOOKING =
   /^\/(?:[a-z]{2}\/)?intercontinental-danang-(?:la-maison|tingara)\/reserve(?:\/|$)/;
 
+/** IHG blocks third-party framing; keep Rewards navigation in this tab with native Back. */
+export function resortLinkTarget(value: string): "_self" | "_blank" {
+  const url = httpsUrl(value, ["www.ihg.com", "ihg.com"]);
+  return url?.pathname.startsWith("/onerewards/") ? "_self" : "_blank";
+}
+
 /** Only the resort website and its identified restaurant booking pages open inside the hub. */
 export function embeddedResortUrl(value: string): string | undefined {
   try {
