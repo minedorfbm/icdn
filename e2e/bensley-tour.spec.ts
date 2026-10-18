@@ -22,7 +22,9 @@ test("official tour loads on demand and preserves reading, map camera and place 
   await map.getByRole("button", { name: "Citron · HEAVEN", exact: true }).press("Enter");
   const preview = map.locator(".atlas-preview");
   await expect(preview.locator("h3")).toHaveText("Citron");
-  const camera = await map.locator(".map-scene").getAttribute("transform");
+  const camera = (await map.locator(".map-scene").getAttribute("transform"))!
+    .match(/-?\d+(?:\.\d+)?/g)!
+    .map(Number);
   await launch.click();
   const reader = map.locator(".atlas-tour-reader");
   const frame = page.frameLocator(`iframe[title="${readerTitle}"]`);
@@ -34,7 +36,15 @@ test("official tour loads on demand and preserves reading, map camera and place 
   await back.click();
   await expect(reader).toBeHidden();
   await expect(launch).toBeFocused();
-  await expect(map.locator(".map-scene")).toHaveAttribute("transform", camera!);
+  const returnedCamera = (await map.locator(".map-scene").getAttribute("transform"))!
+    .match(/-?\d+(?:\.\d+)?/g)!
+    .map(Number);
+  expect(returnedCamera).toHaveLength(3);
+  // WebKit can round the SVG translation during layout; preserve position within 0.005px
+  // and require the zoom itself to remain exactly unchanged.
+  expect(returnedCamera[0]).toBeCloseTo(camera[0]!, 2);
+  expect(returnedCamera[1]).toBeCloseTo(camera[1]!, 2);
+  expect(returnedCamera[2]).toBe(camera[2]);
   await expect(preview.locator("h3")).toHaveText("Citron");
   await preview.getByRole("button", { name: "Discover this place", exact: true }).click();
   await expect(page).toHaveURL("/citron");
