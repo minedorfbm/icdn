@@ -200,10 +200,12 @@ export function CardStack({
   };
 
   return (
-    <div className={`w-full select-none ${layout === "discovery" ? "discovery-stack" : ""}`}>
+    <div
+      className={`w-full select-none ${layout === "discovery" ? "discovery-stack" : "journey-stack"}`}
+    >
       {/* single shared stage */}
       <div
-        className="relative grid w-full touch-pan-y overflow-hidden py-6"
+        className={`card-stack-stage relative grid w-full touch-pan-y overflow-hidden ${layout === "discovery" ? "py-6" : ""}`}
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={(e) => finish(e)}
@@ -227,9 +229,9 @@ export function CardStack({
             <div
               key={dest.id}
               data-destination-id={dest.id}
-              className={`perspective-card relative col-start-1 row-start-1 h-[90svh] w-[75%] origin-left ${near ? "will-change-transform" : ""}`}
+              className={`perspective-card relative col-start-1 row-start-1 w-[75%] origin-left ${near ? "will-change-transform" : ""}`}
               style={{
-                height: layout === "discovery" ? "var(--discovery-card-height)" : undefined,
+                height: layout === "discovery" ? "var(--discovery-card-height)" : "100%",
                 transform: `translate3d(${(x / 75) * 100}%,0,0) perspective(1200px) rotateY(${rotation}deg) scale(${scale})`,
                 zIndex: z,
                 opacity: Math.max(0, Math.min(1, VISIBLE - pos)),
@@ -265,7 +267,7 @@ export function CardStack({
       </div>
 
       {layout === "journey" && (
-        <div className="mx-auto mt-3 flex max-w-[740px] items-center gap-4 px-6">
+        <div className="journey-pagination mx-auto flex max-w-[740px] items-center gap-4 px-6">
           <span
             className="min-w-16 font-serif text-[24px] leading-none tabular-nums"
             aria-live="polite"
