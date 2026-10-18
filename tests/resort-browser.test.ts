@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { embeddedResortUrl, isResortPdf } from "../src/lib/resort-browser";
+import { embeddedResortUrl, isResortPdf, resortLinkTarget } from "../src/lib/resort-browser";
 
 test("resort pages, documents and identified restaurant bookings can open in the hub", () => {
   const links = [
@@ -44,11 +44,27 @@ test("lookalike domains, credentials, unsafe schemes and unrelated bookings are 
   for (const url of links) expect(embeddedResortUrl(url)).toBeUndefined();
 });
 
-test("IHG Rewards and app downloads keep ordinary external-browser navigation", () => {
+test("IHG Rewards and app downloads are not embedded", () => {
   for (const url of [
     "https://www.ihg.com/onerewards/content/us/en/home",
     "https://apps.apple.com/fr/app/h%C3%B4tels-ihg-r%C3%A9compenses/id368217298",
     "https://play.google.com/store/apps/details?id=com.ihg.apps.android",
   ])
     expect(embeddedResortUrl(url)).toBeUndefined();
+});
+
+test("Rewards pages open in the same tab without broadening other external links", () => {
+  for (const url of [
+    "https://www.ihg.com/onerewards/content/us/en/home",
+    "https://www.ihg.com/onerewards/content/gb/ja/home",
+    "https://ihg.com/onerewards/content/gb/zh/home?campaign=hub",
+  ])
+    expect(resortLinkTarget(url)).toBe("_self");
+  for (const url of [
+    "https://www.ihg.com/hotels/",
+    "https://www.ihg.com.evil.example/onerewards/content/us/en/home",
+    "https://play.google.com/store/apps/details?id=com.ihg.apps.android",
+    "javascript:alert(1)",
+  ])
+    expect(resortLinkTarget(url)).toBe("_blank");
 });

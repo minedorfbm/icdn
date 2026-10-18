@@ -138,6 +138,15 @@ const tables: Record<string, unknown[]> = {
   ],
   destination_links: [
     {
+      id: "test-rewards",
+      destination_id: "citron",
+      kind: "DISCOVER",
+      label: "IHG One Rewards",
+      url: "https://www.ihg.com/onerewards/content/us/en/home",
+      display_order: 1,
+      active: true,
+    },
+    {
       id: "test-menu",
       destination_id: "citron",
       kind: "MENU",

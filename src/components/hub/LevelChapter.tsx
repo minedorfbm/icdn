@@ -26,7 +26,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
   const all = useMemo(
     () =>
       destinations
-        .filter((d) => d.active && d.level === id)
+        .filter((d) => d.active && d.level === id && d.type !== "accommodation")
         .sort((a, b) => a.display_order - b.display_order),
     [destinations, id],
   );
