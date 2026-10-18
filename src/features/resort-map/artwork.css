@@ -748,35 +748,6 @@
   stroke-dasharray: 120 420;
   animation: draw-route 1.25s ease-out both;
 }
-.hub-atlas .tour-marker-v2 circle {
-  fill: #071b21;
-  stroke: #c6a25c;
-  stroke-width: 1.3;
-  opacity: 0.5;
-}
-.hub-atlas .tour-marker-v2 text {
-  fill: #d9c189;
-  font:
-    500 7px/1 var(--font-jost),
-    sans-serif;
-}
-.hub-atlas .tour-marker-v2.is-complete circle {
-  fill: #c6a25c;
-  opacity: 1;
-}
-.hub-atlas .tour-marker-v2.is-complete text {
-  fill: #06171c;
-}
-.hub-atlas .tour-marker-v2.is-current circle {
-  fill: #f2daa0;
-  stroke: #fff2c4;
-  stroke-width: 2;
-  opacity: 1;
-  filter: url(#gold-glow-v2);
-}
-.hub-atlas .tour-marker-v2.is-current text {
-  fill: #06171c;
-}
 .hub-atlas .level-cartouches path {
   stroke: rgba(216, 195, 150, 0.3);
   stroke-width: 1;
@@ -951,4 +922,29 @@
 .hub-atlas .hotspot-v2.is-selected .hotspot-name text {
   fill: #061920;
   font-weight: 600;
+}
+
+.hub-atlas .hotspot-tour-number {
+  fill: #f1e4c5;
+  font:
+    500 12px/1 var(--font-jost),
+    sans-serif;
+  pointer-events: none;
+}
+.hub-atlas .hotspot-v2.is-tour {
+  opacity: 0.55;
+}
+.hub-atlas .hotspot-v2.is-tour.is-next,
+.hub-atlas .hotspot-v2.is-tour.is-selected {
+  opacity: 1;
+}
+.hub-atlas .hotspot-v2.is-tour.is-next .hotspot-medallion {
+  stroke: #f2d489;
+  stroke-width: 2;
+}
+.hub-atlas .hotspot-v2.is-tour.is-visited .hotspot-medallion {
+  stroke: #b6d6a9;
+}
+.hub-atlas .hotspot-v2.is-selected .hotspot-tour-number {
+  fill: #06171c;
 }

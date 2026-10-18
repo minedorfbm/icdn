@@ -1,0 +1,115 @@
+.hub-atlas .atlas-tour-story {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 17px;
+  line-height: 1.4;
+  margin: 0 0 12px;
+}
+.hub-atlas .atlas-tour-count {
+  font-size: 11px;
+  color: #f0e5ca;
+  margin: 10px 0 0;
+}
+.hub-atlas .atlas-tour-details {
+  border-bottom: 1px solid #fffefa40;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.hub-atlas .atlas-tour-details summary {
+  min-height: 44px;
+  padding: 12px 0;
+  cursor: pointer;
+}
+.hub-atlas .atlas-tour-details p {
+  margin: 0 0 12px;
+}
+.hub-atlas .atlas-tour-stop-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.hub-atlas .atlas-tour-stop-list button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  width: 100%;
+  padding: 6px 0;
+  text-align: left;
+}
+.hub-atlas .atlas-tour-number {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #f0e5ca80;
+  border-radius: 50%;
+  font-size: 11px;
+}
+.hub-atlas .atlas-tour-visit {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #f0e5ca;
+}
+.hub-atlas .atlas-tour-visit[aria-pressed="true"] {
+  color: #d4edcb;
+}
+.hub-atlas .atlas-tour-next > span {
+  display: grid;
+  gap: 2px;
+}
+.hub-atlas .atlas-tour-next small {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.hub-atlas .atlas-tour-next svg {
+  flex-shrink: 0;
+}
+.hub-atlas .atlas-tour-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.hub-atlas .atlas-tour-navigation button {
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 11px;
+}
+.hub-atlas .atlas-tour-navigation button:disabled {
+  opacity: 0.35;
+}
+.hub-atlas .atlas-tour-hint {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #f0e5ca;
+  margin: 12px 0 0;
+}
+.hub-atlas .atlas-tour-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 11px;
+  text-decoration: underline;
+}
+.hub-atlas .atlas-preview-meta {
+  flex: 1;
+  min-width: 0;
+  color: #f0e5ca;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.hub-atlas .atlas-tour-details summary:focus-visible,
+.hub-atlas .atlas-tour-source:focus-visible {
+  outline: 2px solid #dec99c;
+  outline-offset: 2px;
+}

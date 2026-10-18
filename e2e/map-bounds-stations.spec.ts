@@ -46,14 +46,18 @@ test("Nam Tram names appear on tap or close zoom and dismiss without opening a p
   const svg = map.locator("svg.resort-art");
   const signs = svg.locator(".station-plaque");
   const tapStation = async (level: string) => {
-    const station = map.getByRole("button", { name: `Nam Tram · ${level}`, exact: true });
+    const station = map
+      .locator(".tram-station-targets")
+      .getByRole("button", { name: `Nam Tram · ${level}`, exact: true });
     const hit = await station.boundingBox();
     // Tap the actual position: at overview scale adjacent touch areas overlap.
     await page.touchscreen.tap(hit!.x + hit!.width / 2, hit!.y + hit!.height / 2);
   };
   await expect(signs).toHaveCount(0);
   for (const level of ["HEAVEN", "SKY", "EARTH", "SEA"]) {
-    const station = map.getByRole("button", { name: `Nam Tram · ${level}`, exact: true });
+    const station = map
+      .locator(".tram-station-targets")
+      .getByRole("button", { name: `Nam Tram · ${level}`, exact: true });
     await tapStation(level);
     await expect(station).toHaveAttribute("aria-pressed", "true");
     await expect(signs).toHaveCount(1);
@@ -68,7 +72,9 @@ test("Nam Tram names appear on tap or close zoom and dismiss without opening a p
     await tapStation(level);
     await expect(signs).toHaveCount(0);
   }
-  const heaven = map.getByRole("button", { name: "Nam Tram · HEAVEN", exact: true });
+  const heaven = map
+    .locator(".tram-station-targets")
+    .getByRole("button", { name: "Nam Tram · HEAVEN", exact: true });
   await heaven.focus();
   await heaven.press("Enter");
   await expect(signs).toHaveCount(1);

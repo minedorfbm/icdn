@@ -37,11 +37,12 @@ test("map modes, level filters and official plan remain usable without losing th
   await expect(map.locator(".atlas-preview")).toContainText("Citron");
   await map.getByRole("button", { name: "Bensley Tour", exact: true }).click();
   const preview = map.locator(".atlas-preview");
-  await expect(preview.locator(".atlas-tour-controls button").first()).toBeDisabled();
+  await preview.getByRole("button", { name: "Start at Reception", exact: true }).click();
+  await expect(preview.getByRole("button", { name: "Previous stop", exact: true })).toBeDisabled();
   const firstTitle = await preview.locator("h3").textContent();
-  await preview.locator(".atlas-tour-controls button").last().click();
+  await preview.locator(".atlas-tour-next").click();
   await expect(preview.locator("h3")).not.toHaveText(firstTitle!);
-  await preview.locator(".atlas-tour-controls button").first().click();
+  await preview.getByRole("button", { name: "Previous stop", exact: true }).click();
   await expect(preview.locator("h3")).toHaveText(firstTitle!);
   await map.getByRole("button", { name: "Explore", exact: true }).click();
   await expect(preview).toHaveCount(0);

@@ -8,6 +8,15 @@ const files = readdirSync(directory)
   .filter((name) => name.endsWith(".sql"))
   .sort();
 const db = new PGlite();
+const earthLevelMigration = "20261018120000_la_maison_building_earth_level.sql";
+const maisonState = async () =>
+  (
+    await db.query(`SELECT
+  (SELECT jsonb_agg(to_jsonb(d) - 'level_id' - 'updated_at' ORDER BY id) FROM destinations d WHERE id IN ('la-maison-1888','buffalo-bar','wine-cellar')) AS cards,
+  (SELECT to_jsonb(m) - 'level_id' - 'updated_at' FROM map_places m WHERE id='la-maison-1888') AS map,
+  (SELECT jsonb_agg(n ORDER BY id) FROM destination_notices n WHERE destination_id IN ('la-maison-1888','buffalo-bar','wine-cellar')) AS notices
+`)
+  ).rows;
 const marineRemoval = "20261016140000_remove_duplicate_marine_centre.sql";
 const seasideState = async () =>
   (
@@ -18,24 +27,49 @@ const seasideState = async () =>
       (SELECT jsonb_agg(t ORDER BY locale) FROM destination_translations t WHERE destination_id='sea-experiences') AS translations,
       (SELECT to_jsonb(m) FROM map_places m WHERE id='beach-activity-centre') AS map_place`)
   ).rows;
+async function applyAndCheckMigration(file: string): Promise<void> {
+  try {
+    const beforeLevel = file === earthLevelMigration ? await maisonState() : undefined;
+    const beforeRemoval = file === marineRemoval ? await seasideState() : undefined;
+    await db.exec(readFileSync(new URL(file, directory), "utf8"));
+    if (beforeLevel)
+      assert.deepEqual(
+        await maisonState(),
+        beforeLevel,
+        "Level correction preserves coordinates, notices and all other card content",
+      );
+    if (beforeRemoval) {
+      assert.deepEqual(
+        await seasideState(),
+        beforeRemoval,
+        "Keep Seaside content and official map point unchanged",
+      );
+    }
+  } catch (cause) {
+    throw new Error(`Migration failed on a fresh database: ${file}`, { cause });
+  }
+}
 try {
   await db.exec("CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role BYPASSRLS;");
   // Migrations depend on preceding schema/data changes; they must run sequentially.
-  for (const file of files) {
-    try {
-      const beforeRemoval = file === marineRemoval ? await seasideState() : undefined;
-      await db.exec(readFileSync(new URL(file, directory), "utf8"));
-      if (beforeRemoval) {
-        assert.deepEqual(
-          await seasideState(),
-          beforeRemoval,
-          "Keep Seaside content and official map point unchanged",
-        );
-      }
-    } catch (cause) {
-      throw new Error(`Migration failed on a fresh database: ${file}`, { cause });
-    }
-  }
+  await files.reduce(
+    (previous, file) => previous.then(() => applyAndCheckMigration(file)),
+    Promise.resolve(),
+  );
+  const earthCards = await db.query(
+    "SELECT id, level_id FROM destinations WHERE id IN ('la-maison-1888','buffalo-bar','wine-cellar') ORDER BY id",
+  );
+  assert.deepEqual(
+    earthCards.rows,
+    ["buffalo-bar", "la-maison-1888", "wine-cellar"].map((id) => ({ id, level_id: "earth" })),
+  );
+  assert.deepEqual(
+    (await db.query("SELECT level_id FROM map_places WHERE id='la-maison-1888'")).rows,
+    [{ level_id: "earth" }],
+  );
+  const beforeLevelReplay = await maisonState();
+  await db.exec(readFileSync(new URL(earthLevelMigration, directory), "utf8"));
+  assert.deepEqual(await maisonState(), beforeLevelReplay, "Level correction is idempotent");
   const { rows } = await db.query<{ unsafe: number }>(`
     SELECT count(*)::int AS unsafe FROM information_schema.role_table_grants
     WHERE table_schema='public' AND grantee IN ('anon','authenticated','PUBLIC')

@@ -14,17 +14,19 @@ export const bensleyTour: TourStop[] = [
   {
     placeId: "nam-tram",
     order: 3,
-    travel: "tram",
+    travel: "walk",
   },
   {
     placeId: "heritage-village",
     order: 4,
-    travel: "walk",
+    travel: "tram",
+    arrivalStation: "sky",
   },
   {
     placeId: "la-maison-1888",
     order: 5,
     travel: "tram",
+    arrivalStation: "earth",
   },
   {
     placeId: "terra-mare",

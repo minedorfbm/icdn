@@ -17,6 +17,7 @@ export function MapPreview({
   onClose,
   kicker,
   area,
+  metadata,
   children,
 }: Readonly<{
   title: string;
@@ -27,7 +28,8 @@ export function MapPreview({
   onClose: () => void;
   kicker: string | undefined;
   area?: Place | undefined;
-  children: ReactNode;
+  metadata?: string | undefined;
+  children?: ReactNode;
 }>) {
   const { lang, description, levelLabel, typeLabel } = useI18n();
   const [expanded, setExpanded] = useState(false);
@@ -67,36 +69,42 @@ export function MapPreview({
       </div>
       <div className="atlas-preview-surface">
         <div className="atlas-preview-header">
-          <button
-            type="button"
-            className="atlas-sheet-handle"
-            aria-label={mapCopy(lang, expanded ? "collapse" : "expand")}
-            aria-expanded={expanded}
-            onPointerDown={(event) => {
-              dragStart.current = event.clientY;
-              dragged.current = false;
-              event.currentTarget.setPointerCapture(event.pointerId);
-            }}
-            onPointerUp={(event) => {
-              if (dragStart.current !== null) {
-                const delta = event.clientY - dragStart.current;
-                dragged.current = Math.abs(delta) > 24;
-                if (dragged.current) setExpanded(delta < 0);
-              }
-              dragStart.current = null;
-            }}
-            onPointerCancel={() => {
-              dragStart.current = null;
-              dragged.current = false;
-            }}
-            onClick={() => {
-              if (!dragged.current) setExpanded((value) => !value);
-              dragged.current = false;
-            }}
-          >
-            <span>{kicker ? `${kicker} · ${previewKicker}` : previewKicker}</span>
-            <ChevronDown size={12} aria-hidden />
-          </button>
+          {children ? (
+            <p className="atlas-preview-meta">
+              {metadata ?? (kicker ? `${kicker} · ${previewKicker}` : previewKicker)}
+            </p>
+          ) : (
+            <button
+              type="button"
+              className="atlas-sheet-handle"
+              aria-label={mapCopy(lang, expanded ? "collapse" : "expand")}
+              aria-expanded={expanded}
+              onPointerDown={(event) => {
+                dragStart.current = event.clientY;
+                dragged.current = false;
+                event.currentTarget.setPointerCapture(event.pointerId);
+              }}
+              onPointerUp={(event) => {
+                if (dragStart.current !== null) {
+                  const delta = event.clientY - dragStart.current;
+                  dragged.current = Math.abs(delta) > 24;
+                  if (dragged.current) setExpanded(delta < 0);
+                }
+                dragStart.current = null;
+              }}
+              onPointerCancel={() => {
+                dragStart.current = null;
+                dragged.current = false;
+              }}
+              onClick={() => {
+                if (!dragged.current) setExpanded((value) => !value);
+                dragged.current = false;
+              }}
+            >
+              <span>{kicker ? `${kicker} · ${previewKicker}` : previewKicker}</span>
+              <ChevronDown size={12} aria-hidden />
+            </button>
+          )}
           <button
             type="button"
             className="atlas-preview-close"
@@ -109,45 +117,48 @@ export function MapPreview({
         <div className="atlas-preview-heading">
           <h3>{title}</h3>
         </div>
-        {area?.roomNumbers && (
-          <p className="atlas-description">
-            {mapCopy(lang, numberLabel)}: {area.roomNumbers}
-          </p>
-        )}
-        {primary && !area && (
+        {children || (
           <>
-            {!expanded && (
-              <p className="atlas-preview-summary">
-                {description(primary.id, primary.short_description)}
+            {area?.roomNumbers && (
+              <p className="atlas-description">
+                {mapCopy(lang, numberLabel)}: {area.roomNumbers}
               </p>
             )}
-            <button
-              type="button"
-              className="atlas-discover"
-              onClick={() => onDestination(primary.id)}
-            >
-              {mapCopy(lang, "discover")}
-              <ArrowUpRight size={17} />
-            </button>
-            {expanded && (
-              <p className="atlas-description">
-                {description(primary.id, primary.short_description)}
-              </p>
+            {primary && !area && (
+              <>
+                {!expanded && (
+                  <p className="atlas-preview-summary">
+                    {description(primary.id, primary.short_description)}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  className="atlas-discover"
+                  onClick={() => onDestination(primary.id)}
+                >
+                  {mapCopy(lang, "discover")}
+                  <ArrowUpRight size={17} />
+                </button>
+                {expanded && (
+                  <p className="atlas-description">
+                    {description(primary.id, primary.short_description)}
+                  </p>
+                )}
+              </>
+            )}
+            {(area || destinations.length > 1) && (
+              <div className="atlas-related">
+                <p>{mapCopy(lang, area ? "accommodation" : "here")}</p>
+                {(area ? destinations : destinations.slice(1)).map((d) => (
+                  <button type="button" key={d.id} onClick={() => onDestination(d.id)}>
+                    {d.name}
+                    <ArrowUpRight size={15} />
+                  </button>
+                ))}
+              </div>
             )}
           </>
         )}
-        {(area || destinations.length > 1) && (
-          <div className="atlas-related">
-            <p>{mapCopy(lang, area ? "accommodation" : "here")}</p>
-            {(area ? destinations : destinations.slice(1)).map((d) => (
-              <button type="button" key={d.id} onClick={() => onDestination(d.id)}>
-                {d.name}
-                <ArrowUpRight size={15} />
-              </button>
-            ))}
-          </div>
-        )}
-        {children}
       </div>
     </section>
   );

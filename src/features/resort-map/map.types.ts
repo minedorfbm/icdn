@@ -17,6 +17,12 @@ export type Place = {
   coveredLevels: Level[];
   roomNumbers?: string;
 };
-export type TourStop = { placeId: string; order: number; travel: "walk" | "tram" };
+export type TourStop = {
+  placeId: string;
+  order: number;
+  /** Transport used to reach this stop from the preceding one. */
+  travel: "walk" | "tram";
+  arrivalStation?: Level;
+};
 export type MapPlaceRow = z.infer<typeof mapPlaceRow>;
 export type MapLinkRow = z.infer<typeof mapLinkRow>;
