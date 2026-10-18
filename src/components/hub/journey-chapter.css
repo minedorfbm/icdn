@@ -1,0 +1,127 @@
+/* The viewport is shared by the heading, collections and the existing perspective deck. */
+html[data-journey-snap="true"] {
+  scroll-snap-type: y proximity;
+}
+
+.journey-level {
+  --journey-top: max(76px, calc(env(safe-area-inset-top, 0px) + 64px));
+  --journey-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+  padding-block: var(--journey-top) var(--journey-bottom);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.journey-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: calc(100svh - var(--journey-top) - var(--journey-bottom));
+  /* Short landscape screens and enlarged text can still scroll naturally. */
+  min-height: 420px;
+}
+
+.journey-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  max-width: 740px;
+  margin-inline: auto;
+  padding: 0 24px 8px;
+  flex-shrink: 0;
+}
+
+.journey-level-trigger {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 9vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  cursor: pointer;
+}
+
+.journey-level-trigger svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  opacity: 0.65;
+}
+
+.journey-level-trigger:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 5px;
+}
+
+.journey-line {
+  font-size: clamp(10px, 2.5vw, 13px);
+  line-height: 1.4;
+  text-align: right;
+  white-space: nowrap;
+  opacity: 0.75;
+}
+
+.journey-collections {
+  width: 100%;
+  max-width: 740px;
+  margin-inline: auto;
+  border-bottom: 1px solid color-mix(in oklab, currentColor 20%, transparent);
+  flex-shrink: 0;
+}
+
+.journey-content > .journey-deck {
+  flex: 1;
+  min-height: 0;
+}
+
+.journey-card-group,
+.journey-stack {
+  height: 100%;
+}
+
+.journey-card-group {
+  max-width: calc(740px + var(--hub-rail-gutter));
+  margin-inline: auto;
+}
+
+.journey-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.journey-stack .card-stack-stage {
+  flex: 1;
+  min-height: 0;
+}
+
+.journey-pagination {
+  width: 100%;
+  min-height: 30px;
+  flex-shrink: 0;
+  padding-right: calc(var(--hub-rail-gutter) + 24px);
+}
+
+.journey-transition {
+  height: clamp(56px, 10svh, 100px);
+  pointer-events: none;
+}
+
+@media (max-width: 360px) {
+  .journey-header {
+    padding-inline: 16px;
+    gap: 8px;
+  }
+  .journey-level-trigger {
+    font-size: 30px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-journey-snap="true"] {
+    scroll-snap-type: none;
+  }
+}

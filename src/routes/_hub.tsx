@@ -8,7 +8,7 @@ import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
 import { localizedLinkUrl } from "@/lib/localized-links";
 import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useJourneyMotion } from "@/lib/use-journey-motion";
 import { ArrowUpRight } from "lucide-react";
 import { ConciergeContact } from "@/components/hub/ConciergeContact";
@@ -150,6 +150,15 @@ function Hub() {
   const { levels, links } = useHub();
   const { active, visible } = useJourneyMotion(hubRef, levels);
   const { lang, t, linkLabel } = useI18n();
+  const pathname = useLocation({ select: (location) => location.pathname });
+
+  useEffect(() => {
+    if (pathname !== "/") return;
+    document.documentElement.dataset["journeySnap"] = "true";
+    return () => {
+      delete document.documentElement.dataset["journeySnap"];
+    };
+  }, [pathname]);
 
   const scrollTo = scrollToHubSection;
 
@@ -164,8 +173,19 @@ function Hub() {
 
       {/* THE DESCENT */}
       <div>
-        {levels.map((l) => (
-          <LevelChapter key={l.id} {...l} />
+        {levels.map((l, index) => (
+          <Fragment key={l.id}>
+            <LevelChapter {...l} />
+            {levels[index + 1] && (
+              <div
+                aria-hidden
+                className="journey-transition"
+                style={{
+                  background: `linear-gradient(to bottom, var(--world-${l.id}), var(--world-${levels[index + 1]!.id}))`,
+                }}
+              />
+            )}
+          </Fragment>
         ))}
       </div>
 
