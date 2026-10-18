@@ -72,7 +72,7 @@
   position: absolute;
   right: 14px;
   top: calc(68px + env(safe-area-inset-top));
-  display: grid;
+  display: flex;
   border: 1px solid var(--brand-border);
   background: var(--brand-white);
   border-radius: var(--brand-radius);
@@ -87,7 +87,7 @@
   color: var(--atlas-gold);
 }
 .hub-atlas .atlas-zoom button + button {
-  border-top: 1px solid var(--brand-border);
+  border-left: 1px solid var(--brand-border);
 }
 .hub-atlas .atlas-bottom {
   position: absolute;
@@ -131,20 +131,21 @@
   color: var(--brand-ink);
 }
 .hub-atlas .atlas-collections {
-  display: flex;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
-  overflow-x: auto;
-  flex-wrap: nowrap;
 }
 .hub-atlas .atlas-collections button {
-  flex-shrink: 0;
+  min-width: 0;
   min-height: 44px;
-  padding: 8px 14px;
+  padding: 8px 10px;
   background: var(--brand-white);
   border: 1px solid var(--brand-border);
   border-radius: var(--brand-radius);
   font-size: 12px;
+  line-height: 1.25;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 .hub-atlas .atlas-collections button[aria-pressed="true"] {
   border-color: var(--brand-ink);
@@ -234,13 +235,7 @@
     transform: translateX(-50%);
   }
   .hub-atlas .atlas-zoom {
-    top: calc(68px + env(safe-area-inset-top));
     right: 24px;
-    display: flex;
-  }
-  .hub-atlas .atlas-zoom button + button {
-    border-top: 0;
-    border-left: 1px solid var(--brand-border);
   }
   .hub-atlas .atlas-context,
   .hub-atlas .atlas-photo-guide {
