@@ -3,11 +3,11 @@ import type { DestinationPost } from "@/data/resort";
 import { InstagramPostEmbed } from "./InstagramPostEmbed";
 
 /**
- * Horizontal, snap-scrolled carousel of up to 5 official Instagram post embeds.
+ * Horizontal, snap-scrolled carousel of the published Instagram posts.
  * A single post renders exactly like before (no dots, no scrolling).
  */
 export function InstagramPostCarousel({ posts }: Readonly<{ posts: DestinationPost[] }>) {
-  const items = posts.slice(0, 5);
+  const items = posts;
   const track = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [height, setHeight] = useState<number>();
@@ -78,7 +78,10 @@ export function InstagramPostCarousel({ posts }: Readonly<{ posts: DestinationPo
         ))}
       </div>
 
-      <div data-instagram-pagination className="mt-2 flex items-center justify-center gap-2">
+      <div
+        data-instagram-pagination
+        className="mt-2 flex flex-wrap items-center justify-center gap-2"
+      >
         {items.map((post, i) => (
           <button
             key={post.post_url}

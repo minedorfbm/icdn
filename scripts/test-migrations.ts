@@ -56,6 +56,86 @@ try {
     (previous, file) => previous.then(() => applyAndCheckMigration(file)),
     Promise.resolve(),
   );
+  const guideMigration = readFileSync(
+    new URL("20261018151000_instagram_spots_guide.sql", directory),
+    "utf8",
+  );
+  const guideState = async () =>
+    (
+      await db.query(`SELECT
+    (SELECT jsonb_agg(c ORDER BY key) FROM destination_collection_items c) AS collection,
+    (SELECT jsonb_agg(p ORDER BY id) FROM destination_posts p) AS posts,
+    (SELECT jsonb_agg(v ORDER BY id) FROM destination_videos v) AS videos,
+    (SELECT jsonb_agg(l ORDER BY id) FROM destination_links l) AS links,
+    (SELECT jsonb_agg(t ORDER BY link_id,locale) FROM destination_link_translations t) AS translations,
+    (SELECT jsonb_agg(d ORDER BY id) FROM destinations d) AS destinations
+  `)
+    ).rows;
+  const guideBefore = await guideState();
+  await db.exec(readFileSync(new URL("20261018150500_publish_lobby.sql", directory), "utf8"));
+  await db.exec(guideMigration);
+  assert.deepEqual(
+    await guideState(),
+    guideBefore,
+    "Guide replay preserves every card and media association",
+  );
+  const guide = (
+    await db.query<{ key: string; translations: Record<string, unknown>; description: string }>(
+      "SELECT key,translations,description FROM destination_collection_items WHERE destination_id='instagram-spots' ORDER BY display_order",
+    )
+  ).rows;
+  assert.deepEqual(
+    guide.map((row) => row.key),
+    [..."ABCDEFGHI"],
+  );
+  assert.ok(guide.every((row) => Object.keys(row.translations).length === 5));
+  assert.match(guide[3]!.description, /Christian Le Squer/);
+  assert.deepEqual((await db.query("SELECT active FROM destinations WHERE id='reception'")).rows, [
+    { active: true },
+  ]);
+  assert.equal(
+    (
+      await db.query(
+        "SELECT id FROM destination_posts WHERE destination_id='instagram-spots' AND active",
+      )
+    ).rows.length,
+    6,
+  );
+  assert.equal(
+    (
+      await db.query(
+        "SELECT id FROM destination_videos WHERE destination_id='instagram-spots' AND active",
+      )
+    ).rows.length,
+    1,
+  );
+  assert.deepEqual(
+    (
+      await db.query(`SELECT
+        (SELECT count(*)::int FROM destination_posts WHERE destination_id='reception' AND active) AS posts,
+        (SELECT count(*)::int FROM destination_videos WHERE destination_id='reception' AND active) AS videos`)
+    ).rows,
+    [{ posts: 2, videos: 1 }],
+    "Shared media import publishes both Lobby posts and its design video",
+  );
+  await db.exec("SET ROLE anon");
+  assert.equal((await db.query("SELECT key FROM destination_collection_items")).rows.length, 9);
+  await assert.rejects(
+    db.exec("UPDATE destination_collection_items SET active=false"),
+    /permission denied/,
+  );
+  await db.exec(
+    "RESET ROLE; BEGIN; UPDATE destinations SET active=false WHERE id='citron'; SET ROLE anon",
+  );
+  assert.equal(
+    (await db.query("SELECT key FROM destination_collection_items WHERE key='C'")).rows.length,
+    0,
+  );
+  await db.exec(
+    "ROLLBACK; RESET ROLE; BEGIN; UPDATE destinations SET active=false WHERE id='instagram-spots'; SET ROLE anon",
+  );
+  assert.equal((await db.query("SELECT key FROM destination_collection_items")).rows.length, 0);
+  await db.exec("ROLLBACK; RESET ROLE");
   const earthCards = await db.query(
     "SELECT id, level_id FROM destinations WHERE id IN ('la-maison-1888','buffalo-bar','wine-cellar') ORDER BY id",
   );

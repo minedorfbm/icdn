@@ -31,6 +31,7 @@ export function useDestinationMedia(id: string) {
       videos: groupVideos(data?.videos ?? [])[id] ?? [],
       hours: data?.hours ?? [],
       notices: data?.notices ?? [],
+      collection: data?.collection ?? [],
     }),
     [data, id],
   );

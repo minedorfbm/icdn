@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "./validation";
+import { collectionItemRow } from "./destination-collection";
 import { destinationNoticeRow } from "./destination-notices";
 import { openingHoursRow } from "./opening-hours";
 import { publicReader } from "./public-collection.server";
@@ -91,6 +92,7 @@ async function readHubData(): Promise<HubData> {
 }
 
 const mediaSchema = z.object({
+  collection: z.array(collectionItemRow).nullable(),
   photos: z.array(photoRow).nullable(),
   posts: z.array(postRow).nullable(),
   videos: z.array(videoRow).nullable(),
@@ -108,7 +110,7 @@ export const getDestinationMedia = createServerFn({ method: "GET" })
   )
   .handler(({ data: id }) =>
     readPublicSnapshot(
-      `media-v3/${id}`,
+      `media-v4/${id}`,
       mediaSchema,
       (data) => Object.values(data).every((rows) => rows !== null),
       async () => {
@@ -117,8 +119,9 @@ export const getDestinationMedia = createServerFn({ method: "GET" })
         // here too: this endpoint is public and can be called independently of the UI.
         const published = await read("destinations", destinationRow, "active", undefined, id, "id");
         if (published === null) throw new Error("Catalogue temporarily unavailable");
-        if (!published.length) return { photos: [], posts: [], videos: [], hours: [], notices: [] };
-        const [photos, posts, videos, hours, notices] = await Promise.all([
+        if (!published.length)
+          return { photos: [], posts: [], videos: [], hours: [], notices: [], collection: [] };
+        const [photos, posts, videos, hours, notices, collection] = await Promise.all([
           read("destination_photos", photoRow, "active", "display_order", id),
           read("destination_posts", postRow, "active", "display_order", id),
           read("destination_videos", videoRow, "active", "display_order", id),
@@ -130,8 +133,9 @@ export const getDestinationMedia = createServerFn({ method: "GET" })
             "display_order",
             id,
           ),
+          read("destination_collection_items", collectionItemRow, "active", "display_order", id),
         ]);
-        return { photos, posts, videos, hours, notices };
+        return { photos, posts, videos, hours, notices, collection };
       },
       publicCache(),
     ),
