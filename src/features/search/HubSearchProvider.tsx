@@ -1,4 +1,4 @@
-import { useCallback, useRef, type ReactNode } from "react";
+import { useCallback, useRef, useState, type ReactNode } from "react";
 import { useLocation, useNavigate, useRouterState } from "@tanstack/react-router";
 import { destinationSlug } from "@/lib/destination-route";
 import { useDestinationNavigation } from "@/lib/use-destination-navigation";
@@ -16,6 +16,12 @@ export function HubSearchProvider({ children }: Readonly<{ children: ReactNode }
   const { openDestination } = useDestinationNavigation();
   const beforeNavigate = useRef<(() => void) | undefined>(undefined);
   const selecting = useRef(false);
+  // The router updates its location before the lazy card screen is ready.
+  // Retain the source overlay throughout that interval instead of revealing home.
+  const [selection, setSelection] = useState<{
+    snapshot: SearchSnapshot;
+    historyIndex: number;
+  }>();
   const openSearch = useCallback(
     (onNavigate?: () => void) => {
       beforeNavigate.current = onNavigate;
@@ -52,6 +58,7 @@ export function HubSearchProvider({ children }: Readonly<{ children: ReactNode }
         closeSearch();
         return;
       }
+      setSelection({ snapshot, historyIndex: location.state.__TSR_index });
       await navigate({
         to: location.pathname,
         replace: true,
@@ -62,15 +69,17 @@ export function HubSearchProvider({ children }: Readonly<{ children: ReactNode }
       await openDestination(destination.id, []);
     } finally {
       selecting.current = false;
+      setSelection(undefined);
     }
   };
+  const visibleSearch = selection?.snapshot ?? (routeReady ? location.state.hubSearch : undefined);
   return (
     <SearchContext.Provider value={openSearch}>
       {children}
-      {routeReady && location.state.hubSearch && (
+      {visibleSearch && (
         <SearchDialog
-          key={location.state.__TSR_index}
-          initialState={location.state.hubSearch}
+          key={selection?.historyIndex ?? location.state.__TSR_index}
+          initialState={visibleSearch}
           onClose={closeSearch}
           onSelectDestination={(destination, snapshot) => void selectResult(destination, snapshot)}
         />
