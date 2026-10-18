@@ -106,3 +106,38 @@ test("viewing a search result on the resort map keeps the map accessible", async
   await expect(page).toHaveURL("/");
   await expect(page.getByRole("dialog")).toHaveCount(0);
 });
+
+test("results remain visible while the destination screen loads", async ({ page }) => {
+  let release!: () => void;
+  let started!: () => void;
+  const loading = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(/\/assets\/_hub\.[_$]destinationId[^/]*\.js/, async (route) => {
+    started();
+    await gate;
+    await route.continue();
+  });
+  await page.goto("/");
+  await page.locator(".hub-search-tool button").click();
+  const search = page.getByRole("dialog", { name: "Search", exact: true });
+  await search.getByRole("searchbox").fill("Citron");
+  await search.getByRole("button", { name: /^Citron/ }).click();
+  try {
+    await loading;
+    await expect(search).toBeVisible();
+    // Cross the router pending-screen threshold while the route remains blocked.
+    await page.waitForTimeout(1200);
+    await expect(search).toBeVisible();
+    await expect(search.getByRole("searchbox")).toHaveValue("Citron");
+  } finally {
+    release();
+  }
+  await expect(page.getByRole("dialog", { name: "Citron", exact: true })).toBeVisible();
+  await expect(search).toHaveCount(0);
+  await page.getByRole("button", { name: "BACK", exact: true }).click();
+  await expect(search.getByRole("searchbox")).toHaveValue("Citron");
+});
