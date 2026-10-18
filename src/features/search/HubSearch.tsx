@@ -3,7 +3,7 @@ import { ArrowUpRight, Search, X } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
-import { useDestinationNavigation } from "@/lib/use-destination-navigation";
+import { EMPTY_SEARCH, useHubSearch, type SearchSnapshot } from "./search-context";
 import type { Destination } from "@/data/resort";
 import {
   SEARCH_COLLECTIONS,
@@ -19,13 +19,8 @@ export function HubSearch({
   compact = false,
   onNavigate,
 }: Readonly<{ compact?: boolean; onNavigate?: () => void }>) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <SearchTrigger compact={compact} onOpen={() => setOpen(true)} />
-      {open && <SearchDialog onClose={() => setOpen(false)} onBeforeNavigate={onNavigate} />}
-    </>
-  );
+  const openSearch = useHubSearch();
+  return <SearchTrigger compact={compact} onOpen={() => openSearch(onNavigate)} />;
 }
 
 export function SearchTrigger({
@@ -51,23 +46,27 @@ export function SearchDialog({
   onClose,
   onSelectDestination,
   placesOnly = false,
-  onBeforeNavigate,
+  initialState = EMPTY_SEARCH,
 }: Readonly<{
   onClose: () => void;
-  onSelectDestination?: (destination: Destination) => void;
+  onSelectDestination: (destination: Destination, snapshot: SearchSnapshot) => void;
   placesOnly?: boolean;
-  onBeforeNavigate?: (() => void) | undefined;
+  initialState?: SearchSnapshot;
 }>) {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialState.query);
   const resultsRef = useRef<HTMLDivElement>(null);
-  const [collection, setCollection] = useState<SearchCollection | "">("");
+  const selectedResultRef = useRef<HTMLButtonElement>(null);
+  const [collection, setCollection] = useState<SearchCollection | "">(initialState.collection);
+  const previousFilter = useRef({ query, collection });
   useEffect(() => {
-    if (resultsRef.current) resultsRef.current.scrollTop = 0;
-  }, [query, collection]);
+    const unchanged =
+      previousFilter.current.query === query && previousFilter.current.collection === collection;
+    if (resultsRef.current) resultsRef.current.scrollTop = unchanged ? initialState.scrollTop : 0;
+    previousFilter.current = { query, collection };
+  }, [query, collection, initialState.scrollTop]);
   const { destinations } = useHub();
   const { lang, t, cluster, levelLabel, typeLabel, description, detailDescription, event } =
     useI18n();
-  const { openDestination } = useDestinationNavigation();
   const copy = (key: Parameters<typeof searchCopy>[1]) => searchCopy(lang, key);
   const entries = useMemo(
     () =>
@@ -116,10 +115,12 @@ export function SearchDialog({
     setCollection("");
   };
   const selectDestination = (destination: Destination) => {
-    onClose();
-    onBeforeNavigate?.();
-    if (onSelectDestination) onSelectDestination(destination);
-    else openDestination(destination.id, []);
+    onSelectDestination(destination, {
+      query,
+      collection,
+      scrollTop: resultsRef.current?.scrollTop ?? 0,
+      selectedId: destination.id,
+    });
   };
   const categoryNotes = {
     DINING: "dining",
@@ -146,6 +147,15 @@ export function SearchDialog({
   return (
     <FullscreenDialog
       title={copy("search")}
+      onOpenAutoFocus={(event) => {
+        // Radix mounts portal content after the dialog component's first effect.
+        // Restore once the scroll container exists, before returning keyboard focus.
+        if (resultsRef.current) resultsRef.current.scrollTop = initialState.scrollTop;
+        if (initialState.selectedId && selectedResultRef.current) {
+          event.preventDefault();
+          selectedResultRef.current.focus({ preventScroll: true });
+        }
+      }}
       onClose={onClose}
       overlayClassName="fixed inset-0 bg-black/30 z-[118]"
       className="brand-ui brand-surface hub-search-dialog fixed inset-0 z-[119]"
@@ -222,6 +232,7 @@ export function SearchDialog({
                 {group.items.map(({ item: d }) => (
                   <button
                     key={d.id}
+                    ref={d.id === initialState.selectedId ? selectedResultRef : undefined}
                     type="button"
                     className="hub-search-result"
                     onClick={() => selectDestination(d)}

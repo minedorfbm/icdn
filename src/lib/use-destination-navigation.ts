@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { destinationSlug } from "@/lib/destination-route";
+import type { SearchSnapshot } from "@/features/search/search-context";
 
 declare module "@tanstack/react-router" {
   interface HistoryState {
@@ -8,6 +9,8 @@ declare module "@tanstack/react-router" {
     hubSequence?: string[];
     hubHomeIndex?: number;
     hubPreviousCard?: string;
+    hubSearch?: SearchSnapshot;
+    hubSearchIndex?: number;
   }
 }
 
@@ -23,13 +26,19 @@ export function useDestinationNavigation() {
       if (location.pathname === `/${slug}`) return;
       const ordered = sequence ?? (isDestination ? location.state.hubSequence : undefined);
       const homeIndex = isDestination ? location.state.hubHomeIndex : location.state.__TSR_index;
-      void navigate({
+      const searchIndex = location.state.hubSearch
+        ? location.state.__TSR_index
+        : location.state.hubSearchIndex;
+      return navigate({
         to: "/$destinationId",
         params: { destinationId: slug },
         state: {
           hubCard: true,
           ...(homeIndex !== undefined ? { hubHomeIndex: homeIndex } : {}),
-          ...(isDestination ? { hubPreviousCard: location.pathname.slice(1) } : {}),
+          ...(searchIndex !== undefined ? { hubSearchIndex: searchIndex } : {}),
+          ...(isDestination && !location.state.hubSearch
+            ? { hubPreviousCard: location.pathname.slice(1) }
+            : {}),
           ...(ordered ? { hubSequence: ordered } : {}),
         },
         resetScroll: false,
@@ -40,15 +49,33 @@ export function useDestinationNavigation() {
   const openPreviousDestination = useCallback(() => {
     if (location.state.hubPreviousCard && location.state.__TSR_index > 0) router.history.back();
   }, [location.state.hubPreviousCard, location.state.__TSR_index, router]);
-  const closeDestination = useCallback(() => {
+  const closeToHub = useCallback(() => {
+    // Opening the map explicitly leaves card navigation. Do not restore search over the map.
+    if (location.state.hubSearchIndex !== undefined) {
+      void navigate({ to: "/", replace: true, resetScroll: false });
+      return;
+    }
     const homeIndex = location.state.hubHomeIndex;
     const distance = homeIndex === undefined ? 0 : location.state.__TSR_index - homeIndex;
     if (distance > 0) router.history.go(-distance);
     else void navigate({ to: "/", replace: true, resetScroll: false });
-  }, [location.state.hubHomeIndex, location.state.__TSR_index, navigate, router]);
+  }, [
+    location.state.hubHomeIndex,
+    location.state.hubSearchIndex,
+    location.state.__TSR_index,
+    navigate,
+    router,
+  ]);
+  const closeDestination = useCallback(() => {
+    const searchIndex = location.state.hubSearchIndex;
+    const distance = searchIndex === undefined ? 0 : location.state.__TSR_index - searchIndex;
+    if (distance > 0) router.history.go(-distance);
+    else closeToHub();
+  }, [location.state.hubSearchIndex, location.state.__TSR_index, closeToHub, router]);
   return {
     openDestination,
     closeDestination,
+    closeToHub,
     openPreviousDestination,
     previousCard: location.state.hubPreviousCard,
     isDestination,
