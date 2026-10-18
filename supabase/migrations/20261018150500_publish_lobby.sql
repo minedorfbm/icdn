@@ -66,50 +66,5 @@ VALUES('lobby','reception',0,true,true)
 ON CONFLICT(place_id,destination_id) DO UPDATE SET active=true,is_primary=true
 WHERE NOT map_destination_links.active OR NOT map_destination_links.is_primary;
 UPDATE public.map_places SET level_id='heaven' WHERE id='lobby' AND level_id<>'heaven';
-DO $video$
-DECLARE candidate uuid; matches integer; next_order integer;
-BEGIN
- SELECT count(*),min(id::text)::uuid INTO matches,candidate FROM public.destination_videos
- WHERE destination_id='reception' AND
- (regexp_match(video_url,'(?:[?&]v=|youtu.be/|/(?:shorts|embed|live)/)([A-Za-z0-9_-]{11})(?:[?&#/]|$)'))[1]='pNOVYJjXN-c';
- IF matches>1 THEN RAISE EXCEPTION 'Duplicate existing YouTube video'; END IF;
- IF candidate IS NOT NULL AND EXISTS(SELECT 1 FROM public.destination_videos WHERE id=candidate AND active) THEN RETURN; END IF;
- SELECT coalesce(max(display_order),-1)+1 INTO next_order FROM public.destination_videos WHERE destination_id='reception';
- IF candidate IS NULL THEN
- INSERT INTO public.destination_videos(destination_id,video_url,title,title_translations,display_order,active)
- VALUES('reception','https://www.youtube.com/watch?v=pNOVYJjXN-c',
- 'The Story Behind Bill Bensley’s Design at InterContinental Danang',
- $titles${"vi":"Câu chuyện đằng sau thiết kế của Bill Bensley tại InterContinental Danang","ru":"История дизайна Билла Бенсли в InterContinental Danang","zh":"InterContinental Danang：Bill Bensley 设计背后的故事","ko":"InterContinental Danang에 담긴 빌 벤슬리의 디자인 이야기","ja":"InterContinental Danangを彩るビル・ベンズリーのデザインの物語"}$titles$::jsonb,
- next_order,true);
- ELSE
- UPDATE public.destination_videos SET active=true,display_order=next_order WHERE id=candidate;
- END IF;
-END $video$;
-DO $posts$
-DECLARE r jsonb; candidate uuid; matches integer; next_order integer;
-BEGIN
- FOR r IN SELECT value FROM jsonb_array_elements($selection$[
-  {
-    "url": "https://www.instagram.com/p/C_cqjLcsoGL/",
-    "shortcode": "C_cqjLcsoGL"
-  },
-  {
-    "url": "https://www.instagram.com/p/DVK4hyuGYI2/",
-    "shortcode": "DVK4hyuGYI2"
-  }
-]$selection$::jsonb) LOOP
- SELECT count(*),min(id::text)::uuid INTO matches,candidate FROM public.destination_posts
- WHERE destination_id='reception' AND
- (regexp_match(post_url,'/(?:p|reel|reels)/([A-Za-z0-9_-]+)(?:/|[?]|$)'))[1]=r->>'shortcode';
- IF matches>1 THEN RAISE EXCEPTION 'Duplicate existing Instagram shortcode: %',r->>'shortcode'; END IF;
- IF candidate IS NOT NULL AND EXISTS(SELECT 1 FROM public.destination_posts WHERE id=candidate AND active) THEN CONTINUE; END IF;
- SELECT coalesce(max(display_order),-1)+1 INTO next_order FROM public.destination_posts WHERE destination_id='reception';
- IF candidate IS NULL THEN
- INSERT INTO public.destination_posts(destination_id,post_url,account,posted_at,display_order,active)
- VALUES('reception',r->>'url',NULL,(r->>'date')::date,next_order,true);
- ELSE
- UPDATE public.destination_posts SET active=true,display_order=next_order WHERE id=candidate;
- END IF;
- END LOOP;
-END $posts$;
+-- Media for Lobby and the Top 9 guide is imported together by the next migration.
 COMMIT;

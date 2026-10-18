@@ -578,64 +578,82 @@ CROSS JOIN (VALUES('vi','vn'),('ru','ru'),('zh','zh'),('ko','ko'),('ja','ja')) A
 WHERE l.destination_id='instagram-spots' AND l.kind='DISCOVER'
  AND l.url='https://www.danang.intercontinental.com/top-instagrammable-spots/'
 ON CONFLICT(link_id,locale) DO NOTHING;
+-- Shared media import for the guide and Lobby, preserving per-card order and replay guards.
 DO $video$
-DECLARE candidate uuid; matches integer; next_order integer;
+DECLARE destination text; candidate uuid; matches integer; next_order integer;
 BEGIN
+ FOREACH destination IN ARRAY ARRAY['instagram-spots','reception'] LOOP
  SELECT count(*),min(id::text)::uuid INTO matches,candidate FROM public.destination_videos
- WHERE destination_id='instagram-spots' AND
+ WHERE destination_id=destination AND
  (regexp_match(video_url,'(?:[?&]v=|youtu.be/|/(?:shorts|embed|live)/)([A-Za-z0-9_-]{11})(?:[?&#/]|$)'))[1]='pNOVYJjXN-c';
  IF matches>1 THEN RAISE EXCEPTION 'Duplicate existing YouTube video'; END IF;
- IF candidate IS NOT NULL AND EXISTS(SELECT 1 FROM public.destination_videos WHERE id=candidate AND active) THEN RETURN; END IF;
- SELECT coalesce(max(display_order),-1)+1 INTO next_order FROM public.destination_videos WHERE destination_id='instagram-spots';
+ IF candidate IS NOT NULL AND EXISTS(SELECT 1 FROM public.destination_videos WHERE id=candidate AND active) THEN CONTINUE; END IF;
+ SELECT coalesce(max(display_order),-1)+1 INTO next_order FROM public.destination_videos WHERE destination_id=destination;
  IF candidate IS NULL THEN
  INSERT INTO public.destination_videos(destination_id,video_url,title,title_translations,display_order,active)
- VALUES('instagram-spots','https://www.youtube.com/watch?v=pNOVYJjXN-c',
+ VALUES(destination,'https://www.youtube.com/watch?v=pNOVYJjXN-c',
  'The Story Behind Bill Bensley’s Design at InterContinental Danang',
  $titles${"vi":"Câu chuyện đằng sau thiết kế của Bill Bensley tại InterContinental Danang","ru":"История дизайна Билла Бенсли в InterContinental Danang","zh":"InterContinental Danang：Bill Bensley 设计背后的故事","ko":"InterContinental Danang에 담긴 빌 벤슬리의 디자인 이야기","ja":"InterContinental Danangを彩るビル・ベンズリーのデザインの物語"}$titles$::jsonb,
  next_order,true);
  ELSE
  UPDATE public.destination_videos SET active=true,display_order=next_order WHERE id=candidate;
  END IF;
+ END LOOP;
 END $video$;
 DO $posts$
 DECLARE r jsonb; candidate uuid; matches integer; next_order integer;
 BEGIN
  FOR r IN SELECT value FROM jsonb_array_elements($selection$[
   {
+    "destination": "instagram-spots",
     "url": "https://www.instagram.com/p/DeWjgLQDULr/",
     "shortcode": "DeWjgLQDULr",
     "date": "2026-10-11"
   },
   {
+    "destination": "instagram-spots",
     "url": "https://www.instagram.com/p/Dd_YYuejI_1/",
     "shortcode": "Dd_YYuejI_1",
     "date": "2026-10-02"
   },
   {
+    "destination": "instagram-spots",
     "url": "https://www.instagram.com/reel/DdGCO6mDj5R/",
     "shortcode": "DdGCO6mDj5R",
     "date": "2026-09-09"
   },
   {
+    "destination": "instagram-spots",
     "url": "https://www.instagram.com/p/DahUPJ_kcAx/",
     "shortcode": "DahUPJ_kcAx",
     "date": "2026-07-07"
   },
   {
+    "destination": "instagram-spots",
     "url": "https://www.instagram.com/reel/DYTno_rDZvv/",
     "shortcode": "DYTno_rDZvv",
     "date": "2026-05-13"
+  },
+  {
+    "destination": "reception",
+    "url": "https://www.instagram.com/p/C_cqjLcsoGL/",
+    "shortcode": "C_cqjLcsoGL"
+  },
+  {
+    "destination": "reception",
+    "url": "https://www.instagram.com/p/DVK4hyuGYI2/",
+    "shortcode": "DVK4hyuGYI2"
   }
 ]$selection$::jsonb) LOOP
  SELECT count(*),min(id::text)::uuid INTO matches,candidate FROM public.destination_posts
- WHERE destination_id='instagram-spots' AND
+ WHERE destination_id=r->>'destination' AND
  (regexp_match(post_url,'/(?:p|reel|reels)/([A-Za-z0-9_-]+)(?:/|[?]|$)'))[1]=r->>'shortcode';
  IF matches>1 THEN RAISE EXCEPTION 'Duplicate existing Instagram shortcode: %',r->>'shortcode'; END IF;
  IF candidate IS NOT NULL AND EXISTS(SELECT 1 FROM public.destination_posts WHERE id=candidate AND active) THEN CONTINUE; END IF;
- SELECT coalesce(max(display_order),-1)+1 INTO next_order FROM public.destination_posts WHERE destination_id='instagram-spots';
+ SELECT coalesce(max(display_order),-1)+1 INTO next_order FROM public.destination_posts WHERE destination_id=r->>'destination';
  IF candidate IS NULL THEN
  INSERT INTO public.destination_posts(destination_id,post_url,account,posted_at,display_order,active)
- VALUES('instagram-spots',r->>'url',NULL,(r->>'date')::date,next_order,true);
+ VALUES(r->>'destination',r->>'url',NULL,(r->>'date')::date,next_order,true);
  ELSE
  UPDATE public.destination_posts SET active=true,display_order=next_order WHERE id=candidate;
  END IF;

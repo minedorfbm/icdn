@@ -109,6 +109,15 @@ try {
     ).rows.length,
     1,
   );
+  assert.deepEqual(
+    (
+      await db.query(`SELECT
+        (SELECT count(*)::int FROM destination_posts WHERE destination_id='reception' AND active) AS posts,
+        (SELECT count(*)::int FROM destination_videos WHERE destination_id='reception' AND active) AS videos`)
+    ).rows,
+    [{ posts: 2, videos: 1 }],
+    "Shared media import publishes both Lobby posts and its design video",
+  );
   await db.exec("SET ROLE anon");
   assert.equal((await db.query("SELECT key FROM destination_collection_items")).rows.length, 9);
   await assert.rejects(

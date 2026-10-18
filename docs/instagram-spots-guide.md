@@ -31,6 +31,8 @@ Lobby reuses the existing `reception` ID and `lobby` map association at Heaven L
 
 Instagram import adds five CSV posts to the existing Top 9 post and two supplied Lobby posts. Existing associations retain their order and metadata. Shortcode/video-ID matching prevents duplicates across URL variants, including inactive associations. Unknown Instagram account names are left empty. The design film is associated with both cards. The carousel displays every published post with the existing lazy embed activation; pagination wraps if necessary.
 
+The final content migration imports both cards' media through shared loops. The refactor was replayed against the original applied SQL in an isolated database and preserved the complete catalogue state, including IDs, ordering and timestamps. It requires no further production write.
+
 No map geometry or other catalogue content is changed. The local before/after public snapshots verified all other cards, links, posts, videos, translations and map associations unchanged.
 
 ## Validation
