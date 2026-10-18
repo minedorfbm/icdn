@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowUpRight,
   Camera,
@@ -66,6 +66,7 @@ export default function ResortMap({
   const [photoId, setPhotoId] = useState<string | null>(null);
   const [tourProgress, setTourProgress] = useState(readTourProgress);
   const [tourView, setTourView] = useState<"intro" | "stop" | "closed">("intro");
+  const appliedRequest = useRef<number | null>(null);
   useEffect(() => saveTourProgress(tourProgress), [tourProgress]);
   const [searchOpen, setSearchOpen] = useState(false);
   const [options, setOptions] = useState(false);
@@ -131,6 +132,10 @@ export default function ResortMap({
     [places, focusOn],
   );
   useEffect(() => {
+    // Card navigation refreshes the catalogue, but is not a new map request.
+    // Keep the current tour, selection and camera until openMap is called again.
+    if (appliedRequest.current === request.revision || places.length === 0) return;
+    appliedRequest.current = request.revision;
     setSelectedStation(null);
     setMode(request.mode ?? "explore");
     setPhotoId(null);
@@ -143,7 +148,7 @@ export default function ResortMap({
       setSelectedId(null);
       fit();
     }
-  }, [request, select, fit, tourStops]);
+  }, [request, select, fit, places.length]);
   const changeMode = (next: MapMode) => {
     setSelectedStation(null);
     setMode(next);

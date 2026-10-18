@@ -64,7 +64,6 @@ export function TourOverview({ stops, places, progress, onSelect }: Readonly<Tou
           ))}
         </ol>
       </details>
-      <p className="atlas-tour-hint">{tourCopy(lang, "saved")}</p>
       <a
         className="atlas-tour-source"
         href={BENSLEY_TOUR_SOURCE}

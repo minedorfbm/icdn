@@ -79,14 +79,6 @@ const copy = {
     "{total}곳 중 {done}곳 둘러봄",
     "{total}か所中{done}か所を訪問",
   ],
-  saved: [
-    "Progress is saved on this device when browser storage is available.",
-    "Tiến độ được lưu trên thiết bị này khi trình duyệt cho phép lưu trữ.",
-    "Прогресс сохраняется на этом устройстве, если браузер разрешает хранение данных.",
-    "浏览器允许存储时，进度会保存在此设备上。",
-    "브라우저 저장이 허용되면 이 기기에 진행 상황이 저장됩니다.",
-    "ブラウザーで保存が許可されている場合、この端末に進捗を保存します。",
-  ],
   overview: [
     "Tour overview",
     "Tổng quan hành trình",
