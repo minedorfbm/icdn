@@ -64,6 +64,14 @@ const discoveryPreservedState = async () =>
 
 async function applyAndCheckMigration(file: string): Promise<void> {
   try {
+    const beforePhotos =
+      file === "20261019040000_lobby_instagram_first_images.sql"
+        ? (
+            await db.query(
+              `SELECT jsonb_agg(CASE WHEN id IN ('reception','instagram-spots') THEN to_jsonb(d)-'image_key'-'updated_at' ELSE to_jsonb(d) END ORDER BY id) AS cards FROM destinations d`,
+            )
+          ).rows
+        : undefined;
     const beforeDiscovery =
       file === discoveryBalanceMigration ? await discoveryPreservedState() : undefined;
     const beforeLevel = file === earthLevelMigration ? await maisonState() : undefined;
@@ -71,6 +79,35 @@ async function applyAndCheckMigration(file: string): Promise<void> {
     const beforeLongBar = file === longBarMigration ? await longBarPreservedState() : undefined;
     const migration = readFileSync(new URL(file, directory), "utf8");
     await db.exec(migration);
+    if (beforePhotos) {
+      assert.deepEqual(
+        (
+          await db.query(
+            `SELECT jsonb_agg(CASE WHEN id IN ('reception','instagram-spots') THEN to_jsonb(d)-'image_key'-'updated_at' ELSE to_jsonb(d) END ORDER BY id) AS cards FROM destinations d`,
+          )
+        ).rows,
+        beforePhotos,
+        "Photo replacement preserves detail images and all other card content",
+      );
+      assert.deepEqual(
+        (
+          await db.query(
+            `SELECT id,image_key FROM destinations WHERE id IN ('reception','instagram-spots') ORDER BY id`,
+          )
+        ).rows,
+        [
+          { id: "instagram-spots", image_key: "/images/instagram-spots-home-b9f70907d92f.jpg" },
+          {
+            id: "reception",
+            image_key:
+              "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/instagram-spots-home-8755d08eef.webp",
+          },
+        ],
+      );
+      const after = await refreshedState();
+      await db.exec(migration);
+      assert.deepEqual(await refreshedState(), after, "First photo replacement is idempotent");
+    }
     if (beforeDiscovery) {
       assert.deepEqual(
         await discoveryPreservedState(),

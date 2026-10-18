@@ -102,11 +102,14 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
-  --world-heaven: oklch(0.965 0.018 85);
+  --world-heaven: #faf8f1;
+  --world-heaven-foreground: #2e2b26;
   --world-sky: oklch(0.235 0.065 244);
-  --world-earth: oklch(0.37 0.075 151);
-  --world-sea: oklch(0.88 0.055 228);
-  --world-sea-foreground: oklch(0.22 0.055 248);
+  --world-sky-foreground: #f8f6ef;
+  --world-earth: #194e47;
+  --world-earth-foreground: #f7f5ee;
+  --world-sea: #c8e6ef;
+  --world-sea-foreground: #183c4b;
 }
 
 .dark {
@@ -302,10 +305,19 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
 }
 
-/* Four worlds: one continuous descent through light, sky, canopy and water. */
+/* Shared with expanded cards; photographs add texture without changing each world's hue. */
+.level .level-veil {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--level-bg) 96%, transparent) 0%,
+    color-mix(in oklab, var(--level-bg) 82%, transparent) 56%,
+    color-mix(in oklab, var(--level-bg) 96%, transparent) 100%
+  );
+}
+
 .level {
   --level-bg: var(--world-heaven);
-  --level-fg: oklch(0.16 0.01 90);
+  --level-fg: var(--world-heaven-foreground);
   transition:
     background-color 600ms ease,
     color 600ms ease;
@@ -347,60 +359,32 @@
 
 .level[data-level="heaven"] {
   --level-bg: var(--world-heaven);
-  --level-fg: oklch(0.16 0.01 90);
+  --level-fg: var(--world-heaven-foreground);
   background-color: var(--level-bg);
   color: var(--level-fg);
 }
 .level[data-level="heaven"] .level-bg {
   opacity: 0.3;
 }
-.level[data-level="heaven"] .level-veil {
-  background: linear-gradient(
-    to bottom,
-    oklch(0.985 0.012 88 / 0.96) 0%,
-    oklch(0.965 0.018 85 / 0.68) 56%,
-    oklch(0.235 0.065 244 / 0.96) 100%
-  );
-}
 
 .level[data-level="sky"] {
   --level-bg: var(--world-sky);
-  --level-fg: oklch(0.94 0.01 230);
+  --level-fg: var(--world-sky-foreground);
   background-color: var(--level-bg);
   color: var(--level-fg);
 }
 .level[data-level="sky"] .level-bg {
   opacity: 0.42;
 }
-.level[data-level="sky"] .level-veil {
-  background:
-    radial-gradient(ellipse at 50% 8%, oklch(0.4 0.085 238 / 0.34), transparent 46%),
-    linear-gradient(
-      to bottom,
-      oklch(0.235 0.065 244 / 0.96) 0%,
-      oklch(0.19 0.07 247 / 0.68) 58%,
-      oklch(0.37 0.075 151 / 0.96) 100%
-    );
-}
 
 .level[data-level="earth"] {
   --level-bg: var(--world-earth);
-  --level-fg: oklch(0.95 0.01 120);
+  --level-fg: var(--world-earth-foreground);
   background-color: var(--level-bg);
   color: var(--level-fg);
 }
 .level[data-level="earth"] .level-bg {
   opacity: 0.4;
-}
-.level[data-level="earth"] .level-veil {
-  background:
-    radial-gradient(ellipse at 25% 42%, oklch(0.52 0.09 145 / 0.22), transparent 48%),
-    linear-gradient(
-      to bottom,
-      oklch(0.37 0.075 151 / 0.96) 0%,
-      oklch(0.3 0.075 157 / 0.7) 58%,
-      oklch(0.88 0.055 228 / 0.96) 100%
-    );
 }
 
 .level[data-level="sea"] {
@@ -411,16 +395,6 @@
 }
 .level[data-level="sea"] .level-bg {
   opacity: 0.38;
-}
-.level[data-level="sea"] .level-veil {
-  background:
-    radial-gradient(ellipse at 75% 62%, oklch(0.95 0.035 220 / 0.3), transparent 44%),
-    linear-gradient(
-      to bottom,
-      oklch(0.88 0.055 228 / 0.96) 0%,
-      oklch(0.845 0.065 226 / 0.66) 54%,
-      oklch(0.9 0.045 225 / 0.97) 100%
-    );
 }
 
 .sea-footer {
