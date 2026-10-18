@@ -66,16 +66,17 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "InterContinental Danang — Digital Hub" },
+      { title: "InterContinental Danang — Digital Discovery" },
       {
         name: "description",
-        content: "An immersive digital journey through InterContinental Danang.",
+        content: "Digital Discovery: an immersive journey through InterContinental Danang.",
       },
       { name: "author", content: "Art Digital Journey" },
-      { property: "og:title", content: "InterContinental Danang — Digital Hub" },
+      { property: "og:title", content: "InterContinental Danang — Digital Discovery" },
       {
         property: "og:description",
-        content: "Explore the resort from Heaven to Sea with Art Digital Journey.",
+        content:
+          "Digital Discovery: explore the resort from Heaven to Sea with Art Digital Journey.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

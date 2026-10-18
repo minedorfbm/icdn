@@ -52,13 +52,63 @@ const longBarPreservedState = async () =>
 `)
   ).rows;
 
+const discoveryBalanceMigration = "20261019030000_balance_discovery_chapters.sql";
+const discoveryPreservedState = async () =>
+  (
+    await db.query(`SELECT
+    (SELECT jsonb_agg(to_jsonb(d)-'level_id'-'display_order'-'updated_at' ORDER BY id) FROM destinations d) AS cards,
+    (SELECT jsonb_agg(m ORDER BY id) FROM map_places m) AS places,
+    (SELECT jsonb_agg(l ORDER BY place_id,destination_id) FROM map_destination_links l) AS links
+  `)
+  ).rows;
+
 async function applyAndCheckMigration(file: string): Promise<void> {
   try {
+    const beforeDiscovery =
+      file === discoveryBalanceMigration ? await discoveryPreservedState() : undefined;
     const beforeLevel = file === earthLevelMigration ? await maisonState() : undefined;
     const beforeRemoval = file === marineRemoval ? await seasideState() : undefined;
     const beforeLongBar = file === longBarMigration ? await longBarPreservedState() : undefined;
     const migration = readFileSync(new URL(file, directory), "utf8");
     await db.exec(migration);
+    if (beforeDiscovery) {
+      assert.deepEqual(
+        await discoveryPreservedState(),
+        beforeDiscovery,
+        "Rebalancing preserves card content and physical map locations",
+      );
+      assert.deepEqual(
+        (
+          await db.query(
+            `SELECT level_id, count(*)::int AS count FROM destinations WHERE active AND cluster='EXPERIENCES' AND type<>'accommodation' GROUP BY level_id ORDER BY level_id`,
+          )
+        ).rows,
+        [
+          { level_id: "earth", count: 9 },
+          { level_id: "heaven", count: 9 },
+          { level_id: "sea", count: 8 },
+          { level_id: "sky", count: 9 },
+        ],
+      );
+      for (const [level, expected] of [
+        ["heaven", ["citron", "club-lounge"]],
+        ["sea", ["terra-mare", "long-bar", "b-lounge"]],
+      ] as const) {
+        const rows = (
+          await db.query<{ id: string }>(
+            `SELECT id FROM destinations WHERE active AND cluster='DINING' AND level_id=$1 ORDER BY display_order LIMIT $2`,
+            [level, expected.length],
+          )
+        ).rows;
+        assert.deepEqual(
+          rows.map((row) => row.id),
+          [...expected],
+        );
+      }
+      const after = await refreshedState();
+      await db.exec(migration);
+      assert.deepEqual(await refreshedState(), after, "Discovery rebalancing is idempotent");
+    }
     if (file === "20261016160000_reviewed_catalogue_refresh.sql") {
       // Check replay at this migration's own point in history, before later photo replacements.
       const before = await refreshedState();
