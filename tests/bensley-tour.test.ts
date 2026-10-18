@@ -43,6 +43,8 @@ describe("Bensley discovery progress", () => {
     for (const lang of ["en", "vi", "ru", "zh", "ko", "ja"] as const) {
       for (const stop of bensleyTour) {
         const story = tourStories[stop.placeId]!;
+        expect(story.story).toHaveLength(6);
+        expect(story.look).toHaveLength(6);
         expect(tourText(lang, story.story).length).toBeGreaterThan(10);
         expect(tourText(lang, story.look).length).toBeGreaterThan(10);
       }

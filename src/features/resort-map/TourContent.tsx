@@ -33,6 +33,7 @@ export function TourOverview({ stops, places, progress, onSelect }: Readonly<Tou
   if (!first) return null;
   const resume = stops.find((stop) => stop.placeId === progress.currentId) ?? first;
   const hasProgress = progress.visited.length > 0 || resume.placeId !== first.placeId;
+  const startLabel = first.placeId === "lobby" ? "start" : "startFallback";
   return (
     <div className="atlas-tour-content">
       <p className="atlas-tour-story">{tourCopy(lang, "intro")}</p>
@@ -42,10 +43,7 @@ export function TourOverview({ stops, places, progress, onSelect }: Readonly<Tou
         type="button"
         onClick={() => onSelect((hasProgress ? resume : first).placeId)}
       >
-        {tourCopy(
-          lang,
-          hasProgress ? "resume" : first.placeId === "lobby" ? "start" : "startFallback",
-        )}
+        {tourCopy(lang, hasProgress ? "resume" : startLabel)}
         <ArrowRight size={17} aria-hidden />
       </button>
       <details className="atlas-tour-details">

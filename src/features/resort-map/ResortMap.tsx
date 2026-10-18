@@ -193,6 +193,16 @@ export default function ResortMap({
   if (mode === "photos") previewKicker = `${copy("photos")} ${photoId ?? ""}`;
   else if (mode === "tour")
     previewKicker = `${copy("tour")} · ${tourIndex + 1}/${tourStops.length}`;
+  let previewTitle = previewPlace?.name ?? "";
+  if (tourIntro) previewTitle = copy("tour");
+  else if (previewPlace?.accommodationGroup) previewTitle = copy(previewPlace.accommodationGroup);
+  else if (photoDestinationId && related[0]) previewTitle = related[0].name;
+  let previewMetadata: string | undefined;
+  if (mode === "tour" && previewPlace) {
+    previewMetadata = tourIntro
+      ? tourCopy(lang, "selfGuided")
+      : `${previewKicker} · ${levelLabel(previewPlace.level)}`;
+  }
   const hasPreview = !!previewPlace && !searchOpen;
   const chooseSearchResult = (destination: Destination) => {
     const placeId = destinationPlace(destination.id, mapLinks, mapPlaces);
@@ -359,15 +369,7 @@ export default function ResortMap({
                   : previewPlace.point
               }
               camera={camera}
-              title={
-                tourIntro
-                  ? copy("tour")
-                  : previewPlace.accommodationGroup
-                    ? copy(previewPlace.accommodationGroup)
-                    : photoDestinationId && related[0]
-                      ? related[0].name
-                      : previewPlace.name
-              }
+              title={previewTitle}
               area={previewPlace.accommodationGroup ? previewPlace : undefined}
               destinations={related}
               onDestination={onDestination}
@@ -377,13 +379,7 @@ export default function ResortMap({
                 setTourView("closed");
               }}
               kicker={previewKicker}
-              metadata={
-                mode === "tour"
-                  ? tourIntro
-                    ? tourCopy(lang, "selfGuided")
-                    : `${previewKicker} · ${levelLabel(previewPlace.level)}`
-                  : undefined
-              }
+              metadata={previewMetadata}
             >
               {mode === "tour" &&
                 (tourIntro ? (

@@ -27,31 +27,35 @@ const seasideState = async () =>
       (SELECT jsonb_agg(t ORDER BY locale) FROM destination_translations t WHERE destination_id='sea-experiences') AS translations,
       (SELECT to_jsonb(m) FROM map_places m WHERE id='beach-activity-centre') AS map_place`)
   ).rows;
+async function applyAndCheckMigration(file: string): Promise<void> {
+  try {
+    const beforeLevel = file === earthLevelMigration ? await maisonState() : undefined;
+    const beforeRemoval = file === marineRemoval ? await seasideState() : undefined;
+    await db.exec(readFileSync(new URL(file, directory), "utf8"));
+    if (beforeLevel)
+      assert.deepEqual(
+        await maisonState(),
+        beforeLevel,
+        "Level correction preserves coordinates, notices and all other card content",
+      );
+    if (beforeRemoval) {
+      assert.deepEqual(
+        await seasideState(),
+        beforeRemoval,
+        "Keep Seaside content and official map point unchanged",
+      );
+    }
+  } catch (cause) {
+    throw new Error(`Migration failed on a fresh database: ${file}`, { cause });
+  }
+}
 try {
   await db.exec("CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role BYPASSRLS;");
   // Migrations depend on preceding schema/data changes; they must run sequentially.
-  for (const file of files) {
-    try {
-      const beforeLevel = file === earthLevelMigration ? await maisonState() : undefined;
-      const beforeRemoval = file === marineRemoval ? await seasideState() : undefined;
-      await db.exec(readFileSync(new URL(file, directory), "utf8"));
-      if (beforeLevel)
-        assert.deepEqual(
-          await maisonState(),
-          beforeLevel,
-          "Level correction preserves coordinates, notices and all other card content",
-        );
-      if (beforeRemoval) {
-        assert.deepEqual(
-          await seasideState(),
-          beforeRemoval,
-          "Keep Seaside content and official map point unchanged",
-        );
-      }
-    } catch (cause) {
-      throw new Error(`Migration failed on a fresh database: ${file}`, { cause });
-    }
-  }
+  await files.reduce(
+    (previous, file) => previous.then(() => applyAndCheckMigration(file)),
+    Promise.resolve(),
+  );
   const earthCards = await db.query(
     "SELECT id, level_id FROM destinations WHERE id IN ('la-maison-1888','buffalo-bar','wine-cellar') ORDER BY id",
   );

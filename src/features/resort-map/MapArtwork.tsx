@@ -604,9 +604,13 @@ export function MapArtwork({
               const dimmed = !interactivePlaces.includes(place);
               const tourStop =
                 mode === "tour" ? bensleyTour.find((stop) => stop.placeId === place.id) : undefined;
-              const tourClass = tourStop
-                ? `is-tour ${visitedTourIds.includes(place.id) ? "is-visited" : ""} ${place.id === nextTourId ? "is-next" : ""}`
-                : "";
+              const tourClass = [
+                tourStop && "is-tour",
+                tourStop && visitedTourIds.includes(place.id) && "is-visited",
+                tourStop && place.id === nextTourId && "is-next",
+              ]
+                .filter(Boolean)
+                .join(" ");
               const Icon = collectionIcons[place.categories[0] ?? "beach"];
               const labelName = place.accommodationGroup
                 ? mapCopy(lang, place.accommodationGroup)
