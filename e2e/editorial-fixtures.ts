@@ -38,6 +38,15 @@ export const editorialTables: Record<string, unknown[]> = {
     ...editorialDestinations,
     {
       ...editorialDestinations[0],
+      id: "reception",
+      name: "Lobby",
+      type: "service",
+      cluster: "EXPERIENCES",
+      primary_link_id: null,
+      display_order: 99,
+    },
+    {
+      ...editorialDestinations[0],
       id: "instagram-spots",
       name: "Top 9 Instagram Spots",
       type: "experience",
@@ -88,6 +97,36 @@ export const editorialTables: Record<string, unknown[]> = {
       display_order,
     })),
   ),
+  destination_collection_items: [
+    ["B", "reception", "Reception Lobby", "A welcome above the bay.", "ロビーでひと休み。"],
+    [
+      "C",
+      "citron",
+      "Citron · Nón Lá Tables",
+      "Floating tables above the bay.",
+      "湾を見渡すテーブル。",
+    ],
+    [
+      "D",
+      "la-maison-1888",
+      "La Maison 1888",
+      "Architecture and culinary creations.",
+      "建築と料理の創作。",
+    ],
+  ].map(([key, target_destination_id, title, description, translated], display_order) => ({
+    destination_id: "instagram-spots",
+    key,
+    target_destination_id,
+    title,
+    description,
+    display_order,
+    translations: {
+      ja: {
+        title: { source: title, value: title },
+        description: { source: description, value: translated },
+      },
+    },
+  })),
   destination_relations: [
     { destination_id: "la-maison-1888", related_destination_id: "wine-cellar", display_order: 0 },
     { destination_id: "buffalo-bar", related_destination_id: "la-maison-1888", display_order: 1 },
@@ -131,15 +170,26 @@ export const editorialTables: Record<string, unknown[]> = {
     title_translations: {},
     display_order: 0,
   })),
-  destination_posts: editorialDestinations.flatMap(({ id }) =>
-    ["SHORT", "TALL"].map((post, display_order) => ({
-      destination_id: id,
-      post_url: `https://www.instagram.com/p/${post}/`,
+  destination_posts: [
+    ...Array.from({ length: 6 }, (_, display_order) => ({
+      destination_id: "instagram-spots",
+      post_url: `https://www.instagram.com/p/GUIDE${display_order}/`,
       account: "intercontinentaldanang",
       caption: null,
       image_url: null,
       posted_at: null,
       display_order,
     })),
-  ),
+    ...editorialDestinations.flatMap(({ id }) =>
+      ["SHORT", "TALL"].map((post, display_order) => ({
+        destination_id: id,
+        post_url: `https://www.instagram.com/p/${post}/`,
+        account: "intercontinentaldanang",
+        caption: null,
+        image_url: null,
+        posted_at: null,
+        display_order,
+      })),
+    ),
+  ],
 };

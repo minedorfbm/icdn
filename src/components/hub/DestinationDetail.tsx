@@ -1,3 +1,4 @@
+import { DestinationCollection } from "./DestinationCollection";
 import { ArrowLeft, ArrowUpRight, ChevronDown, MapPin } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import type { Destination } from "@/data/resort";
@@ -200,9 +201,10 @@ export function DestinationDetail({
               </div>
             )}
 
-            {secondary.length > 0 && (
+            {(secondary.length > 0 || media.collection.length > 0) && (
               <section className="editorial-section" aria-label={t(collection)}>
                 <SectionHeading label={t(collection)} title={detailHeading(dest, "links", lang)} />
+                {media.collection.length > 0 && <DestinationCollection items={media.collection} />}
                 <div className="editorial-links">
                   {secondary.map((item, index) =>
                     item.benefitsId ? (
