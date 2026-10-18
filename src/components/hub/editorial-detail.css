@@ -1,7 +1,7 @@
 /* Shared expanded-card palette, including raised surfaces and featured actions. */
 .editorial-detail {
-  --level-bg: #faf8f1;
-  --level-fg: #2e2b26;
+  --level-bg: var(--world-heaven);
+  --level-fg: var(--world-heaven-foreground);
   --editorial-accent: #65533d;
   --editorial-panel: #f2ede3;
   --editorial-button: #65533d;
@@ -16,7 +16,7 @@
 }
 .editorial-detail[data-level="sky"] {
   --level-bg: var(--world-sky);
-  --level-fg: #f8f6ef;
+  --level-fg: var(--world-sky-foreground);
   --editorial-accent: #d3c3a2;
   --editorial-panel: color-mix(in oklab, var(--world-sky) 92%, var(--level-fg));
   --editorial-button: #e6dbc3;
@@ -29,8 +29,8 @@
   border-color: var(--editorial-border);
 }
 .editorial-detail[data-level="earth"] {
-  --level-bg: #194e47;
-  --level-fg: #f7f5ee;
+  --level-bg: var(--world-earth);
+  --level-fg: var(--world-earth-foreground);
   --editorial-accent: #e2ded1;
   --editorial-panel: #255b53;
   --editorial-button: #e2ded1;
@@ -39,8 +39,8 @@
   --editorial-border: #658b7f;
 }
 .editorial-detail[data-level="sea"] {
-  --level-bg: #c8e6ef;
-  --level-fg: #183c4b;
+  --level-bg: var(--world-sea);
+  --level-fg: var(--world-sea-foreground);
   --editorial-accent: #1a5368;
   --editorial-panel: #d8ecf1;
   --editorial-button: #1a5368;
