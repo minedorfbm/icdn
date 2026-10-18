@@ -27,11 +27,78 @@ const seasideState = async () =>
       (SELECT jsonb_agg(t ORDER BY locale) FROM destination_translations t WHERE destination_id='sea-experiences') AS translations,
       (SELECT to_jsonb(m) FROM map_places m WHERE id='beach-activity-centre') AS map_place`)
   ).rows;
+const refreshedState = async () =>
+  (
+    await db.query(`SELECT
+      (SELECT jsonb_agg(to_jsonb(d)-'updated_at' ORDER BY id) FROM destinations d) AS cards,
+      (SELECT jsonb_agg(to_jsonb(l)-'updated_at' ORDER BY id) FROM destination_links l) AS links,
+      (SELECT jsonb_agg(r ORDER BY destination_id,related_destination_id) FROM destination_relations r) AS relations,
+      (SELECT jsonb_agg(e ORDER BY id,destination_id) FROM published_destination_events e) AS events`)
+  ).rows;
+
+const longBarMigration = "20261018170000_long_bar_sea_hd_photo.sql";
+const longBarPreservedState = async () =>
+  (
+    await db.query(`SELECT
+  (SELECT jsonb_agg(CASE
+    WHEN id='long-bar' THEN to_jsonb(d)-'updated_at'-'level_id'-'image_key'
+    WHEN id IN ('long-pool','soar-gym','planet-trekkers') THEN to_jsonb(d)-'updated_at'-'level_id'
+    ELSE to_jsonb(d) END ORDER BY id) FROM destinations d) AS cards,
+  (SELECT jsonb_agg(CASE WHEN id='long-bar' THEN to_jsonb(m)-'level_id' ELSE to_jsonb(m) END ORDER BY id) FROM map_places m) AS places,
+  (SELECT jsonb_agg(l ORDER BY place_id,destination_id) FROM map_destination_links l) AS map_links,
+  (SELECT jsonb_agg(p ORDER BY id) FROM destination_photos p) AS photos,
+  (SELECT jsonb_agg(p ORDER BY id) FROM destination_posts p) AS posts,
+  (SELECT jsonb_agg(v ORDER BY id) FROM destination_videos v) AS videos
+`)
+  ).rows;
+
 async function applyAndCheckMigration(file: string): Promise<void> {
   try {
     const beforeLevel = file === earthLevelMigration ? await maisonState() : undefined;
     const beforeRemoval = file === marineRemoval ? await seasideState() : undefined;
-    await db.exec(readFileSync(new URL(file, directory), "utf8"));
+    const beforeLongBar = file === longBarMigration ? await longBarPreservedState() : undefined;
+    const migration = readFileSync(new URL(file, directory), "utf8");
+    await db.exec(migration);
+    if (file === "20261016160000_reviewed_catalogue_refresh.sql") {
+      // Check replay at this migration's own point in history, before later photo replacements.
+      const before = await refreshedState();
+      await db.exec(migration);
+      assert.deepEqual(
+        await refreshedState(),
+        before,
+        "Catalogue refresh replay preserves content",
+      );
+    }
+    if (beforeLongBar) {
+      assert.deepEqual(
+        await longBarPreservedState(),
+        beforeLongBar,
+        "Sea correction preserves all other content, map positions and media associations",
+      );
+      assert.deepEqual(
+        (
+          await db.query(
+            "SELECT id,level_id FROM destinations WHERE id IN ('long-bar','long-pool','planet-trekkers','soar-gym') ORDER BY id",
+          )
+        ).rows,
+        ["long-bar", "long-pool", "planet-trekkers", "soar-gym"].map((id) => ({
+          id,
+          level_id: "sea",
+        })),
+      );
+      const after = await refreshedState();
+      await db.exec(migration);
+      assert.deepEqual(await refreshedState(), after, "Long Bar update is idempotent");
+      await db.exec(
+        "BEGIN; UPDATE destinations SET image_key='https://example.com/newer.webp' WHERE id='long-bar'",
+      );
+      await assert.rejects(
+        db.exec(migration),
+        /Long Bar changed since/,
+        "Keep a newer editorial photo",
+      );
+      await db.exec("ROLLBACK");
+    }
     if (beforeLevel)
       assert.deepEqual(
         await maisonState(),
@@ -261,21 +328,6 @@ try {
   const refreshMigration = readFileSync(
     new URL("20261016160000_reviewed_catalogue_refresh.sql", directory),
     "utf8",
-  );
-  const refreshedState = async () =>
-    (
-      await db.query(`SELECT
-      (SELECT jsonb_agg(to_jsonb(d)-'updated_at' ORDER BY id) FROM destinations d) AS cards,
-      (SELECT jsonb_agg(to_jsonb(l)-'updated_at' ORDER BY id) FROM destination_links l) AS links,
-      (SELECT jsonb_agg(r ORDER BY destination_id,related_destination_id) FROM destination_relations r) AS relations,
-      (SELECT jsonb_agg(e ORDER BY id,destination_id) FROM published_destination_events e) AS events`)
-    ).rows;
-  const beforeRefreshReplay = await refreshedState();
-  await db.exec(refreshMigration);
-  assert.deepEqual(
-    await refreshedState(),
-    beforeRefreshReplay,
-    "Catalogue refresh must not swap photos twice or duplicate links",
   );
   const sharedEvents = (
     await db.query<{ id: string; destination_id: string }>(`
