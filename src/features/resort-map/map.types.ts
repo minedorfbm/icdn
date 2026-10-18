@@ -12,17 +12,9 @@ export type Place = {
   categories: PlaceCategory[];
   point: MapPoint;
   focus: MapPoint & { zoom: number };
-  tourOrder?: number;
   accommodationGroup?: NonNullable<MapPlaceRow["accommodation_group"]>;
   coveredLevels: Level[];
   roomNumbers?: string;
-};
-export type TourStop = {
-  placeId: string;
-  order: number;
-  /** Transport used to reach this stop from the preceding one. */
-  travel: "walk" | "tram";
-  arrivalStation?: Level;
 };
 export type MapPlaceRow = z.infer<typeof mapPlaceRow>;
 export type MapLinkRow = z.infer<typeof mapLinkRow>;

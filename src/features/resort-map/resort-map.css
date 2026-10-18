@@ -5,7 +5,7 @@
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -281,4 +281,12 @@
     left: 70px;
     right: 14px;
   }
+}
+
+.hub-atlas .atlas-map-view {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  height: 100%;
 }
