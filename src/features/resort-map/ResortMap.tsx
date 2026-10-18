@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowUpRight,
   Camera,
-  ChevronLeft,
-  ChevronRight,
   Compass,
   Footprints,
   Layers,
@@ -25,6 +23,14 @@ import { destinationPlace, linkedDestinations, liveMapPlaces } from "./map-links
 import { photoSpots } from "./map.legend";
 import { bensleyTour } from "./map.data";
 import { mapCopy } from "./map-copy";
+import { TourOverview, TourStopContent } from "./TourContent";
+import { tourCopy } from "./tour-copy";
+import {
+  readTourProgress,
+  saveTourProgress,
+  selectTourStop,
+  toggleTourVisit,
+} from "./tour-progress";
 import type { MapMode, MapRequest } from "./map-context";
 import type { PlaceCategory } from "./map.types";
 import "./artwork.css";
@@ -58,7 +64,9 @@ export default function ResortMap({
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
   const [mode, setMode] = useState<MapMode>(request.mode ?? "explore");
   const [photoId, setPhotoId] = useState<string | null>(null);
-  const [tourIndex, setTourIndex] = useState(0);
+  const [tourProgress, setTourProgress] = useState(readTourProgress);
+  const [tourView, setTourView] = useState<"intro" | "stop" | "closed">("intro");
+  useEffect(() => saveTourProgress(tourProgress), [tourProgress]);
   const [searchOpen, setSearchOpen] = useState(false);
   const [options, setOptions] = useState(false);
   const [reference, setReference] = useState(false);
@@ -72,16 +80,25 @@ export default function ResortMap({
   const photoGuide = destinations.find(
     (destination) => destination.id === "instagram-spots" && destination.active,
   );
-  const related = useMemo(() => {
-    const linked = selectedId ? linkedDestinations(selectedId, mapLinks, destinations) : [];
-    return photoDestinationId
-      ? linked.filter((destination) => destination.id === photoDestinationId)
-      : linked;
-  }, [selectedId, mapLinks, destinations, photoDestinationId]);
   const tourStops = useMemo(
     () => bensleyTour.filter((s) => places.some((p) => p.id === s.placeId)),
     [places],
   );
+  const tourIndex = Math.max(
+    0,
+    tourStops.findIndex((stop) => stop.placeId === tourProgress.currentId),
+  );
+  const tourStop = tourStops[tourIndex];
+  const tourIntro = mode === "tour" && tourView === "intro";
+  const previewPlace = tourIntro
+    ? places.find((place) => place.id === tourStops[0]?.placeId)
+    : selected;
+  const related = useMemo(() => {
+    const linked = previewPlace ? linkedDestinations(previewPlace.id, mapLinks, destinations) : [];
+    return photoDestinationId
+      ? linked.filter((destination) => destination.id === photoDestinationId)
+      : linked;
+  }, [previewPlace, mapLinks, destinations, photoDestinationId]);
   const filtered = useMemo(
     () =>
       places.filter(
@@ -119,8 +136,8 @@ export default function ResortMap({
     setPhotoId(null);
     setCollection(null);
     setLevel(null);
-    setTourIndex(0);
-    const id = request.mode === "tour" ? tourStops[0]?.placeId : request.placeId;
+    setTourView("intro");
+    const id = request.mode === "tour" ? undefined : request.placeId;
     if (id) select(id);
     else {
       setSelectedId(null);
@@ -136,15 +153,20 @@ export default function ResortMap({
     setLevel(null);
     setSearchOpen(false);
     setOptions(false);
-    setTourIndex(0);
-    if (next === "tour" && tourStops[0]) select(tourStops[0].placeId);
-    else fit();
+    setTourView("intro");
+    fit();
   };
-  const tourStep = (index: number) => {
-    const stop = tourStops[index];
-    if (!stop) return;
-    setTourIndex(index);
-    select(stop.placeId);
+  const tourStep = (id: string) => {
+    if (!tourStops.some((stop) => stop.placeId === id)) return;
+    setTourProgress((current) => selectTourStop(current, id));
+    setTourView("stop");
+    select(id);
+  };
+  const tourOverview = () => {
+    setTourView("intro");
+    setSelectedId(null);
+    setSelectedStation(null);
+    fit();
   };
   const choosePhoto = (id: string) => {
     if (!allowPlaceClick()) return;
@@ -166,7 +188,7 @@ export default function ResortMap({
   if (mode === "photos") previewKicker = `${copy("photos")} ${photoId ?? ""}`;
   else if (mode === "tour")
     previewKicker = `${copy("tour")} · ${tourIndex + 1}/${tourStops.length}`;
-  const hasPreview = !!selected && !searchOpen;
+  const hasPreview = !!previewPlace && !searchOpen;
   const chooseSearchResult = (destination: Destination) => {
     const placeId = destinationPlace(destination.id, mapLinks, mapPlaces);
     if (!placeId) {
@@ -180,7 +202,7 @@ export default function ResortMap({
   };
 
   return (
-    <div className="hub-atlas" data-detail={hasPreview}>
+    <div className="hub-atlas">
       <header className="atlas-header">
         <button type="button" onClick={onClose} aria-label={copy("close")}>
           <X size={20} strokeWidth={1.4} aria-hidden />
@@ -210,10 +232,17 @@ export default function ResortMap({
               selectedStation={selectedStation}
               activeFilters={filters}
               mode={mode === "tour" ? "tour" : "explore"}
-              activeTourIndex={tourIndex}
+              activeTourIndex={
+                tourIntro || tourView === "closed"
+                  ? -1
+                  : bensleyTour.findIndex((stop) => stop.placeId === tourStop?.placeId)
+              }
+              visitedTourIds={tourProgress.visited}
+              nextTourId={tourView === "stop" ? tourStops[tourIndex + 1]?.placeId : undefined}
               referenceVisible={reference}
               photosVisible={mode === "photos"}
               selectedPhotoId={photoId}
+              previewVisible={hasPreview}
               layers={{
                 trail: mode === "walk",
                 walking: mode === "walk",
@@ -228,8 +257,10 @@ export default function ResortMap({
                 if (allowPlaceClick()) {
                   if (mode === "tour") {
                     const i = tourStops.findIndex((s) => s.placeId === id);
-                    if (i >= 0) setTourIndex(i);
-                    else setMode("explore");
+                    if (i >= 0) {
+                      tourStep(id);
+                      return;
+                    } else setMode("explore");
                   }
                   select(id);
                 }
@@ -298,6 +329,12 @@ export default function ResortMap({
             </button>
           </div>
           {mode === "walk" && !hasPreview && <p className="atlas-context">{copy("walkNote")}</p>}
+          {mode === "tour" && !hasPreview && !searchOpen && tourStops.length > 0 && (
+            <button type="button" className="atlas-photo-guide" onClick={tourOverview}>
+              {tourCopy(lang, "resume")}
+              <ArrowUpRight size={18} aria-hidden />
+            </button>
+          )}
           {mode === "photos" && !hasPreview && !searchOpen && photoGuide && (
             <button
               type="button"
@@ -308,54 +345,64 @@ export default function ResortMap({
               <ArrowUpRight size={18} aria-hidden />
             </button>
           )}
-          {hasPreview && (
+          {hasPreview && previewPlace && (
             <MapPreview
-              key={`${selected.id}:${photoId ?? ""}`}
+              key={`${previewPlace.id}:${photoId ?? ""}:${tourIntro}`}
               anchor={
                 mode === "photos"
-                  ? (photoSpots.find((spot) => spot.id === photoId)?.point ?? selected.point)
-                  : selected.point
+                  ? (photoSpots.find((spot) => spot.id === photoId)?.point ?? previewPlace.point)
+                  : previewPlace.point
               }
               camera={camera}
               title={
-                selected.accommodationGroup
-                  ? copy(selected.accommodationGroup)
-                  : photoDestinationId && related[0]
-                    ? related[0].name
-                    : selected.name
+                tourIntro
+                  ? copy("tour")
+                  : previewPlace.accommodationGroup
+                    ? copy(previewPlace.accommodationGroup)
+                    : photoDestinationId && related[0]
+                      ? related[0].name
+                      : previewPlace.name
               }
-              area={selected.accommodationGroup ? selected : undefined}
+              area={previewPlace.accommodationGroup ? previewPlace : undefined}
               destinations={related}
               onDestination={onDestination}
               onClose={() => {
                 setSelectedId(null);
                 setPhotoId(null);
+                setTourView("closed");
               }}
               kicker={previewKicker}
+              metadata={
+                mode === "tour"
+                  ? tourIntro
+                    ? tourCopy(lang, "selfGuided")
+                    : `${previewKicker} · ${levelLabel(previewPlace.level)}`
+                  : undefined
+              }
             >
-              {mode === "tour" && (
-                <>
-                  <p className="atlas-tour-note">{copy("tourNote")}</p>
-                  <div className="atlas-tour-controls">
-                    <button
-                      type="button"
-                      disabled={tourIndex === 0}
-                      onClick={() => tourStep(tourIndex - 1)}
-                    >
-                      <ChevronLeft size={16} />
-                      {copy("previous")}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={tourIndex === tourStops.length - 1}
-                      onClick={() => tourStep(tourIndex + 1)}
-                    >
-                      {copy("next")}
-                      <ChevronRight size={16} />
-                    </button>
-                  </div>
-                </>
-              )}
+              {mode === "tour" &&
+                (tourIntro ? (
+                  <TourOverview
+                    stops={tourStops}
+                    places={places}
+                    progress={tourProgress}
+                    onSelect={tourStep}
+                  />
+                ) : (
+                  tourStop && (
+                    <TourStopContent
+                      stops={tourStops}
+                      places={places}
+                      progress={tourProgress}
+                      onSelect={tourStep}
+                      stop={tourStop}
+                      destinations={related}
+                      onDestination={onDestination}
+                      onVisit={(id) => setTourProgress((current) => toggleTourVisit(current, id))}
+                      onOverview={tourOverview}
+                    />
+                  )
+                ))}
             </MapPreview>
           )}
           <div className="atlas-bottom">

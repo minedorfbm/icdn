@@ -2,7 +2,7 @@
 
 ## Source unique
 
-`destinations`, ses relations de médias/liens et les tables de traductions du hub restent la source des cards. La carte utilise `useHub` et ouvre le composant `DestinationDetail` existant. Les noms, descriptions, images, niveaux, collections et visibilité ne sont pas copiés depuis le dépôt de carte. Le niveau de la première card associée est prioritaire sur le niveau du repère : Citron reste Heaven ; La Maison 1888 et Tingara restent Sky.
+`destinations`, ses relations de médias/liens et les tables de traductions du hub restent la source des cards. La carte utilise `useHub` et ouvre le composant `DestinationDetail` existant. Les noms, descriptions, images, niveaux, collections et visibilité ne sont pas copiés depuis le dépôt de carte. Le niveau de la première card associée est prioritaire sur le niveau du repère : Citron reste Heaven ; La Maison 1888, Buffalo Bar et The Wine Cellar sont Earth.
 
 `map_places` contient uniquement les repères illustrés : identifiant, nom de repère de secours, niveau de repère, numéro, coordonnées x/y, zoom et publication. Les coordonnées correspondent au plan dessiné (pas à des coordonnées GPS). `map_destination_links` relie un repère à une ou plusieurs destinations existantes. `display_order` sélectionne la card principale et ordonne les autres ; `is_primary` choisit la position ouverte depuis une card possédant plusieurs repères, comme Mi Sol Spa.
 
@@ -46,3 +46,13 @@ La carte fournie décrit des plages de numéros, pas la répartition exacte des 
 `accommodation_group`, `covered_levels` et `room_numbers` complètent `map_places`. Les zones conservent leur titre et leurs niveaux géographiques ; le premier hébergement lié ne remplace pas le nom de la zone. Un filtre Hébergements et une icône de lit permettent de les repérer. Toutes les cards associées sont proposées, avec une liste défilante sur mobile. Les chambres/suites couvrent Heaven, Sky et Earth ; les penthouses Heaven et Sky ; les villas quatre chambres Earth ; les villas côtières et du lagon Sea. Cela ne modifie pas le niveau éditorial des cards d’accueil.
 
 La préparation `20261013160000_accommodation_map_areas.sql` a été appliquée le 13 octobre 2026 : les colonnes existent et les cinq zones ainsi que les quinze liens sont **inactifs**. Le contrôle public confirme que les repères et associations précédents sont préservés. Les repères existants restent publiés. Après fusion et déploiement du code, exécuter `docs/activate-accommodation-map-areas.sql` puis vérifier les quinze actions View on map et la recherche. Cette séparation empêche l’ancienne interface d’afficher les zones comme des bâtiments précis. [Le relevé des zones](accommodation-map-areas.json) conserve les coordonnées du plan original et celles du dessin du hub.
+
+## Parcours Bensley raconté — 18 octobre 2026
+
+Le parcours reprend les douze arrêts du [tour officiel](https://www.danang.intercontinental.com/bensley-digital-design-tour/), avec des textes originaux concis traduits dans les six langues. Les fiches réutilisent la bulle photo `MapPreview` ; le texte du parcours remplace la description générique, sans second modèle de fiche. Les détails et les cards du lieu restent accessibles dans des sections dépliables.
+
+La progression est facultative et locale (`icdn.bensley-tour.v1`) : sélectionner un arrêt ne le marque jamais comme découvert. Le visiteur le fait explicitement et peut annuler ce choix. Fermer la carte ou revenir d'une card conserve sa progression. Les données sauvegardées sont validées, les arrêts masqués sont exclus du parcours affiché, et un stockage indisponible n'empêche pas la visite. Aucun compte ni envoi au serveur.
+
+Le Nam Tram mène à Sky pour Heritage Village, puis à Earth pour La Maison. Les coordonnées et le tracé illustratif sont conservés. Les trois cards de La Maison et leur repère sont corrigés vers Earth par `20261018120000_la_maison_building_earth_level.sql`. Le [programme officiel La Maison](https://www.danang.intercontinental.com/festival-signatures-at-la-maison-1888/) confirme ce niveau. Le service temporaire à Heaven reste une information indépendante dans les notices existantes : il ne déplace pas le bâtiment ni ses autres lieux.
+
+Sources complémentaires : [Citron](https://www.danang.intercontinental.com/dining/citron/), [Outsider Gallery](https://www.danang.intercontinental.com/amenities/bensley-outsider-gallery/), [L_O_N_G Bar](https://www.danang.intercontinental.com/dining/the-l_o_n_g-bar/), [Mi Sol Spa](https://www.danang.intercontinental.com/spas/mi-sol-spa/).

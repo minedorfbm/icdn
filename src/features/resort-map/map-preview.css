@@ -166,13 +166,6 @@
   text-align: left;
   overflow-wrap: anywhere;
 }
-.hub-atlas .atlas-preview .atlas-tour-note {
-  color: #f0e5ca;
-}
-.hub-atlas .atlas-preview .atlas-tour-controls button {
-  color: var(--preview-paper);
-  border-color: #fffefa66;
-}
 .hub-atlas .atlas-preview button:focus-visible {
   outline-color: #dec99c;
 }

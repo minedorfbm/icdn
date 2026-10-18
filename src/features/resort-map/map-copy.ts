@@ -201,14 +201,6 @@ const copy = {
     "Discovery Trail · 4 km. 표시 시간은 Nam Tram까지의 예상 도보 시간입니다.",
     "Discovery Trail・4 km。所要時間はNam Tramまでの徒歩の目安です。",
   ],
-  tourNote: [
-    "Design tour · a sequence of stops, not walking directions",
-    "Tour thiết kế · thứ tự điểm tham quan, không phải chỉ dẫn đường đi",
-    "Дизайн-тур · порядок остановок, не пешеходный маршрут",
-    "设计导览 · 参观点顺序，并非步行导航",
-    "디자인 투어 · 방문 순서이며 길 안내가 아닙니다",
-    "デザインツアー・訪問順序であり、道案内ではありません",
-  ],
   previous: [
     "Previous stop",
     "Điểm trước",

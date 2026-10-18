@@ -83,14 +83,7 @@ describe("Supabase map associations", () => {
   });
   test("all six hub languages have map navigation labels", () => {
     for (const { code } of LANGUAGES)
-      for (const key of [
-        "open",
-        "locate",
-        "discover",
-        "unavailable",
-        "walkNote",
-        "tourNote",
-      ] as const)
+      for (const key of ["open", "locate", "discover", "unavailable", "walkNote"] as const)
         expect(mapCopy(code, key).length).toBeGreaterThan(0);
   });
 });

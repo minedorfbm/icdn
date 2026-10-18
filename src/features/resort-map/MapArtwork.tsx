@@ -57,9 +57,12 @@ type MapArtworkProps = {
   activeFilters: Set<PlaceCategory>;
   mode: "explore" | "tour";
   activeTourIndex: number;
+  visitedTourIds: readonly string[];
+  nextTourId: string | undefined;
   referenceVisible: boolean;
   photosVisible: boolean;
   selectedPhotoId: string | null;
+  previewVisible: boolean;
   layers: LegendLayers;
   onSelectPhoto: (id: string) => void;
   onViewportChange: (viewport: MapViewport) => void;
@@ -79,9 +82,12 @@ export function MapArtwork({
   activeFilters,
   mode,
   activeTourIndex,
+  visitedTourIds,
+  nextTourId,
   referenceVisible,
   photosVisible,
   selectedPhotoId,
+  previewVisible,
   layers,
   onSelectPhoto,
   onViewportChange,
@@ -143,7 +149,7 @@ export function MapArtwork({
       ?.querySelectorAll(".atlas-bottom, .atlas-preview")
       .forEach((element) => observer.observe(element));
     return () => observer.disconnect();
-  }, [onViewportChange, selectedId, mode, selectedPhotoId, lang]);
+  }, [onViewportChange, selectedId, mode, selectedPhotoId, lang, previewVisible]);
 
   const hotspotsRef = useRef<SVGGElement>(null);
   const interactivePlaces = useMemo(
@@ -581,25 +587,9 @@ export function MapArtwork({
             <path
               key={segment.d}
               d={segment.d}
-              className={`${segment.type} ${index < activeTourIndex ? "is-complete" : ""} ${index === activeTourIndex ? "is-current" : ""}`}
+              className={`${segment.type} ${[bensleyTour[index], bensleyTour[index + 1]].every((stop) => stop && visitedTourIds.includes(stop.placeId)) ? "is-complete" : ""} ${index === activeTourIndex ? "is-current" : ""}`}
             />
           ))}
-          {bensleyTour.map((stop, index) => {
-            const place = places.find((candidate) => candidate.id === stop.placeId);
-            if (!place) return null;
-            return (
-              <g
-                key={stop.placeId}
-                className={`tour-marker-v2 ${index === activeTourIndex ? "is-current" : ""} ${index < activeTourIndex ? "is-complete" : ""}`}
-                transform={`translate(${place.point.x} ${place.point.y}) scale(${pixelScale / camera.scale})`}
-              >
-                <circle r="14" />
-                <text textAnchor="middle" y="3.5">
-                  {String(stop.order).padStart(2, "0")}
-                </text>
-              </g>
-            );
-          })}
         </g>
 
         <g
@@ -612,6 +602,11 @@ export function MapArtwork({
             .sort((a, b) => Number(a.id === selectedId) - Number(b.id === selectedId))
             .map((place) => {
               const dimmed = !interactivePlaces.includes(place);
+              const tourStop =
+                mode === "tour" ? bensleyTour.find((stop) => stop.placeId === place.id) : undefined;
+              const tourClass = tourStop
+                ? `is-tour ${visitedTourIds.includes(place.id) ? "is-visited" : ""} ${place.id === nextTourId ? "is-next" : ""}`
+                : "";
               const Icon = collectionIcons[place.categories[0] ?? "beach"];
               const labelName = place.accommodationGroup
                 ? mapCopy(lang, place.accommodationGroup)
@@ -621,7 +616,7 @@ export function MapArtwork({
                 // SVG groups cannot be HTML buttons; keyboard behavior mirrors one.
                 <g
                   key={place.id}
-                  className={`hotspot-v2 ${place.id === selectedId ? "is-selected" : ""} ${dimmed ? "is-dimmed" : ""}`}
+                  className={`hotspot-v2 ${tourClass} ${place.id === selectedId ? "is-selected" : ""} ${dimmed ? "is-dimmed" : ""}`}
                   transform={`translate(${place.point.x} ${place.point.y})`}
                   role="button"
                   tabIndex={photosVisible || dimmed ? -1 : 0}
@@ -639,31 +634,44 @@ export function MapArtwork({
                   }}
                 >
                   <g transform={`scale(${pixelScale / camera.scale})`}>
-                    {labelIds.has(place.id) && !dimmed && (
-                      <g className="hotspot-name" aria-hidden="true">
-                        <rect x={-labelWidth / 2} y={23} width={labelWidth} height={26} rx={13} />
-                        <text x={0} y={40} textAnchor="middle">
-                          {(() => {
-                            const name = place.accommodationGroup
-                              ? mapCopy(lang, place.accommodationGroup)
-                              : place.name;
-                            return name.length > 25 ? `${name.slice(0, 24)}…` : name;
-                          })()}
-                        </text>
-                      </g>
-                    )}
+                    {labelIds.has(place.id) &&
+                      !dimmed &&
+                      (mode !== "tour" || place.id === selectedId || place.id === nextTourId) && (
+                        <g className="hotspot-name" aria-hidden="true">
+                          <rect x={-labelWidth / 2} y={23} width={labelWidth} height={26} rx={13} />
+                          <text x={0} y={40} textAnchor="middle">
+                            {(() => {
+                              const name = place.accommodationGroup
+                                ? mapCopy(lang, place.accommodationGroup)
+                                : place.name;
+                              return name.length > 25 ? `${name.slice(0, 24)}…` : name;
+                            })()}
+                          </text>
+                        </g>
+                      )}
                     <circle className="hotspot-hit" r="22" />
                     <circle className="hotspot-pulse" r="15" />
                     <circle className="hotspot-medallion" r="12" />
-                    <Icon
-                      className="hotspot-icon"
-                      x={-7}
-                      y={-7}
-                      width={14}
-                      height={14}
-                      strokeWidth={1.6}
-                      aria-hidden="true"
-                    />
+                    {tourStop ? (
+                      <text
+                        className="hotspot-tour-number"
+                        textAnchor="middle"
+                        y={4}
+                        aria-hidden="true"
+                      >
+                        {tourStop.order}
+                      </text>
+                    ) : (
+                      <Icon
+                        className="hotspot-icon"
+                        x={-7}
+                        y={-7}
+                        width={14}
+                        height={14}
+                        strokeWidth={1.6}
+                        aria-hidden="true"
+                      />
+                    )}
                   </g>
                 </g>
               );
