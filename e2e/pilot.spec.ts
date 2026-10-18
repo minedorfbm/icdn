@@ -19,11 +19,12 @@ test.beforeEach(async ({ page }) => {
 
 for (const [id, level, color] of [
   ["pilot-citron", "heaven", "rgb(250, 248, 241)"],
-  ["la-maison-1888", "sky", "oklch(0.235 0.065 244)"],
+  ["pilot-sky", "sky", "oklch(0.235 0.065 244)"],
+  ["la-maison-1888", "earth", "rgb(25, 78, 71)"],
   ["long-bar", "earth", "rgb(25, 78, 71)"],
   ["mi-sol-spa", "sea", "rgb(200, 230, 239)"],
 ] as const) {
-  test(`${level} card keeps its palette, compact collection and floating tools at mobile widths`, async ({
+  test(`${id} ${level} card keeps its palette, compact collection and floating tools at mobile widths`, async ({
     page,
   }, testInfo) => {
     await page.goto(`/${id}`);

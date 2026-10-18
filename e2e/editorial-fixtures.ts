@@ -4,6 +4,7 @@ const editorialDestinations = [
   ["la-maison-1888", "La Maison 1888", "earth", "restaurant", "d-french-dining"],
   ["long-bar", "L_O_N_G Bar", "earth", "bar", "d-bar"],
   ["mi-sol-spa", "Mi Sol Spa & Wellness", "sea", "spa", "d-spa"],
+  ["pilot-sky", "Sky dining preview", "sky", "restaurant", "d-french-dining"],
 ].map(([id, name, level_id, type, image_key], index) => ({
   id,
   name,
