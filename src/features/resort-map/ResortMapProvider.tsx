@@ -22,15 +22,15 @@ class MapBoundary extends Component<
 
 export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }>) {
   const { mapPlaces, mapLinks } = useHub();
-  const { openDestination, closeDestination, isDestination } = useDestinationNavigation();
+  const { openDestination, closeToHub, isDestination } = useDestinationNavigation();
   const { lang, t } = useI18n();
   const [request, setRequest] = useState<(MapRequest & { revision: number }) | null>(null);
   const openMap = useCallback(
     (next: MapRequest = {}) => {
-      if (isDestination) closeDestination();
+      if (isDestination) closeToHub();
       setRequest((prev) => ({ ...next, revision: (prev?.revision ?? 0) + 1 }));
     },
-    [isDestination, closeDestination],
+    [isDestination, closeToHub],
   );
   const value = useMemo(
     () => ({ openMap, locate: (id: string) => destinationPlace(id, mapLinks, mapPlaces) }),

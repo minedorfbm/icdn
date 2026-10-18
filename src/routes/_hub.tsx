@@ -1,6 +1,7 @@
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 import { HubHero } from "@/components/hub/HubHero";
 import { HubSearch } from "@/features/search/HubSearch";
+import { HubSearchProvider } from "@/features/search/HubSearchProvider";
 import { DiscoveryPaths } from "@/features/discovery/DiscoveryPaths";
 import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
 import { useResortMap } from "@/features/resort-map/map-context";
@@ -105,12 +106,14 @@ function HubRoute() {
         )}
         {data ? (
           <HubProvider data={{ ...data, settings }}>
-            <ResortBrowserProvider>
-              <ResortMapProvider>
-                {showHub && <Hub />}
-                <Outlet />
-              </ResortMapProvider>
-            </ResortBrowserProvider>
+            <HubSearchProvider>
+              <ResortBrowserProvider>
+                <ResortMapProvider>
+                  {showHub && <Hub />}
+                  <Outlet />
+                </ResortMapProvider>
+              </ResortBrowserProvider>
+            </HubSearchProvider>
           </HubProvider>
         ) : (
           <CatalogueStatus failed={result.failed} onRetry={() => setAttempt((n) => n + 1)} />

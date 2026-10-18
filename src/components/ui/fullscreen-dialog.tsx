@@ -7,6 +7,7 @@ export function FullscreenDialog({
   className,
   overlayClassName = "fixed inset-0 z-[79] bg-black/30",
   portalled = true,
+  onOpenAutoFocus,
   children,
   ...props
 }: Readonly<{
@@ -15,6 +16,7 @@ export function FullscreenDialog({
   className: string;
   overlayClassName?: string;
   portalled?: boolean;
+  onOpenAutoFocus?: React.ComponentProps<typeof Dialog.Content>["onOpenAutoFocus"];
   children: ReactNode;
   "data-level"?: string;
 }>) {
@@ -24,6 +26,7 @@ export function FullscreenDialog({
       <Dialog.Overlay className={overlayClassName} />
       <Dialog.Content
         {...props}
+        onOpenAutoFocus={onOpenAutoFocus}
         aria-label={title}
         aria-labelledby={undefined}
         aria-describedby={undefined}
