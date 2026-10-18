@@ -38,17 +38,17 @@ export const Route = createFileRoute("/_hub")({
       ? [{ rel: "preload", as: "image", href: resolveHeroImage(loaderData), fetchPriority: "high" }]
       : [],
     meta: [
-      { title: "InterContinental Danang — Digital Hub | Heaven to Sea" },
+      { title: "InterContinental Danang — Digital Discovery | Heaven to Sea" },
       {
         name: "description",
         content:
-          "Descend through InterContinental Danang Sun Peninsula Resort — Heaven, Sky, Earth and Sea. Dining, spa, beaches and experiences in one immersive mobile journey.",
+          "Digital Discovery: descend through InterContinental Danang Sun Peninsula Resort — Heaven, Sky, Earth and Sea. Dining, spa, beaches and experiences in one immersive mobile journey.",
       },
-      { property: "og:title", content: "InterContinental Danang — Digital Hub" },
+      { property: "og:title", content: "InterContinental Danang — Digital Discovery" },
       {
         property: "og:description",
         content:
-          "A digital descent through the resort: Heaven, Sky, Earth, Sea. By Art Digital Journey.",
+          "Digital Discovery through the resort: Heaven, Sky, Earth, Sea. By Art Digital Journey.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
