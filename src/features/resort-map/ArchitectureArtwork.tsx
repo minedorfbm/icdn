@@ -1,4 +1,3 @@
-import { bensleyTour } from "./map.data";
 import { memo, useMemo, type ReactNode } from "react";
 import {
   accommodationSites,
@@ -15,7 +14,6 @@ type ArchitectureArtworkProps = {
   cameraScale: number;
   selectedId: string | null;
   activeFilters: Set<PlaceCategory>;
-  mode: "explore" | "tour";
 };
 
 type BuildingEntry = {
@@ -665,7 +663,6 @@ export const ArchitectureArtwork = memo(function ArchitectureArtwork({
   cameraScale,
   selectedId,
   activeFilters,
-  mode,
 }: Readonly<ArchitectureArtworkProps>) {
   const placeById = useMemo(() => new Map(places.map((p) => [p.id, p])), [places]);
   let detailClass = "";
@@ -684,8 +681,7 @@ export const ArchitectureArtwork = memo(function ArchitectureArtwork({
           const matchesFilter =
             activeFilters.size === 0 ||
             place.categories.some((category) => activeFilters.has(category));
-          const dimmed =
-            !matchesFilter || (mode === "tour" && !bensleyTour.some((s) => s.placeId === place.id));
+          const dimmed = !matchesFilter;
           const selected = selectedId === id;
           return (
             <g

@@ -10,7 +10,6 @@ import {
   Utensils,
 } from "lucide-react";
 import { ArchitectureArtwork } from "./ArchitectureArtwork";
-import { bensleyTour } from "./map.data";
 import { useI18n } from "@/i18n";
 import { mapCopy } from "./map-copy";
 import { ResortLevelIcon } from "@/components/hub/ResortLevelIcon";
@@ -27,7 +26,6 @@ import {
   levelRoads,
   palms,
   stations,
-  tourSegments,
   trace,
   trailEast,
   trailInterior,
@@ -55,10 +53,6 @@ type MapArtworkProps = {
   selectedId: string | null;
   selectedStation: string | null;
   activeFilters: Set<PlaceCategory>;
-  mode: "explore" | "tour";
-  activeTourIndex: number;
-  visitedTourIds: readonly string[];
-  nextTourId: string | undefined;
   referenceVisible: boolean;
   photosVisible: boolean;
   selectedPhotoId: string | null;
@@ -80,10 +74,6 @@ export function MapArtwork({
   selectedId,
   selectedStation,
   activeFilters,
-  mode,
-  activeTourIndex,
-  visitedTourIds,
-  nextTourId,
   referenceVisible,
   photosVisible,
   selectedPhotoId,
@@ -149,7 +139,7 @@ export function MapArtwork({
       ?.querySelectorAll(".atlas-bottom, .atlas-preview")
       .forEach((element) => observer.observe(element));
     return () => observer.disconnect();
-  }, [onViewportChange, selectedId, mode, selectedPhotoId, lang, previewVisible]);
+  }, [onViewportChange, selectedId, selectedPhotoId, lang, previewVisible]);
 
   const hotspotsRef = useRef<SVGGElement>(null);
   const interactivePlaces = useMemo(
@@ -158,10 +148,9 @@ export function MapArtwork({
         (place) =>
           visibleIds.has(place.id) &&
           (activeFilters.size === 0 ||
-            place.categories.some((category) => activeFilters.has(category))) &&
-          (mode !== "tour" || bensleyTour.some((stop) => stop.placeId === place.id)),
+            place.categories.some((category) => activeFilters.has(category))),
       ),
-    [places, visibleIds, activeFilters, mode],
+    [places, visibleIds, activeFilters],
   );
   const screenScale = camera.scale / pixelScale;
   const photoOffsets = useMemo(() => layoutPhotoSpots(photoSpots, screenScale), [screenScale]);
@@ -261,10 +250,7 @@ export function MapArtwork({
     onSelectStation(nearest.label);
   };
 
-  const tramCar = useMemo(() => {
-    const index = mode !== "tour" || activeTourIndex <= 2 ? 0 : Math.min(3, activeTourIndex - 2);
-    return { ...stations[index], r: -72 };
-  }, [activeTourIndex, mode]);
+  const tramCar = { ...stations[0], r: -72 };
 
   return (
     <svg
@@ -472,7 +458,6 @@ export function MapArtwork({
               null
             }
             activeFilters={activeFilters}
-            mode={mode}
           />
 
           <g className="palm-grove-v2" fill="none" aria-hidden="true">
@@ -582,16 +567,6 @@ export function MapArtwork({
           </g>
         </g>
 
-        <g className={`bensley-route-v2 ${mode === "tour" ? "is-visible" : ""}`} aria-hidden="true">
-          {tourSegments.map((segment, index) => (
-            <path
-              key={segment.d}
-              d={segment.d}
-              className={`${segment.type} ${[bensleyTour[index], bensleyTour[index + 1]].every((stop) => stop && visitedTourIds.includes(stop.placeId)) ? "is-complete" : ""} ${index === activeTourIndex ? "is-current" : ""}`}
-            />
-          ))}
-        </g>
-
         <g
           ref={hotspotsRef}
           className="hotspots-v2"
@@ -602,15 +577,6 @@ export function MapArtwork({
             .sort((a, b) => Number(a.id === selectedId) - Number(b.id === selectedId))
             .map((place) => {
               const dimmed = !interactivePlaces.includes(place);
-              const tourStop =
-                mode === "tour" ? bensleyTour.find((stop) => stop.placeId === place.id) : undefined;
-              const tourClass = [
-                tourStop && "is-tour",
-                tourStop && visitedTourIds.includes(place.id) && "is-visited",
-                tourStop && place.id === nextTourId && "is-next",
-              ]
-                .filter(Boolean)
-                .join(" ");
               const Icon = collectionIcons[place.categories[0] ?? "beach"];
               const labelName = place.accommodationGroup
                 ? mapCopy(lang, place.accommodationGroup)
@@ -620,7 +586,7 @@ export function MapArtwork({
                 // SVG groups cannot be HTML buttons; keyboard behavior mirrors one.
                 <g
                   key={place.id}
-                  className={`hotspot-v2 ${tourClass} ${place.id === selectedId ? "is-selected" : ""} ${dimmed ? "is-dimmed" : ""}`}
+                  className={`hotspot-v2 ${place.id === selectedId ? "is-selected" : ""} ${dimmed ? "is-dimmed" : ""}`}
                   transform={`translate(${place.point.x} ${place.point.y})`}
                   role="button"
                   tabIndex={photosVisible || dimmed ? -1 : 0}
@@ -638,44 +604,31 @@ export function MapArtwork({
                   }}
                 >
                   <g transform={`scale(${pixelScale / camera.scale})`}>
-                    {labelIds.has(place.id) &&
-                      !dimmed &&
-                      (mode !== "tour" || place.id === selectedId || place.id === nextTourId) && (
-                        <g className="hotspot-name" aria-hidden="true">
-                          <rect x={-labelWidth / 2} y={23} width={labelWidth} height={26} rx={13} />
-                          <text x={0} y={40} textAnchor="middle">
-                            {(() => {
-                              const name = place.accommodationGroup
-                                ? mapCopy(lang, place.accommodationGroup)
-                                : place.name;
-                              return name.length > 25 ? `${name.slice(0, 24)}…` : name;
-                            })()}
-                          </text>
-                        </g>
-                      )}
+                    {labelIds.has(place.id) && !dimmed && (
+                      <g className="hotspot-name" aria-hidden="true">
+                        <rect x={-labelWidth / 2} y={23} width={labelWidth} height={26} rx={13} />
+                        <text x={0} y={40} textAnchor="middle">
+                          {(() => {
+                            const name = place.accommodationGroup
+                              ? mapCopy(lang, place.accommodationGroup)
+                              : place.name;
+                            return name.length > 25 ? `${name.slice(0, 24)}…` : name;
+                          })()}
+                        </text>
+                      </g>
+                    )}
                     <circle className="hotspot-hit" r="22" />
                     <circle className="hotspot-pulse" r="15" />
                     <circle className="hotspot-medallion" r="12" />
-                    {tourStop ? (
-                      <text
-                        className="hotspot-tour-number"
-                        textAnchor="middle"
-                        y={4}
-                        aria-hidden="true"
-                      >
-                        {tourStop.order}
-                      </text>
-                    ) : (
-                      <Icon
-                        className="hotspot-icon"
-                        x={-7}
-                        y={-7}
-                        width={14}
-                        height={14}
-                        strokeWidth={1.6}
-                        aria-hidden="true"
-                      />
-                    )}
+                    <Icon
+                      className="hotspot-icon"
+                      x={-7}
+                      y={-7}
+                      width={14}
+                      height={14}
+                      strokeWidth={1.6}
+                      aria-hidden="true"
+                    />
                   </g>
                 </g>
               );

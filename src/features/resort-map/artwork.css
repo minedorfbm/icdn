@@ -716,38 +716,6 @@
   stroke: #5b4822;
   stroke-width: 1.2;
 }
-.hub-atlas .bensley-route-v2 {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.45s ease;
-}
-.hub-atlas .bensley-route-v2.is-visible {
-  opacity: 1;
-}
-.hub-atlas .bensley-route-v2 > path {
-  fill: none;
-  stroke-linecap: round;
-  stroke-width: 5;
-  stroke: rgba(239, 227, 200, 0.15);
-  stroke-dasharray: 2 10;
-  transition: 0.5s ease;
-}
-.hub-atlas .bensley-route-v2 > path.tram {
-  stroke: rgba(198, 162, 92, 0.28);
-}
-.hub-atlas .bensley-route-v2 > path.is-complete {
-  stroke: #c6a25c;
-  stroke-opacity: 0.9;
-  stroke-dasharray: none;
-}
-.hub-atlas .bensley-route-v2 > path.is-current {
-  stroke: #f0d796;
-  stroke-width: 7;
-  stroke-opacity: 1;
-  filter: url(#gold-glow-v2);
-  stroke-dasharray: 120 420;
-  animation: draw-route 1.25s ease-out both;
-}
 .hub-atlas .level-cartouches path {
   stroke: rgba(216, 195, 150, 0.3);
   stroke-width: 1;
@@ -922,29 +890,4 @@
 .hub-atlas .hotspot-v2.is-selected .hotspot-name text {
   fill: #061920;
   font-weight: 600;
-}
-
-.hub-atlas .hotspot-tour-number {
-  fill: #f1e4c5;
-  font:
-    500 12px/1 var(--font-jost),
-    sans-serif;
-  pointer-events: none;
-}
-.hub-atlas .hotspot-v2.is-tour {
-  opacity: 0.55;
-}
-.hub-atlas .hotspot-v2.is-tour.is-next,
-.hub-atlas .hotspot-v2.is-tour.is-selected {
-  opacity: 1;
-}
-.hub-atlas .hotspot-v2.is-tour.is-next .hotspot-medallion {
-  stroke: #f2d489;
-  stroke-width: 2;
-}
-.hub-atlas .hotspot-v2.is-tour.is-visited .hotspot-medallion {
-  stroke: #b6d6a9;
-}
-.hub-atlas .hotspot-v2.is-selected .hotspot-tour-number {
-  fill: #06171c;
 }

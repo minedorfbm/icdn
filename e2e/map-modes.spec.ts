@@ -3,6 +3,10 @@ import { expect, test } from "./fixtures";
 test("map modes, level filters and official plan remain usable without losing the map", async ({
   page,
 }) => {
+  await page.route(
+    "https://www.danang.intercontinental.com/bensley-digital-design-tour/",
+    (route) => route.fulfill({ contentType: "text/html", body: "<h1>Official tour</h1>" }),
+  );
   await page.goto("/");
   await page.getByRole("button", { name: /Explore the resort map/ }).click();
   const map = page.getByRole("dialog", { name: "Resort map" });
@@ -36,14 +40,9 @@ test("map modes, level filters and official plan remain usable without losing th
     .click();
   await expect(map.locator(".atlas-preview")).toContainText("Citron");
   await map.getByRole("button", { name: "Bensley Tour", exact: true }).click();
+  await map.getByRole("button", { name: "Back to map", exact: true }).click();
   const preview = map.locator(".atlas-preview");
-  await preview.getByRole("button", { name: "Start at Reception", exact: true }).click();
-  await expect(preview.getByRole("button", { name: "Previous stop", exact: true })).toBeDisabled();
-  const firstTitle = await preview.locator("h3").textContent();
-  await preview.locator(".atlas-tour-next").click();
-  await expect(preview.locator("h3")).not.toHaveText(firstTitle!);
-  await preview.getByRole("button", { name: "Previous stop", exact: true }).click();
-  await expect(preview.locator("h3")).toHaveText(firstTitle!);
+  await expect(preview).toContainText("Citron");
   await map.getByRole("button", { name: "Explore", exact: true }).click();
   await expect(preview).toHaveCount(0);
   await expect(map.locator(".atlas-collections")).toBeVisible();
