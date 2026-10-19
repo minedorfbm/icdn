@@ -9,7 +9,6 @@ html[data-journey-snap="true"] {
   --journey-bottom: max(24px, env(safe-area-inset-bottom, 0px));
   padding-block: var(--journey-top) var(--journey-bottom);
   scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 .journey-content {
@@ -17,6 +16,7 @@ html[data-journey-snap="true"] {
   flex-direction: column;
   gap: var(--journey-gap);
   height: calc(100svh - var(--journey-top) - var(--journey-bottom));
+  height: calc(100dvh - var(--journey-top) - var(--journey-bottom));
   /* Short landscape screens and enlarged text can still scroll naturally. */
   min-height: 420px;
 }
@@ -111,14 +111,15 @@ html[data-journey-snap="true"] {
   pointer-events: none;
 }
 
-/* Preserve the tall reference silhouette when browser bars reduce usable height. */
+/* Card gestures continue into the page instead of trapping the descent. */
+.journey-stack .destination-panel-content {
+  overscroll-behavior-y: auto;
+}
+
+/* Tighten card content spacing on short mobile viewports. */
 @media (max-width: 639px) {
   .journey-stack .card-stack-stage {
     container-type: size;
-  }
-  .journey-stack .perspective-card {
-    width: min(75%, 50cqh);
-    margin-left: calc((75% - min(75%, 50cqh)) / 2);
   }
   .journey-stack .destination-panel-content {
     gap: clamp(10px, 3cqh, 24px);
