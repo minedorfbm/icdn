@@ -133,3 +133,49 @@ test.describe("native scroll settling", () => {
     await page.screenshot({ path: testInfo.outputPath("heaven-desktop.png") });
   });
 });
+
+for (const height of [665, 844]) {
+  test(`browser bars leave room for a readable tagline and the complete card at ${height}px`, async ({
+    page,
+  }, testInfo) => {
+    // The supplied iPhone screenshot is 393 CSS px wide with about 665 px left for the page.
+    await page.setViewportSize({ width: 393, height });
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveAttribute("data-journey-snap", "true");
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    const chapter = page.locator("#heaven");
+    await chapter.evaluate((el) => el.scrollIntoView({ block: "start", behavior: "instant" }));
+    await expect
+      .poll(() => chapter.evaluate((el) => Math.abs(el.getBoundingClientRect().top)))
+      .toBeLessThan(2);
+    await expect
+      .poll(() =>
+        chapter
+          .locator(".journey-card-group")
+          .evaluate((el) => new DOMMatrixReadOnly(getComputedStyle(el).transform).isIdentity),
+      )
+      .toBe(true);
+    const layout = await chapter.evaluate((el) => {
+      const title = el.querySelector(".journey-header")!.getBoundingClientRect();
+      const card = el.querySelector('article[aria-hidden="false"]')!.getBoundingClientRect();
+      const pagination = el.querySelector(".journey-pagination")!.getBoundingClientRect();
+      const tagline = el.querySelector(".journey-line")!;
+      return {
+        titleTop: title.top,
+        cardTop: card.top,
+        cardHeight: card.height,
+        cardWidth: card.width,
+        cardBottom: card.bottom,
+        paginationBottom: pagination.bottom,
+        font: Number.parseFloat(getComputedStyle(tagline).fontSize),
+      };
+    });
+    expect(layout.titleTop).toBeGreaterThanOrEqual(60);
+    expect(layout.font).toBeGreaterThanOrEqual(14);
+    expect(layout.cardHeight).toBeGreaterThan(height * 0.64);
+    expect(layout.cardHeight / layout.cardWidth).toBeGreaterThanOrEqual(1.98);
+    expect(layout.paginationBottom).toBeLessThanOrEqual(height - 20);
+    if (height === 665) expect(layout.cardTop).toBeLessThanOrEqual(172);
+    await page.screenshot({ path: testInfo.outputPath(`heaven-${height}px.png`) });
+  });
+}

@@ -4,7 +4,8 @@ html[data-journey-snap="true"] {
 }
 
 .journey-level {
-  --journey-top: max(76px, calc(env(safe-area-inset-top, 0px) + 64px));
+  --journey-top: max(clamp(64px, 9svh, 76px), calc(env(safe-area-inset-top, 0px) + 60px));
+  --journey-gap: clamp(4px, calc(4svh - 24px), 10px);
   --journey-bottom: max(24px, env(safe-area-inset-bottom, 0px));
   padding-block: var(--journey-top) var(--journey-bottom);
   scroll-snap-align: start;
@@ -14,7 +15,7 @@ html[data-journey-snap="true"] {
 .journey-content {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--journey-gap);
   height: calc(100svh - var(--journey-top) - var(--journey-bottom));
   /* Short landscape screens and enlarged text can still scroll naturally. */
   min-height: 420px;
@@ -28,7 +29,7 @@ html[data-journey-snap="true"] {
   width: 100%;
   max-width: 740px;
   margin-inline: auto;
-  padding: 0 24px 8px;
+  padding: 0 24px clamp(0px, calc(5.6svh - 39px), 8px);
   flex-shrink: 0;
 }
 
@@ -57,11 +58,11 @@ html[data-journey-snap="true"] {
 }
 
 .journey-line {
-  font-size: clamp(10px, 2.5vw, 13px);
+  font-size: clamp(14px, 3.5vw, 16px);
   line-height: 1.4;
   text-align: right;
   white-space: nowrap;
-  opacity: 0.75;
+  opacity: 0.85;
 }
 
 .journey-collections {
@@ -110,13 +111,28 @@ html[data-journey-snap="true"] {
   pointer-events: none;
 }
 
+/* Preserve the tall reference silhouette when browser bars reduce usable height. */
+@media (max-width: 639px) {
+  .journey-stack .card-stack-stage {
+    container-type: size;
+  }
+  .journey-stack .perspective-card {
+    width: min(75%, 50cqh);
+    margin-left: calc((75% - min(75%, 50cqh)) / 2);
+  }
+  .journey-stack .destination-panel-content {
+    gap: clamp(10px, 3cqh, 24px);
+    padding-block: clamp(12px, 3cqh, 20px);
+  }
+}
+
 @media (max-width: 360px) {
   .journey-header {
     padding-inline: 16px;
     gap: 8px;
   }
   .journey-level-trigger {
-    font-size: 30px;
+    font-size: 28px;
   }
 }
 
