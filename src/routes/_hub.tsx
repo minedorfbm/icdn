@@ -150,16 +150,6 @@ function Hub() {
   const { levels, links } = useHub();
   const { active, visible } = useJourneyMotion(hubRef, levels);
   const { lang, t, linkLabel } = useI18n();
-  const pathname = useLocation({ select: (location) => location.pathname });
-
-  useEffect(() => {
-    if (pathname !== "/") return;
-    document.documentElement.dataset["journeySnap"] = "true";
-    return () => {
-      delete document.documentElement.dataset["journeySnap"];
-    };
-  }, [pathname]);
-
   const scrollTo = scrollToHubSection;
 
   return (

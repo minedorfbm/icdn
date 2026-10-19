@@ -1,14 +1,10 @@
-/* The viewport is shared by the heading, collections and the existing perspective deck. */
-html[data-journey-snap="true"] {
-  scroll-snap-type: y proximity;
-}
+/* Use the stable small viewport: browser toolbar motion must not resize the deck. */
 
 .journey-level {
   --journey-top: max(clamp(64px, 9svh, 76px), calc(env(safe-area-inset-top, 0px) + 60px));
   --journey-gap: clamp(4px, calc(4svh - 24px), 10px);
   --journey-bottom: max(24px, env(safe-area-inset-bottom, 0px));
   padding-block: var(--journey-top) var(--journey-bottom);
-  scroll-snap-align: start;
 }
 
 .journey-content {
@@ -16,7 +12,6 @@ html[data-journey-snap="true"] {
   flex-direction: column;
   gap: var(--journey-gap);
   height: calc(100svh - var(--journey-top) - var(--journey-bottom));
-  height: calc(100dvh - var(--journey-top) - var(--journey-bottom));
   /* Short landscape screens and enlarged text can still scroll naturally. */
   min-height: 420px;
 }
@@ -134,11 +129,5 @@ html[data-journey-snap="true"] {
   }
   .journey-level-trigger {
     font-size: 28px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html[data-journey-snap="true"] {
-    scroll-snap-type: none;
   }
 }
