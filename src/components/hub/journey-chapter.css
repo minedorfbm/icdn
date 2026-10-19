@@ -111,6 +111,21 @@ html[data-journey-snap="true"] {
   pointer-events: none;
 }
 
+/* Preserve the tall reference silhouette when browser bars reduce usable height. */
+@media (max-width: 639px) {
+  .journey-stack .card-stack-stage {
+    container-type: size;
+  }
+  .journey-stack .perspective-card {
+    width: min(75%, 50cqh);
+    margin-left: calc((75% - min(75%, 50cqh)) / 2);
+  }
+  .journey-stack .destination-panel-content {
+    gap: clamp(10px, 3cqh, 24px);
+    padding-block: clamp(12px, 3cqh, 20px);
+  }
+}
+
 @media (max-width: 360px) {
   .journey-header {
     padding-inline: 16px;

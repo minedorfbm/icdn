@@ -135,7 +135,12 @@ export function CardStack({
 
   const onDown = (e: React.PointerEvent) => {
     if (!e.isPrimary || e.button !== 0 || start.current) return;
-    travel.current = Math.max(1, e.currentTarget.getBoundingClientRect().width * 0.75);
+    const activeCard = e.currentTarget.querySelector<HTMLElement>('article[aria-hidden="false"]');
+    travel.current = Math.max(
+      1,
+      activeCard?.getBoundingClientRect().width ??
+        e.currentTarget.getBoundingClientRect().width * 0.75,
+    );
     moved.current = false;
     start.current = {
       x: e.clientX,

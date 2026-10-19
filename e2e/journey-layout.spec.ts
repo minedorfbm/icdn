@@ -164,6 +164,7 @@ for (const height of [665, 844]) {
         titleTop: title.top,
         cardTop: card.top,
         cardHeight: card.height,
+        cardWidth: card.width,
         cardBottom: card.bottom,
         paginationBottom: pagination.bottom,
         font: Number.parseFloat(getComputedStyle(tagline).fontSize),
@@ -172,6 +173,7 @@ for (const height of [665, 844]) {
     expect(layout.titleTop).toBeGreaterThanOrEqual(60);
     expect(layout.font).toBeGreaterThanOrEqual(14);
     expect(layout.cardHeight).toBeGreaterThan(height * 0.64);
+    expect(layout.cardHeight / layout.cardWidth).toBeGreaterThanOrEqual(1.98);
     expect(layout.paginationBottom).toBeLessThanOrEqual(height - 20);
     if (height === 665) expect(layout.cardTop).toBeLessThanOrEqual(172);
     await page.screenshot({ path: testInfo.outputPath(`heaven-${height}px.png`) });
