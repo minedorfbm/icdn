@@ -239,7 +239,7 @@ export const LEVELS: {
   {
     id: "sky",
     title: "SKY",
-    line: "Where the horizon opens.",
+    line: "Open horizons.",
     image: skyImg,
     clusters: ["DINING", "WELLNESS", "EXPERIENCES"],
   },

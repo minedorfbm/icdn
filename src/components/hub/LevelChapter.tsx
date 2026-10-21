@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
+import "./journey-pilot.css";
 import { CardStack } from "./CardStack";
 import { DestinationIndex } from "./DestinationIndex";
 import { useHub } from "@/data/hub-context";
@@ -14,6 +16,7 @@ interface Props {
 }
 
 export function LevelChapter({ id, title, line, image, clusters }: Readonly<Props>) {
+  const pilot = id === "heaven" || id === "sky";
   const [cluster, setCluster] = useState(clusters?.[0]);
   const [cardIndex, setCardIndex] = useState(0);
   const [indexOpen, setIndexOpen] = useState(false);
@@ -55,7 +58,14 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
     if (group) setCluster(group.key);
     setCardIndex((group?.items ?? all).findIndex((item) => item.id === destination.id));
     setIndexOpen(false);
-    requestAnimationFrame(() => cardsRef.current?.scrollIntoView({ behavior: "smooth" }));
+    requestAnimationFrame(() => {
+      const target = pilot ? sectionRef.current : cardsRef.current;
+      target?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
+    });
   };
 
   useEffect(() => {
@@ -84,7 +94,8 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
       id={id}
       data-level={id}
       data-cluster={activeCluster}
-      className="level relative min-h-[100svh] py-24"
+      data-arrival-pilot={pilot || undefined}
+      className={`level relative min-h-[100svh] py-24 ${pilot ? "journey-pilot" : ""}`}
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <img
@@ -101,20 +112,39 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
       </div>
 
       <div className="relative pr-[var(--hub-rail-gutter)]">
-        <header className="journey-heading mx-auto max-w-[740px] px-6">
-          <span className="block h-px w-10 bg-current/40" aria-hidden />
-          <h2 className="mt-6 font-serif text-[clamp(48px,18vw,104px)] leading-[0.82] tracking-[-0.03em]">
-            {title}
-          </h2>
-          <p className="mt-5 text-[12px] tracking-[0.24em] opacity-55">
-            {levelLine(id, line).toUpperCase()}
-          </p>
-        </header>
+        {pilot ? (
+          <header className="journey-heading pilot-heading">
+            <h2>
+              <button
+                type="button"
+                onClick={() => setIndexOpen(true)}
+                aria-label={`${title} · ${t("all_places")}`}
+                aria-haspopup="dialog"
+                aria-expanded={indexOpen}
+                className="pilot-level-name"
+              >
+                {title}
+                <ChevronDown aria-hidden size={14} strokeWidth={1.3} />
+              </button>
+            </h2>
+            <p className="pilot-description">{levelLine(id, line)}</p>
+          </header>
+        ) : (
+          <header className="journey-heading mx-auto max-w-[740px] px-6">
+            <span className="block h-px w-10 bg-current/40" aria-hidden />
+            <h2 className="mt-6 font-serif text-[clamp(48px,18vw,104px)] leading-[0.82] tracking-[-0.03em]">
+              {title}
+            </h2>
+            <p className="mt-5 text-[12px] tracking-[0.24em] opacity-55">
+              {levelLine(id, line).toUpperCase()}
+            </p>
+          </header>
+        )}
 
         {groups.length > 0 && (
           <nav
             aria-label={`${title} ${t("collections")}`}
-            className="mx-auto mt-10 max-w-[740px] border-y border-current/20"
+            className="chapter-categories mx-auto mt-10 max-w-[740px] border-y border-current/20"
           >
             <div
               className={
@@ -152,15 +182,17 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
           </nav>
         )}
 
-        <div className="mx-auto mt-8 max-w-[740px] px-6">
-          <button
-            type="button"
-            onClick={() => setIndexOpen(true)}
-            className="min-h-11 border-b border-current/45 text-[11px] tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-2"
-          >
-            {t("all_places")}
-          </button>
-        </div>
+        {!pilot && (
+          <div className="mx-auto mt-8 max-w-[740px] px-6">
+            <button
+              type="button"
+              onClick={() => setIndexOpen(true)}
+              className="min-h-11 border-b border-current/45 text-[11px] tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              {t("all_places")}
+            </button>
+          </div>
+        )}
 
         <div className="journey-deck">
           <div

@@ -91,25 +91,25 @@ export const UI: Record<Lang, Record<UIKey, string>> = uiDict;
 export const LEVEL_LINE: Record<Lang, Record<string, string>> = {
   en: {
     heaven: "Above the bay.",
-    sky: "Where the horizon opens.",
+    sky: "Open horizons.",
     earth: "Where the resort comes alive.",
     sea: "Where everything slows down.",
   },
   vi: {
-    heaven: "Phía trên vịnh biển.",
-    sky: "Nơi chân trời mở ra.",
+    heaven: "Trên vịnh biển.",
+    sky: "Chân trời rộng mở.",
     earth: "Nơi khu nghỉ dưỡng bừng sống.",
     sea: "Nơi mọi thứ chậm lại.",
   },
   ru: {
     heaven: "Над заливом.",
-    sky: "Где открывается горизонт.",
+    sky: "Даль горизонта.",
     earth: "Где курорт оживает.",
     sea: "Где всё замедляется.",
   },
   zh: {
     heaven: "海湾之上。",
-    sky: "视野豁然开阔之处。",
+    sky: "开阔天际。",
     earth: "度假村的生活中心。",
     sea: "一切慢下来的地方。",
   },

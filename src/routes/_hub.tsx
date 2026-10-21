@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+import { useJourneyPilot } from "@/lib/use-journey-pilot";
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 import { HubHero } from "@/components/hub/HubHero";
 import { HubSearch } from "@/features/search/HubSearch";
@@ -149,6 +151,7 @@ function Hub() {
   const hubRef = useRef<HTMLDivElement>(null);
   const { levels, links } = useHub();
   const { active, visible } = useJourneyMotion(hubRef, levels);
+  useJourneyPilot(hubRef);
   const { lang, t, linkLabel } = useI18n();
 
   const scrollTo = scrollToHubSection;
@@ -165,7 +168,10 @@ function Hub() {
       {/* THE DESCENT */}
       <div>
         {levels.map((l) => (
-          <LevelChapter key={l.id} {...l} />
+          <Fragment key={l.id}>
+            <LevelChapter {...l} />
+            {l.id === "heaven" && <div className="pilot-level-transition" aria-hidden />}
+          </Fragment>
         ))}
       </div>
 
