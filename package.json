@@ -36,6 +36,7 @@
     "test:mobile:android": "HUB_TEST_PROJECT=android-chrome node node_modules/@playwright/test/cli.js test --project=android-chrome"
   },
   "overrides": {
+    "launch-editor": "2.14.2",
     "source-map-js": "1.2.2",
     "rolldown": "1.2.1",
     "undici": "7.29.1",
@@ -86,7 +87,7 @@
     "prettier": "^3.9.8",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.70.1",
-    "vite": "8.1.5",
+    "vite": "8.1.6",
     "vite-plugin-istanbul": "9.0.1",
     "wrangler": "4.135.0"
   }
