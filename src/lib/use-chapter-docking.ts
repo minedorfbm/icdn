@@ -25,7 +25,12 @@ export function useChapterDocking(rootRef: RefObject<HTMLElement | null>) {
       startY = null;
       if (reduced.matches || document.querySelector('[role="dialog"][data-state="open"]')) return;
       const y = window.scrollY;
-      const tops = sections.map((section) => section.getBoundingClientRect().top + y);
+      const tops = sections.map(
+        (section) =>
+          section.getBoundingClientRect().top +
+          y -
+          parseFloat(getComputedStyle(section).scrollMarginTop || "0"),
+      );
       const target = chapterDockTarget(tops, y, origin, window.innerHeight);
       if (target === null) return;
       settling = true;

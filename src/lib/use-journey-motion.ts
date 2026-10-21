@@ -6,6 +6,8 @@ type JourneySection = {
   id: Level;
   element: HTMLElement;
   deck: HTMLElement | null;
+  heading: HTMLElement | null;
+  headingTop: number;
   top: number;
   height: number;
   deckTop: number;
@@ -28,12 +30,18 @@ function paintSection(section: JourneySection, y: number, viewport: number, redu
   if (!near && !reduced) return;
   const entrance = reduced ? 1 : arrivalProgress(section.top + 96, y, viewport);
   const cards = reduced ? 1 : arrivalProgress(section.deckTop, y, viewport);
+  const headingY = (1 - entrance) * 28;
   const parallax = reduced
     ? 0
     : Math.max(-40, Math.min(40, (y + viewport / 2 - section.top - section.height / 2) * 0.06));
   section.element.style.setProperty("--journey-scene-y", `${parallax.toFixed(2)}px`);
-  section.element.style.setProperty("--journey-heading-y", `${((1 - entrance) * 28).toFixed(2)}px`);
+  section.element.style.setProperty("--journey-heading-y", `${headingY.toFixed(2)}px`);
   section.element.style.setProperty("--journey-heading-opacity", String(0.3 + entrance * 0.7));
+  // Clip the departing heading beneath the fixed toolbar without adding layout space.
+  section.element.style.setProperty(
+    "--journey-heading-clip",
+    `${Math.max(0, y + 64 - section.headingTop - headingY).toFixed(2)}px`,
+  );
   section.element.style.setProperty("--journey-deck-y", `${((1 - cards) * 24).toFixed(2)}px`);
   section.element.style.setProperty("--journey-deck-opacity", String(0.4 + cards * 0.6));
 }
@@ -60,6 +68,8 @@ export function useJourneyMotion(
               id,
               element,
               deck: element.querySelector<HTMLElement>(".journey-deck"),
+              heading: element.querySelector<HTMLElement>("header"),
+              headingTop: 0,
               top: 0,
               height: 0,
               deckTop: 0,
@@ -83,6 +93,7 @@ export function useJourneyMotion(
           section.top = layoutTop(section.element);
           section.height = section.element.offsetHeight;
           section.deckTop = section.deck ? layoutTop(section.deck) : section.top;
+          section.headingTop = section.heading ? layoutTop(section.heading) : section.top;
         }
         dirty = false;
       }

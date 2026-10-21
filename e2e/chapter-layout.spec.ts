@@ -11,7 +11,7 @@ test("all four card frames fit the viewport below the scrolling level heading", 
     const frame = chapter.locator(".chapter-frame");
     await frame.evaluate((el) => el.scrollIntoView({ behavior: "instant" }));
     await expect
-      .poll(() => frame.evaluate((el) => Math.abs(el.getBoundingClientRect().top)))
+      .poll(() => frame.evaluate((el) => Math.abs(el.getBoundingClientRect().top - 64)))
       .toBeLessThan(2);
     await expect
       .poll(() =>
@@ -37,9 +37,10 @@ test("all four card frames fit the viewport below the scrolling level heading", 
         cardWidth: el.querySelector<HTMLElement>(".perspective-card")!.offsetWidth,
       };
     });
-    expect(geometry.frameHeight).toBeCloseTo(844, 0);
+    expect(geometry.frameHeight + geometry.navTop).toBeCloseTo(844, 0);
     expect(geometry.navTop).toBeGreaterThanOrEqual(60);
-    expect(geometry.headingBottom).toBeLessThan(0);
+    expect(geometry.headingBottom).toBeLessThan(geometry.navTop);
+    expect(geometry.navTop - geometry.headingBottom).toBeCloseTo(16, 0);
     expect(geometry.gap).toBeGreaterThanOrEqual(0);
     expect(geometry.gap).toBeLessThanOrEqual(10);
     expect(geometry.cardHeight).toBeGreaterThan(650);
@@ -69,7 +70,7 @@ test("the level title opens All Places and selection aligns categories with the 
   await expect(index).not.toBeVisible();
   const frame = chapter.locator(".chapter-frame");
   await expect
-    .poll(() => frame.evaluate((el) => Math.abs(el.getBoundingClientRect().top)))
+    .poll(() => frame.evaluate((el) => Math.abs(el.getBoundingClientRect().top - 64)))
     .toBeLessThan(2);
   const y = await page.evaluate(() => window.scrollY);
   await chapter.getByRole("button", { name: "EXPERIENCES", exact: true }).click();
@@ -82,7 +83,7 @@ test("docking aligns the card frame, allows departure and respects reduced motio
 }) => {
   await page.goto("/");
   const frame = page.locator("#sky .chapter-frame");
-  const top = await frame.evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
+  const top = await frame.evaluate((el) => el.getBoundingClientRect().top + window.scrollY - 64);
   const gesture = async (start: number, end: number) => {
     await page.evaluate(
       ({ start, end }) => {
