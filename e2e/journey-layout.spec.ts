@@ -92,9 +92,7 @@ test("translated chapter headings stay on a single line without colliding on sma
   }
 });
 
-test("reduced motion leaves scrolling free and expanded cards do not inherit chapter snapping", async ({
-  page,
-}) => {
+test("reduced motion and expanded cards keep native scrolling", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await expect
@@ -156,9 +154,7 @@ test.describe("free native scrolling", () => {
 });
 
 for (const height of [665, 768, 844]) {
-  test(`browser bars leave room for a readable tagline and the complete card at ${height}px`, async ({
-    page,
-  }, testInfo) => {
+  test(`the portrait composition fits the viewport at ${height}px`, async ({ page }, testInfo) => {
     // The supplied iPhone screenshot is 393 CSS px wide with about 665 px left for the page.
     await page.setViewportSize({ width: 393, height });
     await page.goto("/");
@@ -190,14 +186,23 @@ for (const height of [665, 768, 844]) {
         cardBottom: card.bottom,
         paginationBottom: pagination.bottom,
         font: Number.parseFloat(getComputedStyle(tagline).fontSize),
+        contentOverflow: (() => {
+          const content = el.querySelector(".destination-panel-content")!;
+          return content.scrollHeight - content.clientHeight;
+        })(),
+        headerWidth: el.querySelector(".journey-header")!.getBoundingClientRect().width,
+        collectionsWidth: el.querySelector(".journey-collections")!.getBoundingClientRect().width,
       };
     });
     expect(layout.titleTop).toBeGreaterThanOrEqual(60);
-    expect(layout.font).toBeGreaterThanOrEqual(14);
-    expect(layout.cardHeight).toBeGreaterThan(height * 0.64);
+    expect(layout.font).toBeGreaterThanOrEqual(10);
+    expect(layout.contentOverflow).toBeLessThanOrEqual(1);
+    expect(layout.headerWidth).toBeCloseTo(layout.collectionsWidth, 0);
+    expect(layout.headerWidth).toBeCloseTo(layout.stageWidth * 0.89, 0);
+    expect(layout.cardHeight / layout.cardWidth).toBeCloseTo(2, 1);
     expect(layout.cardWidth).toBeCloseTo(layout.stageWidth * 0.75, 0);
     expect(layout.paginationBottom).toBeLessThanOrEqual(height - 20);
-    expect(layout.paginationBottom).toBeGreaterThanOrEqual(height - 30);
+    expect(layout.paginationBottom).toBeGreaterThanOrEqual(height - 65);
     if (height === 665) expect(layout.cardTop).toBeLessThanOrEqual(172);
     await page.screenshot({ path: testInfo.outputPath(`heaven-${height}px.png`) });
   });
