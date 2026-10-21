@@ -263,26 +263,6 @@ export function CardStack({
           );
         })}
       </div>
-
-      {layout === "journey" && (
-        <div className="card-stack-pagination mx-auto mt-3 flex max-w-[740px] items-center gap-4 px-6">
-          <span
-            className="min-w-16 font-serif text-[24px] leading-none tabular-nums"
-            aria-live="polite"
-          >
-            {String(index + 1).padStart(2, "0")}
-            <span className="ml-1 text-[15px] opacity-50">
-              / {String(items.length).padStart(2, "0")}
-            </span>
-          </span>
-          <div className="h-px flex-1 bg-current/25" aria-hidden>
-            <div
-              className="h-px bg-current transition-[width] duration-300"
-              style={{ width: `${((index + 1) / items.length) * 100}%` }}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

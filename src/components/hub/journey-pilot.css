@@ -77,10 +77,7 @@
   font-size: 12px;
   letter-spacing: 0.12em;
 }
-.journey-pilot .card-stack-pagination {
-  margin-top: 6px;
-  min-height: 36px;
-}
+
 .pilot-level-transition {
   height: clamp(56px, 18vw, 100px);
   background: linear-gradient(to bottom, var(--world-heaven), var(--world-sky));
