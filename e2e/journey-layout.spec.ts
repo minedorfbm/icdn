@@ -154,7 +154,9 @@ test.describe("free native scrolling", () => {
 });
 
 for (const height of [665, 768, 844]) {
-  test(`the portrait composition fits the viewport at ${height}px`, async ({ page }, testInfo) => {
+  test(`the readable composition uses the screen width and fits at ${height}px`, async ({
+    page,
+  }, testInfo) => {
     // The supplied iPhone screenshot is 393 CSS px wide with about 665 px left for the page.
     await page.setViewportSize({ width: 393, height });
     await page.goto("/");
@@ -179,6 +181,16 @@ for (const height of [665, 768, 844]) {
       const tagline = el.querySelector(".journey-line")!;
       return {
         titleTop: title.top,
+        cardLeft: card.left,
+        descriptionFont: Number.parseFloat(
+          getComputedStyle(el.querySelector(".journey-stack h3 + p")!).fontSize,
+        ),
+        categoryFont: Number.parseFloat(
+          getComputedStyle(el.querySelector(".journey-collections button span")!).fontSize,
+        ),
+        actionFont: Number.parseFloat(
+          getComputedStyle(el.querySelector(".destination-panel-content a")!).fontSize,
+        ),
         cardTop: card.top,
         cardHeight: card.height,
         cardWidth: card.width,
@@ -195,11 +207,16 @@ for (const height of [665, 768, 844]) {
       };
     });
     expect(layout.titleTop).toBeGreaterThanOrEqual(60);
-    expect(layout.font).toBeGreaterThanOrEqual(10);
+    expect(layout.font).toBeGreaterThanOrEqual(14);
+    expect(layout.descriptionFont).toBeGreaterThanOrEqual(16);
+    expect(layout.categoryFont).toBeGreaterThanOrEqual(14);
+    expect(layout.actionFont).toBeGreaterThanOrEqual(12);
+    expect(layout.cardLeft).toBeLessThanOrEqual(18);
+    expect(layout.cardWidth).toBeGreaterThanOrEqual(393 * 0.74);
     expect(layout.contentOverflow).toBeLessThanOrEqual(1);
     expect(layout.headerWidth).toBeCloseTo(layout.collectionsWidth, 0);
-    expect(layout.headerWidth).toBeCloseTo(layout.stageWidth * 0.89, 0);
-    expect(layout.cardHeight / layout.cardWidth).toBeCloseTo(2, 1);
+    expect(layout.headerWidth).toBeCloseTo(layout.stageWidth - 44, 0);
+    expect(layout.cardHeight / layout.cardWidth).toBeGreaterThanOrEqual(1.45);
     expect(layout.cardWidth).toBeCloseTo(layout.stageWidth * 0.75, 0);
     expect(layout.paginationBottom).toBeLessThanOrEqual(height - 20);
     expect(layout.paginationBottom).toBeGreaterThanOrEqual(height - 65);
