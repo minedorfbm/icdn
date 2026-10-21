@@ -50,11 +50,22 @@ test("all four card frames fit the viewport below the scrolling level heading", 
   }
   await expect(page.locator(".chapter-gradient")).toHaveCount(3);
   expect(
-    await page
-      .locator(".chapter-gradient")
-      .evaluateAll((elements) =>
-        elements.every((el) => getComputedStyle(el).backgroundImage.includes("linear-gradient")),
-      ),
+    await page.locator(".chapter-gradient").evaluateAll((elements) =>
+      elements.every((el) => {
+        const gradient = getComputedStyle(el, "::before");
+        const next = el.nextElementSibling!;
+        const previous = el.previousElementSibling!;
+        const title = next.querySelector<HTMLElement>("h2")!;
+        const counter = previous.querySelector(".card-stack-pagination")!;
+        return (
+          el.getBoundingClientRect().height === 0 &&
+          gradient.backgroundImage.includes("linear-gradient") &&
+          gradient.height === "180px" &&
+          next.getBoundingClientRect().top === previous.getBoundingClientRect().bottom &&
+          title.getBoundingClientRect().top - counter.getBoundingClientRect().bottom < 80
+        );
+      }),
+    ),
   ).toBe(true);
 });
 

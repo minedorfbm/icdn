@@ -28,7 +28,7 @@ function paintSection(section: JourneySection, y: number, viewport: number, redu
     section.top < y + viewport * 1.25 && section.top + section.height > y - viewport * 0.25;
   section.element.dataset["journeyNear"] = String(near && !reduced);
   if (!near && !reduced) return;
-  const entrance = reduced ? 1 : arrivalProgress(section.top + 96, y, viewport);
+  const entrance = reduced ? 1 : arrivalProgress(section.headingTop, y, viewport);
   const cards = reduced ? 1 : arrivalProgress(section.deckTop, y, viewport);
   const headingY = (1 - entrance) * 28;
   const parallax = reduced

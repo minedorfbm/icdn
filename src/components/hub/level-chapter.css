@@ -23,8 +23,32 @@
   min-height: 44px;
   margin-top: 0;
 }
+/* Paint across the junction without inserting another scrolling section. */
 .chapter-gradient {
-  height: clamp(64px, 12lvh, 112px);
+  position: relative;
+  height: 0;
+  pointer-events: none;
+}
+.chapter-gradient::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: -90px 0 auto;
+  height: 180px;
+  background: linear-gradient(
+    to bottom,
+    var(--chapter-from) 0%,
+    var(--chapter-from) 25%,
+    var(--chapter-to) 75%,
+    var(--chapter-to) 100%
+  );
+}
+.chapter-gradient + .level-chapter {
+  padding-top: 12px;
+}
+/* Cards and text stay above the shared background transition. */
+.level-chapter > .relative {
+  z-index: 2;
 }
 
 .level-chapter .journey-heading {

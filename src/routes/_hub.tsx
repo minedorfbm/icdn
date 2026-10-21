@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, type CSSProperties } from "react";
 import { useChapterDocking } from "@/lib/use-chapter-docking";
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 import { HubHero } from "@/components/hub/HubHero";
@@ -174,9 +174,12 @@ function Hub() {
               <div
                 className="chapter-gradient"
                 aria-hidden
-                style={{
-                  background: `linear-gradient(to bottom, var(--world-${l.id}), var(--world-${levels[index + 1]!.id}))`,
-                }}
+                style={
+                  {
+                    "--chapter-from": `var(--world-${l.id})`,
+                    "--chapter-to": `var(--world-${levels[index + 1]!.id})`,
+                  } as CSSProperties
+                }
               />
             )}
           </Fragment>
