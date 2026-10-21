@@ -13,31 +13,6 @@ export function useJourneyPilot(rootRef: RefObject<HTMLElement | null>) {
     let touching = false;
     let settling = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const seen = new WeakSet<Element>();
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const section = entry.target.closest<HTMLElement>("[data-arrival-pilot]");
-          if (!section) continue;
-          if (!entry.isIntersecting) {
-            delete section.dataset["arrival"];
-            continue;
-          }
-          const fast =
-            startY !== null && Math.abs(window.scrollY - startY) > window.innerHeight * 0.65;
-          section.dataset["arrival"] =
-            reduced.matches || fast ? "direct" : seen.has(section) ? "return" : "first";
-          seen.add(section);
-        }
-      },
-      { rootMargin: "0px 0px -20% 0px" },
-    );
-    sections.forEach((section) => {
-      const heading = section.querySelector("header");
-      if (heading) observer.observe(heading);
-    });
-
     const interrupt = () => {
       clearTimeout(timer);
       if (settling) window.scrollTo({ top: window.scrollY, behavior: "instant" });
@@ -85,8 +60,6 @@ export function useJourneyPilot(rootRef: RefObject<HTMLElement | null>) {
     window.addEventListener("pointerdown", interrupt, { passive: true });
     return () => {
       clearTimeout(timer);
-      observer.disconnect();
-      sections.forEach((section) => delete section.dataset["arrival"]);
       window.removeEventListener("touchstart", touchStart);
       window.removeEventListener("touchend", touchEnd);
       window.removeEventListener("touchcancel", touchEnd);

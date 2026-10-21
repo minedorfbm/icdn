@@ -3,11 +3,6 @@
   min-height: 100lvh;
   padding-block: 72px 24px;
 }
-.journey-pilot .journey-heading,
-.journey-pilot .journey-deck {
-  transform: none;
-  opacity: 1;
-}
 .pilot-heading {
   display: flex;
   align-items: center;
@@ -78,41 +73,13 @@
   letter-spacing: 0.12em;
 }
 
+.journey-pilot .card-stack-pagination {
+  margin-top: 6px;
+  min-height: 36px;
+}
 .pilot-level-transition {
   height: clamp(56px, 18vw, 100px);
   background: linear-gradient(to bottom, var(--world-heaven), var(--world-sky));
-}
-/* Reveal only on arrival, never tied to ongoing scroll or card dimensions. */
-.journey-pilot[data-arrival="first"] .pilot-level-name {
-  animation: pilot-arrive 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-}
-.journey-pilot[data-arrival="first"] .pilot-description {
-  animation: pilot-arrive 440ms 90ms ease-out both;
-}
-.journey-pilot[data-arrival="first"] .chapter-categories,
-.journey-pilot[data-arrival="first"] .journey-deck {
-  animation: pilot-arrive 440ms 140ms ease-out both;
-}
-.journey-pilot[data-arrival="return"] .pilot-heading {
-  animation: pilot-return 220ms ease-out both;
-}
-@keyframes pilot-arrive {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes pilot-return {
-  from {
-    opacity: 0.7;
-  }
-  to {
-    opacity: 1;
-  }
 }
 @media (min-width: 640px) {
   .journey-pilot .card-stack-stage {
@@ -121,14 +88,5 @@
   }
   .pilot-description {
     font-size: 18px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .journey-pilot[data-arrival] .pilot-level-name,
-  .journey-pilot[data-arrival] .pilot-description,
-  .journey-pilot[data-arrival] .pilot-heading,
-  .journey-pilot[data-arrival] .chapter-categories,
-  .journey-pilot[data-arrival] .journey-deck {
-    animation: none;
   }
 }
