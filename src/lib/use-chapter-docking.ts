@@ -1,11 +1,11 @@
 import { useEffect, type RefObject } from "react";
-import { pilotDockTarget } from "./pilot-docking";
+import { chapterDockTarget } from "./chapter-docking";
 
 /** Passive, small arrival assistance. Native scroll owns the rest of the journey. */
-export function useJourneyPilot(rootRef: RefObject<HTMLElement | null>) {
+export function useChapterDocking(rootRef: RefObject<HTMLElement | null>) {
   useEffect(() => {
     const sections = Array.from(
-      rootRef.current?.querySelectorAll<HTMLElement>("[data-arrival-pilot]") ?? [],
+      rootRef.current?.querySelectorAll<HTMLElement>(".chapter-frame") ?? [],
     );
     if (!sections.length) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -26,7 +26,7 @@ export function useJourneyPilot(rootRef: RefObject<HTMLElement | null>) {
       if (reduced.matches || document.querySelector('[role="dialog"][data-state="open"]')) return;
       const y = window.scrollY;
       const tops = sections.map((section) => section.getBoundingClientRect().top + y);
-      const target = pilotDockTarget(tops, y, origin, window.innerHeight);
+      const target = chapterDockTarget(tops, y, origin, window.innerHeight);
       if (target === null) return;
       settling = true;
       window.scrollTo({ top: target, behavior: "smooth" });

@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { useJourneyPilot } from "@/lib/use-journey-pilot";
+import { useChapterDocking } from "@/lib/use-chapter-docking";
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 import { HubHero } from "@/components/hub/HubHero";
 import { HubSearch } from "@/features/search/HubSearch";
@@ -151,7 +151,7 @@ function Hub() {
   const hubRef = useRef<HTMLDivElement>(null);
   const { levels, links } = useHub();
   const { active, visible } = useJourneyMotion(hubRef, levels);
-  useJourneyPilot(hubRef);
+  useChapterDocking(hubRef);
   const { lang, t, linkLabel } = useI18n();
 
   const scrollTo = scrollToHubSection;
@@ -167,10 +167,18 @@ function Hub() {
 
       {/* THE DESCENT */}
       <div>
-        {levels.map((l) => (
+        {levels.map((l, index) => (
           <Fragment key={l.id}>
             <LevelChapter {...l} />
-            {l.id === "heaven" && <div className="pilot-level-transition" aria-hidden />}
+            {levels[index + 1] && (
+              <div
+                className="chapter-gradient"
+                aria-hidden
+                style={{
+                  background: `linear-gradient(to bottom, var(--world-${l.id}), var(--world-${levels[index + 1]!.id}))`,
+                }}
+              />
+            )}
           </Fragment>
         ))}
       </div>

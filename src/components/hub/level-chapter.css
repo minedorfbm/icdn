@@ -1,0 +1,27 @@
+/* The original level heading scrolls above a separate, viewport-sized card frame. */
+.chapter-frame {
+  --chapter-card-height: max(360px, calc(100lvh - 184px));
+  margin-top: 24px;
+  padding-block: 64px 12px;
+}
+.chapter-categories {
+  min-height: 56px;
+}
+.chapter-categories button {
+  min-height: 54px;
+}
+.chapter-frame .card-stack-stage {
+  height: var(--chapter-card-height);
+  padding-block: 0;
+}
+.chapter-frame .perspective-card {
+  height: 100%;
+  min-height: 0;
+}
+.chapter-frame .card-stack-pagination {
+  min-height: 44px;
+  margin-top: 0;
+}
+.chapter-gradient {
+  height: clamp(64px, 12lvh, 112px);
+}
