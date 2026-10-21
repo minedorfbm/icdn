@@ -110,82 +110,70 @@
   overscroll-behavior-y: auto;
 }
 
-/* Scale the whole composition to fit, keeping the front card at 1:2.
-   The 140px budget covers two 44px controls, gaps and the 40px counter row. */
+/* Keep the reference width and readable type. Only the card height responds to
+   a short viewport; browser toolbar motion never resizes the composition. */
 @media (max-width: 639px) {
   .journey-content {
-    width: min(100%, calc((100svh - var(--journey-top) - var(--journey-bottom) - 140px) * 2 / 3));
-    height: auto;
-    min-height: 0;
-    margin-inline: auto;
+    width: 100%;
     padding-right: 0;
-    container-type: inline-size;
+    height: min(calc(100svh - var(--journey-top) - var(--journey-bottom)), calc(150vw + 140px));
+    min-height: 420px;
   }
   .journey-header,
   .journey-collections {
-    width: 89%;
+    width: calc(100% - var(--hub-rail-gutter));
     margin-left: 0;
   }
   .journey-header {
-    gap: 6px;
-    padding-inline: 6cqw;
+    gap: 8px;
+    padding-inline: 16px;
   }
   .journey-level-trigger {
-    font-size: 8cqw;
-  }
-  .journey-level-trigger svg {
-    width: 3.3cqw;
-    height: 3.3cqw;
+    font-size: clamp(28px, 8.2vw, 36px);
   }
   .journey-line {
-    font-size: 3.6cqw;
+    font-size: 14px;
+    opacity: 1;
   }
   .journey-collections > div {
-    padding-inline: 6cqw;
+    padding-inline: 16px;
   }
   .journey-collections button span:first-child {
-    font-size: 3.2cqw;
+    font-size: 14px;
+  }
+  .journey-collections button[aria-current="false"] {
+    opacity: 0.75;
   }
   .journey-card-group {
     width: 100%;
-    clip-path: inset(0 11% 0 0);
-  }
-  .journey-stack .card-stack-stage {
-    flex: none;
-    aspect-ratio: 2 / 3;
+    clip-path: inset(0 var(--hub-rail-gutter) 0 0);
   }
   .journey-pagination {
-    padding-inline: 6cqw 17cqw;
-  }
-  .journey-pagination > span {
-    min-width: 16cqw;
-    font-size: 6cqw;
+    padding-inline: 16px calc(var(--hub-rail-gutter) + 16px);
   }
   .journey-stack .destination-panel-content {
-    gap: 4cqw;
-    padding: 5cqw 4cqw;
+    gap: 16px;
+    padding: 16px;
   }
   .journey-stack h3 {
-    font-size: 6.7cqw;
+    font-size: clamp(28px, 7.7vw, 34px);
+    line-height: 1.06;
   }
   .journey-stack h3 + p {
-    font-size: 3.85cqw;
-    margin-top: 3cqw;
+    font-size: 16px;
+    margin-top: 8px;
+    opacity: 1;
   }
   .journey-stack .destination-panel-content > div:first-child p {
-    font-size: 2.3cqw;
+    font-size: 11px;
+    letter-spacing: 0.12em;
   }
   .journey-stack .destination-panel-content > div:last-child {
-    gap: 1cqw 4cqw;
-    padding-top: 3cqw;
+    gap: 4px 14px;
+    padding-top: 8px;
   }
   .journey-stack .destination-panel-content a {
-    font-size: 2.56cqw;
-    min-height: 11.3cqw;
-    padding-block: 2cqw;
-  }
-  .journey-stack .destination-panel-content a[aria-label] {
-    width: 11.3cqw;
-    height: 11.3cqw;
+    font-size: 12px;
+    letter-spacing: 0.12em;
   }
 }
