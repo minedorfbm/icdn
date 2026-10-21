@@ -309,9 +309,9 @@
 .level .level-veil {
   background: linear-gradient(
     to bottom,
-    var(--level-bg) 0%,
+    color-mix(in oklab, var(--level-bg) 96%, transparent) 0%,
     color-mix(in oklab, var(--level-bg) 82%, transparent) 56%,
-    var(--level-bg) 100%
+    color-mix(in oklab, var(--level-bg) 96%, transparent) 100%
   );
 }
 

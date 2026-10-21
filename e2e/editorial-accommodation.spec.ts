@@ -15,10 +15,7 @@ test("Nam Tram excludes accommodation while Surprise, search and map retain it",
   await expect(
     page.locator('section.level [data-destination-id="club-panoramic-room-oceanview"]'),
   ).toHaveCount(0);
-  await page
-    .locator("#heaven")
-    .getByRole("button", { name: "HEAVEN · ALL PLACES", exact: true })
-    .click();
+  await page.locator("#heaven").getByRole("button", { name: "ALL PLACES", exact: true }).click();
   const index = page.getByRole("dialog", { name: "ALL PLACES", exact: true });
   await expect(index.getByRole("button", { name: /Room Oceanview/ })).toHaveCount(0);
   await index.getByRole("button", { name: "Close", exact: true }).click();
