@@ -1,6 +1,6 @@
 import { test, expect } from "./fixtures";
 
-test("all four card frames fit the viewport below the scrolling level heading", async ({
+test("all four card frames use cards 15% shorter below the scrolling level heading", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -37,13 +37,13 @@ test("all four card frames fit the viewport below the scrolling level heading", 
         cardWidth: el.querySelector<HTMLElement>(".perspective-card")!.offsetWidth,
       };
     });
-    expect(geometry.frameHeight + geometry.navTop).toBeCloseTo(844, 0);
+    expect(geometry.frameHeight + geometry.navTop).toBeCloseTo(844 - (844 - 184) * 0.15, 0);
     expect(geometry.navTop).toBeGreaterThanOrEqual(60);
     expect(geometry.headingBottom).toBeLessThan(geometry.navTop);
     expect(geometry.navTop - geometry.headingBottom).toBeCloseTo(16, 0);
     expect(geometry.gap).toBeGreaterThanOrEqual(0);
     expect(geometry.gap).toBeLessThanOrEqual(10);
-    expect(geometry.cardHeight).toBeGreaterThan(650);
+    expect(geometry.cardHeight).toBeCloseTo((844 - 184) * 0.85, 0);
     expect(geometry.cardWidth).toBeGreaterThan(285);
     await expect(chapter.getByRole("button", { name: "ALL PLACES", exact: true })).toHaveCount(0);
     await expect(chapter.locator(".card-stack-pagination")).toContainText("01");
