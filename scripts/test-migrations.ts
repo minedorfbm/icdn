@@ -499,7 +499,18 @@ try {
         AND post_url LIKE '%/Dc2etiKCC_C/')::int AS "otherWatersports"
     FROM destination_posts
   `);
-  assert.deepEqual(media[0], { links: 6, replacement: 1, otherWatersports: 2 });
+  assert.deepEqual(media[0], { links: 3, replacement: 1, otherWatersports: 2 });
+  const { rows: pausedVideos } = await db.query<{ total: number; active: number }>(`
+    SELECT count(*)::int AS total,
+      count(*) FILTER (WHERE active)::int AS active
+    FROM destination_posts
+    WHERE (destination_id, (regexp_match(post_url, '/(?:p|reel|reels)/([A-Za-z0-9_-]+)(?:/|[?]|$)'))[1]) IN (
+      ('la-maison-1888', 'DdQWW42D91g'),
+      ('wine-cellar', 'DdQWW42D91g'),
+      ('wine-cellar', 'DFfKmy2O0Bt')
+    )
+  `);
+  assert.deepEqual(pausedVideos[0], { total: 3, active: 0 });
   const thingsToDoMigration = readFileSync(
     new URL("20261016130000_things_to_do_instagram_additions.sql", directory),
     "utf8",
