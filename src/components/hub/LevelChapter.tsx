@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
+import "./level-chapter.css";
 import { CardStack } from "./CardStack";
 import { DestinationIndex } from "./DestinationIndex";
 import { useHub } from "@/data/hub-context";
@@ -19,7 +21,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
   const [indexOpen, setIndexOpen] = useState(false);
   const [near, setNear] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
   const { destinations } = useHub();
   const { t, levelLine, cluster: clusterLabel } = useI18n();
 
@@ -55,7 +57,14 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
     if (group) setCluster(group.key);
     setCardIndex((group?.items ?? all).findIndex((item) => item.id === destination.id));
     setIndexOpen(false);
-    requestAnimationFrame(() => cardsRef.current?.scrollIntoView({ behavior: "smooth" }));
+    requestAnimationFrame(() =>
+      frameRef.current?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+        block: "start",
+      }),
+    );
   };
 
   useEffect(() => {
@@ -84,7 +93,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
       id={id}
       data-level={id}
       data-cluster={activeCluster}
-      className="level relative min-h-[100svh] py-24"
+      className="level level-chapter relative pt-24"
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <img
@@ -104,71 +113,80 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
         <header className="journey-heading mx-auto max-w-[740px] px-6">
           <span className="block h-px w-10 bg-current/40" aria-hidden />
           <h2 className="mt-6 font-serif text-[clamp(48px,18vw,104px)] leading-[0.82] tracking-[-0.03em]">
-            {title}
+            <button
+              type="button"
+              onClick={() => setIndexOpen(true)}
+              aria-label={`${title} · ${t("all_places")}`}
+              aria-haspopup="dialog"
+              aria-expanded={indexOpen}
+              className="inline-flex min-h-11 items-center gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-4"
+            >
+              {title}
+              <ChevronDown aria-hidden className="size-5 shrink-0 opacity-60" strokeWidth={1.3} />
+            </button>
           </h2>
-          <p className="mt-5 text-[12px] tracking-[0.24em] opacity-55">
+          <p className="mt-5 text-[14px] leading-relaxed tracking-[0.18em] opacity-70">
             {levelLine(id, line).toUpperCase()}
           </p>
         </header>
 
-        {groups.length > 0 && (
-          <nav
-            aria-label={`${title} ${t("collections")}`}
-            className="mx-auto mt-10 max-w-[740px] border-y border-current/20"
-          >
-            <div
-              className={
-                compactCollections
-                  ? "grid gap-1.5 px-6"
-                  : "flex snap-x snap-mandatory scroll-px-6 gap-2 overflow-x-auto px-6 pr-14 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              }
-              style={
-                compactCollections
-                  ? { gridTemplateColumns: `repeat(${groups.length}, minmax(0, 1fr))` }
-                  : undefined
-              }
+        <div ref={frameRef} className="chapter-frame">
+          {groups.length > 0 && (
+            <nav
+              aria-label={`${title} ${t("collections")}`}
+              className="chapter-categories mx-auto max-w-[740px] border-y border-current/20"
             >
-              {groups.map((group) => (
-                <button
-                  key={group.key}
-                  type="button"
-                  onClick={() => selectCluster(group.key)}
-                  aria-current={group.key === activeCluster ? "true" : undefined}
-                  className={`relative flex min-h-20 ${compactCollections ? "min-w-0" : "min-w-[116px] snap-start"} flex-col items-start justify-center text-left transition-opacity ${
-                    group.key === activeCluster ? "opacity-100" : "opacity-45"
-                  }`}
-                >
-                  <span
-                    className={`font-serif leading-tight tracking-tight ${compactCollections ? "max-w-full text-[clamp(12px,3.6vw,23px)] [overflow-wrap:anywhere]" : "text-[23px]"}`}
+              <div
+                className={
+                  compactCollections
+                    ? "grid gap-1.5 px-6"
+                    : "flex snap-x snap-mandatory scroll-px-6 gap-2 overflow-x-auto px-6 pr-14 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                }
+                style={
+                  compactCollections
+                    ? { gridTemplateColumns: `repeat(${groups.length}, minmax(0, 1fr))` }
+                    : undefined
+                }
+              >
+                {groups.map((group) => (
+                  <button
+                    key={group.key}
+                    type="button"
+                    onClick={() => selectCluster(group.key)}
+                    aria-current={group.key === activeCluster ? "true" : undefined}
+                    className={`relative flex min-h-14 ${compactCollections ? "min-w-0" : "min-w-[116px] snap-start"} flex-col items-start justify-center text-left transition-opacity ${
+                      group.key === activeCluster ? "opacity-100" : "opacity-45"
+                    }`}
                   >
-                    {clusterLabel(group.key)}
-                  </span>
-                  {group.key === activeCluster && (
-                    <span className="absolute inset-x-0 bottom-0 h-[2px] bg-current" aria-hidden />
-                  )}
-                </button>
-              ))}
+                    <span
+                      className={`font-serif leading-tight tracking-tight ${compactCollections ? "max-w-full text-[clamp(14px,3.6vw,23px)] [overflow-wrap:anywhere]" : "text-[23px]"}`}
+                    >
+                      {clusterLabel(group.key)}
+                    </span>
+                    {group.key === activeCluster && (
+                      <span
+                        className="absolute inset-x-0 bottom-0 h-[2px] bg-current"
+                        aria-hidden
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </nav>
+          )}
+
+          <div className="journey-deck">
+            <div
+              key={activeCluster ?? "all"}
+              className="group-enter mt-2 w-[calc(100%+var(--hub-rail-gutter))] overflow-hidden [clip-path:inset(0_var(--hub-rail-gutter)_0_0)]"
+            >
+              <CardStack
+                items={list}
+                near={near}
+                index={activeIndex}
+                onIndexChange={setCardIndex}
+              />
             </div>
-          </nav>
-        )}
-
-        <div className="mx-auto mt-8 max-w-[740px] px-6">
-          <button
-            type="button"
-            onClick={() => setIndexOpen(true)}
-            className="min-h-11 border-b border-current/45 text-[11px] tracking-[0.12em] focus-visible:outline-2 focus-visible:outline-offset-2"
-          >
-            {t("all_places")}
-          </button>
-        </div>
-
-        <div className="journey-deck">
-          <div
-            key={activeCluster ?? "all"}
-            ref={cardsRef}
-            className="group-enter mt-5 w-[calc(100%+var(--hub-rail-gutter))] overflow-hidden [clip-path:inset(0_var(--hub-rail-gutter)_0_0)]"
-          >
-            <CardStack items={list} near={near} index={activeIndex} onIndexChange={setCardIndex} />
           </div>
         </div>
       </div>

@@ -203,7 +203,7 @@ export function CardStack({
     <div className={`w-full select-none ${layout === "discovery" ? "discovery-stack" : ""}`}>
       {/* single shared stage */}
       <div
-        className="relative grid w-full touch-pan-y overflow-hidden py-6"
+        className="card-stack-stage relative grid w-full touch-pan-y overflow-hidden py-6"
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={(e) => finish(e)}
@@ -265,7 +265,7 @@ export function CardStack({
       </div>
 
       {layout === "journey" && (
-        <div className="mx-auto mt-3 flex max-w-[740px] items-center gap-4 px-6">
+        <div className="card-stack-pagination mx-auto mt-3 flex max-w-[740px] items-center gap-4 px-6">
           <span
             className="min-w-16 font-serif text-[24px] leading-none tabular-nums"
             aria-live="polite"

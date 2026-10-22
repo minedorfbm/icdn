@@ -1,3 +1,5 @@
+import { Fragment, type CSSProperties } from "react";
+import { useChapterDocking } from "@/lib/use-chapter-docking";
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 import { HubHero } from "@/components/hub/HubHero";
 import { HubSearch } from "@/features/search/HubSearch";
@@ -149,6 +151,7 @@ function Hub() {
   const hubRef = useRef<HTMLDivElement>(null);
   const { levels, links } = useHub();
   const { active, visible } = useJourneyMotion(hubRef, levels);
+  useChapterDocking(hubRef);
   const { lang, t, linkLabel } = useI18n();
 
   const scrollTo = scrollToHubSection;
@@ -164,8 +167,22 @@ function Hub() {
 
       {/* THE DESCENT */}
       <div>
-        {levels.map((l) => (
-          <LevelChapter key={l.id} {...l} />
+        {levels.map((l, index) => (
+          <Fragment key={l.id}>
+            <LevelChapter {...l} />
+            {levels[index + 1] && (
+              <div
+                className="chapter-gradient"
+                aria-hidden
+                style={
+                  {
+                    "--chapter-from": `var(--world-${l.id})`,
+                    "--chapter-to": `var(--world-${levels[index + 1]!.id})`,
+                  } as CSSProperties
+                }
+              />
+            )}
+          </Fragment>
         ))}
       </div>
 
