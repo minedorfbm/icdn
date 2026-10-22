@@ -159,7 +159,7 @@ function Hub() {
   return (
     <div ref={hubRef} className="bg-background text-foreground">
       <div className="hub-search-tool">
-        <HubSearch />
+        <HubSearch compact />
       </div>
       <NamTramRail active={active} visible={visible} onJump={(level: Level) => scrollTo(level)} />
 

@@ -1,7 +1,7 @@
 .hub-search-tool {
   position: fixed;
-  top: max(12px, env(safe-area-inset-top));
-  right: 100px;
+  top: calc(max(12px, env(safe-area-inset-top)) + 52px);
+  right: 12px;
   z-index: 50;
 }
 .hub-tools {
