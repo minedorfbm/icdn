@@ -84,7 +84,7 @@ test("level heading, controls, categories and full cards fit together on mobile"
           gradient.backgroundImage.includes("linear-gradient") &&
           gradient.height === "180px" &&
           next.getBoundingClientRect().top === previous.getBoundingClientRect().bottom &&
-          title.getBoundingClientRect().top - counter.getBoundingClientRect().bottom < 80
+          title.getBoundingClientRect().top - counter.getBoundingClientRect().bottom < 120
         );
       }),
     ),
@@ -141,4 +141,40 @@ test("docking preserves the heading, allows departure and respects reduced motio
   await gesture(top - 200, top - 35);
   await page.waitForTimeout(350);
   expect(Math.abs((await page.evaluate(() => window.scrollY)) - top + 35)).toBeLessThan(2);
+});
+
+test("Nam Tram jumps center a complete level without revealing adjacent titles", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "The journey From Heaven to Sea", exact: true }).click();
+  const rail = page.locator(".nam-tram-rail");
+  for (const level of ["earth", "heaven", "sea", "sky"]) {
+    await rail.getByRole("button").click();
+    const panel = page.locator(".nam-tram-panel");
+    await panel.getByRole("button", { name: level.toUpperCase(), exact: true }).click();
+    await expect(panel).toHaveCount(0);
+    const chapter = page.locator(`#${level}`);
+    await expect
+      .poll(() => chapter.evaluate((el) => Math.abs(el.getBoundingClientRect().top)))
+      .toBeLessThan(2);
+    await expect(rail).toHaveAttribute("data-level", level);
+    const bounds = await chapter.evaluate((el) => {
+      const heading = el.querySelector("header")!.getBoundingClientRect();
+      const counter = el.querySelector(".card-stack-pagination")!.getBoundingClientRect();
+      const next = el.nextElementSibling?.nextElementSibling?.querySelector("h2");
+      return {
+        headingTop: heading.top,
+        counterBottom: counter.bottom,
+        center: (heading.top + counter.bottom) / 2,
+        nextTop: next?.getBoundingClientRect().top ?? null,
+        height: window.innerHeight,
+      };
+    });
+    expect(bounds.headingTop).toBeGreaterThanOrEqual(12);
+    expect(bounds.counterBottom).toBeLessThan(bounds.height);
+    expect(Math.abs(bounds.center - bounds.height / 2)).toBeLessThan(14);
+    if (bounds.nextTop !== null) expect(bounds.nextTop).toBeGreaterThanOrEqual(bounds.height);
+  }
 });

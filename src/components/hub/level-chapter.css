@@ -1,6 +1,10 @@
 /* The title shares the top row with the compact controls on the right. */
 .level-chapter {
-  padding-top: max(12px, env(safe-area-inset-top));
+  min-height: 100lvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-bottom));
 }
 .chapter-frame {
   --chapter-card-height: calc(max(360px, 100lvh - 184px) * 0.85);
