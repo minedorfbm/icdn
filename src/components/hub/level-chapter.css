@@ -6,6 +6,10 @@
   justify-content: center;
   padding-block: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-bottom));
 }
+/* Size the title against the space left beside the navigation controls. */
+.level-chapter .journey-heading {
+  container-type: inline-size;
+}
 .chapter-frame {
   --chapter-card-height: calc(max(360px, 100lvh - 184px) * 0.85);
   margin-top: 16px;

@@ -178,3 +178,20 @@ test("Nam Tram jumps center a complete level without revealing adjacent titles",
     if (bounds.nextTop !== null) expect(bounds.nextTop).toBeGreaterThanOrEqual(bounds.height);
   }
 });
+
+test("level headings fit beside controls with a wider fallback serif", async ({ page }) => {
+  await page.goto("/");
+  await page.addStyleTag({
+    content: '.level-chapter h2 { font-family: "Times New Roman", serif; }',
+  });
+  for (const width of [390, 360, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    const chapter = page.locator("#heaven");
+    await chapter.evaluate((el) => el.scrollIntoView({ behavior: "instant" }));
+    const bounds = await chapter.evaluate((el) => ({
+      title: el.querySelector("h2 button")!.getBoundingClientRect().right,
+      control: document.querySelector(".hub-tools button")!.getBoundingClientRect().left,
+    }));
+    expect(bounds.title).toBeLessThanOrEqual(bounds.control - 4);
+  }
+});

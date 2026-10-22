@@ -35,12 +35,6 @@
     "beach": "ビーチ",
     "recreation": "レクリエーション"
   },
-  "LEVEL_LABEL": {
-    "heaven": "ヘブン",
-    "sky": "スカイ",
-    "earth": "アース",
-    "sea": "シー"
-  },
   "ACTION": {
     "DISCOVER": "詳しく見る",
     "MENU": "メニュー",

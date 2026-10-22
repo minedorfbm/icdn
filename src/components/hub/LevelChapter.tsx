@@ -110,7 +110,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
 
       <div className="relative pr-[var(--hub-rail-gutter)]">
         <header className="journey-heading mx-auto max-w-[740px] px-6">
-          <h2 className="font-serif text-[clamp(44px,17vw,104px)] leading-[0.82] tracking-[-0.03em]">
+          <h2 className="font-serif text-[clamp(44px,21cqi,104px)] leading-[0.82] tracking-[-0.03em]">
             <button
               type="button"
               onClick={() => setIndexOpen(true)}

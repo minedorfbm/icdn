@@ -35,12 +35,6 @@
     "beach": "해변",
     "recreation": "레저"
   },
-  "LEVEL_LABEL": {
-    "heaven": "헤븐",
-    "sky": "스카이",
-    "earth": "어스",
-    "sea": "씨"
-  },
   "ACTION": {
     "DISCOVER": "자세히 보기",
     "MENU": "메뉴",

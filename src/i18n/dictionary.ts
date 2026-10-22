@@ -249,14 +249,15 @@ export const TYPE_LABEL: Record<Lang, Record<string, string>> = {
   ja: jaDict.TYPE_LABEL,
 };
 
-/** Level names used in the detail sheet. */
+/** Resort wayfinding names stay identical to the map in every language. */
+const RESORT_LEVEL_NAMES = { heaven: "HEAVEN", sky: "SKY", earth: "EARTH", sea: "SEA" };
 export const LEVEL_LABEL: Record<Lang, Record<string, string>> = {
-  en: { heaven: "HEAVEN", sky: "SKY", earth: "EARTH", sea: "SEA" },
-  vi: { heaven: "THIÊN ĐƯỜNG", sky: "TRỜI", earth: "ĐẤT", sea: "BIỂN" },
-  ru: { heaven: "НЕБЕСА", sky: "НЕБО", earth: "ЗЕМЛЯ", sea: "МОРЕ" },
-  zh: { heaven: "天境", sky: "天空", earth: "大地", sea: "海洋" },
-  ko: koDict.LEVEL_LABEL,
-  ja: jaDict.LEVEL_LABEL,
+  en: RESORT_LEVEL_NAMES,
+  vi: RESORT_LEVEL_NAMES,
+  ru: RESORT_LEVEL_NAMES,
+  zh: RESORT_LEVEL_NAMES,
+  ko: RESORT_LEVEL_NAMES,
+  ja: RESORT_LEVEL_NAMES,
 };
 
 /** Call-to-action labels. */
