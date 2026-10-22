@@ -37,11 +37,6 @@ function paintSection(section: JourneySection, y: number, viewport: number, redu
   section.element.style.setProperty("--journey-scene-y", `${parallax.toFixed(2)}px`);
   section.element.style.setProperty("--journey-heading-y", `${headingY.toFixed(2)}px`);
   section.element.style.setProperty("--journey-heading-opacity", String(0.3 + entrance * 0.7));
-  // Clip the departing heading beneath the fixed toolbar without adding layout space.
-  section.element.style.setProperty(
-    "--journey-heading-clip",
-    `${Math.max(0, y + 64 - section.headingTop - headingY).toFixed(2)}px`,
-  );
   section.element.style.setProperty("--journey-deck-y", `${((1 - cards) * 24).toFixed(2)}px`);
   section.element.style.setProperty("--journey-deck-opacity", String(0.4 + cards * 0.6));
 }

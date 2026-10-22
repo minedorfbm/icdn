@@ -5,7 +5,7 @@ import { chapterDockTarget } from "./chapter-docking";
 export function useChapterDocking(rootRef: RefObject<HTMLElement | null>) {
   useEffect(() => {
     const sections = Array.from(
-      rootRef.current?.querySelectorAll<HTMLElement>(".chapter-frame") ?? [],
+      rootRef.current?.querySelectorAll<HTMLElement>(".level-chapter") ?? [],
     );
     if (!sections.length) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");

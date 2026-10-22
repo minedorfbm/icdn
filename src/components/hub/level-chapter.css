@@ -1,9 +1,19 @@
-/* The original level heading scrolls above a separate, viewport-sized card frame. */
+/* The title shares the top row with the compact controls on the right. */
+.level-chapter {
+  min-height: 100lvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-bottom));
+}
+/* Size the title against the space left beside the navigation controls. */
+.level-chapter .journey-heading {
+  container-type: inline-size;
+}
 .chapter-frame {
   --chapter-card-height: calc(max(360px, 100lvh - 184px) * 0.85);
   margin-top: 16px;
   padding-bottom: 12px;
-  scroll-margin-top: 64px;
 }
 .chapter-categories {
   min-height: 56px;
@@ -44,17 +54,7 @@
     var(--chapter-to) 100%
   );
 }
-.chapter-gradient + .level-chapter {
-  padding-top: 12px;
-}
 /* Cards and text stay above the shared background transition. */
 .level-chapter > .relative {
   z-index: 2;
-}
-
-.level-chapter .journey-heading {
-  clip-path: inset(var(--journey-heading-clip, 0px) 0 0);
-}
-.level-chapter header button {
-  scroll-margin-top: 64px;
 }

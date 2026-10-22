@@ -21,7 +21,6 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
   const [indexOpen, setIndexOpen] = useState(false);
   const [near, setNear] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-  const frameRef = useRef<HTMLDivElement>(null);
   const { destinations } = useHub();
   const { t, levelLine, cluster: clusterLabel } = useI18n();
 
@@ -58,7 +57,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
     setCardIndex((group?.items ?? all).findIndex((item) => item.id === destination.id));
     setIndexOpen(false);
     requestAnimationFrame(() =>
-      frameRef.current?.scrollIntoView({
+      sectionRef.current?.scrollIntoView({
         behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
           ? "instant"
           : "smooth",
@@ -93,7 +92,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
       id={id}
       data-level={id}
       data-cluster={activeCluster}
-      className="level level-chapter relative pt-24"
+      className="level level-chapter relative"
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <img
@@ -111,26 +110,25 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
 
       <div className="relative pr-[var(--hub-rail-gutter)]">
         <header className="journey-heading mx-auto max-w-[740px] px-6">
-          <span className="block h-px w-10 bg-current/40" aria-hidden />
-          <h2 className="mt-6 font-serif text-[clamp(48px,18vw,104px)] leading-[0.82] tracking-[-0.03em]">
+          <h2 className="font-serif text-[clamp(44px,21cqi,104px)] leading-[0.82] tracking-[-0.03em]">
             <button
               type="button"
               onClick={() => setIndexOpen(true)}
               aria-label={`${title} · ${t("all_places")}`}
               aria-haspopup="dialog"
               aria-expanded={indexOpen}
-              className="inline-flex min-h-11 items-center gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-4"
+              className="inline-flex min-h-11 items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               {title}
-              <ChevronDown aria-hidden className="size-5 shrink-0 opacity-60" strokeWidth={1.3} />
+              <ChevronDown aria-hidden className="size-3.5 shrink-0 opacity-60" strokeWidth={1.3} />
             </button>
           </h2>
-          <p className="mt-5 text-[14px] leading-relaxed tracking-[0.18em] opacity-70">
+          <p className="mt-3 text-[14px] leading-relaxed tracking-[0.18em] opacity-70">
             {levelLine(id, line).toUpperCase()}
           </p>
         </header>
 
-        <div ref={frameRef} className="chapter-frame">
+        <div className="chapter-frame">
           {groups.length > 0 && (
             <nav
               aria-label={`${title} ${t("collections")}`}
