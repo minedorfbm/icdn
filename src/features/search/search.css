@@ -13,6 +13,16 @@
   gap: 8px;
   max-width: calc(100vw - 24px);
 }
+.hub-tools .brand-control {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  justify-content: center;
+  gap: 0;
+}
+.hub-tools .brand-control svg {
+  display: none;
+}
 .hub-search-trigger {
   display: flex;
   align-items: center;
