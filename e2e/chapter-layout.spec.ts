@@ -74,17 +74,18 @@ test("level heading, controls, categories and full cards fit together on mobile"
   expect(
     await page.locator(".chapter-gradient").evaluateAll((elements) =>
       elements.every((el) => {
-        const gradient = getComputedStyle(el, "::before");
+        const gradient = getComputedStyle(el);
         const next = el.nextElementSibling!;
         const previous = el.previousElementSibling!;
         const title = next.querySelector<HTMLElement>("h2")!;
-        const counter = previous.querySelector(".card-stack-pagination")!;
+        const bounds = el.getBoundingClientRect();
         return (
-          el.getBoundingClientRect().height === 0 &&
+          bounds.height === 80 &&
           gradient.backgroundImage.includes("linear-gradient") &&
-          gradient.height === "180px" &&
-          next.getBoundingClientRect().top === previous.getBoundingClientRect().bottom &&
-          title.getBoundingClientRect().top - counter.getBoundingClientRect().bottom < 120
+          bounds.top === previous.getBoundingClientRect().bottom &&
+          bounds.bottom === next.getBoundingClientRect().top &&
+          bounds.bottom <= title.getBoundingClientRect().top &&
+          getComputedStyle(el, "::before").content === "none"
         );
       }),
     ),
