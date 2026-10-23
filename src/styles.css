@@ -233,8 +233,14 @@
 
 .resort-logo {
   display: block;
-  height: auto;
   max-width: 100%;
+}
+
+.resort-logo > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: inherit;
   object-fit: contain;
 }
 
@@ -245,6 +251,16 @@
 
 .footer-resort-logo {
   width: min(100%, 320px);
+}
+
+@media (min-width: 768px) and (orientation: landscape) {
+  .hero-welcome {
+    color: var(--brand-ink);
+    text-shadow: 0 1px 8px rgb(255 255 255 / 70%);
+  }
+  .hero-resort-logo {
+    filter: drop-shadow(0 1px 4px rgb(255 255 255 / 85%));
+  }
 }
 
 .hero-welcome h1 {

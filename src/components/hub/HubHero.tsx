@@ -1,3 +1,4 @@
+import { HERO_LANDSCAPE_MEDIA } from "@/lib/hero-media";
 import { ResortLogo } from "./ResortLogo";
 import { useI18n } from "@/i18n";
 import { ArrowDown } from "lucide-react";
@@ -6,9 +7,6 @@ import { lazy, Suspense, useCallback, useState } from "react";
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 
 const MichelinFilm = lazy(() => import("./MichelinFilm"));
-
-export const HERO_LANDSCAPE_MEDIA = "(min-width: 768px) and (orientation: landscape)";
-export const HERO_PORTRAIT_MEDIA = "(max-width: 767px), (orientation: portrait)";
 
 export function HubHero({
   image,
@@ -33,7 +31,7 @@ export function HubHero({
       </picture>
 
       <div className="hero-welcome">
-        <ResortLogo tone="light" className="hero-resort-logo" />
+        <ResortLogo tone="light" landscapeTone="dark" className="hero-resort-logo" />
         <h1 className="font-serif">{t("hero_welcome")}</h1>
       </div>
 
