@@ -411,9 +411,10 @@ export function MapArtwork({
             className="canopy-texture"
             href="/resort-map/canopy.webp"
             x="0"
-            y="0"
+            // The northern headland extends above the map's zero baseline.
+            y="-80"
             width="1500"
-            height="1100"
+            height="1180"
             preserveAspectRatio="xMidYMid slice"
             clipPath="url(#landmass-clip)"
           />

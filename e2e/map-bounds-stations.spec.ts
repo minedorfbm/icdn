@@ -10,6 +10,18 @@ test("overview cannot drift out of the resort and keeps station names hidden", a
   const map = page.getByRole("dialog", { name: "Resort map" });
   const svg = map.locator("svg.resort-art");
   const scene = svg.locator(".map-scene");
+  const coverage = await svg.evaluate((el) => {
+    const land = el.querySelector<SVGPathElement>(".forest-base")!.getBBox();
+    const image = el.querySelector<SVGImageElement>(".canopy-texture")!;
+    return {
+      covered:
+        image.x.baseVal.value <= land.x &&
+        image.y.baseVal.value <= land.y &&
+        image.x.baseVal.value + image.width.baseVal.value >= land.x + land.width &&
+        image.y.baseVal.value + image.height.baseVal.value >= land.y + land.height,
+    };
+  });
+  expect(coverage.covered).toBe(true);
   await expect(svg.locator(".station-plaque")).toHaveCount(0);
   await expect(svg.locator(".tram-station-target")).toHaveCount(4);
   await svg.focus();
