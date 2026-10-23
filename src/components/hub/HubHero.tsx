@@ -32,19 +32,23 @@ export function HubHero({
         </picture>
       </div>
 
-      <h1 className="hero-welcome">
-        <ResortLogo tone="gold" className="hero-resort-logo" />
-      </h1>
+      <div className="hero-sky">
+        <div className="hero-sky-content">
+          <h1 className="hero-welcome">
+            <ResortLogo tone="gold" className="hero-resort-logo" />
+          </h1>
 
-      <button onClick={() => scrollToHubSection("discover")} className="hero-invitation">
-        <span className="hero-invitation-title font-serif">
-          {t("hero_title_1")}
-          <br />
-          {t("hero_title_2")}
-        </span>
-        <span className="hero-invitation-caption">{t("hero_sub")}</span>
-        <ArrowDown className="size-4" strokeWidth={1.2} aria-hidden />
-      </button>
+          <button onClick={() => scrollToHubSection("discover")} className="hero-invitation">
+            <span className="hero-invitation-title font-serif">
+              {t("hero_title_1")}
+              <br />
+              {t("hero_title_2")}
+            </span>
+            <span className="hero-invitation-caption">{t("hero_sub")}</span>
+            <ArrowDown className="hero-invitation-arrow" strokeWidth={1.2} aria-hidden />
+          </button>
+        </div>
+      </div>
       <button
         type="button"
         onClick={(event) => {

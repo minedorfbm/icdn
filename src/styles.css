@@ -214,6 +214,7 @@
 
 .hub-hero {
   position: relative;
+  container-type: size;
   height: 100svh;
   min-height: 540px;
   overflow: hidden;
@@ -239,17 +240,37 @@
   object-fit: cover;
 }
 
-.hero-welcome {
+.hero-sky {
+  /* Match object-fit: cover, then locate the clear sky in the supplied portrait photo.
+     Portrait: x 211–484, y 321–621 in 695×1137. No resize/scroll JavaScript. */
+  --hero-photo-width: max(100cqw, calc(100cqh * 0.61126));
+  --hero-photo-height: max(100cqh, calc(100cqw * 1.63597));
   position: absolute;
   z-index: 1;
-  top: 27%;
+  top: calc(50% - var(--hero-photo-height) * 0.2177);
   left: 50%;
-  width: min(50%, 280px);
+  width: calc(var(--hero-photo-width) * 0.392);
+  height: calc(var(--hero-photo-height) * 0.264);
   transform: translateX(-50%);
+  container: hero-sky / size;
+  display: grid;
+  place-items: center;
+}
+
+.hero-sky-content {
+  width: 100%;
+  padding: clamp(6px, 4cqw, 12px);
   display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: clamp(8px, 5cqh, 24px);
+}
+
+.hero-welcome {
+  width: min(100%, 360px);
+  flex-shrink: 0;
+  line-height: 0;
   text-align: center;
-  color: var(--brand-ink);
 }
 
 .resort-logo {
@@ -268,32 +289,32 @@
 }
 
 .hero-invitation {
-  position: absolute;
-  z-index: 1;
-  top: 43%;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  width: min(56%, 360px);
+  gap: clamp(4px, 2cqh, 10px);
+  width: 100%;
   min-height: 44px;
   text-align: center;
-  color: var(--brand-ink);
-  text-shadow: 0 1px 8px rgb(255 255 255 / 70%);
+  color: #000;
 }
 
 .hero-invitation-title {
-  font-size: clamp(28px, 7.8vw, 48px);
+  font-size: clamp(20px, 14cqw, 44px);
   line-height: 1.08;
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .hero-invitation-caption {
-  font-size: clamp(8px, 2.1vw, 10px);
-  line-height: 1.7;
+  font-size: clamp(8px, 3.8cqw, 10px);
+  line-height: 1.5;
   letter-spacing: 0.13em;
+}
+
+.hero-invitation-arrow {
+  width: 14px;
+  height: 14px;
 }
 
 .hero-film-button {
@@ -310,9 +331,16 @@
   filter: brightness(0) invert(1) drop-shadow(0 2px 3px rgb(0 0 0 / 35%));
 }
 
-@media (max-height: 700px) and (orientation: portrait) {
-  .hero-welcome {
-    top: 24%;
+@container hero-sky (max-height: 180px) {
+  .hero-sky-content {
+    padding: 4px;
+    gap: 6px;
+  }
+  .hero-invitation {
+    gap: 3px;
+  }
+  .hero-invitation-arrow {
+    display: none;
   }
 }
 
@@ -320,9 +348,13 @@
   .threshold-img {
     animation: slow-zoom 4000ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
-  .hero-welcome {
-    top: 20%;
-    width: min(32%, 360px);
+  .hero-sky {
+    /* Landscape: clear central opening above the horizon, in 1536×1024. */
+    --hero-photo-width: max(100cqw, calc(100cqh * 1.5));
+    --hero-photo-height: max(100cqh, calc(100cqw * 0.66667));
+    top: calc(50% - var(--hero-photo-height) * 0.375);
+    width: calc(var(--hero-photo-width) * 0.265625);
+    height: calc(var(--hero-photo-height) * 0.39);
   }
 }
 
