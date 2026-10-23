@@ -410,10 +410,11 @@ export function MapArtwork({
           <image
             className="canopy-texture"
             href="/resort-map/canopy.webp"
-            x="0"
-            y="0"
-            width="1500"
-            height="1100"
+            // Include the curved headland beyond the map's zero baseline.
+            x="-100"
+            y="-180"
+            width="1700"
+            height="1280"
             preserveAspectRatio="xMidYMid slice"
             clipPath="url(#landmass-clip)"
           />
