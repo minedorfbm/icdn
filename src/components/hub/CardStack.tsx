@@ -3,6 +3,8 @@ import { DestinationPanel } from "./DestinationPanel";
 import { useDestinationNavigation } from "@/lib/use-destination-navigation";
 import type { Destination } from "@/data/resort";
 import { cardPosition, swipeStep } from "@/lib/card-swipe";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useI18n } from "@/i18n";
 
 /** A front-facing hero and two receding previews, all sharing one responsive stage. */
 // Slot geometry: [horizontal offset, scale, brightness, stacking order, rotation Y].
@@ -59,6 +61,7 @@ export function CardStack({
   const [drag, setDrag] = useState(0); // px, negative = pulling next card in
   const [dragging, setDragging] = useState(false);
   const { openDestination } = useDestinationNavigation();
+  const { t } = useI18n();
   const moved = useRef(false);
   const frame = useRef<number | null>(null);
   const pendingDrag = useRef(0);
@@ -280,6 +283,24 @@ export function CardStack({
               className="h-px bg-current transition-[width] duration-300"
               style={{ width: `${((index + 1) / items.length) * 100}%` }}
             />
+          </div>
+          <div className="chapter-deck-controls">
+            <button
+              type="button"
+              aria-label={`${t("previous_discovery")} · ${items[index - 1]?.name ?? ""}`}
+              disabled={index === 0}
+              onClick={() => onIndexChange((i) => clamp(i - 1))}
+            >
+              <ChevronLeft size={19} strokeWidth={1.4} aria-hidden />
+            </button>
+            <button
+              type="button"
+              aria-label={`${t("continue_journey")} · ${items[index + 1]?.name ?? ""}`}
+              disabled={index === last}
+              onClick={() => onIndexChange((i) => clamp(i + 1))}
+            >
+              <ChevronRight size={19} strokeWidth={1.4} aria-hidden />
+            </button>
           </div>
         </div>
       )}

@@ -39,3 +39,150 @@
   pointer-events: none;
   background: linear-gradient(to bottom, var(--chapter-from) 0%, var(--chapter-to) 100%);
 }
+
+.chapter-deck-controls {
+  display: none;
+}
+
+/* Large formats share the original deck; phone geometry above is unchanged. */
+@media (min-width: 768px) {
+  .level-chapter {
+    padding-block: 24px;
+  }
+  .chapter-layout {
+    --chapter-card-height: clamp(360px, calc(100lvh - 176px), 700px);
+    width: min(1180px, calc(100% - 120px));
+    margin-inline: auto;
+    padding-right: 0;
+  }
+  .level-chapter .journey-heading {
+    max-width: none;
+    margin: 0;
+    padding-inline: 0;
+  }
+  .level-chapter .journey-heading h2 {
+    font-size: clamp(56px, 18cqi, 96px);
+  }
+  .level-chapter .journey-heading p {
+    font-family: var(--font-serif);
+    font-size: 23px;
+    line-height: 1.4;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .level-chapter .chapter-frame {
+    --chapter-card-height: inherit;
+    width: min(100%, calc(var(--chapter-card-height) * 0.78));
+    margin: 0;
+    padding-bottom: 0;
+  }
+  .level-chapter .chapter-categories {
+    max-width: none;
+    border-top: 0;
+  }
+  .level-chapter .chapter-categories > div {
+    padding-inline: 0;
+  }
+  .level-chapter .chapter-categories button > span:first-child {
+    font-size: 18px;
+  }
+  .level-chapter .chapter-stack {
+    width: 100%;
+    clip-path: none;
+  }
+  .level-chapter .card-stack-pagination {
+    padding-inline: 0;
+    min-height: 48px;
+    gap: 16px;
+  }
+  .level-chapter .perspective-card {
+    container-type: inline-size;
+  }
+  .level-chapter .destination-panel h3 {
+    font-size: clamp(30px, 11cqi, 46px);
+  }
+  .level-chapter .destination-panel-meta {
+    font-size: 11px;
+  }
+  .level-chapter .destination-panel-summary {
+    font-size: 17px;
+  }
+  .level-chapter .destination-panel-actions a {
+    font-size: 11px;
+  }
+  .level-chapter .chapter-deck-controls {
+    display: flex;
+    gap: 6px;
+  }
+  .chapter-deck-controls button {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid currentColor;
+    border-color: color-mix(in oklab, currentColor 25%, transparent);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  .chapter-deck-controls button:disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
+  .chapter-deck-controls button:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+/* The editorial heading sits beside the deck when there is room for both. */
+@media (min-width: 1024px) and (orientation: landscape) {
+  .chapter-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    align-items: center;
+    gap: clamp(32px, 5vw, 80px);
+  }
+  .level-chapter .journey-heading {
+    padding-bottom: 52px;
+  }
+  .level-chapter .journey-heading::before {
+    content: "";
+    display: block;
+    width: 44px;
+    height: 1px;
+    margin-bottom: 32px;
+    background: currentColor;
+    opacity: 0.4;
+  }
+  .level-chapter .chapter-frame {
+    justify-self: end;
+  }
+}
+
+/* A portrait tablet keeps a compact heading above a centered, upright deck. */
+@media (min-width: 768px) and (max-width: 1023px), (min-width: 768px) and (orientation: portrait) {
+  .chapter-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: min(760px, calc(100% - 100px));
+    --chapter-card-height: clamp(360px, calc(100lvh - 248px), 800px);
+  }
+  .level-chapter .journey-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: min(100%, calc(var(--chapter-card-height, 800px) * 0.78));
+    margin-bottom: 16px;
+  }
+  .level-chapter .journey-heading h2 {
+    font-size: clamp(64px, 12vw, 88px);
+  }
+  .level-chapter .journey-heading p {
+    max-width: 15ch;
+    margin-top: 0;
+    font-size: 20px;
+    text-align: right;
+  }
+}
