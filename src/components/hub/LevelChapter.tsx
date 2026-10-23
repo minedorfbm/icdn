@@ -105,7 +105,6 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
           height={1400}
           className="journey-backdrop level-bg absolute -inset-y-12 left-0 h-[calc(100%+96px)] w-full object-cover"
         />
-        <div className="level-veil absolute inset-0" />
       </div>
 
       <div className="chapter-layout relative pr-[var(--hub-rail-gutter)]">
