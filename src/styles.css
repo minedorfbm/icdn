@@ -398,16 +398,6 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
 }
 
-/* Shared with expanded cards; photographs add texture without changing each world's hue. */
-.level .level-veil {
-  background: linear-gradient(
-    to bottom,
-    color-mix(in oklab, var(--level-bg) 96%, transparent) 0%,
-    color-mix(in oklab, var(--level-bg) 82%, transparent) 56%,
-    color-mix(in oklab, var(--level-bg) 96%, transparent) 100%
-  );
-}
-
 .level {
   --level-bg: var(--world-heaven);
   --level-fg: var(--world-heaven-foreground);
@@ -417,6 +407,8 @@
 }
 
 .level .level-bg {
+  /* One opacity layer matches the approved photo-over-palette preview. */
+  opacity: 0.1;
   transition: opacity 600ms ease;
 }
 
@@ -456,40 +448,24 @@
   background-color: var(--level-bg);
   color: var(--level-fg);
 }
-.level[data-level="heaven"] .level-bg {
-  opacity: 0.3;
-}
-
 .level[data-level="sky"] {
   --level-bg: var(--world-sky);
   --level-fg: var(--world-sky-foreground);
   background-color: var(--level-bg);
   color: var(--level-fg);
 }
-.level[data-level="sky"] .level-bg {
-  opacity: 0.42;
-}
-
 .level[data-level="earth"] {
   --level-bg: var(--world-earth);
   --level-fg: var(--world-earth-foreground);
   background-color: var(--level-bg);
   color: var(--level-fg);
 }
-.level[data-level="earth"] .level-bg {
-  opacity: 0.4;
-}
-
 .level[data-level="sea"] {
   --level-bg: var(--world-sea);
   --level-fg: var(--world-sea-foreground);
   background-color: var(--level-bg);
   color: var(--level-fg);
 }
-.level[data-level="sea"] .level-bg {
-  opacity: 0.38;
-}
-
 .sea-footer {
   background: var(--brand-white);
   color: var(--brand-ink);

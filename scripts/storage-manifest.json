@@ -85,9 +85,9 @@
   },
   {
     "key": "earth",
-    "file": "earth-4a34efbb9e42.webp",
-    "bytes": 266852,
-    "sha256": "4a34efbb9e42c6fcccdfe27485c11207ccafbd3bfc88f6fcca0238ac6fc9cde3"
+    "file": "earth-9516751b330d.webp",
+    "bytes": 266516,
+    "sha256": "9516751b330d95f03cc0eca5da739ff434fbdd8a382e9d47f2d0625ba2adc922"
   },
   {
     "key": "g-architecture-detail",
@@ -115,9 +115,9 @@
   },
   {
     "key": "heaven",
-    "file": "heaven-07ebb3932730.webp",
-    "bytes": 120668,
-    "sha256": "07ebb3932730acdd22c00df794519a89f54917fcc6df9b544498cc8b6315ef2f"
+    "file": "heaven-6314fa39a2e6.webp",
+    "bytes": 52158,
+    "sha256": "6314fa39a2e636123bba7967c3fbac6b070eee9e361b5ac50d34e5cec25f7051"
   },
   {
     "key": "ihg-rewards",
@@ -145,14 +145,14 @@
   },
   {
     "key": "sea",
-    "file": "sea-75015ae061fa.webp",
-    "bytes": 10666,
-    "sha256": "75015ae061fab598e92ba660f8ec240fe146e617b1dd475b678fcb8f923745e2"
+    "file": "sea-7e5599b59edf.webp",
+    "bytes": 176892,
+    "sha256": "7e5599b59edf0a925bb59afa6c47c3a1039e5d80f5cf6a1852b9108d01890cb6"
   },
   {
     "key": "sky",
-    "file": "sky-3733802086de.webp",
-    "bytes": 60540,
-    "sha256": "3733802086deb6e9892e1d84ec36146755895e5fdf975fe7aa51e8611eade9fb"
+    "file": "sky-de56a07a2dd3.webp",
+    "bytes": 267112,
+    "sha256": "de56a07a2dd39a110eb7f2a777ec88c04ee0eb778545bd9fbcaed7a4ffae67e8"
   }
 ]
