@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { preload } from "react-dom";
 import { DestinationCollection } from "./DestinationCollection";
 import { ArrowLeft, ArrowUpRight, ChevronDown, MapPin } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
@@ -49,6 +50,8 @@ function DestinationHero({ dest, onClose }: Readonly<{ dest: Destination; onClos
   const { t } = useI18n();
   const [selected, setSelected] = useState(0);
   const images = Array.from(new Set([dest.detailImage, dest.image]));
+  // React does not automatically preload images inside a picture element.
+  preload(dest.detailImage, { as: "image", fetchPriority: "high" });
   return (
     <div className="editorial-hero">
       <picture>

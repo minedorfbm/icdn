@@ -37,21 +37,32 @@ test("desktop uses facing columns and both tablet orientations use the portrait 
   for (const format of formats) {
     await page.setViewportSize(format);
     await scroller.evaluate((node) => node.scrollTo(0, 0));
-    const photo = (await card.locator(".editorial-hero").boundingBox())!;
-    const intro = (await card.locator(".editorial-intro").boundingBox())!;
-    const collection = (await card.locator(".editorial-collection").boundingBox())!;
-    expect(photo.y).toBeGreaterThanOrEqual(88);
-    if (format.width >= 1200) {
-      expect(photo.x + photo.width).toBeLessThan(intro.x);
-      expect(intro.y).toBeLessThan(photo.y + photo.height);
-      expect(collection.y).toBeGreaterThanOrEqual(
-        Math.max(photo.y + photo.height, intro.y + intro.height),
-      );
-    } else {
-      expect(intro.y).toBeGreaterThan(photo.y + photo.height);
-      expect(intro.x).toBe(photo.x);
-      expect(intro.width).toBe(photo.width);
-    }
+    await expect(async () => {
+      // Read the whole composition in one frame after the resize has painted.
+      const { photo, intro, collection } = await card.evaluate((node) => {
+        const bounds = (selector: string) => {
+          const { x, y, width, height } = node.querySelector(selector)!.getBoundingClientRect();
+          return { x, y, width, height };
+        };
+        return {
+          photo: bounds(".editorial-hero"),
+          intro: bounds(".editorial-intro"),
+          collection: bounds(".editorial-collection"),
+        };
+      });
+      expect(photo.y).toBeGreaterThanOrEqual(88);
+      if (format.width >= 1200) {
+        expect(photo.x + photo.width).toBeLessThan(intro.x);
+        expect(intro.y).toBeLessThan(photo.y + photo.height);
+        expect(collection.y).toBeGreaterThanOrEqual(
+          Math.max(photo.y + photo.height, intro.y + intro.height),
+        );
+      } else {
+        expect(intro.y).toBeGreaterThan(photo.y + photo.height);
+        expect(intro.x).toBe(photo.x);
+        expect(intro.width).toBe(photo.width);
+      }
+    }).toPass({ timeout: 5000 });
     await expect(card.locator(".editorial-description")).toHaveCSS("font-size", "18px");
     await expect(card.getByRole("button", { name: "BACK", exact: true })).toBeVisible();
     await expect
