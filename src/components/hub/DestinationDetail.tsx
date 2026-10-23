@@ -22,6 +22,7 @@ import { InstagramPostCarousel } from "./InstagramPostCarousel";
 import { InstagramStrip } from "./InstagramStrip";
 import { RelatedDestinations } from "./RelatedDestinations";
 import { DestinationJourneyNavigation } from "./DestinationJourneyNavigation";
+import { ResortLogo } from "./ResortLogo";
 import { ResortLevelIcon } from "./ResortLevelIcon";
 import "./editorial-detail.css";
 
@@ -166,9 +167,7 @@ export function DestinationDetail({
           <ArrowLeft size={17} strokeWidth={1.5} aria-hidden />
           {t("back")}
         </button>
-        <p>
-          InterContinental <span>Danang Sun Peninsula Resort</span>
-        </p>
+        <ResortLogo tone={dest.level === "sky" || dest.level === "earth" ? "light" : "dark"} />
       </header>
       <div className="fixed right-5 top-[max(24px,env(safe-area-inset-top))] z-10">
         <HubSearch compact />

@@ -1,7 +1,9 @@
 import { Fragment, type CSSProperties } from "react";
 import { useChapterDocking } from "@/lib/use-chapter-docking";
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
+import { ResortLogo } from "@/components/hub/ResortLogo";
 import { HubHero } from "@/components/hub/HubHero";
+import { HERO_LANDSCAPE_MEDIA, HERO_PORTRAIT_MEDIA } from "@/lib/hero-media";
 import { HubSearch } from "@/features/search/HubSearch";
 import { HubSearchProvider } from "@/features/search/HubSearchProvider";
 import { DiscoveryPaths } from "@/features/discovery/DiscoveryPaths";
@@ -37,7 +39,22 @@ export const Route = createFileRoute("/_hub")({
   staleTime: 0,
   head: ({ loaderData }) => ({
     links: loaderData?.isHome
-      ? [{ rel: "preload", as: "image", href: resolveHeroImage(loaderData), fetchPriority: "high" }]
+      ? [
+          {
+            rel: "preload",
+            as: "image",
+            href: resolveHeroImage(loaderData),
+            media: HERO_PORTRAIT_MEDIA,
+            fetchPriority: "high",
+          },
+          {
+            rel: "preload",
+            as: "image",
+            href: resolveHeroImage(loaderData, "landscape"),
+            media: HERO_LANDSCAPE_MEDIA,
+            fetchPriority: "high",
+          },
+        ]
       : [],
     meta: [
       { title: "InterContinental Danang — Digital Discovery | Heaven to Sea" },
@@ -103,7 +120,10 @@ function HubRoute() {
             <div className="hub-tools">
               <LanguageSwitch />
             </div>
-            <HubHero image={resolveHeroImage({ settings })} />
+            <HubHero
+              image={resolveHeroImage({ settings })}
+              landscapeImage={resolveHeroImage({ settings }, "landscape")}
+            />
           </>
         )}
         {data ? (
@@ -188,7 +208,9 @@ function Hub() {
 
       {/* END OF JOURNEY */}
       <section className="brand-ui sea-footer px-6 py-24">
-        <h2 className="font-serif text-[30px] leading-tight tracking-tight">{t("footer_title")}</h2>
+        <h2 aria-label={t("footer_title")}>
+          <ResortLogo className="footer-resort-logo" loading="lazy" />
+        </h2>
         <ul className="mt-8 flex flex-col divide-y divide-current/10 border-y border-current/10">
           {links.map(({ label, url, translations }) => (
             <li key={label}>

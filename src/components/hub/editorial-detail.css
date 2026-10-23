@@ -395,19 +395,9 @@
     border-bottom: 1px solid var(--editorial-border);
     background: var(--level-bg);
   }
-  .editorial-large-toolbar > p {
-    font-family: var(--brand-serif);
-    font-size: 23px;
-    line-height: 1.2;
-    text-align: center;
-  }
-  .editorial-large-toolbar > p > span {
-    display: block;
-    margin-top: 4px;
-    font-family: var(--brand-sans);
-    font-size: 9px;
-    letter-spacing: 1.6px;
-    text-transform: uppercase;
+  .editorial-large-toolbar .resort-logo {
+    width: 240px;
+    max-height: 76px;
   }
   .editorial-large-toolbar .editorial-back {
     top: 22px;

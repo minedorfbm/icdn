@@ -107,6 +107,33 @@ test("the hero displays before a slow catalogue and media waits for an opened ca
   expect(errors).toEqual([]);
 });
 
+test("the hero selects the matching photo and preload in portrait and landscape", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const hero = page.locator(".threshold-img");
+  for (const [width, height, file] of [
+    [390, 844, "intercontinental-touch-icon.png"],
+    [1440, 900, "intercontinental-favicon.png"],
+    [834, 1194, "intercontinental-touch-icon.png"],
+    [1194, 834, "intercontinental-favicon.png"],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    await expect
+      .poll(() => hero.evaluate((image: HTMLImageElement) => image.currentSrc))
+      .toContain(file);
+    const activePreloads = await page
+      .locator('link[rel="preload"][as="image"][media]')
+      .evaluateAll((links) =>
+        links
+          .filter((link) => matchMedia(link.getAttribute("media") || "all").matches)
+          .map((link) => link.getAttribute("href")),
+      );
+    expect(activePreloads).toEqual([`/${file}`]);
+  }
+});
+
 test("a failed card media request can be retried without losing the card", async ({ page }) => {
   let mediaCalls = 0;
   await page.route("**/_serverFn/**", (route) => {
