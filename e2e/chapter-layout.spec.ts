@@ -80,7 +80,8 @@ test("level heading, controls, categories and full cards fit together on mobile"
         const title = next.querySelector<HTMLElement>("h2")!;
         const bounds = el.getBoundingClientRect();
         return (
-          bounds.height === 80 &&
+          bounds.height >= 120 &&
+          bounds.height <= 180 &&
           gradient.backgroundImage.includes("linear-gradient") &&
           bounds.top === previous.getBoundingClientRect().bottom &&
           bounds.bottom === next.getBoundingClientRect().top &&

@@ -193,6 +193,7 @@ function Hub() {
             {levels[index + 1] && (
               <div
                 className="chapter-gradient"
+                data-from={l.id}
                 aria-hidden
                 style={
                   {
