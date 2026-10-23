@@ -4,6 +4,8 @@ import { InstagramIcon } from "@/components/ui/instagram-icon";
 import type { DestinationPost } from "@/data/resort";
 import { useI18n } from "@/i18n";
 import { instagramEmbedUrl, instagramLink } from "@/lib/external-url";
+import { nativeInstagramPost } from "@/data/native-instagram-posts";
+import { NativeInstagramPostCard } from "./NativeInstagramPostCard";
 import "./instagram-post.css";
 
 const SCRIPT_SRC = "https://www.instagram.com/embed.js";
@@ -75,7 +77,16 @@ function processEmbeds(): Promise<void> {
 }
 
 /** Official embed with the shared caption preview and an offline fallback. */
-export function InstagramPostEmbed({
+export function InstagramPostEmbed(props: Readonly<{ post: DestinationPost; enabled?: boolean }>) {
+  const native = nativeInstagramPost(props.post.post_url);
+  return native ? (
+    <NativeInstagramPostCard post={native} url={props.post.post_url} />
+  ) : (
+    <OfficialInstagramPostEmbed {...props} />
+  );
+}
+
+function OfficialInstagramPostEmbed({
   post,
   enabled = true,
 }: Readonly<{ post: DestinationPost; enabled?: boolean }>) {

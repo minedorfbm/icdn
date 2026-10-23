@@ -210,6 +210,16 @@ const tables: Record<string, unknown[]> = {
     },
   ],
   destination_posts: [
+    ...["DGwwT3cCPE5", "DL9jFzytrOp", "DMPkp9hM_nP"].map((post, display_order) => ({
+      destination_id: "enchanted-holiday",
+      post_url: `https://www.instagram.com/p/${post}/`,
+      embed_mode: "link",
+      account: "intercontinentaldanang",
+      caption: null,
+      image_url: null,
+      posted_at: null,
+      display_order,
+    })),
     ...["WINDOW0", "WINDOW1", "WINDOW2", "DIRECT3", "WINDOW4"].map((post, display_order) => ({
       destination_id: "tingara",
       post_url: `https://www.instagram.com/p/${post}/`,
