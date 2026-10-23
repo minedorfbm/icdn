@@ -72,3 +72,27 @@ test("unavailable official content always leaves the map return and external lin
   await reader.getByRole("button", { name: "Back to map", exact: true }).click();
   await expect(map.getByRole("button", { name: "Explore", exact: true })).toBeVisible();
 });
+
+test("design-tour card opens the map with the official Bensley tour already open", async ({
+  page,
+}) => {
+  await page.route(BENSLEY_TOUR_SOURCE, (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: "<h1>Official design tour fixture</h1>",
+    }),
+  );
+  await page.goto("/design-digital-tour");
+  await page.locator(".editorial-map").click();
+  const map = page.getByRole("dialog", { name: "Resort map", exact: true });
+  const reader = map.locator(".atlas-tour-reader");
+  await expect(reader).toBeVisible();
+  await expect(
+    page.frameLocator(`iframe[title="${readerTitle}"]`).getByRole("heading", {
+      name: "Official design tour fixture",
+    }),
+  ).toBeVisible();
+  await reader.getByRole("button", { name: "Back to map", exact: true }).click();
+  await expect(reader).toBeHidden();
+  await expect(map.getByRole("button", { name: "Bensley Tour", exact: true })).toBeVisible();
+});

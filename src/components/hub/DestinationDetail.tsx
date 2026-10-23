@@ -91,6 +91,7 @@ function DestinationHero({ dest, onClose }: Readonly<{ dest: Destination; onClos
 }
 
 const destinationMapModes: Record<string, "tour" | "photos"> = {
+  "design-digital-tour": "tour",
   "bensley-package": "tour",
   "instagram-spots": "photos",
 };
