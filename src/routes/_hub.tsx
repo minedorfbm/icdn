@@ -1,5 +1,5 @@
-import { Fragment, type CSSProperties } from "react";
-import "@/components/hub/atmospheric-transitions.css";
+import { Fragment } from "react";
+import { AtmosphericTransition } from "@/components/hub/AtmosphericTransition";
 import { useChapterDocking } from "@/lib/use-chapter-docking";
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 import { ResortLogo } from "@/components/hub/ResortLogo";
@@ -191,22 +191,7 @@ function Hub() {
         {levels.map((l, index) => (
           <Fragment key={l.id}>
             <LevelChapter {...l} />
-            {levels[index + 1] && (
-              <div
-                className="chapter-gradient"
-                data-atmosphere={l.id}
-                aria-hidden
-                style={
-                  {
-                    "--chapter-from": `var(--world-${l.id})`,
-                    "--chapter-to": `var(--world-${levels[index + 1]!.id})`,
-                  } as CSSProperties
-                }
-              >
-                <span className="chapter-atmosphere-mist" />
-                <span className="chapter-atmosphere-light" />
-              </div>
-            )}
+            {levels[index + 1] && <AtmosphericTransition from={l.id} to={levels[index + 1]!.id} />}
           </Fragment>
         ))}
       </div>

@@ -206,13 +206,8 @@ test("atmospheric passages remain static with reduced motion", async ({ page }) 
   await expect(passages).toHaveCount(3);
   for (const passage of await passages.all()) {
     await expect(passage).toHaveAttribute("aria-hidden", "true");
-    expect(
-      await passage.locator("span").evaluateAll((layers) =>
-        layers.every((layer) => {
-          const style = getComputedStyle(layer);
-          return style.animationName === "none" && style.transform === "none";
-        }),
-      ),
-    ).toBe(true);
+    await expect(passage).toHaveAttribute("data-renderer", "fallback");
+    await expect(passage.locator("canvas")).toBeHidden();
+    await expect(passage.locator("svg")).toBeVisible();
   }
 });
