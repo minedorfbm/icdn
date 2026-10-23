@@ -267,6 +267,7 @@ const tables: Record<string, unknown[]> = {
   ],
   site_settings: [
     { key: "hero_image", value: "/intercontinental-touch-icon.png" },
+    { key: "hero_image_landscape", value: "/intercontinental-favicon.png" },
     { key: "contact", value: "tel:+842363938888" },
     { key: "whatsapp", value: "https://wa.me/842363938888" },
     { key: "zalo", value: "https://zalo.me/842363938888" },

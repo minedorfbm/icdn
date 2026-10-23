@@ -1,3 +1,4 @@
+import { ResortLogo } from "./ResortLogo";
 import { useI18n } from "@/i18n";
 import { ArrowDown } from "lucide-react";
 import { lazy, Suspense, useCallback, useState } from "react";
@@ -6,32 +7,34 @@ import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 
 const MichelinFilm = lazy(() => import("./MichelinFilm"));
 
-export function HubHero({ image }: Readonly<{ image: string }>) {
+export const HERO_LANDSCAPE_MEDIA = "(min-width: 768px) and (orientation: landscape)";
+export const HERO_PORTRAIT_MEDIA = "(max-width: 767px), (orientation: portrait)";
+
+export function HubHero({
+  image,
+  landscapeImage,
+}: Readonly<{ image: string; landscapeImage: string }>) {
   const { t } = useI18n();
   const [filmOpen, setFilmOpen] = useState(false);
   const closeFilm = useCallback(() => setFilmOpen(false), []);
   return (
     <section className="brand-ui hub-hero relative h-[100svh] min-h-[540px] overflow-hidden">
-      <img
-        src={image}
-        alt={t("hero_image_alt")}
-        width={1170}
-        height={2532}
-        fetchPriority="high"
-        decoding="async"
-        className="threshold-img absolute inset-0 h-full w-full object-cover"
-      />
+      <picture>
+        <source media={HERO_LANDSCAPE_MEDIA} srcSet={landscapeImage} />
+        <img
+          src={image}
+          alt={t("hero_image_alt")}
+          width={754}
+          height={1107}
+          fetchPriority="high"
+          decoding="async"
+          className="threshold-img absolute inset-0 h-full w-full object-cover"
+        />
+      </picture>
 
       <div className="hero-welcome">
-        <img
-          src="/intercontinental-touch-icon.png"
-          alt="InterContinental"
-          width={180}
-          height={180}
-          className="hero-crest"
-        />
+        <ResortLogo tone="light" className="hero-resort-logo" />
         <h1 className="font-serif">{t("hero_welcome")}</h1>
-        <p className="hero-resort-name">DANANG SUN PENINSULA RESORT</p>
       </div>
 
       <button onClick={() => scrollToHubSection("discover")} className="hero-invitation">

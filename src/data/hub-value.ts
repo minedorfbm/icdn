@@ -13,7 +13,8 @@ import {
   type Destination,
   type Level,
 } from "@/data/resort";
-import receptionHero from "@/assets/hero-reception-20260925.webp";
+import portraitHero from "@/assets/hero-lobby-portrait-20261023.webp";
+import landscapeHero from "@/assets/hero-lobby-landscape-20261023.webp";
 import type { HubData } from "@/lib/hub.functions";
 
 interface HubLevel {
@@ -37,10 +38,17 @@ export interface HubValue {
   zalo: string | undefined;
 }
 
-/** Use the same CMS image for the hero and its preload. */
-export function resolveHeroImage(data?: Pick<HubData, "settings">): string {
-  const reference = data?.settings?.["hero_image"];
-  return resolveImage(reference ?? "") || receptionHero;
+/** The hero and its matching preload share the same CMS source for each format. */
+export function resolveHeroImage(
+  data?: Pick<HubData, "settings">,
+  format: "portrait" | "landscape" = "portrait",
+): string {
+  const settings = data?.settings;
+  const reference =
+    format === "landscape"
+      ? (settings?.["hero_image_landscape"] ?? settings?.["hero_image"])
+      : settings?.["hero_image"];
+  return resolveImage(reference ?? "") || (format === "landscape" ? landscapeHero : portraitHero);
 }
 
 export function createHubValue(data?: HubData): HubValue {

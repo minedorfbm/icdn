@@ -254,6 +254,12 @@ describe("CMS image URLs", () => {
     const configured = { ...ready, settings: { hero_image: image } };
     expect(createHubValue(configured).heroImage).toBe(image);
     expect(resolveHeroImage(configured)).toBe(image);
+    expect(resolveHeroImage(configured, "landscape")).toBe(image);
+    const landscape = "https://example.com/hero-landscape.webp";
+    const responsive = { settings: { hero_image: image, hero_image_landscape: landscape } };
+    expect(resolveHeroImage(responsive)).toBe(image);
+    expect(resolveHeroImage(responsive, "landscape")).toBe(landscape);
+    expect(resolveHeroImage(undefined, "landscape")).not.toBe(resolveHeroImage());
     expect(
       resolveHeroImage({
         ...ready,
