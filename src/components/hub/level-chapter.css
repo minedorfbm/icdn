@@ -33,6 +33,25 @@
   min-height: 44px;
   margin-top: 0;
 }
+/* Fade the whole photo layer, independently of its moving parallax image.
+   Both edges meet the solid colors used by the inter-chapter gradient. */
+.chapter-backdrop {
+  --chapter-photo-fade: 80px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black var(--chapter-photo-fade),
+    black calc(100% - var(--chapter-photo-fade)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black var(--chapter-photo-fade),
+    black calc(100% - var(--chapter-photo-fade)),
+    transparent
+  );
+}
 /* Finish the transition before the next chapter, never behind its heading. */
 .chapter-gradient {
   height: 80px;
