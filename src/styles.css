@@ -341,6 +341,7 @@
   }
   .hero-invitation {
     position: absolute;
+    grid-area: auto;
     top: 43%;
     left: 50%;
     transform: translateX(-50%);
