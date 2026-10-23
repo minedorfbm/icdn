@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DestinationCollection } from "./DestinationCollection";
 import { ArrowLeft, ArrowUpRight, ChevronDown, MapPin } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
@@ -32,6 +33,59 @@ function SectionHeading({ label, title }: Readonly<{ label: string; title?: stri
   );
 }
 
+function DestinationMeta({ dest, className }: Readonly<{ dest: Destination; className: string }>) {
+  const { levelLabel, typeLabel } = useI18n();
+  return (
+    <p className={className}>
+      <ResortLevelIcon level={dest.level} />
+      <span>{levelLabel(dest.level)}</span>
+      <span aria-hidden>·</span>
+      <span>{typeLabel(dest.type)}</span>
+    </p>
+  );
+}
+
+function DestinationHero({ dest, onClose }: Readonly<{ dest: Destination; onClose: () => void }>) {
+  const { t } = useI18n();
+  const [selected, setSelected] = useState(0);
+  const images = Array.from(new Set([dest.detailImage, dest.image]));
+  return (
+    <div className="editorial-hero">
+      <picture>
+        <source media="(min-width: 768px)" srcSet={images[selected]} />
+        <img
+          src={dest.detailImage}
+          alt={dest.name}
+          width={900}
+          height={1400}
+          fetchPriority="high"
+          decoding="async"
+        />
+      </picture>
+      <div className="editorial-gradient" />
+      <button type="button" onClick={onClose} className="editorial-back">
+        <ArrowLeft size={17} strokeWidth={1.5} aria-hidden />
+        {t("back")}
+      </button>
+      <DestinationMeta dest={dest} className="editorial-meta" />
+      {images.length > 1 && (
+        <div className="editorial-photo-picker" data-destination-swipe-ignore>
+          {images.map((image, index) => (
+            <button
+              key={image}
+              type="button"
+              aria-label={`${t("photo")} ${index + 1}`}
+              aria-pressed={selected === index}
+              onClick={() => setSelected(index)}
+              style={{ backgroundImage: `url(${JSON.stringify(image)})` }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const destinationMapModes: Record<string, "tour" | "photos"> = {
   "bensley-package": "tour",
   "instagram-spots": "photos",
@@ -51,7 +105,10 @@ function EditorialInstagram({
   const { t, lang } = useI18n();
   if (media.posts.length > 0) {
     return (
-      <section className="editorial-section" aria-label={t("from_our_world")}>
+      <section
+        className="editorial-section editorial-instagram-section"
+        aria-label={t("from_our_world")}
+      >
         <SectionHeading
           label={t("from_our_world")}
           title={detailHeading(dest, "instagram", lang)}
@@ -80,17 +137,7 @@ export function DestinationDetail({
 }: Readonly<{ dest: Destination; onClose: () => void; aboveMap?: boolean; portalled?: boolean }>) {
   const { media, pending, failed, retry } = useDestinationMedia(dest.id);
   const { ref: swipeRef, ...journey } = useDestinationSwipe(dest.id);
-  const {
-    lang,
-    t,
-    typeLabel,
-    levelLabel,
-    action,
-    linkLabel,
-    description,
-    detailDescription,
-    event,
-  } = useI18n();
+  const { lang, t, action, linkLabel, description, detailDescription, event } = useI18n();
   const { openMap, locate } = useResortMap();
   const placeId = locate(dest.id);
   const mapMode = destinationMapModes[dest.id];
@@ -111,6 +158,15 @@ export function DestinationDetail({
       overlayClassName={`fixed inset-0 ${aboveMap ? "z-[94]" : "z-[79]"} bg-black/30`}
       className={`editorial-detail fixed inset-0 ${aboveMap ? "z-[95]" : "z-[80]"} overflow-hidden`}
     >
+      <header className="editorial-large-toolbar">
+        <button type="button" onClick={onClose} className="editorial-back">
+          <ArrowLeft size={17} strokeWidth={1.5} aria-hidden />
+          {t("back")}
+        </button>
+        <p>
+          InterContinental <span>Danang Sun Peninsula Resort</span>
+        </p>
+      </header>
       <div className="fixed right-5 top-[max(24px,env(safe-area-inset-top))] z-10">
         <HubSearch compact />
       </div>
@@ -121,88 +177,74 @@ export function DestinationDetail({
         className="h-full overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain"
       >
         <article className="editorial-page detail-enter" data-destination-id={dest.id}>
-          <div className="editorial-hero">
-            <img
-              src={dest.detailImage}
-              alt={dest.name}
-              width={900}
-              height={1400}
-              fetchPriority="high"
-              decoding="async"
-            />
-            <div className="editorial-gradient" />
-            <button type="button" onClick={onClose} className="editorial-back">
-              <ArrowLeft size={17} strokeWidth={1.5} aria-hidden />
-              {t("back")}
-            </button>
-            <p className="editorial-meta">
-              <ResortLevelIcon level={dest.level} />
-              <span>{levelLabel(dest.level)}</span>
-              <span aria-hidden>·</span>
-              <span>{typeLabel(dest.type)}</span>
-            </p>
-          </div>
+          <DestinationHero key={dest.id} dest={dest} onClose={onClose} />
           <div className="editorial-body">
-            <h2 className="editorial-title">{dest.name}</h2>
-            <p className="editorial-description">
-              {dest.detail_description
-                ? detailDescription(dest.id, dest.detail_description)
-                : description(dest.id, dest.short_description)}
-            </p>
-            <DestinationNotices notices={media.notices} />
-            {primary &&
-              (primary.benefitsId ? (
-                <AccommodationBenefits
-                  id={primary.benefitsId}
-                  dest={dest}
-                  className="editorial-primary"
-                />
-              ) : (
-                <ResortLink
-                  href={primary.url}
-                  pageTitle={`${dest.name} · ${label(primary)}`}
-                  className="editorial-primary"
-                >
-                  <span>{label(primary)}</span>
-                  <ArrowUpRight size={25} strokeWidth={1.5} aria-hidden />
-                </ResortLink>
-              ))}
-
-            {(media.hours.length > 0 || placeId || mapMode) && (
-              <section className="editorial-practical" aria-label={t("practical_information")}>
-                <OpeningHours hours={media.hours} />
-                {(placeId || mapMode) && (
-                  <button
-                    type="button"
-                    className="editorial-map"
-                    onClick={() =>
-                      openMap({
-                        ...(placeId ? { placeId } : {}),
-                        ...(mapMode ? { mode: mapMode } : {}),
-                      })
-                    }
+            <div className="editorial-intro">
+              <DestinationMeta dest={dest} className="editorial-large-meta" />
+              <h2 className="editorial-title">{dest.name}</h2>
+              <p className="editorial-description">
+                {dest.detail_description
+                  ? detailDescription(dest.id, dest.detail_description)
+                  : description(dest.id, dest.short_description)}
+              </p>
+              <DestinationNotices notices={media.notices} />
+              {primary &&
+                (primary.benefitsId ? (
+                  <AccommodationBenefits
+                    id={primary.benefitsId}
+                    dest={dest}
+                    className="editorial-primary"
+                  />
+                ) : (
+                  <ResortLink
+                    href={primary.url}
+                    pageTitle={`${dest.name} · ${label(primary)}`}
+                    className="editorial-primary"
                   >
-                    <MapPin size={18} strokeWidth={1.5} aria-hidden />
-                    <span>{mapCopy(lang, placeId ? "locate" : "open")}</span>
-                    <ArrowUpRight size={18} strokeWidth={1.5} aria-hidden />
-                  </button>
-                )}
-              </section>
-            )}
+                    <span>{label(primary)}</span>
+                    <ArrowUpRight size={25} strokeWidth={1.5} aria-hidden />
+                  </ResortLink>
+                ))}
 
-            {(pending || failed) && (
-              <div className="editorial-loading" aria-busy={pending}>
-                <output>{t(failed ? "content_unavailable" : "page_loading")}</output>
-                {failed && (
-                  <button type="button" onClick={retry}>
-                    {t("retry")}
-                  </button>
-                )}
-              </div>
-            )}
+              {(media.hours.length > 0 || placeId || mapMode) && (
+                <section className="editorial-practical" aria-label={t("practical_information")}>
+                  <OpeningHours hours={media.hours} />
+                  {(placeId || mapMode) && (
+                    <button
+                      type="button"
+                      className="editorial-map"
+                      onClick={() =>
+                        openMap({
+                          ...(placeId ? { placeId } : {}),
+                          ...(mapMode ? { mode: mapMode } : {}),
+                        })
+                      }
+                    >
+                      <MapPin size={18} strokeWidth={1.5} aria-hidden />
+                      <span>{mapCopy(lang, placeId ? "locate" : "open")}</span>
+                      <ArrowUpRight size={18} strokeWidth={1.5} aria-hidden />
+                    </button>
+                  )}
+                </section>
+              )}
+
+              {(pending || failed) && (
+                <div className="editorial-loading" aria-busy={pending}>
+                  <output>{t(failed ? "content_unavailable" : "page_loading")}</output>
+                  {failed && (
+                    <button type="button" onClick={retry}>
+                      {t("retry")}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
 
             {(secondary.length > 0 || media.collection.length > 0) && (
-              <section className="editorial-section" aria-label={t(collection)}>
+              <section
+                className="editorial-section editorial-collection"
+                aria-label={t(collection)}
+              >
                 <SectionHeading label={t(collection)} title={detailHeading(dest, "links", lang)} />
                 {media.collection.length > 0 && <DestinationCollection items={media.collection} />}
                 <div className="editorial-links">
@@ -263,13 +305,26 @@ export function DestinationDetail({
               </section>
             )}
 
-            {media.videos.length > 0 && (
-              <section className="editorial-section" aria-label={t("in_motion")}>
-                <SectionHeading label={t("in_motion")} title={detailHeading(dest, "video", lang)} />
-                <YouTubeVideos videos={media.videos} />
-              </section>
-            )}
-            <EditorialInstagram dest={dest} media={media} />
+            <div
+              className="editorial-media-row"
+              data-media-pair={
+                media.videos.length > 0 && (media.posts.length > 0 || media.photos.length > 0)
+              }
+            >
+              {media.videos.length > 0 && (
+                <section
+                  className="editorial-section editorial-video-section"
+                  aria-label={t("in_motion")}
+                >
+                  <SectionHeading
+                    label={t("in_motion")}
+                    title={detailHeading(dest, "video", lang)}
+                  />
+                  <YouTubeVideos videos={media.videos} />
+                </section>
+              )}
+              <EditorialInstagram dest={dest} media={media} />
+            </div>
 
             <RelatedDestinations id={dest.id} />
             <DestinationJourneyNavigation {...journey} />

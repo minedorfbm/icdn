@@ -40,6 +40,7 @@ export const editorialTables: Record<string, unknown[]> = {
       ...editorialDestinations[0],
       id: "reception",
       name: "Lobby",
+      detail_image_key: "g-dining-detail",
       type: "service",
       cluster: "EXPERIENCES",
       primary_link_id: null,
@@ -165,7 +166,10 @@ export const editorialTables: Record<string, unknown[]> = {
   ],
   destination_videos: editorialDestinations.map(({ id }) => ({
     destination_id: id,
-    video_url: "https://www.youtube.com/watch?v=PVN005yvGpY",
+    video_url:
+      id === "pilot-sky"
+        ? "https://www.youtube.com/shorts/PVN005yvGpY"
+        : "https://www.youtube.com/watch?v=PVN005yvGpY",
     title: "Resort video",
     title_translations: {},
     display_order: 0,

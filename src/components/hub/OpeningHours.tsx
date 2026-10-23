@@ -7,14 +7,14 @@ export function OpeningHours({ hours }: Readonly<{ hours: Hours[] }>) {
   if (!hours.length) return null;
   return (
     <section
-      className="mt-8 rounded-[18px] border border-current/15 px-5 py-5"
+      className="opening-hours mt-8 rounded-[18px] border border-current/15 px-5 py-5"
       aria-label={t("opening_hours")}
     >
       <h3 className="flex items-center gap-2 text-[10px] tracking-[0.2em]">
         <Clock3 size={15} strokeWidth={1.4} aria-hidden />
         {t("opening_hours")}
       </h3>
-      <ul className="mt-4 divide-y divide-current/10">
+      <ul className="opening-hours-list mt-4 divide-y divide-current/10">
         {hours.map((row) => (
           <li key={row.id} className="py-3 first:pt-0 last:pb-0">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-[13px]">
