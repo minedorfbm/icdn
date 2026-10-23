@@ -13,8 +13,8 @@ import {
   type Destination,
   type Level,
 } from "@/data/resort";
-import portraitHero from "@/assets/hero-lobby-portrait-20261023.webp";
-import landscapeHero from "@/assets/hero-lobby-landscape-20261023.webp";
+import portraitHero from "@/assets/hero-lobby-portrait-no-chandelier-e29f7810e97a.webp";
+import landscapeHero from "@/assets/hero-lobby-landscape-no-chandelier-f06bd383569a.webp";
 import type { HubData } from "@/lib/hub.functions";
 
 interface HubLevel {

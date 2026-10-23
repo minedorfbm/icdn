@@ -23,8 +23,8 @@ export function HubHero({
           <img
             src={image}
             alt={t("hero_image_alt")}
-            width={754}
-            height={1107}
+            width={695}
+            height={1137}
             fetchPriority="high"
             decoding="async"
             className="threshold-img"
