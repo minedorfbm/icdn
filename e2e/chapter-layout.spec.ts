@@ -80,14 +80,13 @@ test("level heading, controls, categories and full cards fit together on mobile"
         const title = next.querySelector<HTMLElement>("h2")!;
         const bounds = el.getBoundingClientRect();
         return (
-          bounds.height >= 160 &&
-          bounds.height <= 240 &&
+          bounds.height >= 96 &&
+          bounds.height <= 144 &&
           gradient.backgroundImage.includes("linear-gradient") &&
           bounds.top === previous.getBoundingClientRect().bottom &&
           bounds.bottom === next.getBoundingClientRect().top &&
           bounds.bottom <= title.getBoundingClientRect().top &&
-          gradient.overflow === "hidden" &&
-          gradient.pointerEvents === "none"
+          getComputedStyle(el, "::before").content === "none"
         );
       }),
     ),
@@ -196,18 +195,5 @@ test("level headings fit beside controls with a wider fallback serif", async ({ 
       control: document.querySelector(".hub-tools button")!.getBoundingClientRect().left,
     }));
     expect(bounds.title).toBeLessThanOrEqual(bounds.control - 4);
-  }
-});
-
-test("atmospheric passages remain static with reduced motion", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
-  const passages = page.locator(".chapter-gradient");
-  await expect(passages).toHaveCount(3);
-  for (const passage of await passages.all()) {
-    await expect(passage).toHaveAttribute("aria-hidden", "true");
-    await expect(passage).toHaveAttribute("data-renderer", "fallback");
-    await expect(passage.locator("canvas")).toBeHidden();
-    await expect(passage.locator("svg")).toBeVisible();
   }
 });

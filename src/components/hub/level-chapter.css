@@ -52,6 +52,23 @@
     transparent
   );
 }
+/* Simple color transition, completed before the next level heading. */
+.chapter-gradient {
+  height: clamp(96px, 12svh, 144px);
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--chapter-from), var(--chapter-to));
+}
+/* Daylight blue keeps ivory-to-navy clear rather than passing through grey. */
+.chapter-gradient[data-from="heaven"] {
+  background: linear-gradient(
+    180deg,
+    var(--chapter-from) 0%,
+    var(--world-sea) 38%,
+    var(--chapter-to) 100%
+  );
+}
+
 .chapter-deck-controls {
   display: none;
 }
@@ -122,7 +139,24 @@
   .level-chapter .destination-panel-actions a {
     font-size: 11px;
   }
-  .level-chapter .chapter-deck-controls {
+  .level-chapter /* Simple color transition, completed before the next level heading. */
+.chapter-gradient {
+    height: clamp(96px, 12svh, 144px);
+    overflow: hidden;
+    pointer-events: none;
+    background: linear-gradient(180deg, var(--chapter-from), var(--chapter-to));
+  }
+  /* Daylight blue keeps ivory-to-navy clear rather than passing through grey. */
+  .chapter-gradient[data-from="heaven"] {
+    background: linear-gradient(
+      180deg,
+      var(--chapter-from) 0%,
+      var(--world-sea) 38%,
+      var(--chapter-to) 100%
+    );
+  }
+
+  .chapter-deck-controls {
     display: flex;
     gap: 6px;
   }
