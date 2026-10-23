@@ -94,7 +94,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
       data-cluster={activeCluster}
       className="level level-chapter relative"
     >
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="chapter-backdrop pointer-events-none absolute inset-0 overflow-hidden">
         <img
           src={near ? image : undefined}
           alt=""
