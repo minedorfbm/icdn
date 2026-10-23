@@ -180,6 +180,24 @@
     transform: translate(42%, -2px) rotate(21deg);
   }
 }
+@media (hover: none) and (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+  .discovery-tram img,
+  .discovery-mini-deck img {
+    transition-duration: 0.16s;
+  }
+  .discovery-journey:active .discovery-tram img {
+    transform: translate(5%, 4px) rotate(-0.75deg);
+  }
+  .discovery-surprise:active .discovery-mini-deck img:nth-child(1) {
+    transform: translate(-17%, -3px) rotate(-13deg);
+  }
+  .discovery-surprise:active .discovery-mini-deck img:nth-child(2) {
+    transform: translate(13%, -5px) rotate(5deg);
+  }
+  .discovery-surprise:active .discovery-mini-deck img:nth-child(3) {
+    transform: translate(42%, -2px) rotate(21deg);
+  }
+}
 .surprise-discovery {
   background: var(--brand-white);
   color: var(--brand-ink);
