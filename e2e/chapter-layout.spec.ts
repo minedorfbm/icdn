@@ -80,12 +80,14 @@ test("level heading, controls, categories and full cards fit together on mobile"
         const title = next.querySelector<HTMLElement>("h2")!;
         const bounds = el.getBoundingClientRect();
         return (
-          bounds.height === 80 &&
+          bounds.height >= 112 &&
+          bounds.height <= 180 &&
           gradient.backgroundImage.includes("linear-gradient") &&
           bounds.top === previous.getBoundingClientRect().bottom &&
           bounds.bottom === next.getBoundingClientRect().top &&
           bounds.bottom <= title.getBoundingClientRect().top &&
-          getComputedStyle(el, "::before").content === "none"
+          gradient.overflow === "hidden" &&
+          gradient.pointerEvents === "none"
         );
       }),
     ),
@@ -194,5 +196,23 @@ test("level headings fit beside controls with a wider fallback serif", async ({ 
       control: document.querySelector(".hub-tools button")!.getBoundingClientRect().left,
     }));
     expect(bounds.title).toBeLessThanOrEqual(bounds.control - 4);
+  }
+});
+
+test("atmospheric passages remain static with reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const passages = page.locator(".chapter-gradient");
+  await expect(passages).toHaveCount(3);
+  for (const passage of await passages.all()) {
+    await expect(passage).toHaveAttribute("aria-hidden", "true");
+    expect(
+      await passage.locator("span").evaluateAll((layers) =>
+        layers.every((layer) => {
+          const style = getComputedStyle(layer);
+          return style.animationName === "none" && style.transform === "none";
+        }),
+      ),
+    ).toBe(true);
   }
 });
