@@ -253,13 +253,31 @@
   width: min(100%, 320px);
 }
 
+.hero-brand-shade {
+  display: none;
+}
+
 @media (min-width: 768px) and (orientation: landscape) {
+  .hero-brand-shade {
+    display: block;
+    position: absolute;
+    inset: 0 0 auto;
+    height: clamp(280px, 38svh, 390px);
+    background: linear-gradient(
+      to bottom,
+      rgb(250 248 241 / 90%),
+      rgb(250 248 241 / 78%) 45%,
+      rgb(250 248 241 / 50%) 70%,
+      transparent
+    );
+    pointer-events: none;
+  }
   .hero-welcome {
     color: var(--brand-ink);
-    text-shadow: 0 1px 8px rgb(255 255 255 / 70%);
+    text-shadow: none;
   }
   .hero-resort-logo {
-    filter: drop-shadow(0 1px 4px rgb(255 255 255 / 85%));
+    filter: none;
   }
 }
 

@@ -29,6 +29,7 @@ export function HubHero({
           className="threshold-img absolute inset-0 h-full w-full object-cover"
         />
       </picture>
+      <div className="hero-brand-shade" aria-hidden />
 
       <div className="hero-welcome">
         <ResortLogo tone="light" landscapeTone="dark" className="hero-resort-logo" />
