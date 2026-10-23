@@ -1,22 +1,11 @@
 import { hubDataSchema, type HubData } from "./hub-schema";
+import { completeCatalogue } from "./hub-data-completeness";
 
 import type { z } from "zod";
 
 const CACHE_ROOT = "https://icdn.artdigitaljourney.com/__cache/";
 const TTL_MS = 120_000;
 type PublicCache = Pick<Cache, "match" | "put">;
-
-function complete(data: HubData): boolean {
-  return (
-    Object.values(data).every((value) => value !== null) &&
-    data.mapPlaces != null &&
-    data.mapLinks != null &&
-    data.linkTranslations != null &&
-    data.siteLinkTranslations != null &&
-    data.editorial?.descriptions != null &&
-    data.editorial.events != null
-  );
-}
 
 /** Public data only, independently keyed, with the same hard two-minute expiry. */
 export async function readPublicSnapshot<T>(
@@ -65,7 +54,7 @@ export function readHubSnapshot(
   cache?: PublicCache,
   now = Date.now(),
 ): Promise<HubData> {
-  return readPublicSnapshot("catalogue-v9", hubDataSchema, complete, load, cache, now);
+  return readPublicSnapshot("catalogue-v9", hubDataSchema, completeCatalogue, load, cache, now);
 }
 
 export function publicCache() {

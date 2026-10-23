@@ -29,7 +29,6 @@ export interface HubValue {
   relations: NonNullable<HubData["relations"]>;
   mapPlaces: MapPlaceRow[];
   mapLinks: MapLinkRow[];
-  heroImage: string;
   levels: HubLevel[];
   destinations: Destination[];
   links: { label: string; url: string; translations?: LinkTranslations }[];
@@ -97,7 +96,6 @@ export function createHubValue(data?: HubData): HubValue {
 
   return {
     relations: data.relations ?? [],
-    heroImage: resolveHeroImage(data),
     mapPlaces: data.mapPlaces ?? [],
     mapLinks: data.mapLinks ?? [],
     levels,

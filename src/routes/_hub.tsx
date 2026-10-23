@@ -20,7 +20,9 @@ import { LevelChapter } from "@/components/hub/LevelChapter";
 import { NamTramRail } from "@/components/hub/NamTramRail";
 import { type Level } from "@/data/resort";
 import { HubProvider, useHub } from "@/data/hub-context";
-import { getHubData, getHubSettings, type HubData } from "@/lib/hub.functions";
+import type { HubData } from "@/lib/hub.functions";
+import { loadHubData, loadHubSettings, primeHubSnapshots } from "@/lib/hub-client";
+import { NavigationProgress } from "@/components/hub/NavigationProgress";
 import { I18nProvider, LanguageSwitch, useI18n } from "@/i18n";
 import { resolveHeroImage } from "@/data/hub-value";
 import { ResortBrowserProvider, ResortLink } from "@/components/hub/ResortBrowser";
@@ -31,8 +33,8 @@ export const Route = createFileRoute("/_hub")({
     // browsers buffer streamed documents; direct card URLs retain their SSR metadata.
     const isHome = location.pathname === "/";
     const [settings, catalogue] = await Promise.all([
-      getHubSettings(),
-      isHome ? Promise.resolve(null) : getHubData(),
+      loadHubSettings(),
+      isHome ? Promise.resolve(null) : loadHubData(),
     ]);
     return { settings, catalogue, isHome };
   },
@@ -78,6 +80,7 @@ export const Route = createFileRoute("/_hub")({
 
 function HubRoute() {
   const { settings, catalogue } = Route.useLoaderData();
+  useEffect(() => primeHubSnapshots(settings, catalogue), [settings, catalogue]);
   const location = useLocation();
   // History state survives a refresh. Keep the hub behind a card only when this
   // mounted page actually came from the homepage during client navigation.
@@ -100,7 +103,7 @@ function HubRoute() {
     if (result.data) return;
     let current = true;
     setResult({ data: null, failed: false });
-    getHubData().then(
+    loadHubData().then(
       (data) => {
         if (current) setResult({ data, failed: false });
       },
@@ -114,6 +117,7 @@ function HubRoute() {
   }, [catalogue, attempt, result.data]);
   return (
     <I18nProvider editorial={data?.editorial}>
+      <NavigationProgress />
       <main className="min-h-svh bg-background text-foreground">
         {showHub && (
           <>
@@ -245,7 +249,7 @@ function Hub() {
           ))}
         </ul>
 
-        <p className="mt-16 text-[9px] tracking-[0.3em] opacity-40">{t("footer_credit")}</p>
+        <p className="mt-16 text-[9px] tracking-[0.3em] opacity-70">{t("footer_credit")}</p>
       </section>
 
       {/* FIXED CONCIERGE BUTTON */}

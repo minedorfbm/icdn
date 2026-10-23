@@ -25,6 +25,7 @@ import { DestinationJourneyNavigation } from "./DestinationJourneyNavigation";
 import { ResortLogo } from "./ResortLogo";
 import { ResortLevelIcon } from "./ResortLevelIcon";
 import "./editorial-detail.css";
+import { thumbnail } from "@/lib/responsive-image";
 
 function SectionHeading({ label, title }: Readonly<{ label: string; title?: string | undefined }>) {
   return (
@@ -81,7 +82,7 @@ function DestinationHero({ dest, onClose }: Readonly<{ dest: Destination; onClos
               aria-label={`${t("photo")} ${index + 1}`}
               aria-pressed={selected === index}
               onClick={() => setSelected(index)}
-              style={{ backgroundImage: `url(${JSON.stringify(image)})` }}
+              style={{ backgroundImage: `url(${JSON.stringify(thumbnail(image))})` }}
             />
           ))}
         </div>

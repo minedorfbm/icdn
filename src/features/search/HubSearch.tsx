@@ -14,6 +14,7 @@ import {
 import { searchCopy } from "./search-copy";
 import { ConciergeContact } from "@/components/hub/ConciergeContact";
 import "./search.css";
+import { thumbnail } from "@/lib/responsive-image";
 
 export function HubSearch({
   compact = false,
@@ -238,7 +239,7 @@ export function SearchDialog({
                     onClick={() => selectDestination(d)}
                   >
                     <img
-                      src={d.image}
+                      src={thumbnail(d.image)}
                       style={{ objectPosition: d.imagePosition }}
                       alt=""
                       width={56}

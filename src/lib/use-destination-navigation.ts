@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { destinationSlug } from "@/lib/destination-route";
+import { loadDestinationMedia } from "./hub-client";
 import type { SearchSnapshot } from "@/features/search/search-context";
 
 declare module "@tanstack/react-router" {
@@ -24,6 +25,9 @@ export function useDestinationNavigation() {
     (destinationId: string, sequence?: string[]) => {
       const slug = destinationSlug(destinationId);
       if (location.pathname === `/${slug}`) return;
+      // Start the independent media read alongside navigation, not after mounting.
+      // The endpoint still verifies publication; errors remain retryable in the card.
+      void loadDestinationMedia(destinationId).catch(() => {});
       const ordered = sequence ?? (isDestination ? location.state.hubSequence : undefined);
       const homeIndex = isDestination ? location.state.hubHomeIndex : location.state.__TSR_index;
       const searchIndex = location.state.hubSearch

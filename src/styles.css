@@ -391,13 +391,6 @@
   animation: group-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Fine film grain for a printed, artistic surface */
-.grain {
-  opacity: 0.35;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
-}
-
 .level {
   --level-bg: var(--world-heaven);
   --level-fg: var(--world-heaven-foreground);

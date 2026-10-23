@@ -1,3 +1,4 @@
+import { thumbnail } from "@/lib/responsive-image";
 import { ArrowUpRight } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type { Destination, Level } from "@/data/resort";
@@ -56,7 +57,7 @@ export function DestinationIndex({
                   className="flex min-h-20 w-full items-center gap-4 py-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2"
                 >
                   <img
-                    src={destination.image}
+                    src={thumbnail(destination.image)}
                     style={{ objectPosition: destination.imagePosition }}
                     alt=""
                     loading="lazy"

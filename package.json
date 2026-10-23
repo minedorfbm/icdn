@@ -1,7 +1,9 @@
 {
   "name": "tanstack_start_ts",
   "private": true,
-  "sideEffects": ["./src/lib/validation.ts"],
+  "sideEffects": [
+    "./src/lib/validation.ts"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite dev",
@@ -33,7 +35,8 @@
     "test:mobile:coverage": "bun -e 'require(\"node:fs\").rmSync(\"coverage/browser\", { recursive: true, force: true })' && bun run build:coverage && HUB_BROWSER_COVERAGE=1 bun run test:mobile && bun scripts/report-browser-coverage.ts",
     "coverage:check-production": "bun scripts/check-production-coverage.ts",
     "test:mobile:iphone": "HUB_TEST_PROJECT=iphone-webkit node node_modules/@playwright/test/cli.js test --project=iphone-webkit",
-    "test:mobile:android": "HUB_TEST_PROJECT=android-chrome node node_modules/@playwright/test/cli.js test --project=android-chrome"
+    "test:mobile:android": "HUB_TEST_PROJECT=android-chrome node node_modules/@playwright/test/cli.js test --project=android-chrome",
+    "images:variants": "bun scripts/generate-image-variants.ts"
   },
   "overrides": {
     "launch-editor": "2.14.2",
@@ -85,6 +88,7 @@
     "istanbul-reports": "3.2.0",
     "nitro": "3.0.260603-beta",
     "prettier": "^3.9.8",
+    "sharp": "0.35.5",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.70.1",
     "vite": "8.1.6",
