@@ -52,13 +52,6 @@
     transparent
   );
 }
-/* Finish the transition before the next chapter, never behind its heading. */
-.chapter-gradient {
-  height: 80px;
-  pointer-events: none;
-  background: linear-gradient(to bottom, var(--chapter-from) 0%, var(--chapter-to) 100%);
-}
-
 .chapter-deck-controls {
   display: none;
 }

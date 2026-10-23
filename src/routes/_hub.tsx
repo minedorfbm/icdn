@@ -1,4 +1,5 @@
 import { Fragment, type CSSProperties } from "react";
+import "@/components/hub/atmospheric-transitions.css";
 import { useChapterDocking } from "@/lib/use-chapter-docking";
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 import { ResortLogo } from "@/components/hub/ResortLogo";
@@ -193,6 +194,7 @@ function Hub() {
             {levels[index + 1] && (
               <div
                 className="chapter-gradient"
+                data-atmosphere={l.id}
                 aria-hidden
                 style={
                   {
@@ -200,7 +202,10 @@ function Hub() {
                     "--chapter-to": `var(--world-${levels[index + 1]!.id})`,
                   } as CSSProperties
                 }
-              />
+              >
+                <span className="chapter-atmosphere-mist" />
+                <span className="chapter-atmosphere-light" />
+              </div>
             )}
           </Fragment>
         ))}

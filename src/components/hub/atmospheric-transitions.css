@@ -1,0 +1,129 @@
+/* Confined to the inter-chapter space: the heading always arrives on its own palette.
+   The photo masks meet these exact endpoint colors without a hard photographic edge. */
+.chapter-gradient {
+  --atmosphere-mist: var(--chapter-from);
+  --atmosphere-light: var(--chapter-to);
+  --atmosphere-origin: 24%;
+  position: relative;
+  isolation: isolate;
+  height: clamp(112px, 16svh, 180px);
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--chapter-from) 0%,
+    color-mix(in oklab, var(--chapter-from) 88%, var(--chapter-to)) 22%,
+    color-mix(in oklab, var(--chapter-from) 48%, var(--chapter-to)) 54%,
+    color-mix(in oklab, var(--chapter-from) 12%, var(--chapter-to)) 82%,
+    var(--chapter-to) 100%
+  );
+}
+
+/* A stationary mask keeps both endpoints exact even as the internal light moves. */
+.chapter-gradient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    var(--chapter-from),
+    transparent 22%,
+    transparent 78%,
+    var(--chapter-to)
+  );
+}
+
+.chapter-atmosphere-mist,
+.chapter-atmosphere-light {
+  position: absolute;
+  inset: -24% -8%;
+  opacity: 0.48;
+  /* Soft gradient stops simulate diffusion without costly blur/backdrop filters. */
+  background:
+    radial-gradient(
+      ellipse 62% 26% at var(--atmosphere-origin) 40%,
+      color-mix(in oklab, var(--atmosphere-mist) 82%, transparent),
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 46% 30% at 80% 62%,
+      color-mix(in oklab, var(--atmosphere-mist) 64%, transparent),
+      transparent 100%
+    );
+}
+
+.chapter-atmosphere-light {
+  opacity: 0.36;
+  background:
+    radial-gradient(
+      ellipse 30% 70% at 70% 45%,
+      color-mix(in oklab, var(--atmosphere-light) 64%, transparent),
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 58% 15% at 22% 66%,
+      color-mix(in oklab, var(--atmosphere-light) 72%, transparent),
+      transparent 100%
+    );
+}
+
+/* White cloud light, emerald haze, then broad low aquatic reflections. */
+.chapter-gradient[data-atmosphere="heaven"] {
+  --atmosphere-light: var(--chapter-from);
+}
+.chapter-gradient[data-atmosphere="sky"] {
+  --atmosphere-mist: var(--chapter-to);
+  --atmosphere-light: var(--chapter-from);
+  --atmosphere-origin: 68%;
+}
+.chapter-gradient[data-atmosphere="earth"] .chapter-atmosphere-light {
+  background:
+    radial-gradient(
+      ellipse 74% 12% at 66% 64%,
+      color-mix(in oklab, var(--chapter-to) 85%, transparent),
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 44% 20% at 18% 40%,
+      color-mix(in oklab, var(--chapter-to) 64%, transparent),
+      transparent 100%
+    );
+}
+
+/* Native scroll timelines enhance supported browsers; others keep the static blend.
+   No scroll listeners, perpetual loops, image downloads or animation dependency. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .chapter-atmosphere-mist {
+      animation: atmosphere-mist-pass 1s linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+    .chapter-atmosphere-light {
+      animation: atmosphere-light-pass 1s linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+
+@keyframes atmosphere-mist-pass {
+  from {
+    transform: translate3d(-1%, -10px, 0) scale(1.03);
+    opacity: 0.38;
+  }
+  to {
+    transform: translate3d(1%, 10px, 0) scale(1.06);
+    opacity: 0.54;
+  }
+}
+@keyframes atmosphere-light-pass {
+  from {
+    transform: translate3d(1%, 12px, 0) scale(1.05);
+    opacity: 0.4;
+  }
+  to {
+    transform: translate3d(-1%, -12px, 0) scale(1.02);
+    opacity: 0.28;
+  }
+}
