@@ -16,23 +16,24 @@ export function HubHero({
   const [filmOpen, setFilmOpen] = useState(false);
   const closeFilm = useCallback(() => setFilmOpen(false), []);
   return (
-    <section className="brand-ui hub-hero relative h-[100svh] min-h-[540px] overflow-hidden">
-      <picture>
-        <source media={HERO_LANDSCAPE_MEDIA} srcSet={landscapeImage} />
-        <img
-          src={image}
-          alt={t("hero_image_alt")}
-          width={754}
-          height={1107}
-          fetchPriority="high"
-          decoding="async"
-          className="threshold-img absolute inset-0 h-full w-full object-cover"
-        />
-      </picture>
-      <div className="hero-brand-shade" aria-hidden />
+    <section className="brand-ui hub-hero">
+      <div className="hero-photograph">
+        <picture>
+          <source media={HERO_LANDSCAPE_MEDIA} srcSet={landscapeImage} />
+          <img
+            src={image}
+            alt={t("hero_image_alt")}
+            width={754}
+            height={1107}
+            fetchPriority="high"
+            decoding="async"
+            className="threshold-img"
+          />
+        </picture>
+      </div>
 
       <div className="hero-welcome">
-        <ResortLogo tone="light" landscapeTone="dark" className="hero-resort-logo" />
+        <ResortLogo className="hero-resort-logo" />
         <h1 className="font-serif">{t("hero_welcome")}</h1>
       </div>
 
@@ -53,14 +54,14 @@ export function HubHero({
         }}
         aria-label={`${t("play_video")}: One MICHELIN Key`}
         aria-haspopup="dialog"
-        className="absolute bottom-8 left-6 grid size-20 place-items-center rounded-full transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+        className="hero-film-button grid place-items-center rounded-full transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4"
       >
         <img
           src="/michelin-key.webp"
           alt=""
           width={494}
           height={585}
-          className="size-full object-contain brightness-0 invert drop-shadow-[0_2px_3px_rgba(0,0,0,0.35)]"
+          className="size-full object-contain"
         />
       </button>
       {filmOpen && (
