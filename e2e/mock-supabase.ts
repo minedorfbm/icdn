@@ -34,6 +34,16 @@ const destinations = ["citron", "tingara"].map((id, display_order) => ({
 destinations.push(
   {
     ...destinations[0]!,
+    id: "design-digital-tour",
+    name: "Bill Bensley Digital Design Tour",
+    cluster: "EXPERIENCES",
+    type: "experience",
+    content_kind: "place",
+    content_family: "storytelling",
+    display_order: 4,
+  },
+  {
+    ...destinations[0]!,
     id: "enchanted-holiday",
     name: "Enchanted Holiday Escape",
     cluster: "EXPERIENCES",
