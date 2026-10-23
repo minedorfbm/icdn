@@ -27,7 +27,7 @@ export function DestinationPanel({
     <article
       aria-hidden={!active}
       inert={!active}
-      className="relative h-full min-h-[inherit] w-full overflow-hidden rounded-[18px] border border-[#e5d3aa]/65 bg-[oklch(0.18_0.02_250)] shadow-[10px_24px_36px_-18px_rgba(0,0,0,0.7)]"
+      className="destination-panel relative h-full min-h-[inherit] w-full overflow-hidden rounded-[18px] border border-[#e5d3aa]/65 bg-[oklch(0.18_0.02_250)] shadow-[10px_24px_36px_-18px_rgba(0,0,0,0.7)]"
     >
       <img
         src={near ? dest.image : undefined}
@@ -55,7 +55,7 @@ export function DestinationPanel({
 
       <div className="relative flex h-full min-h-[inherit] flex-col justify-between gap-6 touch-pan-y overflow-y-auto overscroll-y-contain px-4 py-5 sm:px-7 sm:py-9 text-[oklch(0.98_0.005_90)]">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-[9px] tracking-[0.18em] opacity-80">
+          <p className="destination-panel-meta text-[9px] tracking-[0.18em] opacity-80">
             {levelLabel(dest.level)} / {typeLabel(dest.type)}
           </p>
           {dest.instagram_spot && (
@@ -83,12 +83,12 @@ export function DestinationPanel({
               <span className="drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">{dest.name}</span>
             </button>
           </h3>
-          <p className="mt-3 max-w-[30ch] font-serif text-[15px] italic leading-snug opacity-85">
+          <p className="destination-panel-summary mt-3 max-w-[30ch] font-serif text-[15px] italic leading-snug opacity-85">
             {description(dest.id, dest.short_description)}
           </p>
         </div>
 
-        <div className="pointer-events-none relative z-20 mt-auto flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/25 pt-3">
+        <div className="destination-panel-actions pointer-events-none relative z-20 mt-auto flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-t border-white/25 pt-3">
           {actions.map((a, i) => (
             <ResortLink
               key={`${a.kind}-${i}`}

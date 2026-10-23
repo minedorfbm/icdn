@@ -108,7 +108,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
         <div className="level-veil absolute inset-0" />
       </div>
 
-      <div className="relative pr-[var(--hub-rail-gutter)]">
+      <div className="chapter-layout relative pr-[var(--hub-rail-gutter)]">
         <header className="journey-heading mx-auto max-w-[740px] px-6">
           <h2 className="font-serif text-[clamp(44px,21cqi,104px)] leading-[0.82] tracking-[-0.03em]">
             <button
@@ -123,8 +123,8 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
               <ChevronDown aria-hidden className="size-3.5 shrink-0 opacity-60" strokeWidth={1.3} />
             </button>
           </h2>
-          <p className="mt-3 text-[14px] leading-relaxed tracking-[0.18em] opacity-70">
-            {levelLine(id, line).toUpperCase()}
+          <p className="mt-3 text-[14px] leading-relaxed tracking-[0.18em] uppercase opacity-70">
+            {levelLine(id, line)}
           </p>
         </header>
 
@@ -176,7 +176,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
           <div className="journey-deck">
             <div
               key={activeCluster ?? "all"}
-              className="group-enter mt-2 w-[calc(100%+var(--hub-rail-gutter))] overflow-hidden [clip-path:inset(0_var(--hub-rail-gutter)_0_0)]"
+              className="chapter-stack group-enter mt-2 w-[calc(100%+var(--hub-rail-gutter))] overflow-hidden [clip-path:inset(0_var(--hub-rail-gutter)_0_0)]"
             >
               <CardStack
                 items={list}
