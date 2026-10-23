@@ -1,5 +1,22 @@
 import { test, expect } from "./fixtures";
 
+test("map clicks avoid native outlines while keyboard markers remain visible", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/citron");
+  const back = page.getByRole("button", { name: "BACK", exact: true });
+  await expect(back).toHaveCSS("-webkit-tap-highlight-color", "rgba(0, 0, 0, 0)");
+  await page.getByRole("button", { name: "View on map", exact: true }).click();
+  const map = page.getByRole("dialog", { name: "Resort map" });
+  const pin = map.getByRole("button", { name: /^Citron ·/ });
+  await pin.click();
+  await expect(pin).toHaveCSS("outline-style", "none");
+  await expect(pin).toHaveCSS("-webkit-tap-highlight-color", "rgba(0, 0, 0, 0)");
+  await pin.press("Tab");
+  await page.keyboard.press("Shift+Tab");
+  await expect(pin).toBeFocused();
+  await expect(pin.locator(".hotspot-medallion")).toHaveCSS("stroke-width", "3px");
+});
+
 test("card map entry focuses the venue above its panel and supports closer zoom", async ({
   page,
 }, testInfo) => {

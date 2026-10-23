@@ -1,4 +1,5 @@
 .hub-atlas {
+  -webkit-tap-highlight-color: transparent;
   --atlas-ink: var(--brand-ink);
   --atlas-paper: var(--brand-white);
   --atlas-gold: var(--brand-muted);
@@ -26,6 +27,9 @@
 .hub-atlas input:focus-visible {
   outline: 2px solid var(--atlas-gold);
   outline-offset: 3px;
+}
+.hub-atlas button:focus:not(:focus-visible) {
+  outline: none;
 }
 .hub-atlas svg:not(.resort-art) {
   flex-shrink: 0;

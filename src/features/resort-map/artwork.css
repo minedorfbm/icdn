@@ -741,6 +741,7 @@
 }
 .hub-atlas .hotspot-v2 {
   cursor: pointer;
+  outline: none;
   transition: opacity 0.28s ease;
 }
 .hub-atlas .hotspot-hit {
