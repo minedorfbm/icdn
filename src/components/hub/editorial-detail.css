@@ -74,6 +74,7 @@
   pointer-events: none;
 }
 .editorial-back {
+  -webkit-tap-highlight-color: transparent;
   position: absolute;
   top: max(24px, env(safe-area-inset-top));
   left: 20px;
@@ -88,6 +89,13 @@
   color: var(--editorial-button-text);
   font-size: 11px;
   letter-spacing: 2px;
+}
+.editorial-back:focus:not(:focus-visible) {
+  outline: none;
+}
+.editorial-back:focus-visible {
+  outline: 2px solid var(--editorial-accent);
+  outline-offset: 3px;
 }
 .editorial-meta {
   position: absolute;
