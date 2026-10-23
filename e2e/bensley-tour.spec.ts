@@ -95,4 +95,7 @@ test("design-tour card opens the map with the official Bensley tour already open
   await reader.getByRole("button", { name: "Back to map", exact: true }).click();
   await expect(reader).toBeHidden();
   await expect(map.getByRole("button", { name: "Bensley Tour", exact: true })).toBeVisible();
+  await map.getByRole("button", { name: "Close map", exact: true }).click();
+  await expect(map).toBeHidden();
+  await expect(page).toHaveURL("/");
 });
