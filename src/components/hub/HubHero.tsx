@@ -32,10 +32,9 @@ export function HubHero({
         </picture>
       </div>
 
-      <div className="hero-welcome">
-        <ResortLogo className="hero-resort-logo" />
-        <h1 className="font-serif">{t("hero_welcome")}</h1>
-      </div>
+      <h1 className="hero-welcome">
+        <ResortLogo tone="gold" className="hero-resort-logo" />
+      </h1>
 
       <button onClick={() => scrollToHubSection("discover")} className="hero-invitation">
         <span className="hero-invitation-title font-serif">

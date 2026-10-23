@@ -4,7 +4,7 @@ export function ResortLogo({
   className = "",
   loading = "lazy",
 }: Readonly<{
-  tone?: "dark" | "light";
+  tone?: "dark" | "light" | "gold";
   className?: string;
   loading?: "eager" | "lazy";
 }>) {
