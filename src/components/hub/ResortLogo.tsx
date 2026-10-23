@@ -1,10 +1,10 @@
-/** Official resort artwork; the light wordmark retains the original gold emblem. */
+/** Official resort artwork; every wordmark variant retains the original gold emblem. */
 export function ResortLogo({
   tone = "dark",
   className = "",
   loading = "lazy",
 }: Readonly<{
-  tone?: "dark" | "light" | "gold";
+  tone?: "dark" | "light" | "black";
   className?: string;
   loading?: "eager" | "lazy";
 }>) {

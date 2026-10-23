@@ -35,7 +35,7 @@ export function HubHero({
       <div className="hero-sky">
         <div className="hero-sky-content">
           <h1 className="hero-welcome">
-            <ResortLogo tone="gold" className="hero-resort-logo" />
+            <ResortLogo tone="black" className="hero-resort-logo" />
           </h1>
 
           <button onClick={() => scrollToHubSection("discover")} className="hero-invitation">
