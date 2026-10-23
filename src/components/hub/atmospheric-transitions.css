@@ -6,7 +6,7 @@
   --atmosphere-origin: 24%;
   position: relative;
   isolation: isolate;
-  height: clamp(112px, 16svh, 180px);
+  height: clamp(160px, 22svh, 240px);
   overflow: hidden;
   pointer-events: none;
   background: linear-gradient(
@@ -36,33 +36,34 @@
 .chapter-atmosphere-mist,
 .chapter-atmosphere-light {
   position: absolute;
-  inset: -24% -8%;
-  opacity: 0.48;
+  inset: -30% -12%;
+  opacity: 0.88;
   /* Soft gradient stops simulate diffusion without costly blur/backdrop filters. */
   background:
     radial-gradient(
-      ellipse 62% 26% at var(--atmosphere-origin) 40%,
-      color-mix(in oklab, var(--atmosphere-mist) 82%, transparent),
-      transparent 100%
+      ellipse 64% 40% at var(--atmosphere-origin) 36%,
+      var(--atmosphere-mist) 0%,
+      color-mix(in oklab, var(--atmosphere-mist) 92%, transparent) 30%,
+      transparent 82%
     ),
     radial-gradient(
-      ellipse 46% 30% at 80% 62%,
-      color-mix(in oklab, var(--atmosphere-mist) 64%, transparent),
-      transparent 100%
+      ellipse 48% 32% at 84% 65%,
+      color-mix(in oklab, var(--atmosphere-mist) 96%, transparent) 12%,
+      transparent 84%
     );
 }
 
 .chapter-atmosphere-light {
-  opacity: 0.36;
+  opacity: 0.62;
   background:
     radial-gradient(
-      ellipse 30% 70% at 70% 45%,
-      color-mix(in oklab, var(--atmosphere-light) 64%, transparent),
+      ellipse 24% 80% at 72% 44%,
+      color-mix(in oklab, var(--atmosphere-light) 90%, transparent),
       transparent 100%
     ),
     radial-gradient(
-      ellipse 58% 15% at 22% 66%,
-      color-mix(in oklab, var(--atmosphere-light) 72%, transparent),
+      ellipse 62% 22% at 18% 64%,
+      color-mix(in oklab, var(--atmosphere-light) 96%, transparent),
       transparent 100%
     );
 }
@@ -72,20 +73,20 @@
   --atmosphere-light: var(--chapter-from);
 }
 .chapter-gradient[data-atmosphere="sky"] {
-  --atmosphere-mist: var(--chapter-to);
-  --atmosphere-light: var(--chapter-from);
+  --atmosphere-mist: color-mix(in oklab, var(--chapter-to) 72%, var(--world-sea));
+  --atmosphere-light: var(--chapter-to);
   --atmosphere-origin: 68%;
 }
 .chapter-gradient[data-atmosphere="earth"] .chapter-atmosphere-light {
   background:
     radial-gradient(
-      ellipse 74% 12% at 66% 64%,
-      color-mix(in oklab, var(--chapter-to) 85%, transparent),
+      ellipse 76% 18% at 66% 60%,
+      color-mix(in oklab, var(--chapter-to) 100%, transparent),
       transparent 100%
     ),
     radial-gradient(
-      ellipse 44% 20% at 18% 40%,
-      color-mix(in oklab, var(--chapter-to) 64%, transparent),
+      ellipse 46% 24% at 18% 40%,
+      color-mix(in oklab, var(--chapter-to) 88%, transparent),
       transparent 100%
     );
 }
@@ -109,21 +110,21 @@
 
 @keyframes atmosphere-mist-pass {
   from {
-    transform: translate3d(-1%, -10px, 0) scale(1.03);
-    opacity: 0.38;
+    transform: translate3d(-5%, -22px, 0) scale(1.08);
+    opacity: 0.82;
   }
   to {
-    transform: translate3d(1%, 10px, 0) scale(1.06);
-    opacity: 0.54;
+    transform: translate3d(5%, 22px, 0) scale(1.02);
+    opacity: 0.96;
   }
 }
 @keyframes atmosphere-light-pass {
   from {
-    transform: translate3d(1%, 12px, 0) scale(1.05);
-    opacity: 0.4;
+    transform: translate3d(4%, 28px, 0) scale(1.08);
+    opacity: 0.68;
   }
   to {
-    transform: translate3d(-1%, -12px, 0) scale(1.02);
-    opacity: 0.28;
+    transform: translate3d(-4%, -28px, 0) scale(1.02);
+    opacity: 0.52;
   }
 }
