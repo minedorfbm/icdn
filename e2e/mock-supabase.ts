@@ -390,6 +390,26 @@ serve({
     }
     reads.push(url.pathname + url.search);
 
+    if (url.pathname === "/rest/v1/rpc/published_hub_catalogue_v1") {
+      if (delay) await Bun.sleep(delay);
+      return Response.json({
+        levels: tables.levels,
+        destinations: tables.destinations,
+        links: tables.destination_links,
+        events: tables.published_destination_events,
+        mapPlaces: tables.map_places,
+        mapLinks: tables.map_destination_links,
+        linkTranslations: tables.destination_link_translations ?? [],
+        siteLinkTranslations: tables.site_link_translations ?? [],
+        relations: tables.destination_relations ?? [],
+        editorial: {
+          descriptions: tables.destination_translations ?? [],
+          events: tables.event_translations ?? [],
+        },
+        settings: {},
+      });
+    }
+
     const table = new URL(request.url).pathname.split("/").at(-1)!;
     if (table === "destinations" && delay) await Bun.sleep(delay);
     let rows = tables[table] ?? [];

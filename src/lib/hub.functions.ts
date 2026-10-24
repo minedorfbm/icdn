@@ -4,6 +4,7 @@ import { collectionItemRow } from "./destination-collection";
 import { destinationNoticeRow } from "./destination-notices";
 import { openingHoursRow } from "./opening-hours";
 import { publicReader } from "./public-collection.server";
+import { readPublicCatalogue } from "./public-catalogue.server";
 import { readHubSnapshot, readPublicSnapshot, publicCache } from "./hub-cache.server";
 import {
   levelRow,
@@ -40,7 +41,7 @@ export const getHubSettings = createServerFn({ method: "GET" }).handler(() =>
 );
 
 export const getHubData = createServerFn({ method: "GET" }).handler(async () => {
-  const data = await readHubSnapshot(readHubData, publicCache());
+  const data = await readHubSnapshot(() => readPublicCatalogue(readHubData), publicCache());
   if (!data.levels || !data.destinations) throw new Error("Catalogue temporarily unavailable");
   return data;
 });
