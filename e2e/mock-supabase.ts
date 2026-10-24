@@ -390,6 +390,35 @@ serve({
     }
     reads.push(url.pathname + url.search);
 
+    if (url.pathname === "/rest/v1/rpc/published_hub_destination_media_v1") {
+      if (delay) await Bun.sleep(delay);
+      const id = url.searchParams.get("requested_destination_id");
+      const published = tables.destinations?.some((row) => {
+        const destination = row as { id: string; active: boolean };
+        return destination.id === id && destination.active;
+      });
+      const definitions = {
+        photos: "destination_photos",
+        posts: "destination_posts",
+        videos: "destination_videos",
+        hours: "destination_opening_hours",
+        notices: "published_destination_notices",
+        collection: "destination_collection_items",
+      };
+      return Response.json(
+        Object.fromEntries(
+          Object.entries(definitions).map(([key, table]) => [
+            key,
+            published
+              ? (tables[table] ?? []).filter(
+                  (row) => (row as { destination_id: string }).destination_id === id,
+                )
+              : [],
+          ]),
+        ),
+      );
+    }
+
     if (url.pathname === "/rest/v1/rpc/published_hub_catalogue_v1") {
       if (delay) await Bun.sleep(delay);
       return Response.json({
