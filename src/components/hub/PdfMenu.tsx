@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import type { PDFDocumentProxy } from "pdfjs-dist";
+import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf.mjs";
 import workerUrl from "pdfjs-dist/legacy/build/pdf.worker.min.mjs?url";
 import { useI18n } from "@/i18n";
 import { nextPdfZoom, pinchCenter, pinchDistance, type Point } from "@/lib/pdf-zoom";
@@ -50,20 +51,21 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
 
   useEffect(() => {
     let active = true;
-    let loadingTask: ReturnType<(typeof import("pdfjs-dist/legacy/build/pdf.mjs"))["getDocument"]>;
-    import("pdfjs-dist/legacy/build/pdf.mjs")
-      .then((pdfjs) => {
-        if (!active) return;
-        pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
-        loadingTask = pdfjs.getDocument({
-          url: `/api/resort-pdf?url=${encodeURIComponent(url)}`,
-          disableRange: true,
-          disableStream: false,
-        });
-        return loadingTask.promise;
-      })
+    GlobalWorkerOptions.workerSrc = workerUrl;
+    let loadingTask: ReturnType<typeof getDocument>;
+    try {
+      loadingTask = getDocument({
+        url: `/api/resort-pdf?url=${encodeURIComponent(url)}`,
+        disableRange: true,
+        disableStream: false,
+      });
+    } catch {
+      setError(true);
+      return;
+    }
+    loadingTask.promise
       .then(async (document) => {
-        if (!active || !document) return;
+        if (!active) return;
         const firstPage = await document.getPage(1);
         const viewport = firstPage.getViewport({ scale: 1 });
         if (active) setPdf({ document, heightRatio: viewport.height / viewport.width });

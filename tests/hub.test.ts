@@ -2,7 +2,13 @@ import { describe, expect, test } from "bun:test";
 import { createHubValue, resolveHeroImage } from "../src/data/hub-value";
 import { actionsFor, instagramUrl } from "../src/lib/destination-actions";
 import { safeExternalUrl } from "../src/lib/external-url";
-import { LEVELS, toDestination, youtubeVideoId, type DestinationRow } from "../src/data/resort";
+import {
+  LEVELS,
+  groupVideos,
+  toDestination,
+  youtubeVideoId,
+  type DestinationRow,
+} from "../src/data/resort";
 import { destinationRow, mapPlaceRow } from "../src/lib/hub-schema";
 import type { HubData } from "../src/lib/hub.functions";
 
@@ -23,11 +29,8 @@ const row: DestinationRow = {
 const ready: HubData = {
   levels: [{ id: "sky", title: "SKY", line: "", image_key: null, clusters: [], display_order: 0 }],
   destinations: [row],
-  photos: [],
   links: [],
   events: [],
-  posts: [],
-  videos: [],
   settings: {},
 };
 
@@ -104,12 +107,12 @@ describe("database authority", () => {
     expect(createHubValue({ ...ready, destinations: [] }).destinations).toEqual([]);
     expect(createHubValue({ ...ready, levels: [] }).levels).toEqual([]);
   });
-  test("successful empty media and settings stay empty", () => {
+  test("catalogue does not attach independently loaded media or invent settings", () => {
     const hub = createHubValue(ready);
     expect(hub.destinations[0]?.events).toEqual([]);
-    expect(hub.destinations[0]?.photos).toEqual([]);
-    expect(hub.destinations[0]?.posts).toEqual([]);
-    expect(hub.destinations[0]?.videos).toEqual([]);
+    expect(hub.destinations[0]?.photos).toBeUndefined();
+    expect(hub.destinations[0]?.posts).toBeUndefined();
+    expect(hub.destinations[0]?.videos).toBeUndefined();
     expect(hub.links).toEqual([]);
   });
   test("disabled links never fall back to old columns", () => {
@@ -128,8 +131,8 @@ describe("database authority", () => {
   test("one unavailable collection does not resurrect other deleted content", () => {
     const dest = createHubValue({ ...ready, events: null }).destinations[0]!;
     expect(dest.events).toEqual([]);
-    expect(dest.photos).toEqual([]);
-    expect(dest.posts).toEqual([]);
+    expect(dest.photos).toBeUndefined();
+    expect(dest.posts).toBeUndefined();
     expect(actionsFor(dest)).toEqual([]);
   });
 });
@@ -162,17 +165,14 @@ describe("curated YouTube videos", () => {
       title_translations: { vi: "Phim khu nghỉ dưỡng" },
       display_order,
     });
-    const hub = createHubValue({
-      ...ready,
-      videos: [
-        video("other", "https://youtu.be/dQw4w9WgXcQ", 0),
-        video("citron", "https://youtu.be/invalid-id", 1),
-        video("citron", "https://youtu.be/dQw4w9WgXcQ", 2),
-        video("citron", "https://youtube.com/shorts/shorts12345", 3),
-        video("citron", "https://youtu.be/abcdefghijk", 0),
-      ],
-    });
-    expect(hub.destinations[0]?.videos).toEqual([
+    const grouped = groupVideos([
+      video("other", "https://youtu.be/dQw4w9WgXcQ", 0),
+      video("citron", "https://youtu.be/invalid-id", 1),
+      video("citron", "https://youtu.be/dQw4w9WgXcQ", 2),
+      video("citron", "https://youtube.com/shorts/shorts12345", 3),
+      video("citron", "https://youtu.be/abcdefghijk", 0),
+    ]);
+    expect(grouped["citron"]).toEqual([
       {
         video_id: "abcdefghijk",
         format: "video",

@@ -84,10 +84,7 @@ describe("language-specific discovery links", () => {
       levels: [],
       destinations: [],
       links: [],
-      photos: [],
       events: [],
-      posts: [],
-      videos: [],
       settings: { website: original, dining: original },
       siteLinkTranslations: [{ setting_key: "website", ...translated }],
     };

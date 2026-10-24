@@ -18,7 +18,8 @@ import { ConciergeContact } from "./ConciergeContact";
 
 type ResortPage = Readonly<{ url: string; title: string }>;
 const OpenResortPage = createContext<((page: ResortPage) => void) | null>(null);
-const PdfMenu = lazy(() => import("./PdfMenu"));
+const preparePdfMenu = () => import("./PdfMenu");
+const PdfMenu = lazy(preparePdfMenu);
 
 /** One on-demand browser, outside the swipe deck and above any open destination detail. */
 export function ResortBrowserProvider({ children }: Readonly<{ children: ReactNode }>) {
@@ -36,6 +37,8 @@ export function ResortLink({
   pageTitle,
   children,
   onClick,
+  onPointerEnter,
+  onFocus,
   ...props
 }: Readonly<ComponentPropsWithoutRef<"a"> & { href: string; pageTitle: string }>) {
   const openPage = useContext(OpenResortPage);
@@ -45,7 +48,16 @@ export function ResortLink({
       target={resortLinkTarget(href)}
       rel="noreferrer"
       {...props}
-      href={safeExternalUrl(href)}
+      href={safeExternalUrl(embeddedUrl ?? href)}
+      onPointerEnter={(event) => {
+        onPointerEnter?.(event);
+        if (event.pointerType === "mouse" && isResortPdf(href))
+          void preparePdfMenu().catch(() => {});
+      }}
+      onFocus={(event) => {
+        onFocus?.(event);
+        if (isResortPdf(href)) void preparePdfMenu().catch(() => {});
+      }}
       onClick={(event) => {
         onClick?.(event);
         // Preserve copy-link, middle-click and the browser's modifier-key shortcuts.

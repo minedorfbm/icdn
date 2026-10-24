@@ -3,9 +3,6 @@ import { currentLinkTranslations, type LinkTranslations } from "@/lib/localized-
 import {
   groupEvents,
   groupLinks,
-  groupPhotos,
-  groupPosts,
-  groupVideos,
   LEVELS,
   OFFICIAL,
   resolveImage,
@@ -61,11 +58,8 @@ export function createHubValue(data?: HubData): HubValue {
     ...(l.clusters.length > 0 ? { clusters: l.clusters } : {}),
   }));
 
-  const photosByDest = groupPhotos(data.photos ?? []);
   const linksByDest = groupLinks(data.links ?? [], data.linkTranslations ?? []);
   const eventsByDest = groupEvents(data.events ?? []);
-  const postsByDest = groupPosts(data.posts ?? []);
-  const videosByDest = groupVideos(data.videos ?? []);
   const s = data.settings ?? {};
   const links = (
     [
@@ -102,11 +96,9 @@ export function createHubValue(data?: HubData): HubValue {
     destinations: data.destinations.map((row) => {
       const dest = toDestination(
         row,
-        photosByDest[row.id] ?? [],
+        undefined,
         linksByDest[row.id] ?? [],
         eventsByDest[row.id] ?? [],
-        postsByDest[row.id] ?? [],
-        videosByDest[row.id] ?? [],
       );
       return dest;
     }),

@@ -43,7 +43,7 @@ test("generator publishes deterministic uncropped derivatives only for approved 
     if (url.includes("/rest/v1/"))
       return Response.json(
         [
-          ...originals.map((image_key) => ({ image_key })),
+          ...originals.map((image_key) => ({ image_key, detail_image_key: image_key })),
           { image_key: originals[0] },
           { image_key: null },
           { image_key: "https://other.example/photo.png" },
@@ -55,7 +55,7 @@ test("generator publishes deterministic uncropped derivatives only for approved 
   };
   const summary = await generateImageVariants(root, request);
   expect(summary.sources).toBe(5);
-  expect(downloaded.length).toBe(5);
+  expect(downloaded).toHaveLength(5);
   expect(summary.originalTotal).toBe(photo.length * 5);
   expect(summary.optimizedTotal).toBeGreaterThan(0);
   const manifestFile = path.join(root, "src/data/image-variants.json");
@@ -64,12 +64,17 @@ test("generator publishes deterministic uncropped derivatives only for approved 
   expect(Object.keys(manifest)).toEqual(Object.keys(manifest).sort((a, b) => a.localeCompare(b)));
   for (const source of originals) {
     expect(manifest[source].variants.map((item: { width: number }) => item.width)).toEqual([
-      320, 960, 1600,
+      320, 960, 1280, 1600,
     ]);
+    const avif = manifest[source].avif;
+    expect(avif.width).toBe(1800);
+    const avifBytes = await fs.readFile(path.join(root, "public", avif.src));
+    expect((await sharp(avifBytes).metadata()).width).toBe(1800);
+    expect(avifBytes).toHaveLength(avif.bytes);
     for (const variant of manifest[source].variants) {
       const bytes = await fs.readFile(path.join(root, "public", variant.src));
       const metadata = await sharp(bytes).metadata();
-      expect(bytes.length).toBe(variant.bytes);
+      expect(bytes).toHaveLength(variant.bytes);
       expect(metadata.width).toBe(variant.width);
       expect(metadata.height).toBe(Math.round((variant.width * 2) / 3));
     }

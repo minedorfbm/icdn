@@ -85,9 +85,6 @@ async function readHubData(): Promise<HubData> {
     relations,
     // These belong to independent loading stages, not to the catalogue cache.
     settings: {},
-    photos: [],
-    posts: [],
-    videos: [],
   };
 }
 
