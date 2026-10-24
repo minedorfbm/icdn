@@ -141,3 +141,41 @@ test("results remain visible while the destination screen loads", async ({ page 
   await page.getByRole("button", { name: "BACK", exact: true }).click();
   await expect(search.getByRole("searchbox")).toHaveValue("Citron");
 });
+
+test("a refreshed card restores saved search scroll after the complete catalogue arrives", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.locator(".hub-search-tool button").click();
+  const search = page.getByRole("dialog", { name: "Search", exact: true });
+  await search.getByRole("searchbox").fill("dining");
+  const result = search.locator(".hub-search-result").last();
+  await result.scrollIntoViewIfNeeded();
+  const names = await search.locator(".hub-search-name").allTextContents();
+  const scrollTop = await search.locator(".hub-search-results").evaluate((node) => node.scrollTop);
+  expect(scrollTop).toBeGreaterThan(100);
+  await result.click();
+  await expect(search).toHaveCount(0);
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/_serverFn/**", async (route) => {
+    const response = await route.fetch();
+    if ((response.headers()["server-timing"] ?? "").includes("catalogue;")) await gate;
+    await route.fulfill({ response });
+  });
+  await page.reload();
+  try {
+    await page.getByRole("button", { name: "BACK", exact: true }).click();
+    await expect(search.getByRole("searchbox")).toHaveValue("dining");
+    await expect(search.locator(".hub-search-result")).toHaveCount(0);
+    release();
+    await expect(search.locator(".hub-search-name")).toHaveText(names);
+    await expect
+      .poll(() => search.locator(".hub-search-results").evaluate((node) => node.scrollTop))
+      .toBeCloseTo(scrollTop, 0);
+  } finally {
+    release();
+  }
+});

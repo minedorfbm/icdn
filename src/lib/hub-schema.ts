@@ -191,7 +191,7 @@ export const hubDataSchema = z.object({
     })
     .optional(),
 });
-export type HubData = z.infer<typeof hubDataSchema>;
+export type HubData = z.infer<typeof hubDataSchema> & { scope?: "card" };
 
 /** A malformed collection is unavailable, never silently truncated or partially published. */
 export function readRows<T>(

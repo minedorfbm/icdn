@@ -1,3 +1,4 @@
+import { NotFoundPage } from "@/components/NotFoundPage";
 import { Fragment, type CSSProperties } from "react";
 import { useChapterDocking } from "@/lib/use-chapter-docking";
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
@@ -11,8 +12,8 @@ import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
 import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
 import { localizedLinkUrl } from "@/lib/localized-links";
-import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { createFileRoute, notFound, Outlet, useLocation } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useJourneyMotion } from "@/lib/use-journey-motion";
 import { ArrowUpRight } from "lucide-react";
 import { ConciergeContact } from "@/components/hub/ConciergeContact";
@@ -21,7 +22,15 @@ import { NamTramRail } from "@/components/hub/NamTramRail";
 import { type Level } from "@/data/resort";
 import { HubProvider, useHub } from "@/data/hub-context";
 import type { HubData } from "@/lib/hub.functions";
-import { loadHubData, loadHubSettings, primeHubSnapshots } from "@/lib/hub-client";
+import {
+  loadDestinationCard,
+  loadHubData,
+  loadHubSettings,
+  peekHubData,
+  primeHubSnapshots,
+} from "@/lib/hub-client";
+import { canonicalDestinationId } from "@/lib/destination-route";
+import { cardHubData } from "@/lib/destination-card-schema";
 import { NavigationProgress } from "@/components/hub/NavigationProgress";
 import { I18nProvider, LanguageSwitch, useI18n } from "@/i18n";
 import { resolveHeroImage } from "@/data/hub-value";
@@ -29,14 +38,18 @@ import { ResortBrowserProvider, ResortLink } from "@/components/hub/ResortBrowse
 
 export const Route = createFileRoute("/_hub")({
   loader: async ({ location }) => {
-    // Complete the homepage HTML before requesting its catalogue. Some mobile
-    // browsers buffer streamed documents; direct card URLs retain their SSR metadata.
+    // Finish HTML without streaming a deferred catalogue (mobile browsers may buffer it).
+    // A direct card needs only its own published content, including all its translations.
     const isHome = location.pathname === "/";
-    const [settings, catalogue] = await Promise.all([
+    const catalogue = peekHubData() ?? null;
+    const id = canonicalDestinationId(location.pathname.slice(1));
+    if (!isHome && !/^[a-z0-9-]{1,120}$/.test(id)) throw notFound();
+    const [settings, card] = await Promise.all([
       loadHubSettings(),
-      isHome ? Promise.resolve(null) : loadHubData(),
+      isHome || catalogue ? Promise.resolve(null) : loadDestinationCard(id),
     ]);
-    return { settings, catalogue, isHome };
+    if (!isHome && !catalogue && !card) throw notFound();
+    return { settings, catalogue, card, isHome };
   },
   staleTime: 0,
   head: ({ loaderData }) => ({
@@ -76,10 +89,11 @@ export const Route = createFileRoute("/_hub")({
     ],
   }),
   component: HubRoute,
+  notFoundComponent: NotFoundPage,
 });
 
 function HubRoute() {
-  const { settings, catalogue } = Route.useLoaderData();
+  const { settings, catalogue, card } = Route.useLoaderData();
   useEffect(() => primeHubSnapshots(settings, catalogue), [settings, catalogue]);
   const location = useLocation();
   // History state survives a refresh. Keep the hub behind a card only when this
@@ -94,7 +108,22 @@ function HubRoute() {
     failed: false,
   });
   const [attempt, setAttempt] = useState(0);
+  const retryCatalogue = useCallback(() => setAttempt((n) => n + 1), []);
   const data = catalogue ?? result.data;
+  // Keep providers mounted if a map click leaves the focused card before the catalogue arrives.
+  const [focusedCard, setFocusedCard] = useState(card);
+  useEffect(() => {
+    if (card) setFocusedCard(card);
+  }, [card]);
+  const focused = card ?? focusedCard;
+  const presentation = useMemo(
+    () => data ?? (focused ? cardHubData(focused) : null),
+    [data, focused],
+  );
+  const providerData = useMemo(
+    () => (presentation ? { ...presentation, settings } : undefined),
+    [presentation, settings],
+  );
   useEffect(() => {
     if (catalogue) {
       setResult({ data: catalogue, failed: false });
@@ -116,7 +145,7 @@ function HubRoute() {
     };
   }, [catalogue, attempt, result.data]);
   return (
-    <I18nProvider editorial={data?.editorial}>
+    <I18nProvider editorial={presentation?.editorial}>
       <NavigationProgress />
       <main className="min-h-svh bg-background text-foreground">
         {showHub && (
@@ -130,19 +159,29 @@ function HubRoute() {
             />
           </>
         )}
-        {data ? (
-          <HubProvider data={{ ...data, settings }}>
+        {providerData ? (
+          <HubProvider
+            data={providerData}
+            ready={!!data}
+            failed={result.failed}
+            retry={retryCatalogue}
+          >
             <HubSearchProvider>
               <ResortBrowserProvider>
                 <ResortMapProvider>
-                  {showHub && <Hub />}
+                  {showHub &&
+                    (data ? (
+                      <Hub />
+                    ) : (
+                      <CatalogueStatus failed={result.failed} onRetry={retryCatalogue} />
+                    ))}
                   <Outlet />
                 </ResortMapProvider>
               </ResortBrowserProvider>
             </HubSearchProvider>
           </HubProvider>
         ) : (
-          <CatalogueStatus failed={result.failed} onRetry={() => setAttempt((n) => n + 1)} />
+          <CatalogueStatus failed={result.failed} onRetry={retryCatalogue} />
         )}
       </main>
     </I18nProvider>

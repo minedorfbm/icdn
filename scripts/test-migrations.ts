@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
+import { checkDestinationCardSnapshot } from "./check-destination-card-snapshot";
 import { checkCatalogueSnapshot } from "./check-catalogue-snapshot";
 import { checkDestinationMediaSnapshot } from "./check-destination-media-snapshot";
 
@@ -214,6 +215,7 @@ try {
   );
   await checkCatalogueSnapshot(db);
   await checkDestinationMediaSnapshot(db);
+  await checkDestinationCardSnapshot(db);
   const guideMigration = readFileSync(
     new URL("20261018151000_instagram_spots_guide.sql", directory),
     "utf8",

@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
+import { createHubValue } from "@/data/hub-value";
+import { loadHubData } from "./hub-client";
+import { useCatalogueStatus } from "@/data/catalogue-status";
 import { useHub } from "@/data/hub-context";
 import { adjacentDestination } from "./destination-presentation";
 import { useDestinationNavigation } from "./use-destination-navigation";
@@ -68,7 +71,16 @@ function bindSwipe(node: HTMLElement, navigate: (direction: 1 | -1) => void) {
 
 export function useDestinationSwipe(id: string) {
   const ref = useRef<HTMLDivElement>(null);
+  const pending = useRef(false);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const { destinations } = useHub();
+  const { ready, retry } = useCatalogueStatus();
   const { sequence, openDestination, previousCard, openPreviousDestination } =
     useDestinationNavigation();
   const next = adjacentDestination(id, destinations, sequence);
@@ -80,11 +92,37 @@ export function useDestinationSwipe(id: string) {
   }, [nextId, openDestination]);
   useEffect(() => {
     const node = ref.current;
-    if (!node || (!nextId && !previousId)) return;
+    if (!node || (ready && !nextId && !previousId)) return;
     return bindSwipe(node, (direction) => {
-      if (direction === 1) openNext();
+      if (!ready && direction === 1) {
+        if (pending.current) return;
+        pending.current = true;
+        void loadHubData()
+          .then(
+            (data) => {
+              const next = adjacentDestination(id, createHubValue(data).destinations, sequence);
+              if (next && mounted.current) void openDestination(next.id);
+            },
+            () => {
+              if (mounted.current) retry();
+            },
+          )
+          .finally(() => {
+            pending.current = false;
+          });
+      } else if (direction === 1) openNext();
       else if (previousId) openPreviousDestination();
     });
-  }, [id, nextId, previousId, openNext, openPreviousDestination]);
+  }, [
+    id,
+    nextId,
+    previousId,
+    openNext,
+    openPreviousDestination,
+    ready,
+    sequence,
+    openDestination,
+    retry,
+  ]);
   return { ref, next, previous, openNext, openPrevious: openPreviousDestination };
 }
