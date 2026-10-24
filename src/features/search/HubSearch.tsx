@@ -61,14 +61,24 @@ export function SearchDialog({
   const selectedResultRef = useRef<HTMLButtonElement>(null);
   const [collection, setCollection] = useState<SearchCollection | "">(initialState.collection);
   const previousFilter = useRef({ query, collection });
+  const { ready } = useCatalogueStatus();
   useEffect(() => {
     const unchanged =
       previousFilter.current.query === query && previousFilter.current.collection === collection;
-    if (resultsRef.current) resultsRef.current.scrollTop = unchanged ? initialState.scrollTop : 0;
+    const originalFilter = query === initialState.query && collection === initialState.collection;
+    if (resultsRef.current && ready) {
+      resultsRef.current.scrollTop = unchanged && originalFilter ? initialState.scrollTop : 0;
+    }
     previousFilter.current = { query, collection };
-  }, [query, collection, initialState.scrollTop]);
+  }, [
+    query,
+    collection,
+    initialState.scrollTop,
+    initialState.query,
+    initialState.collection,
+    ready,
+  ]);
   const { destinations } = useHub();
-  const { ready } = useCatalogueStatus();
   const { lang, t, cluster, levelLabel, typeLabel, description, detailDescription, event } =
     useI18n();
   const copy = (key: Parameters<typeof searchCopy>[1]) => searchCopy(lang, key);
