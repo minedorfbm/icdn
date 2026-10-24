@@ -6,7 +6,7 @@ const sourceFiles = readdirSync("src", { recursive: true, withFileTypes: true })
   .filter((entry) => entry.isFile() && /\.(ts|tsx)$/.test(entry.name))
   .map((entry) => `${entry.parentPath}/${entry.name}`.replaceAll("\\", "/"))
   .filter((path) => !path.endsWith(".d.ts") && path !== "src/routeTree.gen.ts")
-  .sort();
+  .sort((a, b) => a.localeCompare(b));
 const sourceSet = new Set(sourceFiles);
 const records = readFileSync("coverage/lcov.info", "utf8")
   .split("end_of_record")

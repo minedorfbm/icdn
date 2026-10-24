@@ -1,12 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 import { readRows } from "./hub-schema";
 
-/** One validated anonymous reader shared by the three public loading stages. */
-export function publicReader() {
+/** Anonymous database access; never installs a user session or privileged key. */
+export function publicDatabase() {
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
   if (!url || !key) throw new Error("Supabase configuration missing");
-  const supabase = createClient(url, key, {
+  return createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: {
       fetch: (input, init) => {
@@ -23,7 +23,10 @@ export function publicReader() {
       },
     },
   });
+}
 
+export function publicReader() {
+  const supabase = publicDatabase();
   return async <T extends import("zod").z.ZodRawShape>(
     table: string,
     schema: import("zod").z.ZodObject<T>,

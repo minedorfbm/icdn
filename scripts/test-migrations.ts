@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { PGlite } from "@electric-sql/pglite";
+import { checkCatalogueSnapshot } from "./check-catalogue-snapshot";
 
 // Real PostgreSQL execution in an isolated, disposable database. Never connects to Supabase.
 const directory = new URL("../supabase/migrations/", import.meta.url);
 const files = readdirSync(directory)
   .filter((name) => name.endsWith(".sql"))
-  .sort();
+  .sort((a, b) => a.localeCompare(b));
 const db = new PGlite();
 const earthLevelMigration = "20261018120000_la_maison_building_earth_level.sql";
 const maisonState = async () =>
@@ -210,6 +211,7 @@ try {
     (previous, file) => previous.then(() => applyAndCheckMigration(file)),
     Promise.resolve(),
   );
+  await checkCatalogueSnapshot(db);
   const guideMigration = readFileSync(
     new URL("20261018151000_instagram_spots_guide.sql", directory),
     "utf8",

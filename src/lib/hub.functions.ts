@@ -4,6 +4,8 @@ import { collectionItemRow } from "./destination-collection";
 import { destinationNoticeRow } from "./destination-notices";
 import { openingHoursRow } from "./opening-hours";
 import { publicReader } from "./public-collection.server";
+import { readPublicCatalogue } from "./public-catalogue.server";
+import { withPublicReadTiming } from "./public-read-timing.server";
 import { readHubSnapshot, readPublicSnapshot, publicCache } from "./hub-cache.server";
 import {
   levelRow,
@@ -27,23 +29,34 @@ export type { HubData } from "./hub-schema";
 
 // Only settings block the homepage; its catalogue loads after the hero is displayed.
 export const getHubSettings = createServerFn({ method: "GET" }).handler(() =>
-  readPublicSnapshot(
-    "settings-v1",
-    z.record(z.string(), z.string()).nullable(),
-    (data) => data !== null,
-    async () => {
-      const rows = await publicReader()("site_settings", settingRow);
-      return rows === null ? null : Object.fromEntries(rows.map((row) => [row.key, row.value]));
-    },
-    publicCache(),
+  withPublicReadTiming("settings", (markSource) =>
+    readPublicSnapshot(
+      "settings-v1",
+      z.record(z.string(), z.string()).nullable(),
+      (data) => data !== null,
+      async () => {
+        markSource("database");
+        const rows = await publicReader()("site_settings", settingRow);
+        return rows === null ? null : Object.fromEntries(rows.map((row) => [row.key, row.value]));
+      },
+      publicCache(),
+    ),
   ),
 );
 
-export const getHubData = createServerFn({ method: "GET" }).handler(async () => {
-  const data = await readHubSnapshot(readHubData, publicCache());
-  if (!data.levels || !data.destinations) throw new Error("Catalogue temporarily unavailable");
-  return data;
-});
+export const getHubData = createServerFn({ method: "GET" }).handler(() =>
+  withPublicReadTiming("catalogue", async (markSource) => {
+    const data = await readHubSnapshot(() => {
+      markSource("rpc");
+      return readPublicCatalogue(() => {
+        markSource("compatibility");
+        return readHubData();
+      });
+    }, publicCache());
+    if (!data.levels || !data.destinations) throw new Error("Catalogue temporarily unavailable");
+    return data;
+  }),
+);
 
 async function readHubData(): Promise<HubData> {
   const read = publicReader();
