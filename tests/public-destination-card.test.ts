@@ -98,7 +98,7 @@ test("a missing card function reads a fresh catalogue instead of resetting a cac
 });
 test("only two absent functions reach the fresh legacy table reader, and partial data cannot become a card", async () => {
   configure();
-  fetchSpy.mockResolvedValue(Response.json({ code: "PGRST202" }, { status: 404 }));
+  fetchSpy.mockImplementation(async () => Response.json({ code: "PGRST202" }, { status: 404 }));
   expect(await readPublicDestinationCard("citron", async () => fullCatalogue())).toEqual(card);
   await expect(
     readPublicDestinationCard("citron", async () => ({ ...fullCatalogue(), links: null })),
