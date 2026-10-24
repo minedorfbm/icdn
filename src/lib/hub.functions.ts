@@ -1,5 +1,5 @@
 import { readPublicDestinationCard } from "./public-destination-card.server";
-import { destinationCardSchema } from "./destination-card-schema";
+import { readCardSnapshot } from "./card-snapshot.server";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "./validation";
 import { collectionItemRow } from "./destination-collection";
@@ -160,15 +160,15 @@ export const getDestinationCard = createServerFn({ method: "GET" })
   )
   .handler(({ data: id }) =>
     withPublicReadTiming("card", (markSource) =>
-      readPublicSnapshot(
-        `card-v2/${id}`,
-        destinationCardSchema.nullable(),
-        (data) => data !== null,
+      readCardSnapshot(
+        id,
         () => {
           markSource("rpc");
           return readPublicDestinationCard(id, readHubData, () => markSource("compatibility"));
         },
         publicCache(),
+        Date.now(),
+        () => markSource("catalogue-cache"),
       ),
     ),
   );

@@ -19,8 +19,16 @@ test("a cold direct card renders through its focused snapshot", async ({ page, r
   ).toEqual([]);
   await page.getByRole("button", { name: "BACK", exact: true }).click();
   await expect(page.locator("#heaven")).toBeVisible();
+  const beforeWarm = (await (await request.get("http://127.0.0.1:54329/control")).json()).reads
+    .length;
   const warm = await page.goto("/tingara");
-  expect(warm!.headers()["server-timing"]).toMatch(/card;dur=\d+(?:\.\d+)?;desc="(?:rpc|cache)"/);
+  expect(warm!.headers()["server-timing"]).toMatch(/card;dur=\d+(?:\.\d+)?;desc="catalogue-cache"/);
+  const warmReads = (
+    await (await request.get("http://127.0.0.1:54329/control")).json()
+  ).reads.slice(beforeWarm);
+  expect(warmReads.some((path: string) => path.includes("published_hub_destination_card_v1"))).toBe(
+    false,
+  );
 });
 
 test("the deferred homepage catalogue reports its own API timing", async ({ page }) => {
