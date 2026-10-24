@@ -36,3 +36,35 @@ test("the deferred homepage catalogue reports its own API timing", async ({ page
   );
   await expect(page.locator("#heaven")).toBeVisible();
 });
+
+test("an opened card reads its media snapshot without per-table requests", async ({
+  page,
+  request,
+}) => {
+  const pending = page.waitForResponse(
+    (response) =>
+      response.url().includes("/_serverFn/") &&
+      (response.headers()["server-timing"] ?? "").includes("media;"),
+  );
+  await page.goto("/citron");
+  const response = await pending;
+  expect(response.headers()["server-timing"]).toMatch(
+    /media;dur=\d+(?:\.\d+)?;desc="(?:rpc|cache)"/,
+  );
+  await expect(page.locator(".opening-hours")).toContainText("06:30");
+  const { reads } = await (await request.get("http://127.0.0.1:54329/control")).json();
+  expect(
+    reads.some(
+      (path: string) =>
+        path.startsWith("/rest/v1/rpc/published_hub_destination_media_v1?") &&
+        path.includes("requested_destination_id=citron"),
+    ),
+  ).toBe(true);
+  expect(
+    reads.filter((path: string) =>
+      /^\/rest\/v1\/(destination_photos|destination_posts|destination_videos|destination_opening_hours|published_destination_notices|destination_collection_items)\?/.test(
+        path,
+      ),
+    ),
+  ).toEqual([]);
+});

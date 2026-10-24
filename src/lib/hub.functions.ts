@@ -5,6 +5,9 @@ import { destinationNoticeRow } from "./destination-notices";
 import { openingHoursRow } from "./opening-hours";
 import { publicReader } from "./public-collection.server";
 import { readPublicCatalogue } from "./public-catalogue.server";
+import { readPublicDestinationMedia } from "./public-destination-media.server";
+import { destinationMediaSchema } from "./destination-media-schema";
+export type { DestinationMediaData } from "./destination-media-schema";
 import { withPublicReadTiming } from "./public-read-timing.server";
 import { readHubSnapshot, readPublicSnapshot, publicCache } from "./hub-cache.server";
 import {
@@ -101,15 +104,6 @@ async function readHubData(): Promise<HubData> {
   };
 }
 
-const mediaSchema = z.object({
-  collection: z.array(collectionItemRow).nullable(),
-  photos: z.array(photoRow).nullable(),
-  posts: z.array(postRow).nullable(),
-  videos: z.array(videoRow).nullable(),
-  hours: z.array(openingHoursRow).nullable(),
-  notices: z.array(destinationNoticeRow).nullable(),
-});
-export type DestinationMediaData = z.infer<typeof mediaSchema>;
 export const getDestinationMedia = createServerFn({ method: "GET" })
   .validator(
     z
@@ -119,34 +113,37 @@ export const getDestinationMedia = createServerFn({ method: "GET" })
       .regex(/^[a-z0-9-]+$/),
   )
   .handler(({ data: id }) =>
-    readPublicSnapshot(
-      `media-v4/${id}`,
-      mediaSchema,
-      (data) => Object.values(data).every((rows) => rows !== null),
-      async () => {
-        const read = publicReader();
-        // The catalogue checks publication before this endpoint is requested. Recheck it
-        // here too: this endpoint is public and can be called independently of the UI.
-        const published = await read("destinations", destinationRow, "active", undefined, id, "id");
-        if (published === null) throw new Error("Catalogue temporarily unavailable");
-        if (!published.length)
-          return { photos: [], posts: [], videos: [], hours: [], notices: [], collection: [] };
-        const [photos, posts, videos, hours, notices, collection] = await Promise.all([
-          read("destination_photos", photoRow, "active", "display_order", id),
-          read("destination_posts", postRow, "active", "display_order", id),
-          read("destination_videos", videoRow, "active", "display_order", id),
-          read("destination_opening_hours", openingHoursRow, "published", "display_order", id),
-          read(
-            "published_destination_notices",
-            destinationNoticeRow,
-            undefined,
-            "display_order",
-            id,
-          ),
-          read("destination_collection_items", collectionItemRow, "active", "display_order", id),
-        ]);
-        return { photos, posts, videos, hours, notices, collection };
-      },
-      publicCache(),
+    withPublicReadTiming("media", (markSource) =>
+      readPublicSnapshot(
+        `media-v4/${id}`,
+        destinationMediaSchema,
+        (data) => Object.values(data).every((rows) => rows !== null),
+        () => {
+          markSource("rpc");
+          return readPublicDestinationMedia(id, () => {
+            markSource("compatibility");
+            return readDestinationMedia(id);
+          });
+        },
+        publicCache(),
+      ),
     ),
   );
+
+async function readDestinationMedia(id: string) {
+  const read = publicReader();
+  // This public endpoint must also check publication when called independently of the catalogue.
+  const published = await read("destinations", destinationRow, "active", undefined, id, "id");
+  if (published === null) throw new Error("Catalogue temporarily unavailable");
+  if (!published.length)
+    return { photos: [], posts: [], videos: [], hours: [], notices: [], collection: [] };
+  const [photos, posts, videos, hours, notices, collection] = await Promise.all([
+    read("destination_photos", photoRow, "active", "display_order", id),
+    read("destination_posts", postRow, "active", "display_order", id),
+    read("destination_videos", videoRow, "active", "display_order", id),
+    read("destination_opening_hours", openingHoursRow, "published", "display_order", id),
+    read("published_destination_notices", destinationNoticeRow, undefined, "display_order", id),
+    read("destination_collection_items", collectionItemRow, "active", "display_order", id),
+  ]);
+  return { photos, posts, videos, hours, notices, collection };
+}
