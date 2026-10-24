@@ -1,6 +1,6 @@
 import { getResponseHeader, setResponseHeader } from "@tanstack/react-start/server";
 
-type ReadSource = "cache" | "database" | "rpc" | "compatibility";
+type ReadSource = "cache" | "catalogue-cache" | "database" | "rpc" | "compatibility";
 
 /** Request-local public diagnostics; never includes URLs, identifiers or credentials. */
 export async function withPublicReadTiming<T>(

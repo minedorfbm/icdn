@@ -4,8 +4,32 @@ import { completeCatalogue } from "./hub-data-completeness";
 import type { z } from "zod";
 
 const CACHE_ROOT = "https://icdn.artdigitaljourney.com/__cache/";
+export const CATALOGUE_CACHE_KEY = "catalogue-v10";
 const TTL_MS = 120_000;
-type PublicCache = Pick<Cache, "match" | "put">;
+export type PublicCache = Pick<Cache, "match" | "put">;
+
+/** Read-only cache lookup. It never renews a publication deadline or writes a derived value. */
+export async function peekPublicSnapshot<T>(
+  key: string,
+  schema: z.ZodType<T>,
+  isComplete: (data: T) => boolean,
+  cache?: PublicCache,
+  now = Date.now(),
+): Promise<T | undefined> {
+  if (cache) {
+    try {
+      const response = await cache.match(CACHE_ROOT + key);
+      const expires = Number(response?.headers.get("x-hub-expires"));
+      if (response?.ok && expires > now && expires <= now + TTL_MS) {
+        const parsed = schema.safeParse(await response.json());
+        if (parsed.success && isComplete(parsed.data)) return parsed.data;
+      }
+    } catch {
+      /* A missing, invalid or unavailable cache remains a miss. */
+    }
+  }
+  return undefined;
+}
 
 /** Public data only, independently keyed, with the same hard two-minute expiry. */
 export async function readPublicSnapshot<T>(
@@ -17,18 +41,8 @@ export async function readPublicSnapshot<T>(
   now = Date.now(),
 ): Promise<T> {
   const url = CACHE_ROOT + key;
-  if (cache) {
-    try {
-      const response = await cache.match(url);
-      const expires = Number(response?.headers.get("x-hub-expires"));
-      if (response?.ok && expires > now && expires <= now + TTL_MS) {
-        const parsed = schema.safeParse(await response.json());
-        if (parsed.success && isComplete(parsed.data)) return parsed.data;
-      }
-    } catch {
-      /* The database remains available when cache storage fails. */
-    }
-  }
+  const cached = await peekPublicSnapshot(key, schema, isComplete, cache, now);
+  if (cached !== undefined) return cached;
   const data = await load();
   if (cache && isComplete(data)) {
     try {
@@ -54,7 +68,14 @@ export function readHubSnapshot(
   cache?: PublicCache,
   now = Date.now(),
 ): Promise<HubData> {
-  return readPublicSnapshot("catalogue-v10", hubDataSchema, completeCatalogue, load, cache, now);
+  return readPublicSnapshot(
+    CATALOGUE_CACHE_KEY,
+    hubDataSchema,
+    completeCatalogue,
+    load,
+    cache,
+    now,
+  );
 }
 
 export function publicCache() {
