@@ -4,7 +4,7 @@ type ReadSource = "cache" | "database" | "rpc" | "compatibility";
 
 /** Request-local public diagnostics; never includes URLs, identifiers or credentials. */
 export async function withPublicReadTiming<T>(
-  name: "settings" | "catalogue" | "media",
+  name: "settings" | "catalogue" | "media" | "card",
   read: (markSource: (source: ReadSource) => void) => Promise<T>,
 ): Promise<T> {
   const started = performance.now();

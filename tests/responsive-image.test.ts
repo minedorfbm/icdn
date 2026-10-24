@@ -54,7 +54,14 @@ test("AVIF preloads agree with the native source and retain a fallback for new C
     const avif = detailHeroAvif(source);
     if ("avif" in image) {
       expect(avif?.src).toBe(image.avif.src);
-      expect(avif?.srcSet).toBe(`${image.avif.src} ${image.width}w`);
+      expect(avif?.srcSet?.split(", ").at(-1)).toBe(`${image.avif.src} ${image.width}w`);
+      if ("avifVariants" in image)
+        for (const variant of image.avifVariants) {
+          expect(avif?.srcSet).toContain(`${variant.src} ${variant.width}w`);
+          expect(existsSync(new URL(`../public${variant.src}`, import.meta.url))).toBe(true);
+        }
+      expect(preload.imageSrcSet).toBe(avif?.srcSet);
+      expect(preload.imageSizes).toBe(avif?.sizes);
       expect(existsSync(new URL(`../public${image.avif.src}`, import.meta.url))).toBe(true);
       expect(preload.href).toBe(image.avif.src);
       expect(preload.type).toBe("image/avif");

@@ -41,6 +41,7 @@ export async function generateImageVariants(
       height: number;
       variants: { src: string; width: number; bytes: number }[];
       avif?: { src: string; width: number; bytes: number };
+      avifVariants?: { src: string; width: number; bytes: number }[];
     }
   > = {};
   let originalTotal = 0,
@@ -71,6 +72,7 @@ export async function generateImageVariants(
       }),
     );
     let avif: { src: string; width: number; bytes: number } | undefined;
+    let avifVariants: { src: string; width: number; bytes: number }[] | undefined;
     if (detailSources.has(source)) {
       const encoded = await sharp(bytes)
         .rotate()
@@ -80,13 +82,32 @@ export async function generateImageVariants(
       await fs.writeFile(path.join(out, file), encoded);
       avif = { src: "/images/optimized/" + file, width: meta.width, bytes: encoded.length };
       optimizedTotal += encoded.length;
+      avifVariants = await Promise.all(
+        [960, 1280]
+          .filter((width) => width < meta.width!)
+          .map(async (width) => {
+            const encoded = await sharp(bytes)
+              .rotate()
+              .resize({ width, withoutEnlargement: true })
+              .avif({ quality: 60, effort: 5, chromaSubsampling: "4:2:0" })
+              .toBuffer();
+            const file =
+              crypto.createHash("sha256").update(encoded).digest("hex").slice(0, 16) +
+              "-" +
+              width +
+              ".avif";
+            await fs.writeFile(path.join(out, file), encoded);
+            optimizedTotal += encoded.length;
+            return { src: "/images/optimized/" + file, width, bytes: encoded.length };
+          }),
+      );
     }
     if (variants.length || avif)
       manifest[source] = {
         width: meta.width,
         height: meta.height,
         variants,
-        ...(avif ? { avif } : {}),
+        ...(avif ? { avif, avifVariants } : {}),
       };
     originalTotal += bytes.length;
   }

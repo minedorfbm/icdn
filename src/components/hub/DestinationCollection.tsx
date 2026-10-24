@@ -1,5 +1,7 @@
 import { thumbnail } from "@/lib/responsive-image";
 import { ArrowUpRight } from "lucide-react";
+import { CataloguePending } from "./CataloguePending";
+import { useCatalogueStatus } from "@/data/catalogue-status";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { collectionCopy, type CollectionItem } from "@/lib/destination-collection";
@@ -11,6 +13,8 @@ export function DestinationCollection({ items }: Readonly<{ items: CollectionIte
   const { destinations } = useHub();
   const { lang } = useI18n();
   const { openDestination } = useDestinationNavigation();
+  const { ready } = useCatalogueStatus();
+  if (!ready) return <CataloguePending />;
   return (
     <ol className="destination-collection">
       {items.map((item) => {
@@ -18,6 +22,7 @@ export function DestinationCollection({ items }: Readonly<{ items: CollectionIte
           (destination) => destination.id === item.target_destination_id,
         );
         if (!target) return null;
+        if (!ready) return <CataloguePending />;
         return (
           <li key={item.key}>
             <button

@@ -4,6 +4,7 @@ type Variants = {
   width: number;
   variants: { src: string; width: number }[];
   avif?: { src: string; width: number };
+  avifVariants?: { src: string; width: number }[];
 };
 const images: Record<string, Variants> = manifest;
 
@@ -54,11 +55,18 @@ export function detailHeroImage(source: string) {
   };
 }
 
-/** Native-resolution AVIF with the unchanged WebP/original fallback in picture. */
+/** Sized AVIF candidates retain native resolution and the unchanged WebP/original fallback. */
 export function detailHeroAvif(source: string) {
-  const avif = images[source]?.avif;
+  const image = images[source];
+  const avif = image?.avif;
   return avif
-    ? { src: avif.src, srcSet: `${avif.src} ${avif.width}w`, sizes: detailHeroImage(source).sizes }
+    ? {
+        src: avif.src,
+        srcSet: [...(image.avifVariants ?? []), avif]
+          .map((item) => `${item.src} ${item.width}w`)
+          .join(", "),
+        sizes: detailHeroImage(source).sizes,
+      }
     : undefined;
 }
 export function detailHeroPreload(source: string) {

@@ -66,6 +66,16 @@ test("generator publishes deterministic uncropped derivatives only for approved 
     expect(manifest[source].variants.map((item: { width: number }) => item.width)).toEqual([
       320, 960, 1280, 1600,
     ]);
+    expect(manifest[source].avifVariants.map((item: { width: number }) => item.width)).toEqual([
+      960, 1280,
+    ]);
+    for (const variant of manifest[source].avifVariants) {
+      const bytes = await fs.readFile(path.join(root, "public", variant.src));
+      const meta = await sharp(bytes).metadata();
+      expect(meta.width).toBe(variant.width);
+      expect(meta.height).toBe(Math.round((variant.width * 2) / 3));
+      expect(bytes).toHaveLength(variant.bytes);
+    }
     const avif = manifest[source].avif;
     expect(avif.width).toBe(1800);
     const avifBytes = await fs.readFile(path.join(root, "public", avif.src));

@@ -1,18 +1,16 @@
 import { expect, test } from "./fixtures";
 
-test("a cold direct card renders through the single catalogue snapshot", async ({
-  page,
-  request,
-}) => {
+test("a cold direct card renders through its focused snapshot", async ({ page, request }) => {
   const response = await page.goto("/citron");
   const timing = response!.headers()["server-timing"];
-  expect(timing).toMatch(/catalogue;dur=\d+(?:\.\d+)?;desc="(?:rpc|cache)"/);
+  expect(timing).not.toContain("catalogue;");
+  expect(timing).toMatch(/card;dur=\d+(?:\.\d+)?;desc="(?:rpc|cache)"/);
   expect(timing).toMatch(/settings;dur=\d+(?:\.\d+)?;desc="(?:database|cache)"/);
   await expect(page.getByRole("dialog", { name: "Citron", exact: true })).toBeVisible();
   await expect(page.locator(".editorial-title")).toHaveText("Citron");
   const { reads } = await (await request.get("http://127.0.0.1:54329/control")).json();
   expect(
-    reads.some((path: string) => path.startsWith("/rest/v1/rpc/published_hub_catalogue_v1")),
+    reads.some((path: string) => path.startsWith("/rest/v1/rpc/published_hub_destination_card_v1")),
   ).toBe(true);
   expect(
     reads.filter((path: string) =>
@@ -22,7 +20,7 @@ test("a cold direct card renders through the single catalogue snapshot", async (
   await page.getByRole("button", { name: "BACK", exact: true }).click();
   await expect(page.locator("#heaven")).toBeVisible();
   const warm = await page.goto("/tingara");
-  expect(warm!.headers()["server-timing"]).toMatch(/catalogue;dur=\d+(?:\.\d+)?;desc="cache"/);
+  expect(warm!.headers()["server-timing"]).toMatch(/card;dur=\d+(?:\.\d+)?;desc="(?:rpc|cache)"/);
 });
 
 test("the deferred homepage catalogue reports its own API timing", async ({ page }) => {

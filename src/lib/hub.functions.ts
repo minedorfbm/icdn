@@ -1,3 +1,6 @@
+import { completeCatalogue } from "./hub-data-completeness";
+import { readPublicDestinationCard } from "./public-destination-card.server";
+import { destinationCardSchema, focusDestinationCard } from "./destination-card-schema";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "./validation";
 import { collectionItemRow } from "./destination-collection";
@@ -147,3 +150,31 @@ async function readDestinationMedia(id: string) {
   ]);
   return { photos, posts, videos, hours, notices, collection };
 }
+
+export const getDestinationCard = createServerFn({ method: "GET" })
+  .validator(
+    z
+      .string()
+      .min(1)
+      .max(120)
+      .regex(/^[a-z0-9-]+$/),
+  )
+  .handler(({ data: id }) =>
+    withPublicReadTiming("card", (markSource) =>
+      readPublicSnapshot(
+        `card-v1/${id}`,
+        destinationCardSchema.nullable(),
+        (data) => data !== null,
+        () => {
+          markSource("rpc");
+          return readPublicDestinationCard(id, async () => {
+            markSource("compatibility");
+            const catalogue = await getHubData();
+            if (!completeCatalogue(catalogue)) throw new Error("Card temporarily unavailable");
+            return focusDestinationCard(catalogue, id);
+          });
+        },
+        publicCache(),
+      ),
+    ),
+  );

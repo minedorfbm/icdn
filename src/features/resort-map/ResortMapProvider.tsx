@@ -1,4 +1,6 @@
 import { Component, lazy, Suspense, useCallback, useMemo, useState, type ReactNode } from "react";
+import { CataloguePending } from "@/components/hub/CataloguePending";
+import { useCatalogueStatus } from "@/data/catalogue-status";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
@@ -22,6 +24,7 @@ class MapBoundary extends Component<
 
 export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }>) {
   const { mapPlaces, mapLinks } = useHub();
+  const { ready } = useCatalogueStatus();
   const { openDestination, closeToHub, isDestination } = useDestinationNavigation();
   const { lang, t } = useI18n();
   const [request, setRequest] = useState<(MapRequest & { revision: number }) | null>(null);
@@ -59,11 +62,20 @@ export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }
         >
           <MapBoundary fallback={message(mapCopy(lang, "unavailable"))}>
             <Suspense fallback={message(mapCopy(lang, "loading"))}>
-              <ResortMap
-                request={request}
-                onClose={close}
-                onDestination={(id) => openDestination(id)}
-              />
+              {ready ? (
+                <ResortMap
+                  request={request}
+                  onClose={close}
+                  onDestination={(id) => openDestination(id)}
+                />
+              ) : (
+                <div className="flex h-full flex-col items-center justify-center">
+                  <CataloguePending />
+                  <button className="min-h-11 border-b px-4" onClick={close}>
+                    {t("close")}
+                  </button>
+                </div>
+              )}
             </Suspense>
           </MapBoundary>
         </FullscreenDialog>

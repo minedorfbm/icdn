@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight, Search, X } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
+import { CataloguePending } from "@/components/hub/CataloguePending";
+import { useCatalogueStatus } from "@/data/catalogue-status";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { EMPTY_SEARCH, useHubSearch, type SearchSnapshot } from "./search-context";
@@ -66,6 +68,7 @@ export function SearchDialog({
     previousFilter.current = { query, collection };
   }, [query, collection, initialState.scrollTop]);
   const { destinations } = useHub();
+  const { ready } = useCatalogueStatus();
   const { lang, t, cluster, levelLabel, typeLabel, description, detailDescription, event } =
     useI18n();
   const copy = (key: Parameters<typeof searchCopy>[1]) => searchCopy(lang, key);
@@ -206,12 +209,13 @@ export function SearchDialog({
               {t("all_places")}
             </button>
             <output aria-live="polite" aria-atomic="true">
-              {results.length} · {copy("results")}
+              {ready ? `${results.length} · ${copy("results")}` : t("page_loading")}
             </output>
           </div>
         </header>
         <div ref={resultsRef} className="hub-search-results">
-          {!query.trim() && (
+          {!ready && <CataloguePending />}
+          {ready && !query.trim() && (
             <section className="hub-search-moods" aria-label={copy("moods")}>
               <h3>{copy("moods")}</h3>
               <div>
@@ -225,44 +229,45 @@ export function SearchDialog({
               </div>
             </section>
           )}
-          {groups.map((group) => (
-            <section key={group.key} aria-label={group.label}>
-              <h3>{group.label}</h3>
-              {group.note && <p className="hub-search-note">{group.note}</p>}
-              <div className="hub-search-grid">
-                {group.items.map(({ item: d }) => (
-                  <button
-                    key={d.id}
-                    ref={d.id === initialState.selectedId ? selectedResultRef : undefined}
-                    type="button"
-                    className="hub-search-result"
-                    onClick={() => selectDestination(d)}
-                  >
-                    <img
-                      src={thumbnail(d.image)}
-                      style={{ objectPosition: d.imagePosition }}
-                      alt=""
-                      width={56}
-                      height={70}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <span className="hub-search-result-text">
-                      <span className="hub-search-name">{d.name}</span>
-                      <span className="hub-search-meta">
-                        {levelLabel(d.level)} · {typeLabel(d.type)}
+          {ready &&
+            groups.map((group) => (
+              <section key={group.key} aria-label={group.label}>
+                <h3>{group.label}</h3>
+                {group.note && <p className="hub-search-note">{group.note}</p>}
+                <div className="hub-search-grid">
+                  {group.items.map(({ item: d }) => (
+                    <button
+                      key={d.id}
+                      ref={d.id === initialState.selectedId ? selectedResultRef : undefined}
+                      type="button"
+                      className="hub-search-result"
+                      onClick={() => selectDestination(d)}
+                    >
+                      <img
+                        src={thumbnail(d.image)}
+                        style={{ objectPosition: d.imagePosition }}
+                        alt=""
+                        width={56}
+                        height={70}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span className="hub-search-result-text">
+                        <span className="hub-search-name">{d.name}</span>
+                        <span className="hub-search-meta">
+                          {levelLabel(d.level)} · {typeLabel(d.type)}
+                        </span>
+                        <span className="hub-search-description">
+                          {description(d.id, d.short_description)}
+                        </span>
                       </span>
-                      <span className="hub-search-description">
-                        {description(d.id, d.short_description)}
-                      </span>
-                    </span>
-                    <ArrowUpRight size={17} strokeWidth={1.3} aria-hidden />
-                  </button>
-                ))}
-              </div>
-            </section>
-          ))}
-          {!results.length && (
+                      <ArrowUpRight size={17} strokeWidth={1.3} aria-hidden />
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ))}
+          {ready && !results.length && (
             <div className="hub-search-empty">
               <h3>{copy("empty")}</h3>
               <p>{copy("hint")}</p>

@@ -1,7 +1,17 @@
-import { getHubData, getHubSettings, getDestinationMedia } from "./hub.functions";
+import {
+  getHubData,
+  getHubSettings,
+  getDestinationMedia,
+  getDestinationCard,
+} from "./hub.functions";
+import { focusDestinationCard } from "./destination-card-schema";
 import { completeCatalogue } from "./hub-data-completeness";
 import { createRequestCache } from "./request-cache";
 import type { HubData } from "./hub-schema";
+
+const cards = createRequestCache<Awaited<ReturnType<typeof getDestinationCard>>>(
+  (data) => data !== null,
+);
 
 const catalogue = createRequestCache<Awaited<ReturnType<typeof getHubData>>>(completeCatalogue);
 const settings = createRequestCache<Awaited<ReturnType<typeof getHubSettings>>>(
@@ -39,4 +49,15 @@ export function primeHubSnapshots(values: HubData["settings"], data: HubData | n
   if (typeof window === "undefined") return;
   void settings.read("settings", () => Promise.resolve(values)).catch(() => {});
   if (data) void catalogue.read("catalogue", () => Promise.resolve(data)).catch(() => {});
+}
+
+export function peekHubData() {
+  return typeof window === "undefined" ? undefined : catalogue.peek("catalogue");
+}
+
+export function loadDestinationCard(id: string) {
+  const full = peekHubData();
+  if (full) return Promise.resolve(focusDestinationCard(full, id));
+  const load = () => getDestinationCard({ data: id });
+  return typeof window === "undefined" ? load() : cards.read(id, load);
 }

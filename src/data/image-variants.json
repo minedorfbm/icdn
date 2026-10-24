@@ -50,7 +50,19 @@
       "src": "/images/optimized/ab06a41329c82e6b.avif",
       "width": 2560,
       "bytes": 238715
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/8e7fc82ff694f578-960.avif",
+        "width": 960,
+        "bytes": 55131
+      },
+      {
+        "src": "/images/optimized/385546191692a87c-1280.avif",
+        "width": 1280,
+        "bytes": 85167
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/airport-lounge-home-hd-3cbdabe6da1d.webp": {
     "width": 2560,
@@ -102,7 +114,19 @@
       "src": "/images/optimized/b3b7ee6106731f34.avif",
       "width": 2000,
       "bytes": 332858
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/c2946d8811580396-960.avif",
+        "width": 960,
+        "bytes": 107599
+      },
+      {
+        "src": "/images/optimized/357b488459749049-1280.avif",
+        "width": 1280,
+        "bytes": 165239
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/apec-garden-home-8b17b91ddf96.webp": {
     "width": 1200,
@@ -144,7 +168,19 @@
       "src": "/images/optimized/0fbf850205d24883.avif",
       "width": 1367,
       "bytes": 96032
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/11b612f0084c1183-960.avif",
+        "width": 960,
+        "bytes": 57202
+      },
+      {
+        "src": "/images/optimized/bf257d4ce0fe4c23-1280.avif",
+        "width": 1280,
+        "bytes": 78881
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/b-lounge-home-4986485f91.webp": {
     "width": 1440,
@@ -186,7 +222,19 @@
       "src": "/images/optimized/df956b6bcbaf43ba.avif",
       "width": 1440,
       "bytes": 302414
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/1391615c1a6a9f06-960.avif",
+        "width": 960,
+        "bytes": 144926
+      },
+      {
+        "src": "/images/optimized/350879025168f56d-1280.avif",
+        "width": 1280,
+        "bytes": 218767
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/bensley-package-detail-82fe653400.webp": {
     "width": 1909,
@@ -217,7 +265,19 @@
       "src": "/images/optimized/5c0e524e8a7cd6e1.avif",
       "width": 1909,
       "bytes": 161081
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/e43d39cd6e32bd40-960.avif",
+        "width": 960,
+        "bytes": 51883
+      },
+      {
+        "src": "/images/optimized/397dc8731a85b729-1280.avif",
+        "width": 1280,
+        "bytes": 81098
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/bensley-package-home-9ff5152260e6.webp": {
     "width": 1200,
@@ -259,7 +319,19 @@
       "src": "/images/optimized/4f453a3d517c01bc.avif",
       "width": 1600,
       "bytes": 110506
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/95b0972b98e5107a-960.avif",
+        "width": 960,
+        "bytes": 51034
+      },
+      {
+        "src": "/images/optimized/d9e2c51fd5a3c313-1280.avif",
+        "width": 1280,
+        "bytes": 73336
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/citron-detail-3b0c495a2769.webp": {
     "width": 1600,
@@ -285,7 +357,19 @@
       "src": "/images/optimized/54eb55c0f98bb81b.avif",
       "width": 1600,
       "bytes": 229499
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/8151c67ef2bc3ea0-960.avif",
+        "width": 960,
+        "bytes": 95001
+      },
+      {
+        "src": "/images/optimized/2853bf8445d92f55-1280.avif",
+        "width": 1280,
+        "bytes": 142255
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/citron-home-hd-42aae51b7ab0.webp": {
     "width": 2560,
@@ -337,7 +421,19 @@
       "src": "/images/optimized/a3a34ac7ffa2eb16.avif",
       "width": 2048,
       "bytes": 216945
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/2f6542d25e75514c-960.avif",
+        "width": 960,
+        "bytes": 65545
+      },
+      {
+        "src": "/images/optimized/f59a9d4c1b18fef1-1280.avif",
+        "width": 1280,
+        "bytes": 101717
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/club-lounge-home-85dcc07916.webp": {
     "width": 1365,
@@ -384,7 +480,19 @@
       "src": "/images/optimized/1feeffd9a56f3eef.avif",
       "width": 2048,
       "bytes": 248539
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/9676634411144f63-960.avif",
+        "width": 960,
+        "bytes": 67599
+      },
+      {
+        "src": "/images/optimized/e04fec7ca6efce0c-1280.avif",
+        "width": 1280,
+        "bytes": 108288
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/coconut-beach-home-96b9efe2d2.webp": {
     "width": 2048,
@@ -431,7 +539,19 @@
       "src": "/images/optimized/970b71d93df77d31.avif",
       "width": 1600,
       "bytes": 82889
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/eaaeb150225bcff1-960.avif",
+        "width": 960,
+        "bytes": 41803
+      },
+      {
+        "src": "/images/optimized/848ad8a096658043-1280.avif",
+        "width": 1280,
+        "bytes": 58488
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/culinary-activities-home-d80f77cbe569.webp": {
     "width": 1200,
@@ -473,7 +593,19 @@
       "src": "/images/optimized/c537b61b1d413641.avif",
       "width": 1600,
       "bytes": 216427
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/4741b6a2eaed72da-960.avif",
+        "width": 960,
+        "bytes": 86345
+      },
+      {
+        "src": "/images/optimized/e0049c314278d37c-1280.avif",
+        "width": 1280,
+        "bytes": 132704
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/destination-experiences-home-1c2739aeaa.webp": {
     "width": 2048,
@@ -525,7 +657,19 @@
       "src": "/images/optimized/d794a0269718ca15.avif",
       "width": 2048,
       "bytes": 125641
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/794cda4b8743bfd6-960.avif",
+        "width": 960,
+        "bytes": 44542
+      },
+      {
+        "src": "/images/optimized/c987e5f3e0a88c0b-1280.avif",
+        "width": 1280,
+        "bytes": 68444
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/dia-tang-home-ffb5dee75c.webp": {
     "width": 1428,
@@ -583,7 +727,14 @@
       "src": "/images/optimized/22731e95b9c651f3.avif",
       "width": 1280,
       "bytes": 75446
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/b1c7bb184512bd37-960.avif",
+        "width": 960,
+        "bytes": 46482
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/heritage-village-home-9b195066b2.webp": {
     "width": 2048,
@@ -635,7 +786,19 @@
       "src": "/images/optimized/c85af747ba7c7148.avif",
       "width": 2000,
       "bytes": 30540
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/26f6c9727d02edda-960.avif",
+        "width": 960,
+        "bytes": 10088
+      },
+      {
+        "src": "/images/optimized/de97b3d9d3b30f15-1280.avif",
+        "width": 1280,
+        "bytes": 15172
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/ihg-one-rewards-home-hd-2c1c464f47ed.webp": {
     "width": 2000,
@@ -735,7 +898,8 @@
       "src": "/images/optimized/c0a4b20a859fbe96.avif",
       "width": 678,
       "bytes": 38635
-    }
+    },
+    "avifVariants": []
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/long-bar-detail-b65d537cae.webp": {
     "width": 1565,
@@ -761,7 +925,19 @@
       "src": "/images/optimized/9db1a853a53100c4.avif",
       "width": 1565,
       "bytes": 192254
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/3e28aba728273214-960.avif",
+        "width": 960,
+        "bytes": 77744
+      },
+      {
+        "src": "/images/optimized/f952001b9965e74e-1280.avif",
+        "width": 1280,
+        "bytes": 116905
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/long-bar-home-8b4aeefdc714.webp": {
     "width": 2560,
@@ -829,7 +1005,19 @@
       "src": "/images/optimized/ec188e74d3ec2f81.avif",
       "width": 1440,
       "bytes": 53738
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/cc2a1ed035144b4b-960.avif",
+        "width": 960,
+        "bytes": 32750
+      },
+      {
+        "src": "/images/optimized/2b32335871794a93-1280.avif",
+        "width": 1280,
+        "bytes": 43690
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/nail-hair-detail-6afa029bd39c.webp": {
     "width": 1118,
@@ -850,7 +1038,14 @@
       "src": "/images/optimized/f5f190beaf7907c8.avif",
       "width": 1118,
       "bytes": 45540
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/ddc65b4e7aee783c-960.avif",
+        "width": 960,
+        "bytes": 34773
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/nam-tram-dining-detail-hd-4dc4f26e871d.webp": {
     "width": 2560,
@@ -881,7 +1076,19 @@
       "src": "/images/optimized/3d7a4905f88ad08d.avif",
       "width": 2560,
       "bytes": 312008
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/19468312fb587525-960.avif",
+        "width": 960,
+        "bytes": 72250
+      },
+      {
+        "src": "/images/optimized/1a94cf52e806ab3d-1280.avif",
+        "width": 1280,
+        "bytes": 114716
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/nam-tram-dining-home-hd-885c5a31e3c9.webp": {
     "width": 2560,
@@ -928,7 +1135,19 @@
       "src": "/images/optimized/4a33c6f374ad57f0.avif",
       "width": 1600,
       "bytes": 123879
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/53f7e09cc921b76c-960.avif",
+        "width": 960,
+        "bytes": 63563
+      },
+      {
+        "src": "/images/optimized/d1ac6f5d488365f0-1280.avif",
+        "width": 1280,
+        "bytes": 88597
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/nursery-home-1b8a9fbc8b72.webp": {
     "width": 1068,
@@ -991,7 +1210,19 @@
       "src": "/images/optimized/84679665c3e420f5.avif",
       "width": 2048,
       "bytes": 229919
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/f9d176bec0972634-960.avif",
+        "width": 960,
+        "bytes": 78625
+      },
+      {
+        "src": "/images/optimized/c7a349006547c5aa-1280.avif",
+        "width": 1280,
+        "bytes": 119202
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/organic-garden-home-e50730d3a69a.webp": {
     "width": 1200,
@@ -1038,7 +1269,19 @@
       "src": "/images/optimized/bcf3e44ce0994064.avif",
       "width": 2048,
       "bytes": 95982
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/c5888554f78b9008-960.avif",
+        "width": 960,
+        "bytes": 36133
+      },
+      {
+        "src": "/images/optimized/44339f32e9b3ad4d-1280.avif",
+        "width": 1280,
+        "bytes": 53366
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/relaxation-pavilion-home-eb498f1cc7.webp": {
     "width": 2048,
@@ -1085,7 +1328,19 @@
       "src": "/images/optimized/9236a1da08baa9f5.avif",
       "width": 1561,
       "bytes": 211781
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/f2ca17b38e4d912b-960.avif",
+        "width": 960,
+        "bytes": 91917
+      },
+      {
+        "src": "/images/optimized/5d78f35e0d4e5425-1280.avif",
+        "width": 1280,
+        "bytes": 137008
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/sammys-home-7bbb7955d2.webp": {
     "width": 2048,
@@ -1132,7 +1387,19 @@
       "src": "/images/optimized/011a1d759241874b.avif",
       "width": 1600,
       "bytes": 78984
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/cf024daa2cf820e3-960.avif",
+        "width": 960,
+        "bytes": 39262
+      },
+      {
+        "src": "/images/optimized/d6263c9adaae492c-1280.avif",
+        "width": 1280,
+        "bytes": 54679
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/sea-experiences-home-73ff1aec5edd.webp": {
     "width": 1200,
@@ -1195,7 +1462,19 @@
       "src": "/images/optimized/448e11f3609a7f4d.avif",
       "width": 1916,
       "bytes": 180568
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/096dea25eddc5efd-960.avif",
+        "width": 960,
+        "bytes": 58949
+      },
+      {
+        "src": "/images/optimized/fbda3b088b08d91d-1280.avif",
+        "width": 1280,
+        "bytes": 90385
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/six-bedroom-sun-peninsula-residence-detail-5f8bd3a18dff.webp": {
     "width": 1600,
@@ -1221,7 +1500,19 @@
       "src": "/images/optimized/9e967322ec7781bd.avif",
       "width": 1600,
       "bytes": 151768
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/de34df36fedfcbd2-960.avif",
+        "width": 960,
+        "bytes": 59283
+      },
+      {
+        "src": "/images/optimized/8670243d04f30634-1280.avif",
+        "width": 1280,
+        "bytes": 92655
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/six-bedroom-sun-peninsula-residence-home-b8d0ac42065f.webp": {
     "width": 1200,
@@ -1268,7 +1559,19 @@
       "src": "/images/optimized/6abc01050b025a16.avif",
       "width": 2048,
       "bytes": 375701
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/b183d0cbe12cc128-960.avif",
+        "width": 960,
+        "bytes": 90678
+      },
+      {
+        "src": "/images/optimized/40b0f966f3de5d53-1280.avif",
+        "width": 1280,
+        "bytes": 150516
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/soar-gym-home-e3a1f43f87.webp": {
     "width": 2048,
@@ -1315,7 +1618,19 @@
       "src": "/images/optimized/a2c463a06932bf86.avif",
       "width": 1438,
       "bytes": 75090
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/ac5b65921b5c6021-960.avif",
+        "width": 960,
+        "bytes": 43459
+      },
+      {
+        "src": "/images/optimized/519f7e92dd930c40-1280.avif",
+        "width": 1280,
+        "bytes": 61168
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/summit-cinema-home-7de3f7c699.webp": {
     "width": 1440,
@@ -1362,7 +1677,19 @@
       "src": "/images/optimized/d6bd8570df16512c.avif",
       "width": 2048,
       "bytes": 174516
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/38e975cec995b187-960.avif",
+        "width": 960,
+        "bytes": 44359
+      },
+      {
+        "src": "/images/optimized/aa747475b0602363-1280.avif",
+        "width": 1280,
+        "bytes": 69322
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/tingara-detail-090e7789d872.webp": {
     "width": 1600,
@@ -1388,7 +1715,19 @@
       "src": "/images/optimized/33154b505e769aef.avif",
       "width": 1600,
       "bytes": 434417
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/ef25e06f86f47cbc-960.avif",
+        "width": 960,
+        "bytes": 161947
+      },
+      {
+        "src": "/images/optimized/73fbc5e68129a0e8-1280.avif",
+        "width": 1280,
+        "bytes": 256186
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/tingara-home-0fce7209b7.webp": {
     "width": 2048,
@@ -1430,7 +1769,14 @@
       "src": "/images/optimized/f80b346861f16dc0.avif",
       "width": 1280,
       "bytes": 171419
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/11ac2e3f06d726dc-960.avif",
+        "width": 960,
+        "bytes": 102512
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/wall-of-lanterns-home-hd-0eea415c2b4d.webp": {
     "width": 1365,
@@ -1477,7 +1823,19 @@
       "src": "/images/optimized/8f21d979e8b11c5e.avif",
       "width": 2048,
       "bytes": 242694
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/28224ce4ffde39d5-960.avif",
+        "width": 960,
+        "bytes": 72159
+      },
+      {
+        "src": "/images/optimized/17b10b3e81b2ed02-1280.avif",
+        "width": 1280,
+        "bytes": 115194
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/weddings-home-12a67f1a33d1.webp": {
     "width": 1200,
@@ -1524,7 +1882,19 @@
       "src": "/images/optimized/8d1028a3432c10e9.avif",
       "width": 2048,
       "bytes": 106496
-    }
+    },
+    "avifVariants": [
+      {
+        "src": "/images/optimized/e549a81daf509d40-960.avif",
+        "width": 960,
+        "bytes": 34822
+      },
+      {
+        "src": "/images/optimized/52965fa9f76b5397-1280.avif",
+        "width": 1280,
+        "bytes": 52958
+      }
+    ]
   },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/yoga-pavilion-home-c01d02d111.webp": {
     "width": 2048,

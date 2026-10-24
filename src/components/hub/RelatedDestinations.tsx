@@ -1,5 +1,7 @@
 import { thumbnail } from "@/lib/responsive-image";
 import { ArrowRight } from "lucide-react";
+import { CataloguePending } from "./CataloguePending";
+import { useCatalogueStatus } from "@/data/catalogue-status";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { relatedDestinations } from "@/lib/destination-presentation";
@@ -10,8 +12,10 @@ import "./related-destinations.css";
 export function RelatedDestinations({ id }: Readonly<{ id: string }>) {
   const { destinations, relations } = useHub();
   const { openDestination } = useDestinationNavigation();
+  const { ready } = useCatalogueStatus();
   const { t } = useI18n();
   const related = relatedDestinations(id, destinations, relations);
+  if (!ready) return <CataloguePending />;
   if (related.length === 0) return null;
 
   return (

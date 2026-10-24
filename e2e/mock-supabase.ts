@@ -390,6 +390,46 @@ serve({
     }
     reads.push(url.pathname + url.search);
 
+    if (url.pathname === "/rest/v1/rpc/published_hub_destination_card_v1") {
+      const id = url.searchParams.get("requested_destination_id");
+      const destination = tables.destinations?.find(
+        (row) =>
+          (row as { id: string; active: boolean }).id === id && (row as { active: boolean }).active,
+      );
+      if (!destination) return Response.json(null);
+      const belongs = (table: string) =>
+        (tables[table] ?? []).filter(
+          (row) => (row as { destination_id: string }).destination_id === id,
+        );
+      const links = belongs("destination_links");
+      const events = belongs("published_destination_events");
+      const mapLinks = belongs("map_destination_links");
+      return Response.json({
+        destination,
+        links,
+        events,
+        mapLinks,
+        mapPlaces: (tables.map_places ?? []).filter((row) =>
+          mapLinks.some(
+            (link) => (link as { place_id: string }).place_id === (row as { id: string }).id,
+          ),
+        ),
+        linkTranslations: (tables.destination_link_translations ?? []).filter((row) =>
+          links.some(
+            (link) => (link as { id: string }).id === (row as { link_id: string }).link_id,
+          ),
+        ),
+        editorial: {
+          descriptions: belongs("destination_translations"),
+          events: (tables.event_translations ?? []).filter((row) =>
+            events.some(
+              (event) => (event as { id: string }).id === (row as { event_id: string }).event_id,
+            ),
+          ),
+        },
+      });
+    }
+
     if (url.pathname === "/rest/v1/rpc/published_hub_destination_media_v1") {
       if (delay) await Bun.sleep(delay);
       const id = url.searchParams.get("requested_destination_id");
