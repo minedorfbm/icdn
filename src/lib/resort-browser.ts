@@ -16,7 +16,13 @@ export function embeddedResortUrl(value: string): string | undefined {
   try {
     const url = httpsUrl(value, [...RESORT_HOSTS, ...BOOKING_HOSTS]);
     if (!url) return undefined;
-    if (RESORT_HOSTS.has(url.hostname)) return url.href;
+    if (RESORT_HOSTS.has(url.hostname)) {
+      // Official HTML pages redirect to www. PDF origins must remain unchanged:
+      // the bounded PDF proxy deliberately refuses redirects.
+      if (!url.pathname.toLowerCase().endsWith(".pdf"))
+        url.hostname = "www.danang.intercontinental.com";
+      return url.href;
+    }
     if (BOOKING_HOSTS.has(url.hostname) && RESORT_BOOKING.test(url.pathname)) return url.href;
   } catch {
     // Invalid and unsupported destinations retain ordinary link handling.

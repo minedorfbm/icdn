@@ -1,6 +1,12 @@
 import { expect, test } from "bun:test";
 import { existsSync } from "node:fs";
-import { thumbnail, responsiveImage } from "../src/lib/responsive-image";
+import {
+  thumbnail,
+  responsiveImage,
+  detailHeroImage,
+  detailHeroAvif,
+  detailHeroPreload,
+} from "../src/lib/responsive-image";
 import images from "../src/data/image-variants.json";
 
 test("new CMS photographs keep their original URL until derivatives are published", () => {
@@ -23,4 +29,42 @@ test("every generated reference is deployed, and HD remains available as a respo
       expect(card.srcSet).not.toContain("320w");
     }
   }
+});
+
+test("expanded heroes preserve native dimensions and cover geometry without duplicate candidates", () => {
+  for (const [source, image] of Object.entries(images)) {
+    const hero = detailHeroImage(source);
+    expect(hero.src).toBe(source);
+    expect(hero.sizes).toContain("58svh");
+    expect(hero.sizes).toContain("min-width: 1200px");
+    const candidates = hero.srcSet!.split(", ");
+    expect(new Set(candidates.map((item) => item.split(" ").at(-1))).size).toBe(candidates.length);
+    expect(candidates.at(-1)).toEndWith(`${image.width}w`);
+    const native = image.variants.find((variant) => variant.width === image.width);
+    expect(candidates.at(-1)).toBe(`${native?.src ?? source} ${image.width}w`);
+  }
+  expect(detailHeroImage("https://example.com/new-photo.webp")).toEqual({
+    src: "https://example.com/new-photo.webp",
+  });
+});
+
+test("AVIF preloads agree with the native source and retain a fallback for new CMS images", () => {
+  for (const [source, image] of Object.entries(images)) {
+    const preload = detailHeroPreload(source);
+    const avif = detailHeroAvif(source);
+    if ("avif" in image) {
+      expect(avif?.src).toBe(image.avif.src);
+      expect(avif?.srcSet).toBe(`${image.avif.src} ${image.width}w`);
+      expect(existsSync(new URL(`../public${image.avif.src}`, import.meta.url))).toBe(true);
+      expect(preload.href).toBe(image.avif.src);
+      expect(preload.type).toBe("image/avif");
+    } else {
+      expect(avif).toBeUndefined();
+      expect(preload.href).toBe(source);
+      expect(preload.type).toBeUndefined();
+    }
+  }
+  const unknown = "https://example.com/new-detail.webp";
+  expect(detailHeroAvif(unknown)).toBeUndefined();
+  expect(detailHeroPreload(unknown).href).toBe(unknown);
 });

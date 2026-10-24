@@ -68,3 +68,12 @@ test("Rewards pages open in the same tab without broadening other external links
   ])
     expect(resortLinkTarget(url)).toBe("_blank");
 });
+
+test("canonical HTML links skip the host redirect while PDF origins stay exact", () => {
+  expect(
+    embeddedResortUrl("https://danang.intercontinental.com/vi/dining/citron/?source=hub#menus"),
+  ).toBe("https://www.danang.intercontinental.com/vi/dining/citron/?source=hub#menus");
+  expect(
+    embeddedResortUrl("https://danang.intercontinental.com/wp-content/uploads/menu.PDF?v=2"),
+  ).toBe("https://danang.intercontinental.com/wp-content/uploads/menu.PDF?v=2");
+});

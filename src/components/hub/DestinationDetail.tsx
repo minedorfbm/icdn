@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { preload } from "react-dom";
 import { DestinationCollection } from "./DestinationCollection";
 import { ArrowLeft, ArrowUpRight, ChevronDown, MapPin } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
@@ -25,7 +24,7 @@ import { DestinationJourneyNavigation } from "./DestinationJourneyNavigation";
 import { ResortLogo } from "./ResortLogo";
 import { ResortLevelIcon } from "./ResortLevelIcon";
 import "./editorial-detail.css";
-import { thumbnail } from "@/lib/responsive-image";
+import { thumbnail, detailHeroImage, detailHeroAvif } from "@/lib/responsive-image";
 
 function SectionHeading({ label, title }: Readonly<{ label: string; title?: string | undefined }>) {
   return (
@@ -52,14 +51,32 @@ function DestinationHero({ dest, onClose }: Readonly<{ dest: Destination; onClos
   const { t } = useI18n();
   const [selected, setSelected] = useState(0);
   const images = Array.from(new Set([dest.detailImage, dest.image]));
-  // React does not automatically preload images inside a picture element.
-  preload(dest.detailImage, { as: "image", fetchPriority: "high" });
+  // Direct routes preload this picture in head; client-opened cards use fetchPriority.
+  const firstImage = detailHeroImage(dest.detailImage);
+  const desktopImage = detailHeroImage(images[selected]!);
+  const mobileAvif = detailHeroAvif(dest.detailImage);
+  const desktopAvif = detailHeroAvif(images[selected]!);
   return (
     <div className="editorial-hero">
       <picture>
-        <source media="(min-width: 768px)" srcSet={images[selected]} />
+        {desktopAvif && (
+          <source
+            media="(min-width: 768px)"
+            type="image/avif"
+            srcSet={desktopAvif.srcSet}
+            sizes={desktopAvif.sizes}
+          />
+        )}
+        <source
+          media="(min-width: 768px)"
+          srcSet={desktopImage.srcSet ?? desktopImage.src}
+          sizes={desktopImage.sizes}
+        />
+        {mobileAvif && (
+          <source type="image/avif" srcSet={mobileAvif.srcSet} sizes={mobileAvif.sizes} />
+        )}
         <img
-          src={dest.detailImage}
+          {...firstImage}
           alt={dest.name}
           width={900}
           height={1400}

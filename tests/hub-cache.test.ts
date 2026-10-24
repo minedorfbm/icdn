@@ -5,11 +5,8 @@ import { destinationRow, readRows, type HubData } from "../src/lib/hub-schema";
 const data: HubData = {
   levels: [],
   destinations: [],
-  photos: [],
   links: [],
   events: [],
-  posts: [],
-  videos: [],
   settings: {},
   mapPlaces: [],
   mapLinks: [],
@@ -36,7 +33,7 @@ test("a single two-minute expiry cannot retain an old publication after partial 
   await readHubSnapshot(load, cache, 0);
   await readHubSnapshot(load, cache, 119_999);
   expect(reads).toBe(1);
-  const fresh = { ...data, videos: null, settings: { status: "new publication" } };
+  const fresh = { ...data, links: null, settings: { status: "new publication" } };
   expect(await readHubSnapshot(async () => fresh, cache, 120_000)).toEqual(fresh);
   expect(await readHubSnapshot(async () => fresh, cache, 86_400_000)).toEqual(fresh);
   await expect(

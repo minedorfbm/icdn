@@ -9,7 +9,8 @@ export async function generateImageVariants(
 ) {
   const config = JSON.parse(await fs.readFile(path.join(root, "wrangler.json"), "utf8"));
   const response = await request(
-    config.vars.SUPABASE_URL + "/rest/v1/destinations?select=id,image_key&active=eq.true",
+    config.vars.SUPABASE_URL +
+      "/rest/v1/destinations?select=id,image_key,detail_image_key&active=eq.true",
     { headers: { apikey: config.vars.SUPABASE_PUBLISHABLE_KEY, Prefer: "count=exact" } },
   );
   if (!response.ok) throw new Error("Public catalogue read failed " + response.status);
@@ -18,10 +19,13 @@ export async function generateImageVariants(
   if (!Array.isArray(rows) || (Number.isFinite(count) && count > rows.length)) {
     throw new Error("Published image catalogue is unavailable or truncated");
   }
+  const detailSources = new Set(
+    (rows as { detail_image_key?: string | null }[]).map((row) => row.detail_image_key),
+  );
   const sources: string[] = [
     ...new Set(
-      (rows as { image_key: string | null }[])
-        .map((r) => r.image_key)
+      (rows as { image_key: string | null; detail_image_key?: string | null }[])
+        .flatMap((r) => [r.image_key, r.detail_image_key])
         .filter(
           (s): s is string =>
             !!s?.startsWith(config.vars.SUPABASE_URL + "/storage/v1/object/public/hub-images/"),
@@ -32,7 +36,12 @@ export async function generateImageVariants(
   await fs.mkdir(out, { recursive: true });
   const manifest: Record<
     string,
-    { width: number; height: number; variants: { src: string; width: number; bytes: number }[] }
+    {
+      width: number;
+      height: number;
+      variants: { src: string; width: number; bytes: number }[];
+      avif?: { src: string; width: number; bytes: number };
+    }
   > = {};
   let originalTotal = 0,
     optimizedTotal = 0;
@@ -44,22 +53,41 @@ export async function generateImageVariants(
     const meta = await sharp(bytes).metadata();
     if (!meta.width || !meta.height) throw new Error("Missing image dimensions");
     const variants = await Promise.all(
-      [320, 960, 1600]
-        .filter((w) => w < meta.width)
-        .map(async (width) => {
-          const result = await sharp(bytes)
-            .rotate()
-            .resize({ width, withoutEnlargement: true })
-            .webp({ quality: 85, effort: 5 })
-            .toBuffer();
-          const hash = crypto.createHash("sha256").update(result).digest("hex").slice(0, 16);
-          const file = hash + "-" + width + ".webp";
-          await fs.writeFile(path.join(out, file), result);
-          optimizedTotal += result.length;
-          return { src: "/images/optimized/" + file, width, bytes: result.length };
-        }),
+      [
+        ...[320, 960, ...(detailSources.has(source) ? [1280] : []), 1600].filter(
+          (w) => w < meta.width,
+        ),
+      ].map(async (width) => {
+        const result = await sharp(bytes)
+          .rotate()
+          .resize({ width, withoutEnlargement: true })
+          .webp({ quality: 85, effort: 5 })
+          .toBuffer();
+        const hash = crypto.createHash("sha256").update(result).digest("hex").slice(0, 16);
+        const file = hash + "-" + width + ".webp";
+        await fs.writeFile(path.join(out, file), result);
+        optimizedTotal += result.length;
+        return { src: "/images/optimized/" + file, width, bytes: result.length };
+      }),
     );
-    if (variants.length) manifest[source] = { width: meta.width, height: meta.height, variants };
+    let avif: { src: string; width: number; bytes: number } | undefined;
+    if (detailSources.has(source)) {
+      const encoded = await sharp(bytes)
+        .rotate()
+        .avif({ quality: 60, effort: 5, chromaSubsampling: "4:2:0" })
+        .toBuffer();
+      const file = crypto.createHash("sha256").update(encoded).digest("hex").slice(0, 16) + ".avif";
+      await fs.writeFile(path.join(out, file), encoded);
+      avif = { src: "/images/optimized/" + file, width: meta.width, bytes: encoded.length };
+      optimizedTotal += encoded.length;
+    }
+    if (variants.length || avif)
+      manifest[source] = {
+        width: meta.width,
+        height: meta.height,
+        variants,
+        ...(avif ? { avif } : {}),
+      };
     originalTotal += bytes.length;
   }
   async function processBatch(index: number): Promise<void> {
