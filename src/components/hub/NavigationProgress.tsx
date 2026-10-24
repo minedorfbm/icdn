@@ -17,11 +17,8 @@ export function NavigationProgress() {
   }, [loading]);
   if (!loading || !visible) return null;
   return (
-    <div
-      role="status"
-      className="brand-ui brand-floating pointer-events-none fixed left-1/2 top-[max(16px,env(safe-area-inset-top))] z-[150] -translate-x-1/2 rounded-full px-5 py-3 text-sm shadow-md"
-    >
+    <output className="brand-ui brand-floating pointer-events-none fixed left-1/2 top-[max(16px,env(safe-area-inset-top))] z-[150] -translate-x-1/2 rounded-full px-5 py-3 text-sm shadow-md">
       {t("page_loading")}
-    </div>
+    </output>
   );
 }

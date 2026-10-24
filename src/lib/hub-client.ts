@@ -37,6 +37,6 @@ export function peekDestinationMedia(id: string) {
 /** Hydration can reuse the public snapshots already present in the SSR document. */
 export function primeHubSnapshots(values: HubData["settings"], data: HubData | null) {
   if (typeof window === "undefined") return;
-  void settings.read("settings", async () => values).catch(() => {});
-  if (data) void catalogue.read("catalogue", async () => data).catch(() => {});
+  void settings.read("settings", () => Promise.resolve(values)).catch(() => {});
+  if (data) void catalogue.read("catalogue", () => Promise.resolve(data)).catch(() => {});
 }
