@@ -4,6 +4,7 @@ import { useI18n } from "@/i18n";
 import type { Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 import { ResortLink } from "./ResortBrowser";
+import { responsiveImage } from "@/lib/responsive-image";
 
 /** The single universal card used everywhere in the hub. */
 export function DestinationPanel({
@@ -30,7 +31,7 @@ export function DestinationPanel({
       className="destination-panel relative h-full min-h-[inherit] w-full overflow-hidden rounded-[18px] border border-[#e5d3aa]/65 bg-[oklch(0.18_0.02_250)] shadow-[10px_24px_36px_-18px_rgba(0,0,0,0.7)]"
     >
       <img
-        src={near ? dest.image : undefined}
+        {...(near ? responsiveImage(dest.image, "(min-width: 768px) 1100px, 900px") : {})}
         alt={dest.name}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
@@ -42,7 +43,6 @@ export function DestinationPanel({
         draggable={false}
         width={768}
         height={1152}
-        sizes="75vw"
         style={{ objectPosition: dest.imagePosition }}
         className={`absolute inset-0 h-full w-full select-none object-cover transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           loaded ? "opacity-100" : "opacity-0"
@@ -60,10 +60,11 @@ export function DestinationPanel({
           </p>
           {dest.instagram_spot && (
             <span
+              role="img"
               aria-label={t("instagram_spot")}
               className="grid size-7 shrink-0 place-items-center rounded-full border border-white/30 bg-black/30 text-white"
             >
-              <InstagramIcon className="size-2.5" strokeWidth={1.6} />
+              <InstagramIcon aria-hidden className="size-2.5" strokeWidth={1.6} />
             </span>
           )}
         </div>

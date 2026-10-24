@@ -22,7 +22,7 @@ Le hub utilise trois collections communes aux quatre niveaux : **DINING**, **WEL
 
 Pour réorganiser une card, modifier `destinations.cluster` avec l'une des trois clés. La répartition de la migration est ponctuelle : un changement de type ne déplace pas automatiquement une card. `levels.clusters` définit l'ordre des onglets ; la base refuse une collection absente du niveau. Les six langues du hub traduisent les libellés. Les anciennes clés du dictionnaire restent compatibles avec un catalogue encore en cache pendant le déploiement.
 
-Le catalogue local de secours a été supprimé. Seules les lignes publiées dans Supabase alimentent les cards. Les identifiants et les quatre niveaux restent disponibles pour la future carte interactive et le funiculaire.
+Le catalogue local de secours a été supprimé. Seules les lignes publiées dans Supabase alimentent les cards. Les identifiants et les quatre niveaux alimentent la carte interactive et la navigation du funiculaire.
 
 L'intégration GitHub applique la nouvelle migration à la fusion. Ne pas rejouer l'historique complet sur la production. Pour contrôler la répartition :
 
@@ -40,7 +40,7 @@ La migration [`20260925130000_destination_videos.sql`](../supabase/migrations/20
 
 Pour préparer une vidéo, créer une ligne dans `destination_videos` avec l'identifiant exact de la card dans `destination_id`, l'URL officielle YouTube en HTTPS dans `video_url`, un `title` et, si souhaité, un objet `title_translations` avec les clés `vi`, `ru`, `zh`, `ko` et `ja`. Régler `display_order` pour l'ordre d'affichage. Laisser `active = false` pendant la préparation, puis le passer à `true` pour publier. Une URL non reconnue est ignorée par le hub ; formats acceptés : `youtube.com/watch?v=…`, `youtu.be/…`, `youtube.com/shorts/…` et `youtube.com/live/…`. Utiliser le lien `/shorts/…` pour obtenir le lecteur vertical 9:16 ; un lien `/watch?v=…` reste affiché en 16:9, même s'il désigne le même Short. Vérifier que le propriétaire de la vidéo autorise l'intégration. Une modification peut mettre environ deux minutes à apparaître à cause du cache.
 
-Le projet de production utilise neuf tables `public` dans Supabase. La base importée depuis Lovable ne partage pas nécessairement l'historique des migrations du dépôt : **ne pas exécuter `db push` ni rejouer toutes les migrations historiques sur la production**. Les deux migrations datées du 23 septembre 2026 sont prévues pour ce schéma déjà importé et se lancent une fois chacune, dans l'ordre, après sauvegarde.
+Le catalogue et ses médias utilisent plusieurs tables et vues `public` dans Supabase. Vérifier l’état actuel du journal avant toute opération de maintenance : **ne pas exécuter `db push` ni rejouer toutes les migrations historiques sur la production**. Les procédures de septembre ci-dessous restent historiques ; elles ne sont pas une liste de scripts à rejouer.
 
 La prise en charge Facebook a été annulée. Le hub ignore les URL Facebook et ne génère plus de lecteur ni d’aperçu. La migration `20260928140000_unpublish_terra_mare_facebook.sql` désactive la ligne Terra Mare concernée sans la supprimer ; les migrations précédentes sont conservées pour la traçabilité.
 

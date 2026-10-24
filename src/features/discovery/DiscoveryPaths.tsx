@@ -9,6 +9,7 @@ import { discoveryCopy } from "./discovery-copy";
 import { readDiscovery, restoreDiscovery, type SavedDiscovery } from "./surprise-order";
 import { SurpriseDiscovery } from "./SurpriseDiscovery";
 import "./discovery.css";
+import { thumbnail } from "@/lib/responsive-image";
 
 const STORAGE_KEY = "adj-discovery-v1";
 const choices = [
@@ -31,13 +32,26 @@ function ChoiceArtwork({
   if (kind === "map")
     return (
       <span className="discovery-art discovery-map-art" aria-hidden>
-        <img src="/resort-map/official.webp" alt="" loading="lazy" width={240} height={180} />
+        <img
+          src={thumbnail("/resort-map/official.webp")}
+          alt=""
+          loading="lazy"
+          width={240}
+          height={180}
+        />
       </span>
     );
   return (
     <span className="discovery-art discovery-mini-deck" aria-hidden>
       {previews.map((card) => (
-        <img key={card.id} src={card.image} alt="" loading="lazy" width={80} height={110} />
+        <img
+          key={card.id}
+          src={thumbnail(card.image)}
+          alt=""
+          loading="lazy"
+          width={80}
+          height={110}
+        />
       ))}
     </span>
   );

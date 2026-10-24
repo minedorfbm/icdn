@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { ArrowUpRight, ChevronDown, X } from "lucide-react";
 import { useI18n } from "@/i18n";
+import { responsiveImage } from "@/lib/responsive-image";
 import type { Destination } from "@/data/resort";
 import { mapCopy } from "./map-copy";
 import type { MapCamera } from "./map-camera";
@@ -55,7 +56,7 @@ export function MapPreview({
         {primary && !photoFailed && (
           <img
             key={primary.image}
-            src={primary.image}
+            {...responsiveImage(primary.image, "(min-width: 768px) 520px, 85vw")}
             alt=""
             decoding="async"
             style={{ objectPosition: primary.imagePosition }}

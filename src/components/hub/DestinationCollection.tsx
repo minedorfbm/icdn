@@ -1,3 +1,4 @@
+import { thumbnail } from "@/lib/responsive-image";
 import { ArrowUpRight } from "lucide-react";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
@@ -26,7 +27,7 @@ export function DestinationCollection({ items }: Readonly<{ items: CollectionIte
             >
               {target.image && (
                 <img
-                  src={target.image}
+                  src={thumbnail(target.image)}
                   style={{ objectPosition: target.imagePosition }}
                   alt=""
                   width={88}

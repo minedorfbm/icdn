@@ -111,7 +111,7 @@ export function LanguageSwitch() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <button
-          aria-label={t("language")}
+          aria-label={`${t("language")} · ${current.label}`}
           className="brand-ui brand-floating brand-control flex min-h-11 items-center gap-2 px-3 py-2 transition-transform active:scale-95"
         >
           <span className="text-[10px] tracking-[0.18em]">{current.label}</span>

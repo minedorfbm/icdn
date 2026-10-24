@@ -29,9 +29,14 @@ test("a failed page retries in the chosen language without clearing its fallback
   page,
 }) => {
   const copy = UI.ja;
+  const start = new Date("2026-10-24T12:00:00Z");
+  await page.clock.setFixedTime(start);
   await page.addInitScript(() => localStorage.setItem("adj-lang", "ja"));
   await page.goto("/");
   await expect(page.locator("#heaven")).toHaveCount(1);
+  // Exercise an unavailable catalogue, rather than the new warm-cache path.
+  // Media failures on a cached card are covered separately in hub/card-loading.
+  await page.clock.setFixedTime(new Date(start.getTime() + 31_000));
   let phase = "fail";
   let releaseRequest!: () => void;
   const pending = new Promise<void>((resolve) => {

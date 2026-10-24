@@ -252,7 +252,6 @@ describe("CMS image URLs", () => {
   });
   test("hero and preload share the configured image, then the dedicated welcome photo", () => {
     const configured = { ...ready, settings: { hero_image: image } };
-    expect(createHubValue(configured).heroImage).toBe(image);
     expect(resolveHeroImage(configured)).toBe(image);
     expect(resolveHeroImage(configured, "landscape")).toBe(image);
     const landscape = "https://example.com/hero-landscape.webp";

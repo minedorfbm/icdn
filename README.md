@@ -134,3 +134,11 @@ exact brand typography would require approved, licensed font assets. This is
 alignment with the public site's visual language, not a certified group brand kit.
 
 Le [complément du catalogue officiel du 6 octobre 2026](docs/official-catalogue-completion.md) distingue Club et lounge, ajoute les dernières expériences et publie les quinze catégories d’hébergement en conservant les identifiants existants.
+
+## Images et fluidité des fiches
+
+Le navigateur partage pendant 30 secondes les lectures publiques du catalogue, des réglages et des médias, y compris les requêtes en cours. Le rendu serveur continue d’utiliser son cache public de deux minutes. Les réponses incomplètes et les erreurs ne sont pas mémorisées ; une nouvelle tentative relit les médias. Les médias commencent au clic, sans charger les embeds des autres fiches.
+
+Les variantes de `src/data/image-variants.json` sont générées depuis les photos publiées et servies dans `public/images/optimized/`. Les vignettes ont leur propre fichier ; les cards utilisent `srcSet` et conservent l’original HD comme plus grand candidat. Le cadrage et les images de détail restent identiques. Une nouvelle URL CMS inconnue utilise directement son original.
+
+Après l’ajout ou le remplacement de photos, exécuter `bun run images:variants --apply`, puis vérifier et inclure le manifeste et les images générées dans la même PR. Cette commande lit le catalogue public et crée des fichiers locaux ; elle ne modifie ni les originaux du Storage ni les publications. Les noms des variantes dépendent de leur contenu et leur cache peut donc être long. Pour remplacer une photographie publiée, utiliser une nouvelle URL plutôt que réécrire un fichier au même nom. Conserver les anciennes variantes encore référencées par une version déployée.

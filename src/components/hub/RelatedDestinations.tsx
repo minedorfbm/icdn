@@ -1,3 +1,4 @@
+import { thumbnail } from "@/lib/responsive-image";
 import { ArrowRight } from "lucide-react";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
@@ -20,7 +21,7 @@ export function RelatedDestinations({ id }: Readonly<{ id: string }>) {
         {related.map((item) => (
           <button key={item.id} type="button" onClick={() => openDestination(item.id)}>
             <img
-              src={item.image}
+              src={thumbnail(item.image)}
               style={{ objectPosition: item.imagePosition }}
               alt=""
               width={88}

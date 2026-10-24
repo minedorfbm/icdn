@@ -5,6 +5,7 @@ import type { Destination } from "@/data/resort";
 import { cardPosition, swipeStep } from "@/lib/card-swipe";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useI18n } from "@/i18n";
+import { responsiveImage } from "@/lib/responsive-image";
 
 /** A front-facing hero and two receding previews, all sharing one responsive stage. */
 // Slot geometry: [horizontal offset, scale, brightness, stacking order, rotation Y].
@@ -98,7 +99,10 @@ export function CardStack({
       const image = new Image();
       image.fetchPriority = "low";
       image.decoding = "async";
-      image.src = item!.image;
+      const source = responsiveImage(item!.image, "(min-width: 768px) 1100px, 900px");
+      if (source.srcSet) image.srcset = source.srcSet;
+      if (source.sizes) image.sizes = source.sizes;
+      image.src = source.src;
       void image.decode().catch(() => {});
       return image;
     });

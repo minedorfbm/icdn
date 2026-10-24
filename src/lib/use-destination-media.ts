@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { groupPhotos, groupPosts, groupVideos } from "@/data/resort";
-import { getDestinationMedia, type DestinationMediaData } from "./hub.functions";
+import type { DestinationMediaData } from "./hub.functions";
+import { loadDestinationMedia, peekDestinationMedia } from "./hub-client";
 
 /** Only an opened card requests its gallery and video metadata. */
 export function useDestinationMedia(id: string) {
@@ -10,8 +11,9 @@ export function useDestinationMedia(id: string) {
   );
   useEffect(() => {
     let current = true;
-    setResult(null);
-    getDestinationMedia({ data: id }).then(
+    const cached = peekDestinationMedia(id);
+    setResult(cached ? { id, data: cached } : null);
+    loadDestinationMedia(id, attempt > 0).then(
       (data) => {
         if (current) setResult({ id, data });
       },
@@ -23,7 +25,7 @@ export function useDestinationMedia(id: string) {
       current = false;
     };
   }, [id, attempt]);
-  const data = result?.id === id ? result.data : undefined;
+  const data = result?.id === id ? result.data : peekDestinationMedia(id);
   const media = useMemo(
     () => ({
       photos: groupPhotos(data?.photos ?? [])[id] ?? [],

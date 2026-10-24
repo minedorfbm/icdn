@@ -5,6 +5,7 @@ import { ArrowDown } from "lucide-react";
 import { lazy, Suspense, useCallback, useState } from "react";
 
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
+import { thumbnail } from "@/lib/responsive-image";
 
 const MichelinFilm = lazy(() => import("./MichelinFilm"));
 
@@ -35,7 +36,7 @@ export function HubHero({
       <div className="hero-sky">
         <div className="hero-sky-content">
           <h1 className="hero-welcome">
-            <ResortLogo tone="black" className="hero-resort-logo" />
+            <ResortLogo tone="black" className="hero-resort-logo" loading="eager" />
           </h1>
 
           <button onClick={() => scrollToHubSection("discover")} className="hero-invitation">
@@ -60,7 +61,7 @@ export function HubHero({
         className="hero-film-button grid place-items-center rounded-full transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4"
       >
         <img
-          src="/michelin-key.webp"
+          src={thumbnail("/michelin-key.webp")}
           alt=""
           width={494}
           height={585}

@@ -78,7 +78,7 @@ test("the hero displays before a slow catalogue and media waits for an opened ca
   console.log(`Hero visible after ${Date.now() - start}ms with catalogue delayed by 3500ms`);
   await expect(page.locator("#heaven")).toHaveCount(0);
   await expect(page.locator('#discover[aria-busy="true"]')).toBeVisible();
-  await page.getByRole("button", { name: "Language", exact: true }).click();
+  await page.getByRole("button", { name: "Language · EN", exact: true }).click();
   await page.getByRole("button", { name: /日本語/ }).click();
   await expect(page.getByRole("button", { name: "再試行", exact: true })).toBeVisible({
     timeout: 15000,
