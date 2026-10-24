@@ -5,11 +5,9 @@ export function destinationSlug(id: string): string {
 
 /** Resolve official and legacy public URLs without requesting the catalogue. */
 export function canonicalDestinationId(slug: string): string {
-  return slug === "summit-auditorium"
-    ? "summit-cinema"
-    : slug === "nature-discovery-guide"
-      ? "nature-experiences"
-      : slug;
+  if (slug === "summit-auditorium") return "summit-cinema";
+  if (slug === "nature-discovery-guide") return "nature-experiences";
+  return slug;
 }
 
 export function findPublicDestination<T extends { id: string; active: boolean }>(

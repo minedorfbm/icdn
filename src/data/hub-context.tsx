@@ -3,6 +3,10 @@ import { CatalogueContext } from "./catalogue-status";
 import { createHubValue, type HubValue } from "./hub-value";
 import type { HubData } from "@/lib/hub.functions";
 
+const noRetry = () => {
+  /* Complete catalogues need no retry by default. */
+};
+
 const HubContext = createContext<HubValue | null>(null);
 
 export function HubProvider({
@@ -10,7 +14,7 @@ export function HubProvider({
   children,
   ready = true,
   failed = false,
-  retry = () => {},
+  retry = noRetry,
 }: Readonly<{
   data?: HubData;
   children: ReactNode;
@@ -19,8 +23,9 @@ export function HubProvider({
   retry?: () => void;
 }>) {
   const value = useMemo(() => createHubValue(data), [data]);
+  const status = useMemo(() => ({ ready, failed, retry }), [ready, failed, retry]);
   return (
-    <CatalogueContext.Provider value={{ ready, failed, retry }}>
+    <CatalogueContext.Provider value={status}>
       <HubContext.Provider value={value}>{children}</HubContext.Provider>
     </CatalogueContext.Provider>
   );

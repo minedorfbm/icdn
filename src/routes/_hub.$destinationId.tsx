@@ -1,3 +1,4 @@
+import type { Destination } from "@/data/resort";
 import { cardHubData } from "@/lib/destination-card-schema";
 import { detailHeroPreload } from "@/lib/responsive-image";
 import { NotFoundPage } from "@/components/NotFoundPage";
@@ -13,17 +14,17 @@ export const Route = createFileRoute("/_hub/$destinationId")({
     const parent = await parentMatchPromise;
     const catalogue = parent.loaderData?.catalogue ?? peekHubData();
     const id = canonicalDestinationId(params.destinationId);
-    const card =
-      parent.loaderData?.card?.destination.id === id
-        ? parent.loaderData.card
-        : catalogue
-          ? null
-          : await loadDestinationCard(id);
-    const destination = catalogue
-      ? findPublicDestination(createHubValue(catalogue).destinations, params.destinationId)
-      : card
-        ? createHubValue(cardHubData(card)).destinations[0]
-        : undefined;
+    let destination: Destination | undefined;
+    if (catalogue) {
+      destination = findPublicDestination(
+        createHubValue(catalogue).destinations,
+        params.destinationId,
+      );
+    } else {
+      const parentCard = parent.loaderData?.card;
+      const card = parentCard?.destination.id === id ? parentCard : await loadDestinationCard(id);
+      if (card) destination = createHubValue(cardHubData(card)).destinations[0];
+    }
     if (!destination) throw notFound();
     return destination;
   },

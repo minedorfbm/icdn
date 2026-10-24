@@ -22,7 +22,6 @@ export function DestinationCollection({ items }: Readonly<{ items: CollectionIte
           (destination) => destination.id === item.target_destination_id,
         );
         if (!target) return null;
-        if (!ready) return <CataloguePending />;
         return (
           <li key={item.key}>
             <button

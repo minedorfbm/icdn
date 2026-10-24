@@ -17,25 +17,27 @@ export async function checkDestinationCardSnapshot(db: PGlite) {
       (await db.query<{ data: unknown }>("SELECT public.published_hub_catalogue_v1() AS data"))
         .rows[0]!.data,
     );
-    for (const destination of full.destinations ?? []) {
-      const actual = destinationCardSchema.parse(await read(destination.id));
-      const expected = focusDestinationCard(full, destination.id)!;
-      const normalize = (card: typeof actual) => ({
-        ...card,
-        linkTranslations: [...card.linkTranslations].sort(
-          (a, b) => a.locale.localeCompare(b.locale) || a.link_id.localeCompare(b.link_id),
-        ),
-        editorial: {
-          descriptions: [...card.editorial.descriptions].sort((a, b) =>
-            a.locale.localeCompare(b.locale),
+    await Promise.all(
+      (full.destinations ?? []).map(async (destination) => {
+        const actual = destinationCardSchema.parse(await read(destination.id));
+        const expected = focusDestinationCard(full, destination.id)!;
+        const normalize = (card: typeof actual) => ({
+          ...card,
+          linkTranslations: [...card.linkTranslations].sort(
+            (a, b) => a.locale.localeCompare(b.locale) || a.link_id.localeCompare(b.link_id),
           ),
-          events: [...card.editorial.events].sort(
-            (a, b) => a.locale.localeCompare(b.locale) || a.event_id.localeCompare(b.event_id),
-          ),
-        },
-      });
-      assert.deepEqual(normalize(actual), normalize(expected), destination.id);
-    }
+          editorial: {
+            descriptions: [...card.editorial.descriptions].sort((a, b) =>
+              a.locale.localeCompare(b.locale),
+            ),
+            events: [...card.editorial.events].sort(
+              (a, b) => a.locale.localeCompare(b.locale) || a.event_id.localeCompare(b.event_id),
+            ),
+          },
+        });
+        assert.deepEqual(normalize(actual), normalize(expected), destination.id);
+      }),
+    );
     assert.equal(await read("missing-destination"), null);
   } finally {
     await db.exec("ROLLBACK");

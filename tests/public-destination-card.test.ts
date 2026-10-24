@@ -58,7 +58,7 @@ test("the first card uses one anonymous GET and its focused payload never claims
   expect(new Headers(init?.headers).has("authorization")).toBe(false);
   expect(completeCatalogue(cardHubData(card))).toBe(false);
   expect(focusDestinationCard(cardHubData(card), "citron")).toEqual(card);
-  expect(focusDestinationCard(cardHubData(card), "unknown")).toBe(null);
+  expect(focusDestinationCard(cardHubData(card), "unknown")).toBeNull();
 });
 test("an unpublished card returns null and only a missing migration invokes compatibility", async () => {
   configure();
@@ -67,7 +67,7 @@ test("an unpublished card returns null and only a missing migration invokes comp
     await readPublicDestinationCard("citron", async () => {
       throw Error("unexpected");
     }),
-  ).toBe(null);
+  ).toBeNull();
   fetchSpy.mockResolvedValue(Response.json({ code: "PGRST202" }, { status: 404 }));
   expect(await readPublicDestinationCard("citron", async () => card)).toEqual(card);
 });

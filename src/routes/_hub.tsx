@@ -13,7 +13,7 @@ import { useResortMap } from "@/features/resort-map/map-context";
 import { mapCopy } from "@/features/resort-map/map-copy";
 import { localizedLinkUrl } from "@/lib/localized-links";
 import { createFileRoute, notFound, Outlet, useLocation } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useJourneyMotion } from "@/lib/use-journey-motion";
 import { ArrowUpRight } from "lucide-react";
 import { ConciergeContact } from "@/components/hub/ConciergeContact";
@@ -108,6 +108,7 @@ function HubRoute() {
     failed: false,
   });
   const [attempt, setAttempt] = useState(0);
+  const retryCatalogue = useCallback(() => setAttempt((n) => n + 1), []);
   const data = catalogue ?? result.data;
   // Keep providers mounted if a map click leaves the focused card before the catalogue arrives.
   const [focusedCard, setFocusedCard] = useState(card);
@@ -115,7 +116,14 @@ function HubRoute() {
     if (card) setFocusedCard(card);
   }, [card]);
   const focused = card ?? focusedCard;
-  const presentation = data ?? (focused ? cardHubData(focused) : null);
+  const presentation = useMemo(
+    () => data ?? (focused ? cardHubData(focused) : null),
+    [data, focused],
+  );
+  const providerData = useMemo(
+    () => (presentation ? { ...presentation, settings } : undefined),
+    [presentation, settings],
+  );
   useEffect(() => {
     if (catalogue) {
       setResult({ data: catalogue, failed: false });
@@ -151,12 +159,12 @@ function HubRoute() {
             />
           </>
         )}
-        {presentation ? (
+        {providerData ? (
           <HubProvider
-            data={{ ...presentation, settings }}
+            data={providerData}
             ready={!!data}
             failed={result.failed}
-            retry={() => setAttempt((n) => n + 1)}
+            retry={retryCatalogue}
           >
             <HubSearchProvider>
               <ResortBrowserProvider>
@@ -165,10 +173,7 @@ function HubRoute() {
                     (data ? (
                       <Hub />
                     ) : (
-                      <CatalogueStatus
-                        failed={result.failed}
-                        onRetry={() => setAttempt((n) => n + 1)}
-                      />
+                      <CatalogueStatus failed={result.failed} onRetry={retryCatalogue} />
                     ))}
                   <Outlet />
                 </ResortMapProvider>
@@ -176,7 +181,7 @@ function HubRoute() {
             </HubSearchProvider>
           </HubProvider>
         ) : (
-          <CatalogueStatus failed={result.failed} onRetry={() => setAttempt((n) => n + 1)} />
+          <CatalogueStatus failed={result.failed} onRetry={retryCatalogue} />
         )}
       </main>
     </I18nProvider>
