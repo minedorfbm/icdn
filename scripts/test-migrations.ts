@@ -7,7 +7,7 @@ import { checkCatalogueSnapshot } from "./check-catalogue-snapshot";
 const directory = new URL("../supabase/migrations/", import.meta.url);
 const files = readdirSync(directory)
   .filter((name) => name.endsWith(".sql"))
-  .sort();
+  .sort((a, b) => a.localeCompare(b));
 const db = new PGlite();
 const earthLevelMigration = "20261018120000_la_maison_building_earth_level.sql";
 const maisonState = async () =>
