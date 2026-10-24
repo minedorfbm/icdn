@@ -60,7 +60,11 @@ test("the first card uses one anonymous GET and its focused payload never claims
   expect(focusDestinationCard(cardHubData(card), "citron")).toEqual(card);
   expect(focusDestinationCard(cardHubData(card), "unknown")).toBeNull();
 });
-test("an unpublished card returns null and only a missing migration invokes compatibility", async () => {
+function fullCatalogue() {
+  const { scope: _scope, ...data } = cardHubData(card);
+  return data;
+}
+test("an unpublished card returns null without reading a catalogue", async () => {
   configure();
   fetchSpy.mockResolvedValue(Response.json(null));
   expect(
@@ -68,9 +72,39 @@ test("an unpublished card returns null and only a missing migration invokes comp
       throw Error("unexpected");
     }),
   ).toBeNull();
-  fetchSpy.mockResolvedValue(Response.json({ code: "PGRST202" }, { status: 404 }));
-  expect(await readPublicDestinationCard("citron", async () => card)).toEqual(card);
+  expect(fetchSpy).toHaveBeenCalledTimes(1);
 });
+test("a missing card function reads a fresh catalogue instead of resetting a cached snapshot's deadline", async () => {
+  configure();
+  const missing = () => Response.json({ code: "PGRST202" }, { status: 404 });
+  let compatibility = 0;
+  const legacy = async () => {
+    throw Error("unexpected legacy tables");
+  };
+  fetchSpy.mockResolvedValueOnce(missing()).mockResolvedValueOnce(Response.json(fullCatalogue()));
+  expect(await readPublicDestinationCard("citron", legacy, () => compatibility++)).toEqual(card);
+  // Even after an earlier successful compatibility read, publication is read fresh.
+  const unpublished = fullCatalogue();
+  unpublished.destinations = [{ ...card.destination, active: false }];
+  fetchSpy.mockResolvedValueOnce(missing()).mockResolvedValueOnce(Response.json(unpublished));
+  expect(await readPublicDestinationCard("citron", legacy)).toBeNull();
+  expect(compatibility).toBe(1);
+  expect(fetchSpy.mock.calls.map(([url]) => new URL(String(url)).pathname)).toEqual([
+    "/rest/v1/rpc/published_hub_destination_card_v1",
+    "/rest/v1/rpc/published_hub_catalogue_v1",
+    "/rest/v1/rpc/published_hub_destination_card_v1",
+    "/rest/v1/rpc/published_hub_catalogue_v1",
+  ]);
+});
+test("only two absent functions reach the fresh legacy table reader, and partial data cannot become a card", async () => {
+  configure();
+  fetchSpy.mockResolvedValue(Response.json({ code: "PGRST202" }, { status: 404 }));
+  expect(await readPublicDestinationCard("citron", async () => fullCatalogue())).toEqual(card);
+  await expect(
+    readPublicDestinationCard("citron", async () => ({ ...fullCatalogue(), links: null })),
+  ).rejects.toThrow("Card temporarily unavailable");
+});
+
 test.each([
   { body: { code: "42501" }, status: 403 },
   { body: { code: "57014" }, status: 504 },

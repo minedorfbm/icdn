@@ -1,6 +1,5 @@
-import { completeCatalogue } from "./hub-data-completeness";
 import { readPublicDestinationCard } from "./public-destination-card.server";
-import { destinationCardSchema, focusDestinationCard } from "./destination-card-schema";
+import { destinationCardSchema } from "./destination-card-schema";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "./validation";
 import { collectionItemRow } from "./destination-collection";
@@ -162,17 +161,12 @@ export const getDestinationCard = createServerFn({ method: "GET" })
   .handler(({ data: id }) =>
     withPublicReadTiming("card", (markSource) =>
       readPublicSnapshot(
-        `card-v1/${id}`,
+        `card-v2/${id}`,
         destinationCardSchema.nullable(),
         (data) => data !== null,
         () => {
           markSource("rpc");
-          return readPublicDestinationCard(id, async () => {
-            markSource("compatibility");
-            const catalogue = await getHubData();
-            if (!completeCatalogue(catalogue)) throw new Error("Card temporarily unavailable");
-            return focusDestinationCard(catalogue, id);
-          });
+          return readPublicDestinationCard(id, readHubData, () => markSource("compatibility"));
         },
         publicCache(),
       ),
