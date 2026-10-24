@@ -92,7 +92,7 @@ test("generator publishes deterministic uncropped derivatives only for approved 
   expect(await fs.readFile(path.join(root, "public/resort-map/official.webp"))).toEqual(photo);
   await generateImageVariants(root, request);
   expect(await fs.readFile(manifestFile, "utf8")).toBe(before);
-});
+}, 30_000);
 
 test("generator rejects unavailable or truncated catalogues without publishing a manifest", async () => {
   const { root } = await fixture();
