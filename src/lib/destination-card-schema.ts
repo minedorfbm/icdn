@@ -1,4 +1,5 @@
 import { z } from "./validation";
+import { openingHoursRow } from "./opening-hours";
 import {
   destinationRow,
   linkRow,
@@ -14,6 +15,7 @@ import {
 /** Explicitly focused data: never prime the complete catalogue cache with this payload. */
 export const destinationCardSchema = z.object({
   destination: destinationRow,
+  hours: z.array(openingHoursRow).optional(),
   links: z.array(linkRow),
   events: z.array(eventRow),
   mapPlaces: z.array(mapPlaceRow),
@@ -28,9 +30,10 @@ export type DestinationCardData = z.infer<typeof destinationCardSchema>;
 
 /** Presentation adapter only; catalogue readiness remains a separate, explicit state. */
 export function cardHubData(card: DestinationCardData): HubData {
-  const { destination, ...collections } = card;
+  const { destination, hours, ...collections } = card;
   return {
     ...collections,
+    ...(hours !== undefined ? { openingHours: hours } : {}),
     scope: "card",
     destinations: [destination],
     levels: [],
@@ -48,6 +51,9 @@ export function focusDestinationCard(data: HubData, id: string): DestinationCard
   const mapLinks = (data.mapLinks ?? []).filter((row) => row.destination_id === id);
   return {
     destination,
+    ...(data.openingHours !== undefined && data.openingHours !== null
+      ? { hours: data.openingHours.filter((row) => row.destination_id === id) }
+      : {}),
     links,
     events,
     mapLinks,

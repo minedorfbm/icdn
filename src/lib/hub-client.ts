@@ -23,10 +23,15 @@ const media = createRequestCache<Awaited<ReturnType<typeof getDestinationMedia>>
 
 // Only browser reads are retained. SSR always uses the existing public server cache,
 // never a module-global snapshot shared across requests or Worker environments.
-export function loadHubData() {
+const backgroundCatalogueFetch: typeof fetch = (input, init) =>
+  fetch(input, { ...init, priority: "low" });
+
+export function loadHubData({ background = false }: { background?: boolean } = {}) {
   return typeof window === "undefined"
     ? getHubData()
-    : catalogue.read("catalogue", () => getHubData());
+    : catalogue.read("catalogue", () =>
+        getHubData(background ? { fetch: backgroundCatalogueFetch } : {}),
+      );
 }
 
 export function loadHubSettings() {

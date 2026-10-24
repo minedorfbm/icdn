@@ -32,6 +32,7 @@ export async function readPublicDestinationCard(
   if (!parsed.success) throw new Error("Card temporarily unavailable");
   const card = parsed.data;
   if (
+    card.hours?.some((row) => row.destination_id !== id) ||
     card.destination.id !== id ||
     !card.destination.active ||
     [...card.links, ...card.events, ...card.mapLinks, ...card.editorial.descriptions].some(

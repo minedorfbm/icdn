@@ -100,6 +100,9 @@ export function createHubValue(data?: HubData): HubValue {
         linksByDest[row.id] ?? [],
         eventsByDest[row.id] ?? [],
       );
+      if (data.openingHours) {
+        dest.initialHours = data.openingHours.filter((hours) => hours.destination_id === row.id);
+      }
       return dest;
     }),
     links,

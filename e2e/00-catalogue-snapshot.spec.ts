@@ -3,6 +3,7 @@ import { expect, test } from "./fixtures";
 test("a cold direct card renders through its focused snapshot", async ({ page, request }) => {
   const response = await page.goto("/citron");
   const timing = response!.headers()["server-timing"];
+  expect(await response!.text()).toContain("06:30");
   expect(timing).not.toContain("catalogue;");
   expect(timing).toMatch(/card;dur=\d+(?:\.\d+)?;desc="(?:rpc|cache)"/);
   expect(timing).toMatch(/settings;dur=\d+(?:\.\d+)?;desc="(?:database|cache)"/);

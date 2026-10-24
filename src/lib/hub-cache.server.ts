@@ -4,7 +4,7 @@ import { completeCatalogue } from "./hub-data-completeness";
 import type { z } from "zod";
 
 const CACHE_ROOT = "https://icdn.artdigitaljourney.com/__cache/";
-export const CATALOGUE_CACHE_KEY = "catalogue-v10";
+export const CATALOGUE_CACHE_KEY = "catalogue-v11";
 const TTL_MS = 120_000;
 export type PublicCache = Pick<Cache, "match" | "put">;
 

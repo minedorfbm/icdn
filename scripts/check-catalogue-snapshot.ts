@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import type { PGlite } from "@electric-sql/pglite";
+import { openingHoursRow } from "../src/lib/opening-hours";
 import * as schema from "../src/lib/hub-schema";
 import { completeCatalogue } from "../src/lib/hub-data-completeness";
 
 const collections = [
+  ["openingHours", "destination_opening_hours", openingHoursRow, "published", "display_order"],
   ["levels", "levels", schema.levelRow, undefined, "display_order"],
   ["destinations", "destinations", schema.destinationRow, "active", "display_order"],
   ["links", "destination_links", schema.linkRow, "active", "display_order"],
@@ -139,6 +141,7 @@ export async function checkCatalogueSnapshot(db: PGlite) {
   try {
     const snapshot = await read(db);
     assert.ok(!snapshot.destinations!.some((row) => row.id === "citron"));
+    assert.ok(!snapshot.openingHours!.some((row) => row.destination_id === "citron"));
     assert.ok(!snapshot.links!.some((row) => row.destination_id === "citron"));
     assert.ok(!snapshot.editorial!.descriptions!.some((row) => row.destination_id === "citron"));
   } finally {

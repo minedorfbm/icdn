@@ -1,4 +1,5 @@
 import { afterAll, afterEach, expect, spyOn, test } from "bun:test";
+import { createHubValue } from "../src/data/hub-value";
 import { completeCatalogue } from "../src/lib/hub-data-completeness";
 import { readPublicDestinationCard } from "../src/lib/public-destination-card.server";
 import {
@@ -27,6 +28,16 @@ const card: DestinationCardData = {
   mapLinks: [],
   linkTranslations: [],
   editorial: { descriptions: [], events: [] },
+};
+const hour = {
+  id: "breakfast",
+  destination_id: "citron",
+  service: "breakfast" as const,
+  days: [1, 2, 3, 4, 5, 6, 7],
+  opens_minutes: 390,
+  closes_minutes: 630,
+  last_order_minutes: null,
+  display_order: 0,
 };
 afterAll(() => fetchSpy.mockRestore());
 afterEach(() => {
@@ -111,6 +122,8 @@ test.each([
   { body: { code: "PGRST000" }, status: 503 },
   { body: [], status: 200 },
   { body: { ...card, links: null }, status: 200 },
+  { body: { ...card, hours: [{ ...hour, destination_id: "other" }] }, status: 200 },
+  { body: { ...card, hours: null }, status: 200 },
   { body: { ...card, destination: { ...card.destination, active: false } }, status: 200 },
   { body: { ...card, destination: { ...card.destination, id: "other" } }, status: 200 },
   {
@@ -145,3 +158,25 @@ test.each([
     expect(fetchSpy).toHaveBeenCalledTimes(1);
   },
 );
+
+test("published hours arrive with the focused snapshot and stay scoped through catalogue projection", async () => {
+  configure();
+  const withHours = { ...card, hours: [hour] };
+  fetchSpy.mockResolvedValue(Response.json(withHours));
+  expect(
+    await readPublicDestinationCard("citron", async () => {
+      throw Error("unexpected fallback");
+    }),
+  ).toEqual(withHours);
+  expect(fetchSpy).toHaveBeenCalledTimes(1);
+  const full = {
+    ...fullCatalogue(),
+    openingHours: [hour, { ...hour, id: "other", destination_id: "other" }],
+  };
+  expect(focusDestinationCard(full, "citron")!.hours).toEqual([hour]);
+  expect(createHubValue(cardHubData(withHours)).destinations[0]!.initialHours).toEqual([hour]);
+  expect(createHubValue(cardHubData(card)).destinations[0]!.initialHours).toBeUndefined();
+  expect(createHubValue(cardHubData({ ...card, hours: [] })).destinations[0]!.initialHours).toEqual(
+    [],
+  );
+});
