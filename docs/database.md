@@ -50,12 +50,11 @@ Seule l’erreur de fonction absente `PGRST202` active les lecteurs de compatibi
 
 `Server-Timing` distingue réglages, catalogue, fiche et médias ainsi que leur provenance (`cache`, `catalogue-cache`, `database`, `rpc`, `compatibility`). La durée comprend le travail applicatif de validation et de cache ; elle ne mesure pas uniquement le SQL ni l’affichage complet. Comparer les lectures hors cache entre elles et conserver les conditions de mesure. Une réponse en cache ne prouve pas à elle seule que la fonction distante est installée.
 
-## Sauvegarde et restauration : validation restante
+## Sauvegarde et restauration
 
-La reconstruction locale des migrations et le contrôle des 92 versions ne constituent **pas** un exercice de restauration. Les [sauvegardes de base Supabase](https://supabase.com/docs/guides/platform/backups) contiennent les métadonnées Storage, pas les fichiers stockés eux-mêmes.
+Le contrôle du 25 octobre confirme que l’offre actuelle n’inclut pas de sauvegardes Supabase restaurables. Un export réel des 23 tables du CMS (1 437 lignes) et des 118 fichiers du bucket public `hub-images` a été récupéré et vérifié sur une cible locale jetable : empreintes identiques, 74 fiches publiées lisibles et droits visiteurs contrôlés. Aucune donnée de production n’a été modifiée.
 
-Avant de déclarer la restauration validée, réaliser un exercice sur une cible isolée : vérifier les sauvegardes disponibles, restaurer le schéma et les données nécessaires, recopier les fichiers Storage correspondants, puis vérifier les références d’images, les droits publics et le fonctionnement des fiches et lecteurs. Relever la date de la source, les vérifications et le temps nécessaire. Ne pas connecter le Worker de production à cette cible et ne pas réutiliser ou publier ses secrets. **Cet exercice reste à effectuer ; aucune restauration distante n’est exécutée par les commandes de contrôle ci-dessus.**
-
+Voir la [procédure reproductible et ses limites](cms-recovery.md), l’[export SELECT](../supabase/manual/export-cms-recovery.sql) et le [script d’archivage et de vérification hors ligne](../scripts/rehearse-cms-recovery.ts). Cet exercice couvre le CMS et les fichiers de ce bucket ; il ne remplace pas une sauvegarde chiffrée indépendante du poste ni une restauration complète du compte Supabase. Les [sauvegardes de base Supabase](https://supabase.com/docs/guides/platform/backups) contiennent les métadonnées Storage, pas les fichiers eux-mêmes. Ne pas lancer de restauration sur la production pour reproduire le test.
 
 ## Collections et navigation
 
