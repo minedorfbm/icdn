@@ -12,12 +12,14 @@ const photoPaths = new Set([
 for (const scenario of [
   { label: "new CMS photo", hero: "/intercontinental-touch-icon.png?card-detail-only=citron" },
   { label: "responsive photo", hero: knownPhoto },
+  { label: "tablet responsive photo", hero: knownPhoto, viewport: { width: 834, height: 1194 } },
+  { label: "desktop responsive photo", hero: knownPhoto, viewport: { width: 1440, height: 900 } },
 ]) {
   test(`selected ${scenario.label} starts while fresh card data are pending`, async ({
     page,
     request,
-    browserName,
   }) => {
+    if (scenario.viewport) await page.setViewportSize(scenario.viewport);
     const hero = scenario.hero;
     // Keep fallback reads inside the fixture, including a browser without AVIF support.
     if (scenario.hero === knownPhoto)
@@ -73,7 +75,9 @@ for (const scenario of [
     page.on("request", (request) => {
       if (
         request.url().includes("card-detail-only=") ||
-        photoPaths.has(new URL(request.url()).pathname)
+        (photoPaths.has(new URL(request.url()).pathname) &&
+          // Visible desktop/tablet picker thumbnails are intentional, not hero transfers.
+          new URL(request.url()).pathname !== photo.variants[0].src)
       )
         requests.push(request.url());
     });
@@ -105,11 +109,28 @@ for (const scenario of [
       .locator(".editorial-hero img")
       .evaluate((image: HTMLImageElement) => image.currentSrc);
     expect(requests.filter((url) => url === selectedSource)).toHaveLength(1);
-    // WebKit already fetches the original picture fallback on main, with no early preload.
-    // Permit only that existing fallback; never another candidate or another card's photo.
-    const fallback = browserName === "webkit" && hero === knownPhoto ? knownPhoto : null;
-    expect(requests.filter((url) => url !== selectedSource && url !== fallback)).toEqual([]);
-    expect(requests.filter((url) => url === fallback).length).toBeLessThanOrEqual(1);
+    expect(requests).toHaveLength(1);
+    if (scenario.viewport) {
+      await page.getByRole("button", { name: "Photo 2", exact: true }).click();
+      await expect
+        .poll(() =>
+          page
+            .locator(".editorial-hero img")
+            .evaluate((image: HTMLImageElement) => image.currentSrc),
+        )
+        .toContain("/intercontinental-touch-icon.png");
+      expect(requests).toHaveLength(1);
+      await page.getByRole("button", { name: "Photo 1", exact: true }).click();
+      await expect
+        .poll(() =>
+          page
+            .locator(".editorial-hero img")
+            .evaluate((image: HTMLImageElement) => image.currentSrc),
+        )
+        .toBe(selectedSource);
+      expect(requests.filter((url) => url !== selectedSource)).toEqual([]);
+      expect(requests.length).toBeLessThanOrEqual(2);
+    }
     const initialRequests = requests.length;
     await page.getByRole("button", { name: "BACK", exact: true }).click();
     await expect(card).toBeVisible();
@@ -128,8 +149,7 @@ for (const scenario of [
       .evaluate((image: HTMLImageElement) => image.currentSrc);
     const updatedRequests = requests.slice(initialRequests);
     expect(updatedRequests.filter((url) => url === updatedSource)).toHaveLength(1);
-    expect(updatedRequests.filter((url) => url !== updatedSource && url !== fallback)).toEqual([]);
-    expect(updatedRequests.filter((url) => url === fallback).length).toBeLessThanOrEqual(1);
+    expect(updatedRequests).toHaveLength(1);
     await page.getByRole("button", { name: "BACK", exact: true }).click();
     await expect(card).toBeVisible();
     published = false;
@@ -140,3 +160,27 @@ for (const scenario of [
     await expect(page.locator(".editorial-detail")).toHaveCount(0);
   });
 }
+
+test.describe("native responsive image on a direct route", () => {
+  test.use({ javaScriptEnabled: false });
+  test("known AVIF keeps its original fallback available without hydration", async ({ page }) => {
+    await page.route(knownPhoto, (route) =>
+      route.fulfill({
+        path: new URL("../public" + photo.variants.at(-1)!.src, import.meta.url).pathname,
+        contentType: "image/webp",
+      }),
+    );
+    await page.goto("/design-digital-tour");
+    const image = page.locator(".editorial-hero img");
+    await expect(image).toHaveAttribute("src", knownPhoto);
+    await expect(image).toHaveAttribute("srcset", new RegExp("citron-detail"));
+    await expect(image).not.toHaveAttribute("loading", "lazy");
+    await expect
+      .poll(() =>
+        image.evaluate((node: HTMLImageElement) => node.complete && node.naturalWidth > 0),
+      )
+      .toBe(true);
+    expect(await image.evaluate((node: HTMLImageElement) => node.currentSrc)).toMatch(/\.avif$/);
+    await expect(page.locator(".editorial-title")).toHaveText("Bill Bensley Digital Design Tour");
+  });
+});

@@ -71,3 +71,11 @@ Les ressources statiques restent servies au plus près du visiteur avec la confi
 Le retour au réglage précédent consiste à retirer `previews.placement` et redéployer la prévisualisation. Un déploiement de production ne doit pas être décrit comme optimisé tant que son propre placement et ses mesures ne l’ont pas confirmé.
 
 Le sens de `x-envoy-upstream-service-time` est décrit dans la [documentation Envoy](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-upstream-service-time) ; il ne remplace pas un plan d’exécution SQL.
+
+## Transfert des photos de fiche sur WebKit
+
+La photo principale connue est préparée dès le clic, pendant la lecture fraîche des données. Lors d’une navigation côté navigateur, WebKit pouvait aussi demander le WebP de secours avant que le nouvel élément `img` ne soit associé aux sources de son `picture`. Le remplacement de sources dans un même `picture` pouvait également déclencher l’ancien secours.
+
+Le `picture` conserve désormais une identité liée à ses deux sources et les attributs de secours sont appliqués après son attachement, avant le premier affichage. Le préchargement commence toujours dès le clic. Un accès direct rendu côté serveur garde immédiatement les attributs complets et son secours original, même sans JavaScript ; l’image principale n’est pas marquée `loading="lazy"`.
+
+La régression réseau couvre une source CMS inconnue, une source AVIF connue aux tailles mobile/tablette/desktop, les changements de photo et une dépublication. Elle exige une seule requête pour l’image principale par sélection ; les petites vignettes visibles du sélecteur restent intentionnelles. Ce contrôle des transferts ne donne pas un nouveau LCP global et ne remplace pas la validation physique à Da Nang.

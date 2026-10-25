@@ -36,6 +36,9 @@ destinations.push(
     ...destinations[0]!,
     id: "design-digital-tour",
     name: "Bill Bensley Digital Design Tour",
+    // Exercise a known responsive source in native SSR, independently of browser RPC overrides.
+    detail_image_key:
+      "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/citron-detail-3b0c495a2769.webp",
     cluster: "EXPERIENCES",
     type: "experience",
     content_kind: "place",

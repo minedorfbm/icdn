@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { DestinationCollection } from "./DestinationCollection";
 import { ArrowLeft, ArrowUpRight, ChevronDown, MapPin } from "lucide-react";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
@@ -47,7 +47,11 @@ function DestinationMeta({ dest, className }: Readonly<{ dest: Destination; clas
   );
 }
 
-function DestinationHero({ dest, onClose }: Readonly<{ dest: Destination; onClose: () => void }>) {
+function DestinationHero({
+  dest,
+  onClose,
+  clientEntry,
+}: Readonly<{ dest: Destination; onClose: () => void; clientEntry: boolean }>) {
   const { t } = useI18n();
   const [selected, setSelected] = useState(0);
   const images = Array.from(new Set([dest.detailImage, dest.image]));
@@ -56,9 +60,18 @@ function DestinationHero({ dest, onClose }: Readonly<{ dest: Destination; onClos
   const desktopImage = detailHeroImage(images[selected]!);
   const mobileAvif = detailHeroAvif(dest.detailImage);
   const desktopAvif = detailHeroAvif(images[selected]!);
+  const pictureKey = JSON.stringify([dest.detailImage, images[selected]]);
+  const [connectedSource, setConnectedSource] = useState<string | null>(
+    clientEntry ? null : pictureKey,
+  );
+  useLayoutEffect(() => setConnectedSource(pictureKey), [pictureKey]);
+  // Avoid WebKit selecting the detached fallback before its picture sources exist.
+  // Preloading stays immediate; direct SSR retains the full eager image.
+  const fallbackImage =
+    (mobileAvif || desktopAvif) && connectedSource !== pictureKey ? {} : firstImage;
   return (
     <div className="editorial-hero">
-      <picture>
+      <picture key={pictureKey}>
         {desktopAvif && (
           <source
             media="(min-width: 768px)"
@@ -76,7 +89,7 @@ function DestinationHero({ dest, onClose }: Readonly<{ dest: Destination; onClos
           <source type="image/avif" srcSet={mobileAvif.srcSet} sizes={mobileAvif.sizes} />
         )}
         <img
-          {...firstImage}
+          {...fallbackImage}
           alt={dest.name}
           width={900}
           height={1400}
@@ -208,7 +221,7 @@ export function DestinationDetail({
           className={`editorial-page${animateEntry ? " detail-enter" : ""}`}
           data-destination-id={dest.id}
         >
-          <DestinationHero key={dest.id} dest={dest} onClose={onClose} />
+          <DestinationHero key={dest.id} dest={dest} onClose={onClose} clientEntry={animateEntry} />
           <div className="editorial-body">
             <div className="editorial-intro">
               <DestinationMeta dest={dest} className="editorial-large-meta" />
