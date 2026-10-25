@@ -27,7 +27,11 @@ function pageAt(container: HTMLElement, y: number): HTMLElement | undefined {
   return pages.find((page) => page.getBoundingClientRect().bottom > y) ?? pages.at(-1);
 }
 
-export default function PdfMenu({ url, title }: Readonly<{ url: string; title: string }>) {
+export default function PdfMenu({
+  url,
+  title,
+  onReady,
+}: Readonly<{ url: string; title: string; onReady: () => void }>) {
   const { t } = useI18n();
   const [pdf, setPdf] = useState<LoadedPdf | null>(null);
   const [zoom, setZoom] = useState(1);
@@ -38,7 +42,10 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
   const anchorPage = useRef(1);
   const pinchRef = useRef<Pinch | null>(null);
   const pendingPinchRef = useRef<Pinch | null>(null);
-  const showError = useCallback(() => setError(true), []);
+  const showError = useCallback(() => {
+    setError(true);
+    onReady();
+  }, [onReady]);
 
   useEffect(() => {
     const container = scrollRef.current;
@@ -56,11 +63,10 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
     try {
       loadingTask = getDocument({
         url: `/api/resort-pdf?url=${encodeURIComponent(url)}`,
-        disableRange: true,
-        disableStream: false,
+        rangeChunkSize: 256 * 1024,
       });
     } catch {
-      setError(true);
+      showError();
       return;
     }
     loadingTask.promise
@@ -71,13 +77,13 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
         if (active) setPdf({ document, heightRatio: viewport.height / viewport.width });
       })
       .catch(() => {
-        if (active) setError(true);
+        if (active) showError();
       });
     return () => {
       active = false;
       void loadingTask?.destroy();
     };
-  }, [url]);
+  }, [url, showError]);
 
   const pageWidth = Math.min(Math.max(width - 32, 1), 900) * zoom;
 
@@ -204,7 +210,7 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
   const renderDocument = () => {
     if (error)
       return <p className="mx-auto max-w-xs px-4 py-16 text-center text-sm">{t("pdf_error")}</p>;
-    if (!pdf || !width) return <p className="py-16 text-center text-sm">{t("page_loading")}</p>;
+    if (!pdf || !width) return null;
     return (
       <div ref={pagesRef} className="flex min-w-full w-max flex-col items-center gap-6 p-4 pb-20">
         {Array.from({ length: pdf.document.numPages }, (_, index) => (
@@ -218,6 +224,7 @@ export default function PdfMenu({ url, title }: Readonly<{ url: string; title: s
               title={title}
               scrollRef={scrollRef}
               onError={showError}
+              onReady={onReady}
             />
             <figcaption className="pt-3 text-center text-xs opacity-65">
               {t("pdf_page")} {index + 1} / {pdf.document.numPages}
@@ -264,6 +271,7 @@ function PdfPage({
   title,
   scrollRef,
   onError,
+  onReady,
 }: Readonly<{
   document: PDFDocumentProxy;
   pageNumber: number;
@@ -272,6 +280,7 @@ function PdfPage({
   title: string;
   scrollRef: RefObject<HTMLDivElement | null>;
   onError: () => void;
+  onReady: () => void;
 }>) {
   const slotRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -317,6 +326,7 @@ function PdfPage({
           transform: ratio === 1 ? undefined : [ratio, 0, 0, ratio, 0, 0],
         });
         await renderTask.promise;
+        if (active && pageNumber === 1) onReady();
       })
       .catch((cause: unknown) => {
         if (active && !(cause instanceof Error && cause.name === "RenderingCancelledException"))
@@ -330,7 +340,7 @@ function PdfPage({
         canvas.height = 0;
       }
     };
-  }, [visible, document, pageNumber, width, onError]);
+  }, [visible, document, pageNumber, width, onError, onReady]);
 
   return (
     <div ref={slotRef} style={{ height }} className="bg-white shadow-xl">
