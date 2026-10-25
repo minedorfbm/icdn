@@ -52,7 +52,7 @@ const exportSchema = z.array(
 );
 const manifestSchema = z.object({
   format: z.literal("icdn-cms-recovery-v1"),
-  captured_at: z.string().datetime({ offset: true }),
+  captured_at: z.iso.datetime({ offset: true }),
   tables: z.array(z.string()),
   versions: z.array(z.string()),
   columns: z.record(z.string(), z.array(z.string())),
@@ -73,19 +73,32 @@ const storageSchema = z.array(
 );
 const hash = (bytes: string | Uint8Array) => createHash("sha256").update(bytes).digest("hex");
 const quote = (name: string) => '"' + name.replaceAll('"', '""') + '"';
+const alphabetical = (a: string, b: string) => a.localeCompare(b, "en");
+// Migrations and commands on one local PostgreSQL connection must retain their order.
+// The same chain bounds image batches instead of starting all remote reads together.
+async function serial<T>(items: readonly T[], step: (item: T) => Promise<unknown>): Promise<void> {
+  await items.reduce<Promise<unknown>>(
+    (previous, item) => previous.then(() => step(item)),
+    Promise.resolve(),
+  );
+}
+function constraintMode(fk: { deferrable: boolean; deferred: boolean }) {
+  if (!fk.deferrable) return "NOT DEFERRABLE";
+  return fk.deferred ? "DEFERRABLE INITIALLY DEFERRED" : "DEFERRABLE INITIALLY IMMEDIATE";
+}
 const canonical = (value: unknown): unknown => {
   if (Array.isArray(value)) return value.map(canonical);
   if (value !== null && typeof value === "object") {
     return Object.fromEntries(
       Object.entries(value)
-        .sort(([a], [b]) => a.localeCompare(b))
+        .sort(([a], [b]) => alphabetical(a, b))
         .map(([key, item]) => [key, canonical(item)]),
     );
   }
   return value;
 };
 const rowsHash = (rows: unknown[]) =>
-  hash(JSON.stringify(rows.map((row) => JSON.stringify(canonical(row))).sort()));
+  hash(JSON.stringify(rows.map((row) => JSON.stringify(canonical(row))).sort(alphabetical)));
 const unpack = (value: unknown): unknown => (typeof value === "string" ? JSON.parse(value) : value);
 
 async function privateJson(path: string, value: unknown) {
@@ -151,11 +164,14 @@ function parseExport(bytes: string) {
   };
   const manifest = manifestSchema.parse(get("manifest", "cms-v1"));
   assert.deepEqual(
-    [...manifest.tables].sort(),
-    [...tables],
+    [...manifest.tables].sort(alphabetical),
+    [...tables].sort(alphabetical),
     "Public schema changed: review export scope first",
   );
-  assert.deepEqual(Object.keys(manifest.columns).sort(), [...tables]);
+  assert.deepEqual(
+    Object.keys(manifest.columns).sort(alphabetical),
+    [...tables].sort(alphabetical),
+  );
   const data = Object.fromEntries(
     tables.map((table) => [
       table,
@@ -164,7 +180,10 @@ function parseExport(bytes: string) {
   );
   for (const table of tables) {
     for (const row of data[table]!)
-      assert.deepEqual(Object.keys(row).sort(), [...manifest.columns[table]!].sort());
+      assert.deepEqual(
+        Object.keys(row).sort(alphabetical),
+        [...manifest.columns[table]!].sort(alphabetical),
+      );
   }
   const bucket = z
     .array(z.object({ id: z.literal("hub-images"), public: z.literal(true) }))
@@ -212,7 +231,7 @@ export async function createCmsArchive(
   const migrationDir = join(root, "supabase/migrations");
   const migrationNames = (await readdir(migrationDir))
     .filter((name) => name.endsWith(".sql"))
-    .sort();
+    .sort(alphabetical);
   assert.deepEqual(
     manifest.versions,
     migrationNames.map((name) => name.split("_")[0]),
@@ -224,17 +243,20 @@ export async function createCmsArchive(
   await mkdir(join(output, "objects"), { mode: 0o700 });
   await mkdir(join(output, "migrations"), { mode: 0o700 });
   await privateJson(join(output, "cms.json"), rows);
-  const migrations = [];
-  for (const name of migrationNames) {
+  const migrations: { name: string; sha256: string }[] = [];
+  await serial(migrationNames, async (name) => {
     const bytes = await readFile(join(migrationDir, name));
     await writeFile(join(output, "migrations", name), bytes, { mode: 0o600, flag: "wx" });
     migrations.push({ name, sha256: hash(bytes) });
-  }
+  });
   const objects: { name: string; file: string; bytes: number; sha256: string }[] = [];
   // Four concurrent anonymous reads, bounded by exported lengths and per-file timeouts.
-  for (let index = 0; index < storage.length; index += 4) {
+  const batches = Array.from({ length: Math.ceil(storage.length / 4) }, (_, index) =>
+    storage.slice(index * 4, index * 4 + 4),
+  );
+  await serial(batches, async (pending) => {
     const batch = await Promise.all(
-      storage.slice(index, index + 4).map(async (object) => {
+      pending.map(async (object) => {
         const bytes = await downloadImage(
           object.name,
           object.metadata.size,
@@ -248,7 +270,7 @@ export async function createCmsArchive(
     );
     objects.push(...batch);
     console.log(`Archived ${objects.length}/${storage.length} public objects`);
-  }
+  });
   await privateJson(join(output, "archive.json"), {
     format: "icdn-cms-archive-v1",
     cmsSha256: hash(await readFile(join(output, "cms.json"))),
@@ -306,12 +328,12 @@ export async function verifyArchive(output: string) {
     await db.exec(
       "SET TIME ZONE 'UTC'; CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role BYPASSRLS;",
     );
-    for (const migration of archive.migrations) {
+    await serial(archive.migrations, async (migration) => {
       const bytes = await readFile(join(output, "migrations", migration.name));
       assert.equal(hash(bytes), migration.sha256);
       await db.exec(bytes.toString());
-    }
-    for (const table of tables) {
+    });
+    await serial(tables, async (table) => {
       const columns = (
         await db.query<{ column_name: string }>(
           "SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name=$1 ORDER BY ordinal_position",
@@ -319,7 +341,7 @@ export async function verifyArchive(output: string) {
         )
       ).rows.map((row) => row.column_name);
       assert.deepEqual(columns, manifest.columns[table], `${table}: schema drift`);
-    }
+    });
     // The featured-link FK forms a destinations/links cycle. Defer FKs only in this
     // local transaction, then validate every row and restore their original modes.
     const foreignKeys = (
@@ -339,33 +361,39 @@ export async function verifyArchive(output: string) {
     await db.exec("BEGIN");
     // Editorial INSERT triggers recapture source text/URLs and would alter old drafts.
     // Suspend only USER triggers in this disposable database; FK checks stay active.
-    for (const table of tables)
-      await db.exec(`ALTER TABLE public.${quote(table)} DISABLE TRIGGER USER`);
-    for (const fk of foreignKeys)
-      await db.exec(
+    await serial(tables, (table) =>
+      db.exec(`ALTER TABLE public.${quote(table)} DISABLE TRIGGER USER`),
+    );
+    await serial(foreignKeys, (fk) =>
+      db.exec(
         `ALTER TABLE public.${quote(fk.table_name)} ALTER CONSTRAINT ${quote(fk.name)} DEFERRABLE INITIALLY DEFERRED`,
-      );
-    await db.exec(`TRUNCATE ${tables.map((table) => `public.${quote(table)}`).join(",")}`);
-    for (const table of tables)
-      await db.query(
+      ),
+    );
+    const qualifiedTables = tables.map((table) => "public." + quote(table)).join(",");
+    await db.exec(`TRUNCATE ${qualifiedTables}`);
+    await serial(tables, (table) =>
+      db.query(
         `INSERT INTO public.${quote(table)} SELECT * FROM jsonb_populate_recordset(NULL::public.${quote(table)}, $1::jsonb)`,
         [JSON.stringify(data[table])],
-      );
+      ),
+    );
     await db.exec("SET CONSTRAINTS ALL IMMEDIATE");
-    for (const fk of foreignKeys)
-      await db.exec(
-        `ALTER TABLE public.${quote(fk.table_name)} ALTER CONSTRAINT ${quote(fk.name)} ${fk.deferrable ? `DEFERRABLE INITIALLY ${fk.deferred ? "DEFERRED" : "IMMEDIATE"}` : "NOT DEFERRABLE"}`,
-      );
-    for (const table of tables)
-      await db.exec(`ALTER TABLE public.${quote(table)} ENABLE TRIGGER USER`);
+    await serial(foreignKeys, (fk) =>
+      db.exec(
+        `ALTER TABLE public.${quote(fk.table_name)} ALTER CONSTRAINT ${quote(fk.name)} ${constraintMode(fk)}`,
+      ),
+    );
+    await serial(tables, (table) =>
+      db.exec(`ALTER TABLE public.${quote(table)} ENABLE TRIGGER USER`),
+    );
     await db.exec("COMMIT");
-    for (const table of tables) {
+    await serial(tables, async (table) => {
       const actual = (
         await db.query<{ row: unknown }>(`SELECT to_jsonb(t) AS row FROM public.${quote(table)} t`)
       ).rows.map((item) => item.row);
       assert.equal(rowsHash(actual), rowsHash(data[table]!), `${table}: restored content differs`);
       counts[table] = { rows: actual.length, sha256: rowsHash(actual) };
-    }
+    });
     await db.exec("BEGIN; SET LOCAL ROLE anon");
     const catalogue = hubDataSchema
       .required()
@@ -374,11 +402,11 @@ export async function verifyArchive(output: string) {
           .rows[0]!.data,
       );
     assert.deepEqual(
-      catalogue.destinations.map((d) => d.id).sort(),
+      catalogue.destinations.map((d) => d.id).sort(alphabetical),
       data
         .destinations!.filter((d) => d.active === true)
-        .map((d) => d.id)
-        .sort(),
+        .map((d) => z.string().parse(d.id))
+        .sort(alphabetical),
       "All and only published cards must be readable",
     );
     const unsafeTables = (
@@ -387,7 +415,7 @@ export async function verifyArchive(output: string) {
       )
     ).rows;
     assert.deepEqual(unsafeTables, [], "Public tables must retain RLS and deny visitor writes");
-    for (const destination of catalogue.destinations) {
+    await serial(catalogue.destinations, async (destination) => {
       const card = destinationCardSchema.parse(
         (
           await db.query<{ data: unknown }>(
@@ -406,13 +434,13 @@ export async function verifyArchive(output: string) {
         ).rows[0]!.data,
       );
       publicCards++;
-    }
+    });
     await db.exec("ROLLBACK");
   } finally {
     await db.close();
   }
   await mkdir(join(recovery, "objects"), { mode: 0o700 });
-  for (const object of archive.objects) {
+  await serial(archive.objects, async (object) => {
     const source = join(output, "objects", object.file);
     assert.equal(
       hash(await readFile(source)),
@@ -425,7 +453,7 @@ export async function verifyArchive(output: string) {
       object.sha256,
       `Recovered bytes differ: ${object.name}`,
     );
-  }
+  });
   const result = {
     capturedAt: manifest.captured_at,
     checkedAt: new Date().toISOString(),
