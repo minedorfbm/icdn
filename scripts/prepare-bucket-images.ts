@@ -32,6 +32,12 @@ export async function prepareBucketImages(input: string, archiveDir: string, out
       object,
     ]),
   );
+  const reviewedSources = new Set(usages.map((usage) => usage.source));
+  const originalByHash = new Map<string, string>();
+  for (const [source, object] of [...originals].sort(([a], [b]) => a.localeCompare(b))) {
+    if (reviewedSources.has(source) && !originalByHash.has(object.sha256))
+      originalByHash.set(object.sha256, source);
+  }
   await fs.mkdir(output, { recursive: true, mode: 0o700 });
   for (const folder of ["masters", "upload", "cache"])
     await fs.mkdir(path.join(output, folder), { recursive: true });
@@ -93,7 +99,8 @@ export async function prepareBucketImages(input: string, archiveDir: string, out
     const width = metadata.autoOrient?.width ?? metadata.width;
     const height = metadata.autoOrient?.height ?? metadata.height;
     const format = metadata.format === "jpeg" ? "jpg" : metadata.format!;
-    const original = originals.has(source) ? source : await publish(bytes, "original." + format);
+    const existingMaster = originalByHash.get(hash);
+    const original = existingMaster ?? (await publish(bytes, "original." + format));
     // Vector logos stay vector; application icons retain PNG. Neither is rasterized.
     if (format === "svg" || /intercontinental-(favicon|touch-icon)\.png$/.test(source)) {
       return { aliases: [], original, src: original, width, height, variants: [] };
@@ -101,7 +108,7 @@ export async function prepareBucketImages(input: string, archiveDir: string, out
     const webp = await sharp(bytes).rotate().webp({ quality: 85, effort: 5 }).toBuffer();
     const native = format === "webp" && bytes.length <= webp.length ? bytes : webp;
     const src =
-      native === bytes && originals.has(source) ? source : await publish(native, "native.webp");
+      native === bytes && existingMaster ? existingMaster : await publish(native, "native.webp");
     const candidates: Candidate[] = [];
     for (const target of [320, 640, 960, 1280, 1600].filter((w) => w < width)) {
       const encoded = await sharp(bytes)
@@ -118,7 +125,9 @@ export async function prepareBucketImages(input: string, archiveDir: string, out
     candidates.push({ src, width, bytes: native.length });
     // AVIF is used by the existing detail picture element. Preserve native HD.
     const detail = usages.some(
-      (u) => u.source === source && (u.role === "Fiche agrandie" || u.role === "Galerie"),
+      (u) =>
+        (u.source === source || originals.get(u.source)?.sha256 === hash) &&
+        (u.role === "Fiche agrandie" || u.role === "Galerie"),
     );
     const avifs: Candidate[] = [];
     if (detail)
