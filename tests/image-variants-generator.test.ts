@@ -2,135 +2,117 @@ import { afterEach, expect, test } from "bun:test";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import sharp from "sharp";
-import { generateImageVariants } from "../scripts/generate-image-variants";
+import { prepareBucketImages } from "../scripts/prepare-bucket-images";
 
-const directories: string[] = [];
+const dirs: string[] = [];
+const prefix = "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/";
+const hash = (bytes: Buffer) => createHash("sha256").update(bytes).digest("hex");
 afterEach(async () => {
-  await Promise.all(
-    directories.splice(0).map((dir) => fs.rm(dir, { recursive: true, force: true })),
-  );
+  await Promise.all(dirs.splice(0).map((dir) => fs.rm(dir, { recursive: true, force: true })));
 });
 async function fixture() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "image-variants-test-"));
-  directories.push(root);
-  await fs.mkdir(path.join(root, "public/resort-map"), { recursive: true });
-  await fs.mkdir(path.join(root, "src/data"), { recursive: true });
-  await fs.writeFile(
-    path.join(root, "wrangler.json"),
-    JSON.stringify({
-      vars: {
-        SUPABASE_URL: "https://catalogue.example",
-        SUPABASE_PUBLISHABLE_KEY: "public-test-key",
-      },
-    }),
-  );
-  const photo = await sharp({
-    create: { width: 1800, height: 1200, channels: 3, background: "#123456" },
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "bucket-images-test-"));
+  dirs.push(root);
+  await fs.mkdir(path.join(root, "archive/objects"), { recursive: true });
+  const rgba = await sharp({
+    create: { width: 500, height: 1000, channels: 4, background: "#12345680" },
   })
     .png()
     .toBuffer();
-  await fs.writeFile(path.join(root, "public/resort-map/official.webp"), photo);
-  await fs.writeFile(path.join(root, "public/michelin-key.webp"), photo);
-  return { root, photo };
-}
-const prefix = "https://catalogue.example/storage/v1/object/public/hub-images/";
-test("generator publishes deterministic uncropped derivatives only for approved catalogue sources", async () => {
-  const { root, photo } = await fixture();
-  const originals = ["z", "a", "b", "c", "d"].map((id) => prefix + id + ".png");
-  const downloaded: string[] = [];
-  const request = async (url: string) => {
-    if (url.includes("/rest/v1/"))
-      return Response.json(
-        [
-          ...originals.map((image_key) => ({ image_key, detail_image_key: image_key })),
-          { image_key: originals[0] },
-          { image_key: null },
-          { image_key: "https://other.example/photo.png" },
-        ],
-        { headers: { "content-range": "0-7/8" } },
-      );
-    downloaded.push(url);
-    return new Response(photo, { headers: { "content-type": "image/png" } });
-  };
-  const summary = await generateImageVariants(root, request);
-  expect(summary.sources).toBe(5);
-  expect(downloaded).toHaveLength(5);
-  expect(summary.originalTotal).toBe(photo.length * 5);
-  expect(summary.optimizedTotal).toBeGreaterThan(0);
-  const manifestFile = path.join(root, "src/data/image-variants.json");
-  const before = await fs.readFile(manifestFile, "utf8");
-  const manifest = JSON.parse(before);
-  expect(Object.keys(manifest)).toEqual(Object.keys(manifest).sort((a, b) => a.localeCompare(b)));
-  for (const source of originals) {
-    expect(manifest[source].variants.map((item: { width: number }) => item.width)).toEqual([
-      320, 960, 1280, 1600,
-    ]);
-    expect(manifest[source].avifVariants.map((item: { width: number }) => item.width)).toEqual([
-      960, 1280,
-    ]);
-    for (const variant of manifest[source].avifVariants) {
-      const bytes = await fs.readFile(path.join(root, "public", variant.src));
-      const meta = await sharp(bytes).metadata();
-      expect(meta.width).toBe(variant.width);
-      expect(meta.height).toBe(Math.round((variant.width * 2) / 3));
-      expect(bytes).toHaveLength(variant.bytes);
-    }
-    const avif = manifest[source].avif;
-    expect(avif.width).toBe(1800);
-    const avifBytes = await fs.readFile(path.join(root, "public", avif.src));
-    expect((await sharp(avifBytes).metadata()).width).toBe(1800);
-    expect(avifBytes).toHaveLength(avif.bytes);
-    for (const variant of manifest[source].variants) {
-      const bytes = await fs.readFile(path.join(root, "public", variant.src));
-      const metadata = await sharp(bytes).metadata();
-      expect(bytes).toHaveLength(variant.bytes);
-      expect(metadata.width).toBe(variant.width);
-      expect(metadata.height).toBe(Math.round((variant.width * 2) / 3));
-    }
-  }
-  expect(await fs.readFile(path.join(root, "public/resort-map/official.webp"))).toEqual(photo);
-  await generateImageVariants(root, request);
-  expect(await fs.readFile(manifestFile, "utf8")).toBe(before);
-}, 30_000);
-
-test("generator rejects unavailable or truncated catalogues without publishing a manifest", async () => {
-  const { root } = await fixture();
-  for (const response of [
-    new Response("offline", { status: 503 }),
-    Response.json(null),
-    Response.json([], { headers: { "content-range": "0-0/2" } }),
-  ]) {
-    await expect(generateImageVariants(root, () => Promise.resolve(response))).rejects.toThrow();
-  }
-  expect(await fs.exists(path.join(root, "src/data/image-variants.json"))).toBe(false);
-});
-
-test("generator rejects invalid image responses and does not enlarge a tiny source", async () => {
-  const { root } = await fixture();
-  const rows = () => Response.json([{ image_key: prefix + "tiny" }]);
-  for (const image of [
-    new Response("missing", { status: 404 }),
-    new Response("not an image", { headers: { "content-type": "text/html" } }),
-  ]) {
-    await expect(
-      generateImageVariants(root, (url) =>
-        Promise.resolve(url.includes("/rest/") ? rows() : image),
-      ),
-    ).rejects.toThrow("Image unavailable");
-  }
-  const tiny = await sharp({ create: { width: 20, height: 20, channels: 3, background: "white" } })
-    .png()
+  const rotated = await sharp({
+    create: { width: 96, height: 48, channels: 3, background: "#abcdef" },
+  })
+    .jpeg()
+    .withMetadata({ orientation: 6 })
     .toBuffer();
-  await generateImageVariants(root, (url) =>
-    Promise.resolve(
-      url.includes("/rest/")
-        ? rows()
-        : new Response(tiny, { headers: { "content-type": "image/png" } }),
+  const sources = [
+    { name: "portrait.png", bytes: rgba },
+    { name: "alias.png", bytes: rgba },
+    { name: "rotated.jpg", bytes: rotated },
+  ];
+  const objects = sources.map(({ name, bytes }) => ({
+    name,
+    file: hash(bytes),
+    sha256: hash(bytes),
+  }));
+  for (const { bytes } of sources)
+    await fs.writeFile(path.join(root, "archive/objects", hash(bytes)), bytes);
+  await fs.writeFile(path.join(root, "archive/archive.json"), JSON.stringify({ objects }));
+  await fs.writeFile(
+    path.join(root, "input.json"),
+    JSON.stringify(sources.map(({ name }) => ({ source: prefix + name, role: "Fiche agrandie" }))),
+  );
+  return { root, sources, objects };
+}
+
+test("staging deduplicates originals, preserves orientation, transparency and native HD", async () => {
+  const { root, sources } = await fixture();
+  const output = path.join(root, "staging");
+  const summary = await prepareBucketImages(
+    path.join(root, "input.json"),
+    path.join(root, "archive"),
+    output,
+  );
+  expect(summary.sources).toBe(3);
+  expect(summary.uniqueImages).toBe(2);
+  const manifest = JSON.parse(await fs.readFile(path.join(output, "managed-images.json"), "utf8"));
+  type Image = {
+    aliases: string[];
+    width: number;
+    height: number;
+    src: string;
+    variants: { src: string; width: number }[];
+  };
+  const images = Object.values(manifest) as Image[];
+  const portrait = images.find((image) => image.aliases.includes(prefix + "portrait.png"))!;
+  expect(portrait.aliases).toContain(prefix + "alias.png");
+  expect([portrait.width, portrait.height]).toEqual([500, 1000]);
+  const native = await sharp(
+    path.join(output, "upload", portrait.src.slice(prefix.length)),
+  ).metadata();
+  expect(native.hasAlpha).toBe(true);
+  expect([native.width, native.height]).toEqual([500, 1000]);
+  const oriented = images.find((image) => image.aliases.includes(prefix + "rotated.jpg"))!;
+  expect([oriented.width, oriented.height]).toEqual([48, 96]);
+  for (const image of images)
+    for (const variant of image.variants) {
+      const meta = await sharp(
+        path.join(output, "upload", variant.src.slice(prefix.length)),
+      ).metadata();
+      expect(meta.width).toBe(variant.width);
+      expect(meta.height).toBe(Math.round((variant.width * image.height) / image.width));
+      expect(variant.width).toBeLessThanOrEqual(image.width);
+    }
+  for (const { bytes } of sources)
+    expect(await fs.readFile(path.join(root, "archive/objects", hash(bytes)))).toEqual(bytes);
+  const before = await fs.readFile(path.join(output, "managed-images.json"), "utf8");
+  await prepareBucketImages(path.join(root, "input.json"), path.join(root, "archive"), output);
+  expect(await fs.readFile(path.join(output, "managed-images.json"), "utf8")).toBe(before);
+}, 30000);
+
+test("staging rejects changed backup bytes and unreviewed hosts without publishing a manifest", async () => {
+  const { root, objects } = await fixture();
+  await fs.writeFile(path.join(root, "archive/objects", objects[0]!.file), "changed");
+  await expect(
+    prepareBucketImages(
+      path.join(root, "input.json"),
+      path.join(root, "archive"),
+      path.join(root, "bad"),
     ),
+  ).rejects.toThrow("Archive digest mismatch");
+  expect(await fs.exists(path.join(root, "bad/managed-images.json"))).toBe(false);
+  await fs.writeFile(
+    path.join(root, "input.json"),
+    JSON.stringify([{ source: "https://other.example/image.jpg", role: "test" }]),
   );
-  const manifest = JSON.parse(
-    await fs.readFile(path.join(root, "src/data/image-variants.json"), "utf8"),
-  );
-  expect(manifest[prefix + "tiny"]).toBeUndefined();
+  await expect(
+    prepareBucketImages(
+      path.join(root, "input.json"),
+      path.join(root, "archive"),
+      path.join(root, "unknown"),
+    ),
+  ).rejects.toThrow("reviewed host");
+  expect(await fs.exists(path.join(root, "unknown/managed-images.json"))).toBe(false);
 });

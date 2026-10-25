@@ -2,12 +2,17 @@ import { expect, test } from "./fixtures";
 import images from "../src/data/image-variants.json" with { type: "json" };
 const knownPhoto =
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/citron-detail-3b0c495a2769.webp";
-const photo = images[knownPhoto];
+const photo = Object.values(images).find((image) => image.aliases.includes(knownPhoto))! as {
+  src: string;
+  variants: { src: string }[];
+  avifVariants: { src: string }[];
+  avif: { src: string };
+};
 const photoPaths = new Set([
   new URL(knownPhoto).pathname,
-  ...photo.variants.map((v) => v.src),
-  ...photo.avifVariants.map((v) => v.src),
-  photo.avif.src,
+  ...photo.variants.map((v) => new URL(v.src).pathname),
+  ...photo.avifVariants.map((v) => new URL(v.src).pathname),
+  new URL(photo.avif.src).pathname,
 ]);
 for (const scenario of [
   { label: "new CMS photo", hero: "/intercontinental-touch-icon.png?card-detail-only=citron" },
@@ -25,8 +30,8 @@ for (const scenario of [
     if (scenario.hero === knownPhoto)
       await page.route(knownPhoto, (route) =>
         route.fulfill({
-          path: new URL("../public" + photo.variants.at(-1)!.src, import.meta.url).pathname,
-          contentType: "image/webp",
+          path: new URL("../public/intercontinental-touch-icon.png", import.meta.url).pathname,
+          contentType: "image/png",
         }),
       );
     const catalogue = await (
@@ -77,7 +82,7 @@ for (const scenario of [
         request.url().includes("card-detail-only=") ||
         (photoPaths.has(new URL(request.url()).pathname) &&
           // Visible desktop/tablet picker thumbnails are intentional, not hero transfers.
-          new URL(request.url()).pathname !== photo.variants[0].src)
+          new URL(request.url()).pathname !== new URL(photo.variants[0]!.src).pathname)
       )
         requests.push(request.url());
     });
@@ -118,7 +123,11 @@ for (const scenario of [
             .locator(".editorial-hero img")
             .evaluate((image: HTMLImageElement) => image.currentSrc),
         )
-        .toContain("/intercontinental-touch-icon.png");
+        .toBe(
+          Object.values(images).find((image) =>
+            image.aliases.includes("/intercontinental-touch-icon.png"),
+          )!.src,
+        );
       expect(requests).toHaveLength(1);
       await page.getByRole("button", { name: "Photo 1", exact: true }).click();
       await expect
@@ -166,14 +175,14 @@ test.describe("native responsive image on a direct route", () => {
   test("known AVIF keeps its original fallback available without hydration", async ({ page }) => {
     await page.route(knownPhoto, (route) =>
       route.fulfill({
-        path: new URL("../public" + photo.variants.at(-1)!.src, import.meta.url).pathname,
-        contentType: "image/webp",
+        path: new URL("../public/intercontinental-touch-icon.png", import.meta.url).pathname,
+        contentType: "image/png",
       }),
     );
     await page.goto("/design-digital-tour");
     const image = page.locator(".editorial-hero img");
-    await expect(image).toHaveAttribute("src", knownPhoto);
-    await expect(image).toHaveAttribute("srcset", new RegExp("citron-detail"));
+    await expect(image).toHaveAttribute("src", photo.src);
+    await expect(image).toHaveAttribute("srcset", new RegExp("/hub-images/adj-"));
     await expect(image).not.toHaveAttribute("loading", "lazy");
     await expect
       .poll(() =>

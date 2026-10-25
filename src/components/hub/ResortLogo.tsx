@@ -1,3 +1,5 @@
+import { imageSource } from "@/lib/image-source";
+
 /** Official resort artwork; every wordmark variant retains the original gold emblem. */
 export function ResortLogo({
   tone = "dark",
@@ -10,7 +12,7 @@ export function ResortLogo({
 }>) {
   return (
     <img
-      src={`/intercontinental-danang-logo-${tone}.svg`}
+      src={imageSource(`/intercontinental-danang-logo-${tone}.svg`)}
       alt="InterContinental Danang Sun Peninsula Resort"
       width={1230}
       height={384}

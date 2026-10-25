@@ -1,14 +1,25 @@
+import images from "../src/data/image-variants.json" with { type: "json" };
 import { expect, test } from "./fixtures";
 
 test("Nam Tram uses the angled cabin on the rail and the full front view in its selector", async ({
   page,
 }, testInfo) => {
+  const source = (file: string) =>
+    Object.values(images).find((image) => image.aliases.includes(`src/assets/${file}`))!.src;
+  for (const file of ["nam-tram-rail.webp", "nam-tram-selector.webp"]) {
+    await page.route(source(file), (route) =>
+      route.fulfill({
+        path: new URL(`../src/assets/${file}`, import.meta.url).pathname,
+        contentType: "image/webp",
+      }),
+    );
+  }
   await page.goto("/");
   await page.locator("section#heaven").scrollIntoViewIfNeeded();
   const rail = page.locator(".nam-tram-rail");
   await expect(rail).toBeVisible();
   const cabin = rail.locator("img");
-  await expect(cabin).toHaveAttribute("src", /nam-tram-rail/);
+  await expect(cabin).toHaveAttribute("src", source("nam-tram-rail.webp"));
   await expect
     .poll(() => cabin.evaluate((img) => (img as HTMLImageElement).naturalWidth))
     .toBe(240);
@@ -16,7 +27,7 @@ test("Nam Tram uses the angled cabin on the rail and the full front view in its 
   await rail.getByRole("button").click();
   const panel = page.locator(".nam-tram-panel");
   const artwork = panel.locator(".nam-tram-art img");
-  await expect(artwork).toHaveAttribute("src", /nam-tram-selector/);
+  await expect(artwork).toHaveAttribute("src", source("nam-tram-selector.webp"));
   await expect
     .poll(() => artwork.evaluate((img) => (img as HTMLImageElement).naturalWidth))
     .toBe(900);

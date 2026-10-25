@@ -4,6 +4,7 @@ import { InstagramIcon } from "@/components/ui/instagram-icon";
 import type { NativeInstagramPost } from "@/data/native-instagram-posts";
 import { instagramLink } from "@/lib/external-url";
 import { useI18n } from "@/i18n";
+import { responsiveImage } from "@/lib/responsive-image";
 
 /** Hosted photographs preserve the original carousel without a login-dependent iframe. */
 export function NativeInstagramPostCard({
@@ -42,7 +43,7 @@ export function NativeInstagramPostCard({
         {post.images.map((image, i) => (
           <img
             key={image}
-            src={image}
+            {...responsiveImage(image, "(min-width: 768px) 520px, 100vw")}
             alt={`${t("photo")} ${i + 1} / ${post.images.length} — @${post.account}`}
             loading="lazy"
             decoding="async"

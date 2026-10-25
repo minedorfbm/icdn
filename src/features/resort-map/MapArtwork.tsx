@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { ArchitectureArtwork } from "./ArchitectureArtwork";
 import { useI18n } from "@/i18n";
+import { imageSource } from "@/lib/image-source";
 import { mapCopy } from "./map-copy";
 import { ResortLevelIcon } from "@/components/hub/ResortLevelIcon";
 import type { Level } from "@/data/resort";
@@ -409,7 +410,7 @@ export function MapArtwork({
           <path className="forest-base" d={LANDMASS} fill="url(#forest-wash)" />
           <image
             className="canopy-texture"
-            href="/resort-map/canopy.webp"
+            href={imageSource("/resort-map/canopy.webp")}
             // Include the curved headland beyond the map's zero baseline.
             x="-100"
             y="-180"
@@ -509,7 +510,7 @@ export function MapArtwork({
         {referenceVisible && (
           <image
             className="official-plan-layer"
-            href="/resort-map/official.webp"
+            href={imageSource("/resort-map/official.webp")}
             {...REFERENCE_IMAGE}
             preserveAspectRatio="none"
           />
