@@ -1,4 +1,7 @@
 import { useCallback } from "react";
+import { preload } from "react-dom";
+import { useHub } from "@/data/hub-context";
+import { detailHeroPreload } from "./responsive-image";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { destinationSlug } from "@/lib/destination-route";
 import { loadDestinationMedia } from "./hub-client";
@@ -18,6 +21,7 @@ declare module "@tanstack/react-router" {
 /** Keep the hub mounted and preserve its scroll, collection and carousel state. */
 export function useDestinationNavigation() {
   const router = useRouter();
+  const { destinations } = useHub();
   const navigate = useNavigate();
   const location = useLocation();
   const isDestination = location.pathname !== "/";
@@ -25,6 +29,13 @@ export function useDestinationNavigation() {
     (destinationId: string, sequence?: string[]) => {
       const slug = destinationSlug(destinationId);
       if (location.pathname === `/${slug}`) return;
+      // Use only the selected public image while fresh publication data are fetched.
+      // This warms bytes, never a catalogue or card snapshot, and matches the final picture.
+      const destination = destinations.find((item) => item.id === destinationId);
+      if (destination?.detailImage) {
+        const { href, ...image } = detailHeroPreload(destination.detailImage);
+        preload(href, { ...image, as: "image", fetchPriority: "high" });
+      }
       // Start the independent media read alongside navigation, not after mounting.
       // The endpoint still verifies publication; errors remain retryable in the card.
       void loadDestinationMedia(destinationId).catch(() => {});
@@ -48,7 +59,7 @@ export function useDestinationNavigation() {
         resetScroll: false,
       });
     },
-    [navigate, isDestination, location.pathname, location.state],
+    [navigate, isDestination, location.pathname, location.state, destinations],
   );
   const openPreviousDestination = useCallback(() => {
     if (location.state.hubPreviousCard && location.state.__TSR_index > 0) router.history.back();

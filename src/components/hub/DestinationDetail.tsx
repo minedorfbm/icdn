@@ -51,7 +51,7 @@ function DestinationHero({ dest, onClose }: Readonly<{ dest: Destination; onClos
   const { t } = useI18n();
   const [selected, setSelected] = useState(0);
   const images = Array.from(new Set([dest.detailImage, dest.image]));
-  // Direct routes preload this picture in head; client-opened cards use fetchPriority.
+  // Direct routes preload in head; known client clicks start the same picture before route data.
   const firstImage = detailHeroImage(dest.detailImage);
   const desktopImage = detailHeroImage(images[selected]!);
   const mobileAvif = detailHeroAvif(dest.detailImage);
