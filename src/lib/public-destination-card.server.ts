@@ -1,12 +1,9 @@
+import { focusDestinationCard } from "./destination-card";
 import { readPublicCatalogue } from "./public-catalogue.server";
 import { completeCatalogue } from "./hub-data-completeness";
 import type { HubData } from "./hub-schema";
 import { publicDatabase } from "./public-collection.server";
-import {
-  destinationCardSchema,
-  focusDestinationCard,
-  type DestinationCardData,
-} from "./destination-card-schema";
+import { destinationCardSchema, type DestinationCardData } from "./destination-card-schema";
 
 /** Only the requested published card blocks its first HTML. RLS still runs as anon. */
 export async function readPublicDestinationCard(

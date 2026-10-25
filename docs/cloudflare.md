@@ -79,3 +79,11 @@ La photo principale connue est préparée dès le clic, pendant la lecture fraî
 Le `picture` conserve désormais une identité liée à ses deux sources et les attributs de secours sont appliqués après son attachement, avant le premier affichage. Le préchargement commence toujours dès le clic. Un accès direct rendu côté serveur garde immédiatement les attributs complets et son secours original, même sans JavaScript ; l’image principale n’est pas marquée `loading="lazy"`.
 
 La régression réseau couvre une source CMS inconnue, une source AVIF connue aux tailles mobile/tablette/desktop, les changements de photo et une dépublication. Elle exige une seule requête pour l’image principale par sélection ; les petites vignettes visibles du sélecteur restent intentionnelles. Ce contrôle des transferts ne donne pas un nouveau LCP global et ne remplace pas la validation physique à Da Nang.
+
+## Séparer la validation serveur de la présentation navigateur
+
+Les schémas des fiches, horaires, collections, annonces et avantages restent validés au serveur. Leurs fonctions d'affichage et d'adaptation importent uniquement les types des schémas ; elles ne construisent pas de validateurs dans le navigateur. Les lecteurs et leurs règles de publication, de sécurité et de cache restent inchangés.
+
+Comparaison locale du 26 octobre 2026 avec le même verrou de dépendances et le même build de production : fichier d'entrée de 480 257 à 386 536 octets, et de 146 786 à 120 564 octets avec la même compression gzip locale. L'analyse des sourcemaps temporaires ne trouve plus Zod ni l'initialisation `jitless` dans les chunks client. Ce relevé de poids ne représente pas un gain LCP mesuré, ni le transfert Brotli réel de Cloudflare. Les sourcemaps servent seulement à l'analyse locale ; elles ne sont pas activées dans la configuration publiée.
+
+`tests/presentation-boundary.test.ts` construit les fonctions de présentation pour le navigateur et vérifie qu'elles ne réintroduisent ni import Zod ni initialisation de la validation. Les tests de données continuent de vérifier les mêmes schémas et rejets au serveur.

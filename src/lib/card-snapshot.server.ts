@@ -1,3 +1,4 @@
+import { focusDestinationCard } from "./destination-card";
 import {
   CATALOGUE_CACHE_KEY,
   peekPublicSnapshot,
@@ -6,11 +7,7 @@ import {
 } from "./hub-cache.server";
 import { hubDataSchema } from "./hub-schema";
 import { completeCatalogue } from "./hub-data-completeness";
-import {
-  destinationCardSchema,
-  focusDestinationCard,
-  type DestinationCardData,
-} from "./destination-card-schema";
+import { destinationCardSchema, type DestinationCardData } from "./destination-card-schema";
 
 const cardSchema = destinationCardSchema.nullable();
 // A focused payload (including its scope marker) must never impersonate a full catalogue.

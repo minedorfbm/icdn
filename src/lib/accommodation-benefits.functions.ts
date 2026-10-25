@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "./validation";
 import { publicReader } from "./public-collection.server";
 import { publicCache, readPublicSnapshot } from "./hub-cache.server";
-import { benefitContent, benefitRow, benefitTranslationRow } from "./accommodation-benefits";
+import { benefitContent, benefitRow, benefitTranslationRow } from "./accommodation-benefits-schema";
 
 /** Requested only when Benefits is opened; anonymous RLS checks visible card ownership. */
 export const getAccommodationBenefits = createServerFn({ method: "GET" })

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import type { PGlite } from "@electric-sql/pglite";
-import { openingHoursRow } from "../src/lib/opening-hours";
+import { openingHoursRow } from "../src/lib/opening-hours-schema";
 import * as schema from "../src/lib/hub-schema";
 import { completeCatalogue } from "../src/lib/hub-data-completeness";
 

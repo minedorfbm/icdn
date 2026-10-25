@@ -4,7 +4,7 @@ import {
   getDestinationMedia,
   getDestinationCard,
 } from "./hub.functions";
-import { focusDestinationCard } from "./destination-card-schema";
+import { focusDestinationCard } from "./destination-card";
 import { completeCatalogue } from "./hub-data-completeness";
 import { createRequestCache } from "./request-cache";
 import type { HubData } from "./hub-schema";

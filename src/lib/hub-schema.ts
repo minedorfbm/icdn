@@ -1,4 +1,4 @@
-import { openingHoursRow } from "./opening-hours";
+import { openingHoursRow } from "./opening-hours-schema";
 import { z } from "./validation";
 
 // Validate at the server boundary; frontend types are inferred, never asserted from JSON.

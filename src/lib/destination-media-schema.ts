@@ -1,8 +1,8 @@
 import { z } from "./validation";
 import { photoRow, postRow, videoRow } from "./hub-schema";
-import { collectionItemRow } from "./destination-collection";
-import { destinationNoticeRow } from "./destination-notices";
-import { openingHoursRow } from "./opening-hours";
+import { collectionItemRow } from "./destination-collection-schema";
+import { destinationNoticeRow } from "./destination-notices-schema";
+import { openingHoursRow } from "./opening-hours-schema";
 
 export const destinationMediaSchema = z.object({
   collection: z.array(collectionItemRow).nullable(),

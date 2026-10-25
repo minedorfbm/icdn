@@ -5,7 +5,7 @@ import {
   cardHubData,
   focusDestinationCard,
   type DestinationCardData,
-} from "../src/lib/destination-card-schema";
+} from "../src/lib/destination-card";
 import type { HubData } from "../src/lib/hub-schema";
 
 const card: DestinationCardData = {

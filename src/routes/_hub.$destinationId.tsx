@@ -1,6 +1,6 @@
 import { useCardEntryMotion } from "@/lib/card-entry-context";
 import type { Destination } from "@/data/resort";
-import { cardHubData } from "@/lib/destination-card-schema";
+import { cardHubData } from "@/lib/destination-card";
 import { detailHeroPreload } from "@/lib/responsive-image";
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { loadDestinationCard, peekHubData } from "@/lib/hub-client";

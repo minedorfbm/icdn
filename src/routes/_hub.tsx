@@ -31,7 +31,7 @@ import {
   primeHubSnapshots,
 } from "@/lib/hub-client";
 import { canonicalDestinationId } from "@/lib/destination-route";
-import { cardHubData } from "@/lib/destination-card-schema";
+import { cardHubData } from "@/lib/destination-card";
 import { NavigationProgress } from "@/components/hub/NavigationProgress";
 import { I18nProvider, LanguageSwitch, useI18n } from "@/i18n";
 import { resolveHeroImage } from "@/data/hub-value";
