@@ -77,6 +77,18 @@ function fixedPdfBody(body: ReadableStream<Uint8Array>, length?: number) {
   return fixed.readable;
 }
 
+function pdfHeaders(metadata: PdfMetadata) {
+  const headers = new Headers({
+    "content-type": "application/pdf",
+    "cache-control": "public, max-age=3600",
+    "x-content-type-options": "nosniff",
+  });
+  if (metadata.length !== undefined) headers.set("content-length", String(metadata.length));
+  if (metadata.acceptsRanges) headers.set("accept-ranges", "bytes");
+  if (metadata.contentRange) headers.set("content-range", metadata.contentRange);
+  return headers;
+}
+
 /** Stream bounded public PDFs from the resort's exact HTTPS hosts. No redirects. */
 export async function serveResortPdf(
   request: Request,
@@ -116,19 +128,11 @@ export async function serveResortPdf(
       await upstream.body.cancel();
       return new Response(null, { status: 502 });
     }
-    const headers = new Headers({
-      "content-type": "application/pdf",
-      "cache-control": "public, max-age=3600",
-      "x-content-type-options": "nosniff",
-    });
-    if (metadata.length !== undefined) headers.set("content-length", String(metadata.length));
-    if (metadata.acceptsRanges) headers.set("accept-ranges", "bytes");
-    if (metadata.contentRange) headers.set("content-range", metadata.contentRange);
     return new Response(
       fixedPdfBody(boundedPdfBody(upstream.body, signal, metadata.length), metadata.length),
       {
         status: metadata.status,
-        headers,
+        headers: pdfHeaders(metadata),
       },
     );
   } catch {
