@@ -1,3 +1,4 @@
+import { CardEntryProvider } from "@/components/hub/CardEntryProvider";
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { Fragment, type CSSProperties } from "react";
 import { useChapterDocking } from "@/lib/use-chapter-docking";
@@ -175,7 +176,9 @@ function HubRoute() {
                     ) : (
                       <CatalogueStatus failed={result.failed} onRetry={retryCatalogue} />
                     ))}
-                  <Outlet />
+                  <CardEntryProvider>
+                    <Outlet />
+                  </CardEntryProvider>
                 </ResortMapProvider>
               </ResortBrowserProvider>
             </HubSearchProvider>

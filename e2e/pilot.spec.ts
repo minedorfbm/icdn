@@ -219,12 +219,15 @@ test("horizontal swipes navigate forward and back across current and legacy cata
   await page.goto("/la-maison-1888");
   const hero = page.locator(".editorial-hero img");
   await expect(hero).toBeVisible();
+  await expect(page.locator(".editorial-page")).toHaveCSS("animation-name", "none");
   expect(await swipe(hero, [290, 280], [80, 283])).toBe(true);
   await expect(page).toHaveURL("/wine-cellar");
+  await expect(page.locator(".editorial-page")).toHaveCSS("animation-name", "detail-in");
   const nextHero = page.locator("[data-destination-scroll] img").first();
   await expect(nextHero).toBeVisible();
   await swipe(nextHero, [80, 280], [290, 283]);
   await expect(page).toHaveURL("/la-maison-1888");
+  await expect(page.locator(".editorial-page")).toHaveCSS("animation-name", "detail-in");
   await expect(page.locator("[data-destination-scroll]")).toHaveJSProperty("scrollTop", 0);
 });
 

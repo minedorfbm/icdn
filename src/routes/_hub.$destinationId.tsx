@@ -1,3 +1,4 @@
+import { useCardEntryMotion } from "@/lib/card-entry-context";
 import type { Destination } from "@/data/resort";
 import { cardHubData } from "@/lib/destination-card-schema";
 import { detailHeroPreload } from "@/lib/responsive-image";
@@ -55,11 +56,13 @@ export const Route = createFileRoute("/_hub/$destinationId")({
 
 function DestinationRoute() {
   const destination = Route.useLoaderData();
+  const animateEntry = useCardEntryMotion();
   const { closeDestination } = useDestinationNavigation();
   return (
     <DestinationDetail
       key={destination.id}
       dest={destination}
+      animateEntry={animateEntry}
       onClose={closeDestination}
       aboveMap
       portalled={false}
