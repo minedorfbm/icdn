@@ -14,6 +14,14 @@ import portraitHero from "@/assets/hero-lobby-portrait-no-chandelier-e29f7810e97
 import landscapeHero from "@/assets/hero-lobby-landscape-no-chandelier-f06bd383569a.webp";
 import type { HubData } from "@/lib/hub.functions";
 
+// These versioned Storage files match the bundled photographs byte for byte.
+// Exact references only: a CMS replacement or query variant keeps its own URL.
+const heroStorage = "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/";
+const bundledHeroes: Readonly<Record<string, string>> = {
+  [heroStorage + "hero-lobby-portrait-no-chandelier-e29f7810e97a.webp"]: portraitHero,
+  [heroStorage + "hero-lobby-landscape-no-chandelier-f06bd383569a.webp"]: landscapeHero,
+};
+
 interface HubLevel {
   id: Level;
   title: string;
@@ -44,7 +52,8 @@ export function resolveHeroImage(
     format === "landscape"
       ? (settings?.["hero_image_landscape"] ?? settings?.["hero_image"])
       : settings?.["hero_image"];
-  return resolveImage(reference ?? "") || (format === "landscape" ? landscapeHero : portraitHero);
+  const image = resolveImage(reference ?? "");
+  return bundledHeroes[image] ?? (image || (format === "landscape" ? landscapeHero : portraitHero));
 }
 
 export function createHubValue(data?: HubData): HubValue {

@@ -273,4 +273,32 @@ describe("CMS image URLs", () => {
       LEVELS[0]!.image,
     );
   });
+  test("versioned lobby photos reuse their bundled copies in either CMS field", () => {
+    const base = "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/";
+    const portrait = base + "hero-lobby-portrait-no-chandelier-e29f7810e97a.webp";
+    const landscape = base + "hero-lobby-landscape-no-chandelier-f06bd383569a.webp";
+    const configured = { settings: { hero_image: portrait, hero_image_landscape: landscape } };
+    expect(resolveHeroImage(configured)).toBe(resolveHeroImage());
+    expect(resolveHeroImage(configured, "landscape")).toBe(
+      resolveHeroImage(undefined, "landscape"),
+    );
+    // Landscape still follows the CMS portrait setting when its own field is absent.
+    expect(resolveHeroImage({ settings: { hero_image: portrait } }, "landscape")).toBe(
+      resolveHeroImage(),
+    );
+  });
+  test("CMS replacements and query variants never reuse a different bundled photograph", () => {
+    const original =
+      "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/hero-lobby-portrait-no-chandelier-e29f7810e97a.webp";
+    for (const image of [
+      original + "?version=2",
+      original.replace("e29f7810e97a", "new-photo"),
+      original.replace("cxcffaegqyvbhrpzpowa", "another-project"),
+      "https://example.com/custom-hero.webp",
+    ]) {
+      const configured = { settings: { hero_image: image, hero_image_landscape: image } };
+      expect(resolveHeroImage(configured)).toBe(image);
+      expect(resolveHeroImage(configured, "landscape")).toBe(image);
+    }
+  });
 });
