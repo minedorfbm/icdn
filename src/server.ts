@@ -2,10 +2,9 @@ import { requestLanguage } from "./i18n/preferred-language";
 import type { Lang } from "./i18n/dictionary";
 import { renderErrorPage } from "./lib/error-page";
 import { withSecurityHeaders } from "./lib/security-headers";
+import { createCspNonce } from "./lib/csp-nonce";
 
-type ServerEntry = {
-  fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
-};
+type ServerEntry = typeof import("@tanstack/react-start/server-entry").default;
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
@@ -22,6 +21,7 @@ async function normalizeCatastrophicSsrResponse(
   response: Response,
   requestId: string,
   lang: Lang,
+  nonce: string,
 ): Promise<Response> {
   if (response.status < 500) return response;
   const contentType = response.headers.get("content-type") ?? "";
@@ -31,7 +31,7 @@ async function normalizeCatastrophicSsrResponse(
   if (!isH3SwallowedErrorBody(body)) return response;
 
   console.error("[ssr] Upstream handler returned an unhandled error", { requestId });
-  return new Response(renderErrorPage(lang), {
+  return new Response(renderErrorPage(lang, nonce), {
     status: 500,
     headers: { "content-type": "text/html; charset=utf-8" },
   });
@@ -47,23 +47,30 @@ function isH3SwallowedErrorBody(body: string): boolean {
 }
 
 export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
+  async fetch(request: Request, options?: Parameters<ServerEntry["fetch"]>[1]) {
     const requestId = crypto.randomUUID();
+    const nonce = createCspNonce();
     const lang = requestLanguage(request.headers.get("accept-language"));
     try {
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
+      const response = await handler.fetch(request, {
+        ...options,
+        context: { ...options?.context, nonce },
+      });
       return withSecurityHeaders(
-        await normalizeCatastrophicSsrResponse(response, requestId, lang),
+        await normalizeCatastrophicSsrResponse(response, requestId, lang, nonce),
         request,
+        nonce,
       );
     } catch (error) {
       console.error("[ssr] Request failed", { requestId, error });
       return withSecurityHeaders(
-        new Response(renderErrorPage(lang), {
+        new Response(renderErrorPage(lang, nonce), {
           status: 500,
           headers: { "content-type": "text/html; charset=utf-8" },
         }),
+        request,
+        nonce,
       );
     }
   },

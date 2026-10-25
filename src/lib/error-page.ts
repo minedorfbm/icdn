@@ -1,6 +1,7 @@
 import { UI, type Lang } from "../i18n/dictionary";
+import { cspNonce } from "./csp-nonce";
 
-export function renderErrorPage(lang: Lang = "en"): string {
+export function renderErrorPage(lang: Lang = "en", nonce?: string): string {
   const copy = UI[lang];
   const translations = Object.fromEntries(
     Object.entries(UI).map(([locale, labels]) => [
@@ -14,6 +15,7 @@ export function renderErrorPage(lang: Lang = "en"): string {
     ]),
   );
   const serialized = JSON.stringify(translations).replaceAll("<", String.raw`\u003c`);
+  const scriptNonce = cspNonce(nonce);
   return `<!doctype html>
 <html lang="${lang}">
   <head>
@@ -40,7 +42,7 @@ export function renderErrorPage(lang: Lang = "en"): string {
         <a id="error-home" class="secondary" href="/">${copy.go_home}</a>
       </div>
     </div>
-    <script>
+    <script${scriptNonce ? ` nonce="${scriptNonce}"` : ""}>
       (() => {
         document.getElementById("error-retry").addEventListener("click", () => location.reload());
         const translations = ${serialized};

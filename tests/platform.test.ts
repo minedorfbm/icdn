@@ -20,9 +20,7 @@ describe("Worker response security", () => {
     expect(policy).toContain("https://www.tablecheck.com");
     expect(policy).toContain("worker-src 'self' blob:");
     expect(policy).toContain("script-src-attr 'none'");
-    expect(policy).toContain(
-      "script-src 'self' 'unsafe-inline' https://www.instagram.com https://www.youtube.com",
-    );
+    expect(policy).toContain("script-src 'self' https://www.instagram.com https://www.youtube.com");
     expect(policy).toContain("connect-src 'self' https://www.instagram.com");
     expect(policy).not.toContain("'unsafe-eval'");
     expect(response.status).toBe(201);
