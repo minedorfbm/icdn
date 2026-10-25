@@ -57,6 +57,9 @@ export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }
         <FullscreenDialog
           title={mapCopy(lang, "title")}
           onClose={close}
+          // Keep map and SSR card dialogs as siblings: a body portal would hide
+          // the card's main ancestor while the map stays mounted behind it.
+          portalled={false}
           overlayClassName="fixed inset-0 z-[89] bg-black/40"
           className="fixed inset-0 z-[90] h-dvh overflow-hidden brand-ui brand-surface"
         >
