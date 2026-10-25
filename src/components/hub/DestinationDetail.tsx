@@ -157,7 +157,14 @@ export function DestinationDetail({
   onClose,
   aboveMap = false,
   portalled = true,
-}: Readonly<{ dest: Destination; onClose: () => void; aboveMap?: boolean; portalled?: boolean }>) {
+  animateEntry = true,
+}: Readonly<{
+  dest: Destination;
+  onClose: () => void;
+  aboveMap?: boolean;
+  portalled?: boolean;
+  animateEntry?: boolean;
+}>) {
   const { media, pending, failed, retry } = useDestinationMedia(dest.id, dest.initialHours);
   const { ref: swipeRef, ...journey } = useDestinationSwipe(dest.id);
   const { lang, t, action, linkLabel, description, detailDescription, event } = useI18n();
@@ -197,7 +204,10 @@ export function DestinationDetail({
         data-destination-scroll
         className="h-full overflow-x-hidden overflow-y-auto overscroll-x-none overscroll-y-contain"
       >
-        <article className="editorial-page detail-enter" data-destination-id={dest.id}>
+        <article
+          className={`editorial-page${animateEntry ? " detail-enter" : ""}`}
+          data-destination-id={dest.id}
+        >
           <DestinationHero key={dest.id} dest={dest} onClose={onClose} />
           <div className="editorial-body">
             <div className="editorial-intro">
