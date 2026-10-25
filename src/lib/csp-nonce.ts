@@ -1,6 +1,6 @@
 /** Fresh 128-bit script authorization for one response; never retained in a cache. */
 export function createCspNonce(): string {
-  return btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
+  return btoa(String.fromCodePoint(...crypto.getRandomValues(new Uint8Array(16))));
 }
 
 /** Only accept the format generated above when reading request context or writing HTML. */

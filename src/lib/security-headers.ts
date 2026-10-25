@@ -34,7 +34,8 @@ export function withSecurityHeaders(
 ): Response {
   const headers = new Headers(response.headers);
   const scriptNonce = cspNonce(nonce);
-  const scripts = `script-src 'self'${scriptNonce ? ` 'nonce-${scriptNonce}'` : ""} https://www.instagram.com https://www.youtube.com`;
+  const authorization = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
+  const scripts = `script-src 'self'${authorization} https://www.instagram.com https://www.youtube.com`;
   const resources = `${RESOURCE_POLICY}; ${scripts}`;
   // Supersede the observation header if an upstream response still carries it.
   headers.delete("content-security-policy-report-only");
