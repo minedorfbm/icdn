@@ -1,6 +1,60 @@
 # Base Supabase : cohérence et publication
 
-> État de maintenance au 14 octobre 2026 : les procédures de septembre ci-dessous sont historiques, pas une liste de scripts à rejouer. Le journal de production contient 41 versions et s’arrête au 30 septembre ; 17 fichiers plus récents ont des effets déjà présents en base sans journal complet. Voir l’[audit code et sécurité](audits/code-security-2026-10-14.md) avant toute synchronisation. `bun run migrations:check` contrôle les noms et doublons locaux ; il ne certifie pas la synchronisation de la base.
+> Dernier relevé vérifié : **25 octobre 2026, après la PR 170**, sur le projet `cxcffaegqyvbhrpzpowa`. Le journal contient **92 versions**, jusqu’à `20261025010001`, avec la même empreinte de liste que les migrations de [`main` à cette révision](https://github.com/minedorfbm/icdn/tree/004ab0e201c5af37af4afb1b5c2c85266c72d33d/supabase/migrations). Ce contrôle porte sur les identifiants enregistrés, pas sur l’identité de tous les effets SQL ni sur une restauration. Les comptages de septembre et de l’[audit du 14 octobre](audits/code-security-2026-10-14.md) sont historiques. **Ne pas rejouer les anciennes migrations éditoriales, lancer un `db push` global ou réparer le journal sans examiner l’état réellement installé.**
+
+## Procédure de maintenance actuelle
+
+1. Vérifier le projet ciblé, la révision Git fusionnée et les résultats des déploiements Supabase et Cloudflare. Relever le journal en lecture seule avec la requête ci-dessous. Une fusion et un test local réussis ne prouvent pas que la base distante a été mise à jour.
+2. Préparer chaque changement de schéma ou de droits dans **un nouveau fichier** de `supabase/migrations`, avec une version unique. Conserver les fichiers déjà fusionnés. Une modification éditoriale courante passe par les tables de contenu existantes ; elle ne nécessite pas de rejouer la migration qui les avait initialisées.
+3. Exécuter `bun run migrations:check` pour les noms et doublons, puis `bun run migrations:test` pour reconstruire une base PostgreSQL locale jetable et vérifier les permissions et les contrats publics. Ce second contrôle utilise PGlite et ne se connecte pas à Supabase. Il ne restaure ni le contenu actuel du CMS ni les fichiers Storage.
+4. Avant une opération distante, vérifier la sauvegarde disponible et le plan de retour correspondant au changement. Faire relire le SQL et les effets attendus dans la PR. Préserver la compatibilité pendant les déploiements indépendants de la base et du frontend.
+5. Fusionner normalement la PR approuvée ; l’intégration Supabase applique les migrations non enregistrées. Vérifier sa réussite et celle du Worker, puis relire le journal et contrôler le comportement public attendu. Si une étape échoue ou si le journal diverge, examiner la cause ; ne pas marquer une migration comme appliquée pour masquer l’écart.
+6. Pour revenir sur le code, utiliser un commit de revert normal. Cela **n’annule pas** une migration SQL ni une modification de contenu. Un retour en base nécessite une correction relue ou une restauration vérifiée ; ne pas réinitialiser la production ou réécrire l’historique Git.
+
+### Contrôle du journal en lecture seule
+
+```sql
+SELECT
+  count(*) AS recorded_versions,
+  max(version) AS latest_recorded_version,
+  md5(string_agg(version, ',' ORDER BY version)) AS version_set_checksum
+FROM supabase_migrations.schema_migrations;
+```
+
+Au relevé du 25 octobre : `92`, `20261025010001`, `81ea7069fd45f497acbeb5e064183f86`. Cette empreinte sert à comparer la liste ordonnée des versions ; ce n’est ni une signature de sécurité ni une empreinte des corps SQL. Refaire la comparaison après les futures migrations au lieu de conserver ces valeurs comme une cible permanente. Une égalité de nombre ou de dernière version ne suffit pas à établir l’égalité de la liste.
+
+Le [suivi de réconciliation d’octobre](audits/reliability-followup-2026-10-14.md) explique la correction de l’ancien journal sans rejouer les contenus. Il décrit une opération passée, pas une procédure automatique de réparation. La [documentation Supabase sur les migrations](https://supabase.com/docs/guides/deployment/database-migrations) distingue également l’exécution du SQL du suivi de son historique.
+
+## Lecture publique et caches
+
+Les lectures serveur utilisent exclusivement le client anonyme, avec validation des réponses et politiques RLS du visiteur. Les trois fonctions de snapshot sont `STABLE`, `SECURITY INVOKER`, avec un `search_path` fixé et des colonnes publiques explicites.
+
+| Arrivée du visiteur | Données attendues avant le premier HTML | Chargements suivants |
+| --- | --- | --- |
+| Accueil | Réglages publics `site_settings` | Catalogue complet en arrière-plan |
+| Fiche ouverte directement | Réglages et fiche publiée via `published_hub_destination_card_v1` ; horaires initiaux inclus | Catalogue complet en arrière-plan, médias propres à la fiche |
+| Autre fiche avec un catalogue valide | Projection de la fiche demandée depuis ce catalogue | Médias propres à la nouvelle fiche |
+
+Les réglages et la fiche directe sont demandés **en parallèle**, pas successivement. `published_hub_catalogue_v1()` regroupe les collections publiques du catalogue, horaires inclus. `published_hub_destination_media_v1(id)` vérifie la publication et regroupe galerie, posts, vidéos, horaires, actualités et sous-cards. Les médias plus récents gardent la priorité sur les horaires initiaux, y compris une liste volontairement vide.
+
+| Cache serveur | Clé à la révision PR 170 | Expiration |
+| --- | --- | --- |
+| Réglages | `settings-v1` | 2 minutes strictes |
+| Catalogue complet | `catalogue-v11` | 2 minutes strictes |
+| Fiche ciblée | `card-v3/{id}` | 2 minutes strictes |
+| Médias d’une fiche | `media-v4/{id}` | 2 minutes strictes |
+
+Les [clés et délais serveur](../src/lib/hub-cache.server.ts), la [projection de fiche](../src/lib/card-snapshot.server.ts) et les [lectures](../src/lib/hub.functions.ts) font foi si ces contrats évoluent. Une fiche extraite d’un catalogue ne crée pas une nouvelle entrée et ne renouvelle pas son expiration. Les réponses partielles ou en échec ne sont pas conservées ; une expiration ne ressuscite pas un contenu plus ancien. Le cache navigateur partage les requêtes en cours et conserve les réponses complètes jusqu’à 30 secondes, indépendamment du cache serveur. Les réglages publics ne doivent contenir aucun secret.
+
+Seule l’erreur de fonction absente `PGRST202` active les lecteurs de compatibilité. Une panne, une permission refusée ou une réponse invalide reste une erreur relançable par l’interface, sans nouvelle salve de lectures ni tentative automatique du SDK. Chaque appel Supabase est borné à 8 secondes ; ce délai n’est pas une promesse de temps total de page.
+
+`Server-Timing` distingue réglages, catalogue, fiche et médias ainsi que leur provenance (`cache`, `catalogue-cache`, `database`, `rpc`, `compatibility`). La durée comprend le travail applicatif de validation et de cache ; elle ne mesure pas uniquement le SQL ni l’affichage complet. Comparer les lectures hors cache entre elles et conserver les conditions de mesure. Une réponse en cache ne prouve pas à elle seule que la fonction distante est installée.
+
+## Sauvegarde et restauration : validation restante
+
+La reconstruction locale des migrations et le contrôle des 92 versions ne constituent **pas** un exercice de restauration. Les [sauvegardes de base Supabase](https://supabase.com/docs/guides/platform/backups) contiennent les métadonnées Storage, pas les fichiers stockés eux-mêmes.
+
+Avant de déclarer la restauration validée, réaliser un exercice sur une cible isolée : vérifier les sauvegardes disponibles, restaurer le schéma et les données nécessaires, recopier les fichiers Storage correspondants, puis vérifier les références d’images, les droits publics et le fonctionnement des fiches et lecteurs. Relever la date de la source, les vérifications et le temps nécessaire. Ne pas connecter le Worker de production à cette cible et ne pas réutiliser ou publier ses secrets. **Cet exercice reste à effectuer ; aucune restauration distante n’est exécutée par les commandes de contrôle ci-dessus.**
 
 
 ## Collections et navigation
@@ -11,7 +65,7 @@ Le hub utilise trois collections communes aux quatre niveaux : **DINING**, **WEL
 - **WELLNESS** : spa, soins, sport, yoga, piscines, plages, Relaxation Pavilion et Spa Lagoon Villas.
 - **EXPERIENCES** : art, activités famille, lieux à explorer, événements, offres et IHG One Rewards.
 
-À l'issue de cette répartition, les 43 cards visibles sont réparties ainsi :
+Comptage historique à l’issue de la migration du 25 septembre : les 43 cards alors visibles étaient réparties ainsi. Ce tableau n’est pas l’inventaire actuel :
 
 | Niveau | DINING | WELLNESS | EXPERIENCES |
 | ------ | -----: | -------: | ----------: |
@@ -36,7 +90,7 @@ ORDER BY l.display_order, d.cluster;
 
 ## Vidéos YouTube
 
-La migration [`20260925130000_destination_videos.sql`](../supabase/migrations/20260925130000_destination_videos.sql) ajoute la table `destination_videos` au projet `cxcffaegqyvbhrpzpowa` et publie la vidéo officielle fournie pour `mi-sol-spa`. Elle a été appliquée au projet de production le 25 septembre 2026 ; la requête de contrôle a confirmé une seule ligne active pour `mi-sol-spa`. **Ne pas rejouer l'historique complet des migrations** sur cette base. Le fichier est réexécutable sans dupliquer cette vidéo si l'intégration GitHub le reprend. La table active RLS et n'autorise la lecture publique que pour une vidéo active appartenant à un lieu actif.
+La migration historique [`20260925130000_destination_videos.sql`](../supabase/migrations/20260925130000_destination_videos.sql) ajoute la table `destination_videos` au projet `cxcffaegqyvbhrpzpowa` et publie la vidéo officielle initiale de `mi-sol-spa`. Le contrôle du 25 septembre 2026 confirmait une seule ligne active pour ce lieu ; ce n’est pas le comptage actuel. **Ne pas rejouer cette migration pour ajouter une vidéo.** La table active RLS et n’autorise la lecture publique que pour une vidéo active appartenant à un lieu actif.
 
 Pour préparer une vidéo, créer une ligne dans `destination_videos` avec l'identifiant exact de la card dans `destination_id`, l'URL officielle YouTube en HTTPS dans `video_url`, un `title` et, si souhaité, un objet `title_translations` avec les clés `vi`, `ru`, `zh`, `ko` et `ja`. Régler `display_order` pour l'ordre d'affichage. Laisser `active = false` pendant la préparation, puis le passer à `true` pour publier. Une URL non reconnue est ignorée par le hub ; formats acceptés : `youtube.com/watch?v=…`, `youtu.be/…`, `youtube.com/shorts/…` et `youtube.com/live/…`. Utiliser le lien `/shorts/…` pour obtenir le lecteur vertical 9:16 ; un lien `/watch?v=…` reste affiché en 16:9, même s'il désigne le même Short. Vérifier que le propriétaire de la vidéo autorise l'intégration. Une modification peut mettre environ deux minutes à apparaître à cause du cache.
 
@@ -64,13 +118,9 @@ Les libellés standard des boutons restent traduits par le dictionnaire du site.
 
 ## Déployer les protections
 
-1. Sauvegarder la base. Vérifier que le projet ciblé est bien `cxcffaegqyvbhrpzpowa` et que les tables de contenu sont présentes.
-2. Dans le SQL Editor du projet, exécuter **seulement** `supabase/migrations/20260923120000_content_integrity.sql`, puis `supabase/migrations/20260923121000_translation_lifecycle.sql`. Chaque fichier est transactionnel ; une erreur annule son propre changement.
-3. Vérifier que les neuf tables ont toujours RLS activé, que les politiques de lecture des quatre tables enfants incluent le lieu actif, et que les traductions comportent les dates de suivi. Lancer `bun run i18n:audit:database` et les vérifications du hub.
-4. Fusionner la PR et vérifier le site mobile. Ces deux migrations n'enlèvent aucune colonne : elles peuvent être appliquées avant ou après le nouveau Worker. Aucun bouton `BOOK` ne doit apparaître du seul fait d'un ancien `booking_message`.
-5. **Après** validation du nouveau Worker en production et de la décision éditoriale sur les quatre boutons, exécuter séparément `supabase/migrations/20260924120000_retire_legacy_action_columns.sql`. Ce fichier refuse de supprimer les anciennes colonnes si un lien réel n'a pas été repris dans `destination_links`. Il n'excepte que les quatre liens génériques vers l'accueil du resort. Ne pas lancer cette étape sur l'ancien Worker, qui lit encore ces colonnes.
+Cette ancienne section concernait le déploiement de septembre. Les migrations `20260923120000_content_integrity.sql`, `20260923121000_translation_lifecycle.sql` et `20260924120000_retire_legacy_action_columns.sql` appartiennent désormais à l’historique enregistré. **Ne pas les réexécuter comme des étapes d’installation actuelles.** Pour une nouvelle évolution, suivre la [procédure de maintenance actuelle](#procédure-de-maintenance-actuelle).
 
-Ces protections empêchent désormais la suppression accidentelle en cascade d'un niveau, d'un lieu ou d'un événement possédant encore des contenus liés. Utiliser `active = false` pour retirer un lieu du site. Une suppression définitive nécessite de traiter explicitement ses dépendances.
+Les protections existantes empêchent la suppression accidentelle en cascade d’un niveau, d’un lieu ou d’un événement possédant encore des contenus liés. Utiliser `active = false` pour retirer un lieu du site. Une suppression définitive nécessite de traiter explicitement ses dépendances. Les anciens champs de réservation ne doivent pas créer un bouton `BOOK` sans véritable lien publié.
 
 ## État constaté avant migration
 
