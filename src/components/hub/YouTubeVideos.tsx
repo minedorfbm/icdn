@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { DestinationVideo } from "@/data/resort";
 import { useI18n } from "@/i18n";
+import { imageSource } from "@/lib/image-source";
 
 function YouTubeVideo({
   video,
@@ -72,7 +73,7 @@ function DeferredYouTubePlayer({
         />
       ) : (
         <img
-          src={`https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`}
+          src={imageSource(`https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`)}
           alt=""
           width={480}
           height={360}

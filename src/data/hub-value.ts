@@ -10,8 +10,7 @@ import {
   type Destination,
   type Level,
 } from "@/data/resort";
-import portraitHero from "@/assets/hero-lobby-portrait-no-chandelier-e29f7810e97a.webp";
-import landscapeHero from "@/assets/hero-lobby-landscape-no-chandelier-f06bd383569a.webp";
+import { imageSource } from "@/lib/image-source";
 import type { HubData } from "@/lib/hub.functions";
 
 interface HubLevel {
@@ -44,7 +43,14 @@ export function resolveHeroImage(
     format === "landscape"
       ? (settings?.["hero_image_landscape"] ?? settings?.["hero_image"])
       : settings?.["hero_image"];
-  return resolveImage(reference ?? "") || (format === "landscape" ? landscapeHero : portraitHero);
+  return (
+    resolveImage(reference ?? "") ||
+    imageSource(
+      format === "landscape"
+        ? "src/assets/hero-lobby-landscape-no-chandelier-f06bd383569a.webp"
+        : "src/assets/hero-lobby-portrait-no-chandelier-e29f7810e97a.webp",
+    )
+  );
 }
 
 export function createHubValue(data?: HubData): HubValue {

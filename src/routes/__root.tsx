@@ -6,6 +6,7 @@ import { useErrorCopy } from "../i18n/use-error-copy";
 import { NotFoundPage } from "../components/NotFoundPage";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { imageSource } from "../lib/image-source";
 
 function ErrorComponent({ error }: Readonly<{ error: unknown }>) {
   const router = useRouter();
@@ -86,8 +87,17 @@ export const Route = createRootRoute({
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/intercontinental-favicon.png", type: "image/png", sizes: "32x32" },
-      { rel: "apple-touch-icon", href: "/intercontinental-touch-icon.png", sizes: "180x180" },
+      {
+        rel: "icon",
+        href: imageSource("/intercontinental-favicon.png"),
+        type: "image/png",
+        sizes: "32x32",
+      },
+      {
+        rel: "apple-touch-icon",
+        href: imageSource("/intercontinental-touch-icon.png"),
+        sizes: "180x180",
+      },
     ],
   }),
   shellComponent: RootShell,

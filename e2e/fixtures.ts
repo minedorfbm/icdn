@@ -17,6 +17,16 @@ export const test = base.extend({
     await context.route("https://www.youtube-nocookie.com/embed/**", (route) =>
       route.fulfill({ contentType: "text/html", body: "<button>YouTube Play</button>" }),
     );
+    // Layout/network-priority tests use a deterministic image. Real Storage files
+    // are separately verified by digest and decoded before publishing the manifest.
+    await context.route(
+      "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/**",
+      (route) =>
+        route.fulfill({
+          path: new URL("../public/intercontinental-touch-icon.png", import.meta.url).pathname,
+          contentType: "image/png",
+        }),
+    );
     if (process.env["HUB_BROWSER_COVERAGE"] !== "1") {
       await runWithContext(context);
       return;

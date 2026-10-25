@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { existsSync } from "node:fs";
+import { imageSource } from "../src/lib/image-source";
 import {
   thumbnail,
   responsiveImage,
@@ -15,14 +15,21 @@ test("new CMS photographs keep their original URL until derivatives are publishe
   expect(responsiveImage(source, "75vw")).toEqual({ src: source });
 });
 
-test("every generated reference is deployed, and HD remains available as a responsive candidate", () => {
+const bucket = "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/";
+test("every generated source stays in Storage, including aliases and native fallback", () => {
   for (const [source, image] of Object.entries(images)) {
+    expect(source).toStartWith(bucket);
     for (const variant of image.variants) {
-      expect(existsSync(new URL(`../public${variant.src}`, import.meta.url))).toBe(true);
+      expect(variant.src).toStartWith(bucket);
       expect(variant.bytes).toBeGreaterThan(0);
     }
-    expect(thumbnail(source)).toBe(image.variants[0]!.src);
-    if (source.startsWith("https:")) {
+    expect(thumbnail(source)).toBe(image.variants[0]?.src ?? source);
+    for (const alias of image.aliases) {
+      expect(imageSource(alias)).toBe(source);
+      expect(responsiveImage(alias, "900px")).toEqual(responsiveImage(source, "900px"));
+      expect(detailHeroPreload(alias)).toEqual(detailHeroPreload(source));
+    }
+    if (image.variants.length) {
       const card = responsiveImage(source, "900px");
       expect(card.srcSet).toContain(`${source} ${image.width}w`);
       expect(card.sizes).toBe("900px");
@@ -58,11 +65,11 @@ test("AVIF preloads agree with the native source and retain a fallback for new C
       if ("avifVariants" in image)
         for (const variant of image.avifVariants) {
           expect(avif?.srcSet).toContain(`${variant.src} ${variant.width}w`);
-          expect(existsSync(new URL(`../public${variant.src}`, import.meta.url))).toBe(true);
+          expect(variant.src).toStartWith(bucket);
         }
       expect(preload.imageSrcSet).toBe(avif?.srcSet);
       expect(preload.imageSizes).toBe(avif?.sizes);
-      expect(existsSync(new URL(`../public${image.avif.src}`, import.meta.url))).toBe(true);
+      expect(image.avif.src).toStartWith(bucket);
       expect(preload.href).toBe(image.avif.src);
       expect(preload.type).toBe("image/avif");
     } else {
