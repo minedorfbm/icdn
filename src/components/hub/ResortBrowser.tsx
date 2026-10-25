@@ -3,6 +3,7 @@ import {
   Suspense,
   createContext,
   useContext,
+  useCallback,
   useEffect,
   useState,
   type ComponentPropsWithoutRef,
@@ -85,7 +86,8 @@ export function ResortLink({
 function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClose: () => void }>) {
   const { t } = useI18n();
   const pdf = isResortPdf(page.url);
-  const [loading, setLoading] = useState(!pdf);
+  const [loading, setLoading] = useState(true);
+  const loaded = useCallback(() => setLoading(false), []);
 
   useEffect(() => {
     // Cross-origin frames do not reliably report failures. Never leave an endless loader;
@@ -131,29 +133,34 @@ function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClos
             <ExternalLink aria-hidden className="size-[19px]" strokeWidth={1.5} />
           </a>
         </div>
-        <output className="sr-only">{loading ? t("page_loading") : ""}</output>
-        {loading && (
-          <div
-            aria-hidden="true"
-            className="absolute bottom-0 left-0 h-px w-1/3 animate-pulse bg-[var(--brand-accent)]"
+      </header>
+      <div className="relative flex min-h-0 flex-1 flex-col">
+        {pdf ? (
+          <Suspense fallback={null}>
+            <PdfMenu url={page.url} title={page.title} onReady={loaded} />
+          </Suspense>
+        ) : (
+          <iframe
+            src={page.url}
+            title={page.title}
+            className="min-h-0 w-full flex-1 border-0 bg-white"
+            referrerPolicy="strict-origin-when-cross-origin"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
+            allow="fullscreen"
+            onLoad={loaded}
           />
         )}
-      </header>
-      {pdf ? (
-        <Suspense fallback={<p className="p-4 text-sm">{t("page_loading")}</p>}>
-          <PdfMenu url={page.url} title={page.title} />
-        </Suspense>
-      ) : (
-        <iframe
-          src={page.url}
-          title={page.title}
-          className="min-h-0 w-full flex-1 border-0 bg-white"
-          referrerPolicy="strict-origin-when-cross-origin"
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"
-          allow="fullscreen"
-          onLoad={() => setLoading(false)}
-        />
-      )}
+        {loading && (
+          <div
+            role="status"
+            className={`absolute inset-0 z-10 grid place-items-center${pdf ? "" : " pointer-events-none"}`}
+          >
+            <p className="rounded-full brand-floating px-6 py-3 text-center text-sm">
+              {t("page_loading")}
+            </p>
+          </div>
+        )}
+      </div>
     </FullscreenDialog>
   );
 }

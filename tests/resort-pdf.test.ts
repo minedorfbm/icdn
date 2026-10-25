@@ -119,3 +119,153 @@ test("PDF content type accepts case-insensitive MIME with valid parameters", asy
   expect(result.status).toBe(200);
   expect(await result.text()).toBe("%PDF-1.4");
 });
+
+test("known-length PDFs expose range capability without buffering the whole document", async () => {
+  let release!: () => void;
+  const pending = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const upstream = new Response(
+    new ReadableStream({
+      async pull(controller) {
+        await pending;
+        controller.enqueue(new TextEncoder().encode("%PDF-1.4"));
+        controller.close();
+      },
+    }),
+    {
+      headers: {
+        "content-type": "application/pdf",
+        "content-length": "8",
+        "accept-ranges": "bytes",
+      },
+    },
+  );
+  const result = await serveResortPdf(proxy(source), (async () => upstream) as typeof fetch);
+  expect(result.headers.get("content-length")).toBe("8");
+  expect(result.headers.get("accept-ranges")).toBe("bytes");
+  release();
+  expect(await result.text()).toBe("%PDF-1.4");
+});
+
+test("one bounded range is forwarded, validated and returned as partial content", async () => {
+  const request = new Request(proxy(source), {
+    headers: { range: "bytes=10-13", cookie: "private=1", authorization: "Bearer private" },
+  });
+  const result = await serveResortPdf(request, (async (_input, init) => {
+    expect(new Headers(init?.headers).get("range")).toBe("bytes=10-13");
+    expect(new Headers(init?.headers).get("cookie")).toBeNull();
+    expect(new Headers(init?.headers).get("authorization")).toBeNull();
+    return new Response("test", {
+      status: 206,
+      headers: {
+        "content-type": "application/pdf",
+        "content-range": "bytes 10-13/100",
+        "content-length": "4",
+      },
+    });
+  }) as typeof fetch);
+  expect(result.status).toBe(206);
+  expect(result.headers.get("content-range")).toBe("bytes 10-13/100");
+  expect(result.headers.get("content-length")).toBe("4");
+  expect(result.headers.get("accept-ranges")).toBe("bytes");
+  expect(await result.text()).toBe("test");
+});
+
+test("the final range can be shorter when it reaches the document's end", async () => {
+  const result = await serveResortPdf(
+    new Request(proxy(source), { headers: { range: "bytes=6-20" } }),
+    (async () =>
+      new Response(".4", {
+        status: 206,
+        headers: { "content-type": "application/pdf", "content-range": "bytes 6-7/8" },
+      })) as typeof fetch,
+  );
+  expect(result.status).toBe(206);
+  expect(result.headers.get("content-length")).toBe("2");
+  expect(await result.text()).toBe(".4");
+});
+
+test("multipart, open, reversed and excessive ranges never reach the origin", async () => {
+  const forbidden = [
+    "",
+    "bytes=0-",
+    "bytes=-20",
+    "bytes=10-1",
+    "bytes=0-1,4-5",
+    "bytes=0-33554432",
+    "bytes=33554432-33554433",
+    "bytes=9007199254740992-9007199254740993",
+  ];
+  for (const range of forbidden) {
+    const result = await serveResortPdf(new Request(proxy(source), { headers: { range } }), (() => {
+      throw new Error("Unexpected fetch");
+    }) as typeof fetch);
+    expect(result.status).toBe(416);
+  }
+});
+
+test("invalid range responses cannot masquerade as complete or unlimited PDFs", async () => {
+  for (const headers of [
+    {},
+    { "content-range": "bytes 1-4/100" },
+    { "content-range": "bytes 0-4/100" },
+    { "content-range": "bytes 0-3/33554433" },
+    { "content-range": "bytes 0-3/*" },
+    { "content-range": "bytes 0-3/100", "content-length": "5" },
+    { "content-range": "bytes 0-3/100", "content-length": "4e0" },
+    { "content-range": "bytes 0-3/100", "content-encoding": "gzip" },
+  ]) {
+    let cancelled = false;
+    const upstream = new Response(
+      new ReadableStream({
+        cancel() {
+          cancelled = true;
+        },
+      }),
+      { status: 206, headers: { ...headers, "content-type": "application/pdf" } },
+    );
+    const result = await serveResortPdf(
+      new Request(proxy(source), { headers: { range: "bytes=0-3" } }),
+      (async () => upstream) as typeof fetch,
+    );
+    expect(result.status).toBe(502);
+    expect(cancelled).toBe(true);
+  }
+  const unsolicited = await serveResortPdf(
+    proxy(source),
+    (async () =>
+      new Response("test", {
+        status: 206,
+        headers: { "content-type": "application/pdf", "content-range": "bytes 0-3/4" },
+      })) as typeof fetch,
+  );
+  expect(unsolicited.status).toBe(502);
+});
+
+test("a server that ignores ranges safely falls back to a complete bounded PDF", async () => {
+  const result = await serveResortPdf(
+    new Request(proxy(source), { headers: { range: "bytes=0-3" } }),
+    (async () =>
+      new Response("%PDF-1.4", {
+        headers: { "content-type": "application/pdf", "content-length": "8" },
+      })) as typeof fetch,
+  );
+  expect(result.status).toBe(200);
+  expect(result.headers.get("content-range")).toBeNull();
+  expect(await result.text()).toBe("%PDF-1.4");
+});
+
+test("truncated and overlong partial bodies fail even when their headers look valid", async () => {
+  for (const body of ["abc", "abcde"]) {
+    const result = await serveResortPdf(
+      new Request(proxy(source), { headers: { range: "bytes=0-3" } }),
+      (async () =>
+        new Response(body, {
+          status: 206,
+          headers: { "content-type": "application/pdf", "content-range": "bytes 0-3/100" },
+        })) as typeof fetch,
+    );
+    await expect(result.text()).rejects.toThrow();
+  }
+});
