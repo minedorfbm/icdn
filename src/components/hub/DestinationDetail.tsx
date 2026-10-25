@@ -158,7 +158,7 @@ export function DestinationDetail({
   aboveMap = false,
   portalled = true,
 }: Readonly<{ dest: Destination; onClose: () => void; aboveMap?: boolean; portalled?: boolean }>) {
-  const { media, pending, failed, retry } = useDestinationMedia(dest.id);
+  const { media, pending, failed, retry } = useDestinationMedia(dest.id, dest.initialHours);
   const { ref: swipeRef, ...journey } = useDestinationSwipe(dest.id);
   const { lang, t, action, linkLabel, description, detailDescription, event } = useI18n();
   const { openMap, locate } = useResortMap();

@@ -64,7 +64,7 @@ test("a warm complete catalogue supplies exactly the requested card without a da
   );
   expect(hits).toBe(1);
   expect(writes).toEqual([]);
-  expect(entries.has(prefix + "card-v2/citron")).toBe(false);
+  expect(entries.has(prefix + "card-v3/citron")).toBe(false);
   expect(entries.get(prefix + CATALOGUE_CACHE_KEY)!.headers.get("x-hub-expires")).toBe("120000");
   let reads = 0;
   expect(
@@ -79,14 +79,14 @@ test("a warm complete catalogue supplies exactly the requested card without a da
     ),
   ).toEqual(card);
   expect(reads).toBe(1);
-  expect(writes).toEqual([prefix + "card-v2/citron"]);
+  expect(writes).toEqual([prefix + "card-v3/citron"]);
 });
 
 test("the card's own newer snapshot takes precedence over an older catalogue", async () => {
   const { cache, seed, writes } = fixture();
   seed(CATALOGUE_CACHE_KEY, fullCatalogue());
   const newer = { ...card, destination: { ...card.destination, short_description: "Updated" } };
-  seed("card-v2/citron", newer);
+  seed("card-v3/citron", newer);
   expect(await readCardSnapshot("citron", unexpectedRead, cache, 1)).toEqual(newer);
   expect(writes).toEqual([]);
 });
@@ -104,6 +104,7 @@ test("a destination absent or unpublished in the valid catalogue stays unpublish
 
 test.each([
   { ...fullCatalogue(), links: null },
+  { ...fullCatalogue(), openingHours: null },
   { ...fullCatalogue(), editorial: { descriptions: null, events: [] } },
   cardHubData(card),
   { levels: "invalid" },
@@ -151,7 +152,7 @@ test.each([
   "foreign or inactive card cache entries are ignored and a future-dated catalogue is rejected: %j",
   async (destination) => {
     const { cache, seed } = fixture();
-    seed("card-v2/citron", { ...card, destination });
+    seed("card-v3/citron", { ...card, destination });
     seed(CATALOGUE_CACHE_KEY, fullCatalogue(), 999_999);
     let reads = 0;
     expect(

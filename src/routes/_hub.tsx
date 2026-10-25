@@ -132,7 +132,7 @@ function HubRoute() {
     if (result.data) return;
     let current = true;
     setResult({ data: null, failed: false });
-    loadHubData().then(
+    loadHubData({ background: attempt === 0 }).then(
       (data) => {
         if (current) setResult({ data, failed: false });
       },

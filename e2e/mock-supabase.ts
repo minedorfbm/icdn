@@ -406,6 +406,7 @@ serve({
       const mapLinks = belongs("map_destination_links");
       return Response.json({
         destination,
+        hours: belongs("destination_opening_hours"),
         links,
         events,
         mapLinks,
@@ -462,6 +463,7 @@ serve({
     if (url.pathname === "/rest/v1/rpc/published_hub_catalogue_v1") {
       if (delay) await Bun.sleep(delay);
       return Response.json({
+        openingHours: tables.destination_opening_hours ?? [],
         levels: tables.levels,
         destinations: tables.destinations,
         links: tables.destination_links,

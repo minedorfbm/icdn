@@ -42,6 +42,27 @@ export async function checkDestinationCardSnapshot(db: PGlite) {
   } finally {
     await db.exec("ROLLBACK");
   }
+  await db.exec(
+    "BEGIN; UPDATE destination_opening_hours SET published=false WHERE destination_id='citron'; SET LOCAL ROLE anon",
+  );
+  try {
+    assert.deepEqual(destinationCardSchema.parse(await read("citron")).hours, []);
+    const full = hubDataSchema.parse(
+      (await db.query<{ data: unknown }>("SELECT public.published_hub_catalogue_v1() AS data"))
+        .rows[0]!.data,
+    );
+    assert.ok(!full.openingHours!.some((row) => row.destination_id === "citron"));
+  } finally {
+    await db.exec("ROLLBACK");
+  }
+  await db.exec(
+    "BEGIN; REVOKE SELECT ON public.destination_opening_hours FROM anon; SET LOCAL ROLE anon",
+  );
+  try {
+    await assert.rejects(read("citron"), /permission denied/);
+  } finally {
+    await db.exec("ROLLBACK");
+  }
   const properties = (
     await db.query<{ prosecdef: boolean; provolatile: string; proconfig: string[] }>(
       "SELECT prosecdef,provolatile,proconfig FROM pg_proc WHERE oid='public.published_hub_destination_card_v1(text)'::regprocedure",

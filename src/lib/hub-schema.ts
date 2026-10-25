@@ -1,3 +1,4 @@
+import { openingHoursRow } from "./opening-hours";
 import { z } from "./validation";
 
 // Validate at the server boundary; frontend types are inferred, never asserted from JSON.
@@ -174,6 +175,8 @@ export const eventTranslationRow = z.object({
 });
 export const settingRow = z.object({ key: text, value: text });
 export const hubDataSchema = z.object({
+  // Optional during independent database/frontend deployments.
+  openingHours: z.array(openingHoursRow).nullable().optional(),
   relations: z.array(destinationRelationRow).nullable().optional(),
   levels: z.array(levelRow).nullable(),
   destinations: z.array(destinationRow).nullable(),

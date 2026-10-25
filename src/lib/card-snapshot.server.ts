@@ -25,7 +25,7 @@ export async function readCardSnapshot(
   now = Date.now(),
   onCatalogueHit?: () => void,
 ): Promise<DestinationCardData | null> {
-  const key = `card-v2/${id}`;
+  const key = `card-v3/${id}`;
   const completeCard = (data: DestinationCardData | null) =>
     data !== null && data.destination.id === id && data.destination.active;
   const card = await peekPublicSnapshot(key, cardSchema, completeCard, cache, now);

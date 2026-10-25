@@ -1,3 +1,4 @@
+import type { OpeningHours } from "@/lib/opening-hours";
 import type { z } from "zod";
 import type {
   linkRow,
@@ -66,6 +67,8 @@ type DestinationContentFamily = "resort" | "offer" | "storytelling";
 type DestinationAudience = "adult" | "all" | "kids";
 
 export interface Destination {
+  /** Published hours available before the independent media read completes. */
+  initialHours?: OpeningHours[];
   id: string;
   name: string;
   level: Level;
