@@ -20,6 +20,20 @@ type Image = {
   avifVariants?: Candidate[];
 };
 
+// Encoding each size in order bounds native Sharp memory, rather than launching
+// all variants of two HD sources together.
+async function sequentialMap<T, R>(items: T[], transform: (item: T) => Promise<R>): Promise<R[]> {
+  const results: R[] = [];
+  await items.reduce(
+    (previous, item) =>
+      previous.then(async () => {
+        results.push(await transform(item));
+      }),
+    Promise.resolve(),
+  );
+  return results;
+}
+
 export async function prepareBucketImages(input: string, archiveDir: string, output: string) {
   const root = path.resolve(import.meta.dir, "..");
   if (![input, archiveDir, output].every(path.isAbsolute)) throw new Error("Use absolute paths");
@@ -39,8 +53,11 @@ export async function prepareBucketImages(input: string, archiveDir: string, out
       originalByHash.set(object.sha256, source);
   }
   await fs.mkdir(output, { recursive: true, mode: 0o700 });
-  for (const folder of ["masters", "upload", "cache"])
-    await fs.mkdir(path.join(output, folder), { recursive: true });
+  await Promise.all(
+    ["masters", "upload", "cache"].map((folder) =>
+      fs.mkdir(path.join(output, folder), { recursive: true }),
+    ),
+  );
   const entries: Record<string, Image> = {};
   const upload = new Map<
     string,
@@ -109,19 +126,21 @@ export async function prepareBucketImages(input: string, archiveDir: string, out
     const native = format === "webp" && bytes.length <= webp.length ? bytes : webp;
     const src =
       native === bytes && existingMaster ? existingMaster : await publish(native, "native.webp");
-    const candidates: Candidate[] = [];
-    for (const target of [320, 640, 960, 1280, 1600].filter((w) => w < width)) {
-      const encoded = await sharp(bytes)
-        .rotate()
-        .resize({ width: target, withoutEnlargement: true })
-        .webp({ quality: 85, effort: 5 })
-        .toBuffer();
-      candidates.push({
-        src: await publish(encoded, target + ".webp"),
-        width: target,
-        bytes: encoded.length,
-      });
-    }
+    const candidates = await sequentialMap(
+      [320, 640, 960, 1280, 1600].filter((w) => w < width),
+      async (target): Promise<Candidate> => {
+        const encoded = await sharp(bytes)
+          .rotate()
+          .resize({ width: target, withoutEnlargement: true })
+          .webp({ quality: 85, effort: 5 })
+          .toBuffer();
+        return {
+          src: await publish(encoded, target + ".webp"),
+          width: target,
+          bytes: encoded.length,
+        };
+      },
+    );
     candidates.push({ src, width, bytes: native.length });
     // AVIF is used by the existing detail picture element. Preserve native HD.
     const detail = usages.some(
@@ -129,20 +148,21 @@ export async function prepareBucketImages(input: string, archiveDir: string, out
         (u.source === source || originals.get(u.source)?.sha256 === hash) &&
         (u.role === "Fiche agrandie" || u.role === "Galerie"),
     );
-    const avifs: Candidate[] = [];
-    if (detail)
-      for (const target of [...[960, 1280].filter((w) => w < width), width]) {
+    const avifs = await sequentialMap(
+      detail ? [...[960, 1280].filter((w) => w < width), width] : [],
+      async (target): Promise<Candidate> => {
         const encoded = await sharp(bytes)
           .rotate()
           .resize({ width: target, withoutEnlargement: true })
           .avif({ quality: 60, effort: 4, chromaSubsampling: "4:2:0" })
           .toBuffer();
-        avifs.push({
+        return {
           src: await publish(encoded, target + ".avif"),
           width: target,
           bytes: encoded.length,
-        });
-      }
+        };
+      },
+    );
     audit.push({
       source,
       originalBytes: bytes.length,
@@ -159,33 +179,32 @@ export async function prepareBucketImages(input: string, archiveDir: string, out
       ...(avifs.length ? { avif: avifs.at(-1), avifVariants: avifs.slice(0, -1) } : {}),
     };
   }
-  const sources = [...new Set(usages.map((u) => u.source))].sort();
+  const sources = [...new Set(usages.map((u) => u.source))].sort((a, b) => a.localeCompare(b));
   let finished = 0;
   // Two encoders bound CPU/memory use; existing masters are reused from backup.
-  async function worker() {
-    for (;;) {
-      const source = sources.shift();
-      if (!source) return;
-      const bytes = await load(source);
-      const key = digest(bytes);
-      let result = processing.get(key);
-      if (!result) {
-        result = encode(source, bytes);
-        processing.set(key, result);
-      }
-      const image = await result;
-      image.aliases.push(source);
-      entries[image.src] = image;
-      finished++;
-      if (finished % 5 === 0) console.log(`Prepared ${finished} sources`);
-      await fs.writeFile(
-        path.join(output, "progress.json"),
-        JSON.stringify({ finished, images: Object.keys(entries).length, files: upload.size }),
-      );
+  async function worker(): Promise<void> {
+    const source = sources.shift();
+    if (!source) return;
+    const bytes = await load(source);
+    const key = digest(bytes);
+    let result = processing.get(key);
+    if (!result) {
+      result = encode(source, bytes);
+      processing.set(key, result);
     }
+    const image = await result;
+    image.aliases.push(source);
+    entries[image.src] = image;
+    finished++;
+    if (finished % 5 === 0) console.log(`Prepared ${finished} sources`);
+    await fs.writeFile(
+      path.join(output, "progress.json"),
+      JSON.stringify({ finished, images: Object.keys(entries).length, files: upload.size }),
+    );
+    return worker();
   }
   await Promise.all([worker(), worker()]);
-  for (const image of Object.values(entries)) image.aliases.sort();
+  for (const image of Object.values(entries)) image.aliases.sort((a, b) => a.localeCompare(b));
   const manifest = Object.fromEntries(
     Object.entries(entries).sort(([a], [b]) => a.localeCompare(b)),
   );
