@@ -33,6 +33,49 @@ Le preset Nitro est `cloudflare-module`. `@lovable.dev/vite-tanstack-config` res
 
 Le Worker applique les restrictions de ressources précédemment testées en observation : scripts locaux, Instagram et YouTube ; connexions locales et Instagram ; iframes limitées aux fournisseurs approuvés. Les PDF passent par le serveur du hub, les lectures Supabase restent côté serveur et le lecteur PDF utilise un worker local/blob. Les styles Google Fonts et leurs polices restent autorisés. Les images et médias HTTPS restent possibles pour le catalogue.
 
-Le rendu serveur nécessite encore les scripts inline. Les gestionnaires inline (`onclick`, etc.) et l’évaluation dynamique (`eval`/`Function`) restent bloqués. Cette politique limite les ressources chargées ; elle ne garantit ni l’absence de vulnérabilité ni la disponibilité des services tiers.
+Le rendu serveur autorise ses scripts inline avec un nonce propre à chaque réponse, sans permission générale `unsafe-inline` pour les scripts. Les gestionnaires inline (`onclick`, etc.) et l’évaluation dynamique (`eval`/`Function`) restent bloqués. Cette politique limite les ressources chargées ; elle ne garantit ni l’absence de vulnérabilité ni la disponibilité des services tiers.
 
 L’ancien en-tête `Content-Security-Policy-Report-Only` est retiré. Aucun collecteur de rapports, suivi supplémentaire ou requête récurrente n’est ajouté. L’exception d’intégration par `artdigitaljourney.com` reste limitée aux deux pages de démonstration prévues. Toute nouvelle origine de script, connexion ou iframe doit être vérifiée avant d’être autorisée dans `src/lib/security-headers.ts`.
+
+## Pilote de placement des prévisualisations
+
+Les prévisualisations activent `placement.mode = "smart"`. La production garde son placement actuel : la section `previews` est une configuration distincte. Ce pilote cherche à réduire le trajet entre le Worker et Supabase lorsque les caches sont froids. Il ne change ni les lectures publiques, ni les règles RLS, ni l’expiration des caches, ni la présentation.
+
+Mesures du 25 octobre 2026 sur trois fiches publiques (Citron, Tingara, Wine Cellar), puis une seconde lecture des mêmes fiches :
+
+| Mesure                                            | Résultat                                                | Portée                                                                                                         |
+| ------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Lecture `card` fraîche vue depuis le Worker       | 487–1 202 ms, médiane 623 ms                            | Trois appels, inclut réseau, traitement et cache ; pas seulement SQL                                           |
+| Lecture `card` avec cache serveur valide          | 6–90 ms, médiane 7 ms                                   | Trois appels, durée serveur ; pas le rendu complet                                                             |
+| Requête PostgREST de fiche dans Query Performance | Moyenne 20 ms, minimum 4 ms, maximum 338 ms, 370 appels | Statistiques accumulées de production, période de remise à zéro non déterminée ; plusieurs révisions possibles |
+| Temps amont annoncé par la passerelle Supabase    | 36–46 ms                                                | Trois lectures anonymes directes ; inclut le traitement amont et son réseau local                              |
+
+Ces chiffres rendent le trajet réseau prioritaire à examiner. Ils ne prouvent pas qu’un placement différent accélérera le site. Les requêtes du poste sont entrées par le point Cloudflare MRS ; elles ne représentent pas un parcours mesuré au Vietnam ni un LCP mobile. Aucun pourcentage de gain visiteur n’est établi.
+
+### Référence géographique : Da Nang
+
+Le public prioritaire utilise le site depuis Da Nang, Vietnam. Le tableau Supabase du projet confirme actuellement **Oceania (Sydney), `ap-southeast-2`**. Ne pas déduire la région de la base du seul nom de domaine Supabase ou de son adresse IP publique.
+
+Les mesures entrées par MRS sont un diagnostic de couches, pas une validation locale. Le critère d’acceptation doit inclure un réseau Wi-Fi de Da Nang et un réseau mobile vietnamien, sur un appareil physique. Conserver la date, le type de connexion et le point d’entrée réseau observé, sans enregistrer l’adresse IP du visiteur. Une mesure située à Singapour peut servir de repère régional, mais doit rester étiquetée comme telle.
+
+Le placement Smart ne déplace pas la base hors de Sydney et peut rester au réglage par défaut s’il n’observe aucun gain. Ne pas forcer le Worker à Sydney : les lectures avec cache valide pourraient alors payer un trajet supplémentaire. Une migration Supabase vers une autre région est un chantier distinct qui nécessite comparaison depuis Da Nang, sauvegarde, validation des contenus et des URL Storage, ainsi qu’un plan de bascule et de retour. Ce pilote ne crée pas de nouveau projet et ne modifie pas le projet actuel.
+
+### Conditions de validation
+
+Selon la [documentation Cloudflare du placement](https://developers.cloudflare.com/workers/configuration/placement/), Smart Placement a besoin de trafic provenant de plusieurs emplacements et peut prendre jusqu’à quinze minutes pour établir une décision. Une prévisualisation déployée ou un seul poste de mesure ne prouvent pas que le placement a été optimisé. Si l’état est `INSUFFICIENT_INVOCATIONS`, le pilote est non concluant.
+
+Avant toute activation en production, relever le statut de placement dans le tableau Cloudflare et comparer des lectures fraîches et en cache sur les mêmes fiches, à plusieurs heures et depuis les zones utilisées par les visiteurs. Comparer le TTFB complet et les métriques `Server-Timing`, séparément des temps d’exécution SQL. Vérifier aussi les erreurs et les lecteurs PDF/pages externes. Ne pas allonger les caches pour produire un gain apparent, ni vider les caches de production pour le test.
+
+Les ressources statiques restent servies au plus près du visiteur avec la configuration actuelle d’Assets : ne pas ajouter `run_worker_first: true`. Voir la [documentation Assets et Smart Placement](https://developers.cloudflare.com/workers/static-assets/binding/#smart-placement). Un accès explicite via la liaison `ASSETS` peut suivre le lieu du Worker ; le pilote doit donc mesurer aussi les chemins de lecture concernés.
+
+Le retour au réglage précédent consiste à retirer `previews.placement` et redéployer la prévisualisation. Un déploiement de production ne doit pas être décrit comme optimisé tant que son propre placement et ses mesures ne l’ont pas confirmé.
+
+Le sens de `x-envoy-upstream-service-time` est décrit dans la [documentation Envoy](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-upstream-service-time) ; il ne remplace pas un plan d’exécution SQL.
+
+## Transfert des photos de fiche sur WebKit
+
+La photo principale connue est préparée dès le clic, pendant la lecture fraîche des données. Lors d’une navigation côté navigateur, WebKit pouvait aussi demander le WebP de secours avant que le nouvel élément `img` ne soit associé aux sources de son `picture`. Le remplacement de sources dans un même `picture` pouvait également déclencher l’ancien secours.
+
+Le `picture` conserve désormais une identité liée à ses deux sources et les attributs de secours sont appliqués après son attachement, avant le premier affichage. Le préchargement commence toujours dès le clic. Un accès direct rendu côté serveur garde immédiatement les attributs complets et son secours original, même sans JavaScript ; l’image principale n’est pas marquée `loading="lazy"`.
+
+La régression réseau couvre une source CMS inconnue, une source AVIF connue aux tailles mobile/tablette/desktop, les changements de photo et une dépublication. Elle exige une seule requête pour l’image principale par sélection ; les petites vignettes visibles du sélecteur restent intentionnelles. Ce contrôle des transferts ne donne pas un nouveau LCP global et ne remplace pas la validation physique à Da Nang.

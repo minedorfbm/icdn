@@ -15,6 +15,9 @@
     "vars": {
       "SUPABASE_URL": "https://cxcffaegqyvbhrpzpowa.supabase.co",
       "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_fCrshqSxyDVJe3LXQbTHYw_CMH_tVI9"
+    },
+    "placement": {
+      "mode": "smart"
     }
   }
 }
