@@ -43,6 +43,7 @@ test("the enforced Worker policy restricts scripts and requests while allowing p
 }) => {
   const headers = (await request.get("/")).headers();
   const policy = headers["content-security-policy"]!;
+  const nonce = /'nonce-([^']+)'/.exec(policy)![1];
   expect(headers["content-security-policy-report-only"]).toBeUndefined();
   let unexpectedRequests = 0;
   await page.route("https://unapproved.example/**", (route) => {
@@ -70,7 +71,7 @@ test("the enforced Worker policy restricts scripts and requests while allowing p
     route.fulfill({
       headers: { "content-type": "text/html", "content-security-policy": policy },
       body: `<!doctype html><html><body>
-      <script>
+      <script nonce="${nonce}">
         document.addEventListener('securitypolicyviolation', event => {
           const result = document.createElement('output');
           result.textContent = event.effectiveDirective + ':' + event.blockedURI;
@@ -105,12 +106,13 @@ test("the actual fallback error page can retry under the Worker policy", async (
   request,
 }) => {
   const policy = (await request.get("/")).headers()["content-security-policy"]!;
+  const nonce = /'nonce-([^']+)'/.exec(policy)![1];
   // Load the actual renderer and its JSON dictionaries with the project's Bun runtime.
   const errorHtml = execFileSync(
     "bun",
     [
       "-e",
-      'import { renderErrorPage } from "./src/lib/error-page.ts"; process.stdout.write(renderErrorPage("en"));',
+      `import { renderErrorPage } from "./src/lib/error-page.ts"; process.stdout.write(renderErrorPage("en", ${JSON.stringify(nonce)}));`,
     ],
     { cwd: resolve(import.meta.dirname, ".."), encoding: "utf8" },
   );
@@ -135,6 +137,7 @@ test("the Worker policy allows approved embeds and blocks an unknown frame and i
 }) => {
   const response = await request.get("/");
   const policy = response.headers()["content-security-policy"]!;
+  const nonce = /'nonce-([^']+)'/.exec(policy)![1];
   expect(policy).toContain("frame-src");
   const hosts = [
     "www.instagram.com",
@@ -157,7 +160,7 @@ test("the Worker policy allows approved embeds and blocks an unknown frame and i
     route.fulfill({
       headers: { "content-type": "text/html", "content-security-policy": policy },
       body: `<!doctype html><html><body>
-      <script>document.addEventListener('securitypolicyviolation', e => {
+      <script nonce="${nonce}">document.addEventListener('securitypolicyviolation', e => {
         const p = document.createElement('p'); p.className = 'violation';
         p.textContent = e.effectiveDirective; document.body.append(p);
       });</script>
