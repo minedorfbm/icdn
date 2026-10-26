@@ -69,11 +69,13 @@ test("the catalogue starts before hydration and its early response is consumed o
     const catalogue = await pending;
     expect(catalogue.status()).toBe(200);
     expect(catalogue.headers()["server-timing"]).toContain("catalogue;");
-    expect((await catalogue.json()).destinations.length).toBeGreaterThan(0);
+    // Chromium may defer a low-priority body while the deliberately blocked
+    // module requests are outstanding. Headers already prove the early read.
     expect(await page.locator("#heaven").count()).toBe(0);
   } finally {
     releaseScripts();
   }
+  expect((await (await pending).json()).destinations.length).toBeGreaterThan(0);
   await expect(page.locator("#heaven")).toBeVisible();
   expect(reads).toHaveLength(1);
 });
