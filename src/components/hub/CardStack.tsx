@@ -5,8 +5,8 @@ import type { Destination } from "@/data/resort";
 import { cardPosition, swipeStep } from "@/lib/card-swipe";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useI18n } from "@/i18n";
-import { preload } from "react-dom";
-import { coverImageSizes, picturePreload } from "@/lib/responsive-image";
+import { coverImageSizes } from "@/lib/responsive-image";
+import { useCardImageReadiness } from "@/lib/use-card-image-readiness";
 import { useCardImageSize } from "@/lib/use-card-image-size";
 
 /** A front-facing hero and two receding previews, all sharing one responsive stage. */
@@ -64,6 +64,7 @@ export function CardStack({
   const [drag, setDrag] = useState(0); // px, negative = pulling next card in
   const [dragging, setDragging] = useState(false);
   const { stage, box } = useCardImageSize(items.length, layout);
+  const { canLoad, onSettled } = useCardImageReadiness(items, index, near, Boolean(box));
   const { openDestination } = useDestinationNavigation();
   const { t } = useI18n();
   const moved = useRef(false);
@@ -93,17 +94,6 @@ export function CardStack({
     return cancelFrame;
   }, [items]);
 
-  // Keep images, text and links out of the per-frame drag renders.
-  // Warm adjacent pictures at low priority, using the same format and size as the panel.
-  useEffect(() => {
-    if (!near || !box) return;
-    const neighbours = [items[index - 1], items[index + 1]].filter(Boolean);
-    neighbours.forEach((item) => {
-      const { href, ...source } = picturePreload(item!.image, coverImageSizes(item!.image, box));
-      preload(href, { as: "image", fetchPriority: "low", ...source });
-    });
-  }, [items, index, near, box]);
-
   const panels = useMemo(
     () =>
       items.map((dest, i) => (
@@ -112,7 +102,8 @@ export function CardStack({
           dest={dest}
           active={i === index}
           priority={near && i === index}
-          near={near}
+          near={canLoad(dest)}
+          onImageSettled={() => onSettled(dest)}
           imageSizes={box ? coverImageSizes(dest.image, box) : undefined}
           onOpen={() =>
             i === index
@@ -124,7 +115,7 @@ export function CardStack({
           }
         />
       )),
-    [items, index, near, box, onIndexChange, openDestination],
+    [items, index, near, box, onIndexChange, openDestination, canLoad, onSettled],
   );
 
   if (items.length === 0) return null;

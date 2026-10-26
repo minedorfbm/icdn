@@ -7,6 +7,8 @@ import { useHub } from "@/data/hub-context";
 import { type Destination, type Level } from "@/data/resort";
 import { useI18n } from "@/i18n";
 import { imageVariants } from "@/lib/image-source";
+import { useLevelImageReadiness } from "@/lib/use-level-image-readiness";
+import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 
 interface Props {
   id: Level;
@@ -20,11 +22,16 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
   const [cluster, setCluster] = useState(clusters?.[0]);
   const [cardIndex, setCardIndex] = useState(0);
   const [indexOpen, setIndexOpen] = useState(false);
-  const [near, setNear] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const near = useLevelImageReadiness(id, sectionRef);
+  const [backdropReady, setBackdropReady] = useState(false);
+  const showBackdrop = near || backdropReady;
+  useEffect(() => {
+    if (near) setBackdropReady(true);
+  }, [near]);
   const { destinations } = useHub();
   const { t, levelLine, cluster: clusterLabel } = useI18n();
-  const backdropAvif = near ? imageVariants(image)?.avif?.src : undefined;
+  const backdropAvif = showBackdrop ? imageVariants(image)?.avif?.src : undefined;
 
   const all = useMemo(
     () =>
@@ -58,35 +65,8 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
     if (group) setCluster(group.key);
     setCardIndex((group?.items ?? all).findIndex((item) => item.id === destination.id));
     setIndexOpen(false);
-    requestAnimationFrame(() =>
-      sectionRef.current?.scrollIntoView({
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "instant"
-          : "smooth",
-        block: "start",
-      }),
-    );
+    requestAnimationFrame(() => scrollToHubSection(id));
   };
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section || near) return;
-    if (!("IntersectionObserver" in window)) {
-      setNear(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          setNear(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "400px 0px" },
-    );
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, [near]);
 
   return (
     <section
@@ -100,10 +80,11 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
         <picture className="contents">
           {backdropAvif && <source type="image/avif" srcSet={backdropAvif} />}
           <img
-            src={near ? image : undefined}
+            src={showBackdrop ? image : undefined}
             alt=""
             aria-hidden
             loading="lazy"
+            fetchPriority="low"
             decoding="async"
             width={900}
             height={1400}
