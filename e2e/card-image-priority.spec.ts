@@ -60,14 +60,18 @@ for (const scenario of [
       const timing = response.headers()["server-timing"] ?? "";
       if (timing.includes("catalogue;") || timing.includes("card;")) {
         const result = timing.includes("catalogue;") ? catalogue : cardSnapshot;
-        // Ordinary server-function JSON, as used by the hours publication regression.
+        // Catalogue transport is plain JSON; the focused card uses server-function JSON.
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({
-            result: timing.includes("card;") && !published ? null : result,
-            context: {},
-          }),
+          body: JSON.stringify(
+            timing.includes("catalogue;")
+              ? result
+              : {
+                  result: timing.includes("card;") && !published ? null : result,
+                  context: {},
+                },
+          ),
         });
       } else await route.fulfill({ response });
     });

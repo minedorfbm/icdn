@@ -41,7 +41,41 @@ test("the deferred homepage catalogue reports its own API timing", async ({ page
   expect(catalogue.headers()["server-timing"]).toMatch(
     /catalogue;dur=\d+(?:\.\d+)?;desc="(?:rpc|cache)"/,
   );
+  expect(catalogue.headers()["cache-control"]).toBe("no-store");
+  const snapshot = await catalogue.json();
+  expect(snapshot.destinations.some((row: { id: string }) => row.id === "citron")).toBe(true);
+  expect(snapshot).not.toHaveProperty("t");
   await expect(page.locator("#heaven")).toBeVisible();
+});
+
+test("the catalogue starts before hydration and its early response is consumed once", async ({
+  page,
+}) => {
+  let releaseScripts!: () => void;
+  const scriptsReady = new Promise<void>((resolve) => {
+    releaseScripts = resolve;
+  });
+  await page.route(/\/assets\/.*\.js(?:\?.*)?$/, async (route) => {
+    await scriptsReady;
+    await route.continue();
+  });
+  const reads: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/_serverFn/")) reads.push(request.url());
+  });
+  const pending = page.waitForResponse((response) => response.url().includes("/_serverFn/"));
+  try {
+    await page.goto("/", { waitUntil: "commit" });
+    const catalogue = await pending;
+    expect(catalogue.status()).toBe(200);
+    expect(catalogue.headers()["server-timing"]).toContain("catalogue;");
+    expect((await catalogue.json()).destinations.length).toBeGreaterThan(0);
+    expect(await page.locator("#heaven").count()).toBe(0);
+  } finally {
+    releaseScripts();
+  }
+  await expect(page.locator("#heaven")).toBeVisible();
+  expect(reads).toHaveLength(1);
 });
 
 test("an opened card reads its media snapshot without per-table requests", async ({

@@ -7,13 +7,14 @@ import {
 import { focusDestinationCard } from "./destination-card";
 import { completeCatalogue } from "./hub-data-completeness";
 import { createRequestCache } from "./request-cache";
+import { takeCatalogueRequest } from "./catalogue-bootstrap";
 import type { HubData } from "./hub-schema";
 
 const cards = createRequestCache<Awaited<ReturnType<typeof getDestinationCard>>>(
   (data) => data !== null,
 );
 
-const catalogue = createRequestCache<Awaited<ReturnType<typeof getHubData>>>(completeCatalogue);
+const catalogue = createRequestCache<HubData>(completeCatalogue);
 const settings = createRequestCache<Awaited<ReturnType<typeof getHubSettings>>>(
   (data) => data !== null,
 );
@@ -23,15 +24,24 @@ const media = createRequestCache<Awaited<ReturnType<typeof getDestinationMedia>>
 
 // Only browser reads are retained. SSR always uses the existing public server cache,
 // never a module-global snapshot shared across requests or Worker environments.
-const backgroundCatalogueFetch: typeof fetch = (input, init) =>
-  fetch(input, { ...init, priority: "low" });
-
 export function loadHubData({ background = false }: { background?: boolean } = {}) {
+  const early = takeCatalogueRequest(getHubData.url);
+  const read = async (): Promise<HubData> => {
+    const response =
+      typeof window === "undefined"
+        ? await getHubData()
+        : await (early?.response ??
+            fetch(getHubData.url, { priority: background ? "low" : "auto" }));
+    if (!response.ok) throw new Error("Catalogue temporarily unavailable");
+    // getHubData validates every collection on the server before writing this
+    // same-origin JSON response. No dates, classes or references need hydration.
+    const data: HubData = await response.json();
+    if (!completeCatalogue(data)) throw new Error("Catalogue temporarily unavailable");
+    return data;
+  };
   return typeof window === "undefined"
-    ? getHubData()
-    : catalogue.read("catalogue", () =>
-        getHubData(background ? { fetch: backgroundCatalogueFetch } : {}),
-      );
+    ? read()
+    : catalogue.read("catalogue", read, false, early?.started);
 }
 
 export function loadHubSettings() {

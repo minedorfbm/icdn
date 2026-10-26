@@ -23,7 +23,8 @@ import { LevelChapter } from "@/components/hub/LevelChapter";
 import { NamTramRail } from "@/components/hub/NamTramRail";
 import { type Level } from "@/data/resort";
 import { HubProvider, useHub } from "@/data/hub-context";
-import type { HubData } from "@/lib/hub.functions";
+import { getHubData, type HubData } from "@/lib/hub.functions";
+import { catalogueBootstrap } from "@/lib/catalogue-bootstrap";
 import {
   loadDestinationCard,
   loadHubData,
@@ -55,6 +56,7 @@ export const Route = createFileRoute("/_hub")({
   },
   staleTime: 0,
   head: ({ loaderData }) => ({
+    scripts: loaderData?.isHome ? [{ children: catalogueBootstrap(getHubData.url) }] : [],
     links: loaderData?.isHome
       ? [
           {

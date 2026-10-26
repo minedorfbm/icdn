@@ -30,7 +30,7 @@ for (const viewport of [
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({ result: catalogue, context: {} }),
+          body: JSON.stringify(catalogue),
         });
       else await route.fulfill({ response });
     });

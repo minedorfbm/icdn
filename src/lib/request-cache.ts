@@ -14,13 +14,15 @@ export function createRequestCache<T>(
   };
   return {
     peek,
-    read(key: string, load: () => Promise<T>, refresh = false): Promise<T> {
+    read(key: string, load: () => Promise<T>, refresh = false, startedAt = now()): Promise<T> {
       const previous = entries.get(key);
       if (!refresh && previous && previous.expires > now()) {
         if (previous.pending) return previous.pending;
         if (previous.value !== undefined) return Promise.resolve(previous.value);
       }
-      const entry: Entry = { expires: now() + ttl };
+      // An early request's freshness starts when it was issued, not when its
+      // response is handed to the application after hydration.
+      const entry: Entry = { expires: Math.min(now(), startedAt) + ttl };
       entries.delete(key);
       entries.set(key, entry);
       while (entries.size > limit) entries.delete(entries.keys().next().value!);
