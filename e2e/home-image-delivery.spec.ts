@@ -1,3 +1,4 @@
+import { imageDeliveryUrl } from "../src/lib/image-delivery";
 import { expect, test } from "./fixtures";
 import images from "../src/data/image-variants.json" with { type: "json" };
 
@@ -59,14 +60,19 @@ for (const viewport of [
         Math.max(geometry.width, (geometry.height * photo.width) / photo.height),
       );
       const candidates = "avif" in photo ? [...photo.avifVariants, photo.avif] : photo.variants;
-      expect(candidates.some((candidate) => candidate.src === geometry.source)).toBe(true);
+      expect(
+        candidates.some(
+          (candidate) =>
+            new URL(imageDeliveryUrl(candidate.src), page.url()).href === geometry.source,
+        ),
+      ).toBe(true);
       const allCandidates = new Set(
         [...photo.variants, ...("avif" in photo ? [...photo.avifVariants, photo.avif] : [])].map(
-          (candidate) => candidate.src,
+          (candidate) => new URL(imageDeliveryUrl(candidate.src), page.url()).href,
         ),
       );
       // The discovery chooser intentionally downloads its separate 320px thumbnail.
-      const thumbnail = photo.variants[0]?.src;
+      const thumbnail = new URL(imageDeliveryUrl(photo.variants[0]!.src), page.url()).href;
       expect(calls.filter((url) => allCandidates.has(url) && url !== thumbnail)).toEqual([
         geometry.source,
       ]);

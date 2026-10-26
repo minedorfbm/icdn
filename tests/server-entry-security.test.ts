@@ -76,3 +76,15 @@ test.each([
     authorizedNonce(response);
   },
 );
+
+test("the image route rejects unknown files before catalogue or SSR rendering", async () => {
+  upstream = () => {
+    throw new Error("Image requests must not enter SSR");
+  };
+  const response = await server.fetch(
+    new Request("https://icdn.artdigitaljourney.com/media/unknown.svg"),
+  );
+  expect(response.status).toBe(404);
+  expect(await response.text()).toBe("");
+  expect(response.headers.get("cache-control")).toBe("no-store");
+});
