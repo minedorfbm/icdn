@@ -1,28 +1,13 @@
 import { CardEntryProvider } from "@/components/hub/CardEntryProvider";
 import { NotFoundPage } from "@/components/NotFoundPage";
-import { Fragment, type CSSProperties } from "react";
-import { useChapterDocking } from "@/lib/use-chapter-docking";
-import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
-import { ResortLogo } from "@/components/hub/ResortLogo";
 import { HubHero } from "@/components/hub/HubHero";
 import { HERO_LANDSCAPE_MEDIA, HERO_PORTRAIT_MEDIA } from "@/lib/hero-media";
 import { homeHeroSizes, picturePreload, thumbnailImage } from "@/lib/responsive-image";
-import { HubSearch } from "@/features/search/HubSearch";
 import { HubSearchProvider } from "@/features/search/HubSearchProvider";
-import { DiscoveryPaths } from "@/features/discovery/DiscoveryPaths";
 import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
-import { useResortMap } from "@/features/resort-map/map-context";
-import { mapCopy } from "@/features/resort-map/map-copy";
-import { localizedLinkUrl } from "@/lib/localized-links";
 import { createFileRoute, notFound, Outlet, useLocation } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useJourneyMotion } from "@/lib/use-journey-motion";
-import { ArrowUpRight } from "lucide-react";
-import { ConciergeContact } from "@/components/hub/ConciergeContact";
-import { LevelChapter } from "@/components/hub/LevelChapter";
-import { NamTramRail } from "@/components/hub/NamTramRail";
-import { type Level } from "@/data/resort";
-import { HubProvider, useHub } from "@/data/hub-context";
+import { useCallback, useEffect, useMemo, useState, lazy, Suspense } from "react";
+import { HubProvider } from "@/data/hub-context";
 import { getHubData, type HubData } from "@/lib/hub.functions";
 import { catalogueBootstrap } from "@/lib/catalogue-bootstrap";
 import {
@@ -34,10 +19,14 @@ import {
 } from "@/lib/hub-client";
 import { canonicalDestinationId } from "@/lib/destination-route";
 import { cardHubData } from "@/lib/destination-card";
+import { afterDetailHero } from "@/lib/after-detail-hero";
 import { NavigationProgress } from "@/components/hub/NavigationProgress";
 import { I18nProvider, LanguageSwitch, useI18n } from "@/i18n";
 import { resolveHeroImage } from "@/data/hub-value";
-import { ResortBrowserProvider, ResortLink } from "@/components/hub/ResortBrowser";
+import { ResortBrowserProvider } from "@/components/hub/ResortBrowser";
+
+const prepareHubJourney = () => import("@/components/hub/HubJourney");
+const HubJourney = lazy(prepareHubJourney);
 
 export const Route = createFileRoute("/_hub")({
   loader: async ({ location }) => {
@@ -121,6 +110,11 @@ function HubRoute() {
     if (location.pathname === "/") setHasVisitedHome(true);
   }, [location.pathname]);
   const showHub = location.pathname === "/" || (hasVisitedHome && location.state.hubCard === true);
+  // On home, start the journey chunk alongside the catalogue, not after it.
+  // Direct cards never request it until the visitor returns to the homepage.
+  useEffect(() => {
+    if (showHub) void prepareHubJourney().catch(() => {});
+  }, [showHub]);
   const [result, setResult] = useState<{ data: HubData | null; failed: boolean }>({
     data: catalogue,
     failed: false,
@@ -150,18 +144,29 @@ function HubRoute() {
     if (result.data) return;
     let current = true;
     setResult({ data: null, failed: false });
-    loadHubData({ background: attempt === 0 }).then(
-      (data) => {
-        if (current) setResult({ data, failed: false });
-      },
-      () => {
-        if (current) setResult({ data: null, failed: true });
-      },
+    const read = () => {
+      void loadHubData({ background: attempt === 0 }).then(
+        (data) => {
+          if (current) setResult({ data, failed: false });
+        },
+        () => {
+          if (current) setResult({ data: null, failed: true });
+        },
+      );
+    };
+    // The focused snapshot already contains this card. Let its main photo finish
+    // before fetching the full resort, unless the visitor starts interacting.
+    const cancel = afterDetailHero(
+      !showHub && attempt === 0
+        ? document.querySelector<HTMLImageElement>(".editorial-hero img")
+        : null,
+      read,
     );
     return () => {
       current = false;
+      cancel();
     };
-  }, [catalogue, attempt, result.data]);
+  }, [catalogue, attempt, result.data, showHub]);
   return (
     <I18nProvider editorial={presentation?.editorial}>
       <NavigationProgress />
@@ -189,7 +194,9 @@ function HubRoute() {
                 <ResortMapProvider>
                   {showHub &&
                     (data ? (
-                      <Hub />
+                      <Suspense fallback={<CatalogueStatus />}>
+                        <HubJourney />
+                      </Suspense>
                     ) : (
                       <CatalogueStatus failed={result.failed} onRetry={retryCatalogue} />
                     ))}
@@ -226,93 +233,5 @@ function CatalogueStatus({
         </button>
       )}
     </section>
-  );
-}
-
-function Hub() {
-  const { openMap } = useResortMap();
-  const hubRef = useRef<HTMLDivElement>(null);
-  const { levels, links } = useHub();
-  const { active, visible } = useJourneyMotion(hubRef, levels);
-  useChapterDocking(hubRef);
-  const { lang, t, linkLabel } = useI18n();
-
-  const scrollTo = scrollToHubSection;
-
-  return (
-    <div ref={hubRef} className="bg-background text-foreground">
-      <div className="hub-search-tool">
-        <HubSearch compact />
-      </div>
-      <NamTramRail active={active} visible={visible} onJump={(level: Level) => scrollTo(level)} />
-
-      <DiscoveryPaths onJourney={() => scrollTo(levels[0]?.id ?? "heaven")} />
-
-      {/* THE DESCENT */}
-      <div>
-        {levels.map((l, index) => (
-          <Fragment key={l.id}>
-            <LevelChapter {...l} />
-            {levels[index + 1] && (
-              <div
-                className="chapter-gradient"
-                data-from={l.id}
-                aria-hidden
-                style={
-                  {
-                    "--chapter-from": `var(--world-${l.id})`,
-                    "--chapter-to": `var(--world-${levels[index + 1]!.id})`,
-                  } as CSSProperties
-                }
-              />
-            )}
-          </Fragment>
-        ))}
-      </div>
-
-      {/* END OF JOURNEY */}
-      <section className="brand-ui sea-footer px-6 py-24">
-        <h2 aria-label={t("footer_title")}>
-          <ResortLogo className="footer-resort-logo" loading="lazy" />
-        </h2>
-        <ul className="mt-8 flex flex-col divide-y divide-current/10 border-y border-current/10">
-          {links.map(({ label, url, translations }) => (
-            <li key={label}>
-              {label === "Resort Map" ? (
-                <button
-                  type="button"
-                  onClick={() => openMap()}
-                  className="flex w-full items-center justify-between py-3 text-[11px] tracking-[0.22em]"
-                >
-                  {mapCopy(lang, "open").toUpperCase()}
-                  <ArrowUpRight aria-hidden className="size-4 shrink-0" strokeWidth={1.3} />
-                </button>
-              ) : (
-                <ResortLink
-                  href={localizedLinkUrl(
-                    label === "Website" ? "WEBSITE" : label,
-                    url,
-                    translations,
-                    lang,
-                  )}
-                  pageTitle={linkLabel(label)}
-                  target={label === "Contact" ? undefined : "_blank"}
-                  rel={label === "Contact" ? undefined : "noreferrer"}
-                  className="flex items-center justify-between py-3 text-[11px] tracking-[0.22em]"
-                >
-                  {linkLabel(label).toUpperCase()}
-                  <ArrowUpRight aria-hidden className="size-4 shrink-0" strokeWidth={1.3} />
-                </ResortLink>
-              )}
-            </li>
-          ))}
-        </ul>
-
-        <p className="mt-16 text-[9px] tracking-[0.3em] opacity-70">{t("footer_credit")}</p>
-      </section>
-
-      {/* FIXED CONCIERGE BUTTON */}
-      <ConciergeContact />
-    </div>
   );
 }
