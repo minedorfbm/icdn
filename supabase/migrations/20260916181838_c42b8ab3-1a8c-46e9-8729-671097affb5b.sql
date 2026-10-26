@@ -1,1 +1,0 @@
-ALTER TABLE public.destinations ADD COLUMN IF NOT EXISTS instagram_spot boolean NOT NULL DEFAULT false;
