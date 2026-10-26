@@ -4,7 +4,7 @@ import type { Destination } from "@/data/resort";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { useResortMap } from "@/features/resort-map/map-context";
-import tramIllustration from "@/assets/nam-tram-rail.webp";
+import { imageSource } from "@/lib/image-source";
 import { discoveryCopy } from "./discovery-copy";
 import { readDiscovery, restoreDiscovery, type SavedDiscovery } from "./surprise-order";
 import { SurpriseDiscovery } from "./SurpriseDiscovery";
@@ -26,7 +26,13 @@ function ChoiceArtwork({
     return (
       <span className="discovery-art discovery-tram" aria-hidden>
         <span className="discovery-tram-line" />
-        <img src={tramIllustration} alt="" loading="lazy" width={240} height={219} />
+        <img
+          src={imageSource("src/assets/nam-tram-rail.webp")}
+          alt=""
+          loading="lazy"
+          width={240}
+          height={219}
+        />
       </span>
     );
   if (kind === "map")

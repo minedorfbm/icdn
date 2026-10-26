@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { LEVELS, type Level } from "@/data/resort";
 import { useI18n } from "@/i18n";
-import tramIllustration from "@/assets/nam-tram-selector.webp";
+import { imageSource } from "@/lib/image-source";
 import { NamTramCabin } from "./NamTramCabin";
 import { NamTramStation } from "./NamTramStation";
 import "./nam-tram.css";
@@ -87,7 +87,7 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
       >
         <div aria-hidden className="nam-tram-art">
           <img
-            src={tramIllustration}
+            src={imageSource("src/assets/nam-tram-selector.webp")}
             alt=""
             width={900}
             height={600}

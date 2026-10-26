@@ -1,4 +1,5 @@
 import type { OpeningHours } from "@/lib/opening-hours";
+import { imageSource } from "@/lib/image-source";
 import type { z } from "zod";
 import type {
   linkRow,
@@ -311,8 +312,8 @@ const ASSET_BY_KEY: Record<string, string> = {
 
 /** Resolves a stored photo reference: either an absolute URL or an asset key. */
 export function resolveImage(ref: string): string {
-  if (/^(https?:)?\/\//.test(ref) || ref.startsWith("/")) return ref;
-  return ASSET_BY_KEY[ref] ?? "";
+  if (/^(https?:)?\/\//.test(ref) || ref.startsWith("/")) return imageSource(ref);
+  return imageSource(ASSET_BY_KEY[ref] ?? "");
 }
 
 /** Groups photo rows by destination, ready to attach to a destination. */

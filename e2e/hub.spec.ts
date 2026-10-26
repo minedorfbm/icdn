@@ -1,3 +1,4 @@
+import managedImages from "../src/data/image-variants.json" with { type: "json" };
 import { expect, test, type Locator, type Page } from "./fixtures";
 
 // Instagram is external; focused tests below replace this route with a deterministic script.
@@ -122,7 +123,7 @@ test("the hero selects the matching photo and preload in portrait and landscape"
     await page.setViewportSize({ width, height });
     await expect
       .poll(() => hero.evaluate((image: HTMLImageElement) => image.currentSrc))
-      .toContain(file);
+      .toBe(Object.values(managedImages).find((image) => image.aliases.includes(`/${file}`))!.src);
     const activePreloads = await page
       .locator('link[rel="preload"][as="image"][media]')
       .evaluateAll((links) =>
@@ -130,7 +131,9 @@ test("the hero selects the matching photo and preload in portrait and landscape"
           .filter((link) => matchMedia(link.getAttribute("media") || "all").matches)
           .map((link) => link.getAttribute("href")),
       );
-    expect(activePreloads).toEqual([`/${file}`]);
+    expect(activePreloads).toEqual([
+      Object.values(managedImages).find((image) => image.aliases.includes(`/${file}`))!.src,
+    ]);
   }
 });
 

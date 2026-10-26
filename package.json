@@ -36,7 +36,7 @@
     "coverage:check-production": "bun scripts/check-production-coverage.ts",
     "test:mobile:iphone": "HUB_TEST_PROJECT=iphone-webkit node node_modules/@playwright/test/cli.js test --project=iphone-webkit",
     "test:mobile:android": "HUB_TEST_PROJECT=android-chrome node node_modules/@playwright/test/cli.js test --project=android-chrome",
-    "images:variants": "bun scripts/generate-image-variants.ts"
+    "images:variants": "bun scripts/prepare-bucket-images.ts"
   },
   "overrides": {
     "launch-editor": "2.14.2",

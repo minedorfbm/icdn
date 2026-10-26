@@ -1,24 +1,17 @@
-import manifest from "@/data/image-variants.json";
-
-type Variants = {
-  width: number;
-  variants: { src: string; width: number }[];
-  avif?: { src: string; width: number };
-  avifVariants?: { src: string; width: number }[];
-};
-const images: Record<string, Variants> = manifest;
+import { imageSource, imageVariants } from "./image-source";
 
 /** An exact source match is required; a new CMS URL keeps its original image. */
 export function thumbnail(source: string): string {
-  return images[source]?.variants[0]?.src ?? source;
+  return imageVariants(source)?.variants[0]?.src ?? imageSource(source);
 }
 
-/** No crop or focal-position changes. Original HD remains the largest candidate. */
+/** No crop or focal-position changes. Native HD remains the largest candidate. */
 export function responsiveImage(source: string, sizes: string) {
-  const image = images[source];
+  source = imageSource(source);
+  const image = imageVariants(source);
   if (!image) return { src: source };
   const candidates = image.variants.filter(
-    (variant) => variant.width >= 960 && variant.width < image.width,
+    (variant) => variant.width >= 640 && variant.width < image.width,
   );
   return {
     src: source,
@@ -31,12 +24,12 @@ export function responsiveImage(source: string, sizes: string) {
 }
 
 /** Expanded photos keep their full native resolution with a lighter encoded file.
- * The untouched original remains the fallback for unknown CMS sources/browsers. */
+ * Unknown CMS references retain their original fallback. */
 export function detailHeroImage(source: string) {
-  const image = images[source];
+  source = imageSource(source);
+  const image = imageVariants(source);
   if (!image) return { src: source };
-  const ratio = (manifest as Record<string, { width: number; height: number }>)[source]!;
-  const aspect = Number((ratio.width / ratio.height).toFixed(4));
+  const aspect = Number((image.width / image.height).toFixed(4));
   // Account for object-fit: cover: a narrow viewport can still need a wider source
   // when its hero is tall. Keep these dimensions aligned with editorial-detail.css.
   const sizes = `(min-width: 1200px) max(min(calc((100vw - 124px) * 0.4595), 532px), ${560 * aspect}px), (min-width: 768px) max(calc(100vw - 80px), calc(clamp(300px, 36vw, 420px) * ${aspect})), max(min(100vw, 740px), calc(clamp(350px, 58svh, 630px) * ${aspect}))`;
@@ -57,7 +50,7 @@ export function detailHeroImage(source: string) {
 
 /** Sized AVIF candidates retain native resolution and the unchanged WebP/original fallback. */
 export function detailHeroAvif(source: string) {
-  const image = images[source];
+  const image = imageVariants(source);
   const avif = image?.avif;
   return avif
     ? {
