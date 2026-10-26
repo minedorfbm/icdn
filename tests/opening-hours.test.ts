@@ -1,5 +1,6 @@
+import { openingHoursRow } from "../src/lib/opening-hours-schema";
 import { expect, test } from "bun:test";
-import { hoursDays, hoursTime, openingHoursRow } from "../src/lib/opening-hours";
+import { hoursDays, hoursTime } from "../src/lib/opening-hours";
 
 test("weekday ranges use ISO weekdays and retain a separate Sunday", () => {
   expect(hoursDays([7, 1, 2, 3, 4, 5], "en", "Daily")).toBe("Mon–Fri, Sun");

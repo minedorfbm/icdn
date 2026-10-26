@@ -1,10 +1,6 @@
+import { destinationNoticeRow } from "../src/lib/destination-notices-schema";
 import { expect, test } from "bun:test";
-import {
-  currentNotices,
-  destinationNoticeRow,
-  noticeCopy,
-  type DestinationNotice,
-} from "../src/lib/destination-notices";
+import { currentNotices, noticeCopy, type DestinationNotice } from "../src/lib/destination-notices";
 const notice: DestinationNotice = {
   id: "temporary",
   destination_id: "la-maison-1888",

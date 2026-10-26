@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import type { PGlite } from "@electric-sql/pglite";
 import { hubDataSchema } from "../src/lib/hub-schema";
-import { destinationCardSchema, focusDestinationCard } from "../src/lib/destination-card-schema";
+import { destinationCardSchema } from "../src/lib/destination-card-schema";
+import { focusDestinationCard } from "../src/lib/destination-card";
 
 export async function checkDestinationCardSnapshot(db: PGlite) {
   const read = async (id: string) =>

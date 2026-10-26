@@ -1,5 +1,6 @@
+import { collectionItemRow } from "../src/lib/destination-collection-schema";
 import { expect, test } from "bun:test";
-import { collectionCopy, collectionItemRow } from "../src/lib/destination-collection";
+import { collectionCopy } from "../src/lib/destination-collection";
 
 const item = collectionItemRow.parse({
   destination_id: "instagram-spots",

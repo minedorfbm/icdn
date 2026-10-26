@@ -1,5 +1,6 @@
+import { benefitContent } from "../src/lib/accommodation-benefits-schema";
 import { expect, test } from "bun:test";
-import { localizedBenefits, benefitContent } from "../src/lib/accommodation-benefits";
+import { localizedBenefits } from "../src/lib/accommodation-benefits";
 import { groupLinks } from "../src/data/resort";
 import seed from "../docs/accommodation-benefits.json";
 

@@ -6,7 +6,7 @@ import {
   cardHubData,
   focusDestinationCard,
   type DestinationCardData,
-} from "../src/lib/destination-card-schema";
+} from "../src/lib/destination-card";
 const originalUrl = process.env["SUPABASE_URL"],
   originalKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
 const fetchSpy = spyOn(globalThis, "fetch");
