@@ -14,6 +14,7 @@ export function DestinationPanel({
   near = true,
   imageSizes,
   onOpen,
+  onImageSettled,
 }: Readonly<{
   dest: Destination;
   active: boolean;
@@ -21,6 +22,7 @@ export function DestinationPanel({
   near?: boolean;
   imageSizes: string | undefined;
   onOpen: () => void;
+  onImageSettled?: () => void;
 }>) {
   const { lang, t, typeLabel, levelLabel, action, linkLabel, description } = useI18n();
   const actions = actionsFor(dest, 3, lang);
@@ -40,10 +42,17 @@ export function DestinationPanel({
           alt={dest.name}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
-          {...(priority ? { fetchPriority: "high" as const } : {})}
-          onLoad={() => setLoaded(true)}
+          fetchPriority={priority ? "high" : "low"}
+          onLoad={() => {
+            setLoaded(true);
+            onImageSettled?.();
+          }}
+          onError={onImageSettled}
           ref={(el) => {
-            if (el?.complete && el.naturalWidth > 0) setLoaded(true);
+            if (el?.complete && el.naturalWidth > 0) {
+              setLoaded(true);
+              onImageSettled?.();
+            }
           }}
           draggable={false}
           width={768}
