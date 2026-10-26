@@ -135,9 +135,7 @@ test("delivery URLs retain all responsive candidates and leave unmanaged CMS URL
   for (const file of Object.keys(manifest)) {
     const source = imageBucket + file;
     expect(imageVariants(imageSource(source))).toEqual(imageVariants(source));
-    expect(imageSource(source)).toBe(
-      file.startsWith("adj-") && !file.endsWith(".svg") ? "/media/" + file : source,
-    );
+    expect(imageSource(source)).toBe(file.startsWith("adj-") ? "/media/" + file : source);
   }
   expect(imageDeliveryUrl(imageBucket + "unversioned.webp")).toBe(imageBucket + "unversioned.webp");
   expect(imageSource("https://example.com/new.webp")).toBe("https://example.com/new.webp");
@@ -182,5 +180,56 @@ test("a cache outage still serves the public photo and a different ETag returns 
     expect(warning).toHaveBeenCalledTimes(2);
   } finally {
     warning.mockRestore();
+  }
+});
+
+test("the official SVG retains its golden embedded emblem, verifies bytes and is reused from cache", async () => {
+  const logo = await Bun.file(
+    new URL("./fixtures/official-logo-black.svg", import.meta.url),
+  ).bytes();
+  const source = imageSource("/intercontinental-danang-logo-black.svg");
+  expect(source).toStartWith("/media/");
+  const cache = memoryCache();
+  const fetchImage = mock(
+    async () => new Response(logo, { headers: { "content-type": "image/svg+xml" } }),
+  );
+  const deps = { cache: cache as unknown as Cache, fetchImage: fetchImage as typeof fetch };
+  const response = await serveImage(new Request("https://hub.example" + source), deps);
+  expect(response.status).toBe(200);
+  expect(new Uint8Array(await response.arrayBuffer())).toEqual(logo);
+  expect(response.headers.get("content-type")).toBe("image/svg+xml");
+  expect(response.headers.get("content-security-policy")).toBe(
+    "default-src 'none'; img-src data:; style-src 'unsafe-inline'; sandbox",
+  );
+  expect(response.headers.get("content-length")).toBe(String(logo.byteLength));
+  expect(
+    (await serveImage(new Request("https://hub.example" + source), deps)).headers.get(
+      "x-image-cache",
+    ),
+  ).toBe("HIT");
+  expect(fetchImage).toHaveBeenCalledTimes(1);
+});
+
+test("changed, truncated, oversized or interrupted logo bodies never enter the cache", async () => {
+  const source = imageSource("/intercontinental-danang-logo-black.svg");
+  for (const body of [
+    "<svg><script>alert(1)</script></svg>",
+    "",
+    new Uint8Array(65537),
+    new ReadableStream({
+      start(controller) {
+        controller.error(new Error("interrupted"));
+      },
+    }),
+  ]) {
+    const cache = memoryCache();
+    const response = await serveImage(new Request("https://hub.example" + source), {
+      cache: cache as unknown as Cache,
+      fetchImage: (async () =>
+        new Response(body, { headers: { "content-type": "image/svg+xml" } })) as typeof fetch,
+    });
+    expect(response.status).toBe(502);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(cache.put).not.toHaveBeenCalled();
   }
 });

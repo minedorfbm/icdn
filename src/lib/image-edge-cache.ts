@@ -1,5 +1,10 @@
 import manifest from "../data/image-variants-runtime.json";
-import { imageBucket, imageDeliveryPrefix, immutableImageName } from "./image-delivery";
+import {
+  imageBucket,
+  imageDeliveryPrefix,
+  immutableImageName,
+  officialLogoHashes,
+} from "./image-delivery";
 
 type ImageCache = Pick<Cache, "match" | "put">;
 type ImageRequest = Request & { waitUntil?: (promise: Promise<unknown>) => void };
@@ -51,7 +56,7 @@ export async function serveImage(
   if (
     !url.pathname.startsWith(imageDeliveryPrefix) ||
     url.search ||
-    !immutableImageName.test(name) ||
+    (!immutableImageName.test(name) && !Object.hasOwn(officialLogoHashes, name)) ||
     !allowed.has(name)
   )
     return failure(404);
@@ -97,7 +102,8 @@ async function readOrigin(name: string, fetchImage: typeof fetch): Promise<Respo
   } catch {
     return failure(502);
   }
-  const contentType = "image/" + name.split(".").at(-1);
+  const isLogo = Object.hasOwn(officialLogoHashes, name);
+  const contentType = isLogo ? "image/svg+xml" : "image/" + name.split(".").at(-1);
   if (
     upstream.status !== 200 ||
     upstream.headers.get("content-type")?.split(";")[0]?.trim() !== contentType
@@ -105,16 +111,52 @@ async function readOrigin(name: string, fetchImage: typeof fetch): Promise<Respo
     void upstream.body?.cancel();
     return failure(upstream.status === 404 ? 404 : 502);
   }
+  const logo = isLogo ? await verifiedLogo(upstream, officialLogoHashes[name]!) : undefined;
+  if (isLogo && !logo) return failure(502);
   const headers = new Headers({
     "content-type": contentType,
     "cache-control": "public, max-age=31536000, immutable",
     etag: `"${name}"`,
     "x-content-type-options": "nosniff",
-    "content-security-policy": "default-src 'none'; sandbox",
+    "content-security-policy": isLogo
+      ? "default-src 'none'; img-src data:; style-src 'unsafe-inline'; sandbox"
+      : "default-src 'none'; sandbox",
     "referrer-policy": "strict-origin-when-cross-origin",
   });
   const length = upstream.headers.get("content-length");
   if (length && /^\d+$/.test(length) && !upstream.headers.has("content-encoding"))
     headers.set("content-length", length);
-  return new Response(upstream.body, { headers });
+  if (logo) headers.set("content-length", String(logo.byteLength));
+  return new Response(logo ?? upstream.body, { headers });
+}
+
+/** Only the three inspected official logos may be SVG documents. Bound the read
+ * and verify every byte before caching, even if a Storage object is overwritten. */
+async function verifiedLogo(
+  response: Response,
+  expectedHash: string,
+): Promise<Uint8Array<ArrayBuffer> | undefined> {
+  const reader = response.body?.getReader();
+  if (!reader) return undefined;
+  const buffer = new Uint8Array(64 * 1024);
+  let length = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (length + value.byteLength > buffer.byteLength) return undefined;
+      buffer.set(value, length);
+      length += value.byteLength;
+    }
+    const bytes = buffer.slice(0, length);
+    const hash = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), (byte) =>
+      byte.toString(16).padStart(2, "0"),
+    ).join("");
+    return hash === expectedHash ? bytes : undefined;
+  } catch {
+    return undefined;
+  } finally {
+    await reader.cancel().catch(() => {});
+    reader.releaseLock();
+  }
 }
