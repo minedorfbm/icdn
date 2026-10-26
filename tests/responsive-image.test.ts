@@ -6,8 +6,62 @@ import {
   detailHeroImage,
   detailHeroAvif,
   detailHeroPreload,
+  coverImageSizes,
+  responsiveAvif,
+  picturePreload,
+  homeHeroSizes,
+  thumbnailImage,
+  framedImageSizes,
 } from "../src/lib/responsive-image";
 import images from "../src/data/image-variants.json";
+import runtime from "../src/data/image-variants-runtime.json";
+import { compactImageManifest } from "../scripts/compact-image-manifest";
+
+test("the browser manifest exactly matches the reviewed image inventory without audit metadata", () => {
+  expect(runtime).toEqual(compactImageManifest(images));
+  expect(JSON.stringify(runtime).length).toBeLessThan(JSON.stringify(images).length * 0.6);
+  expect(() =>
+    compactImageManifest({ "https://other.example/photo": Object.values(images)[0]! }),
+  ).toThrow("public bucket");
+});
+
+test("cards request cover resolution, retaining landscape sharpness without overfetching portraits", () => {
+  for (const [source, image] of Object.entries(images)) {
+    const box = { width: 300, height: 540 };
+    const sizes = coverImageSizes(source, box);
+    const cssWidth = Number.parseInt(sizes);
+    expect(cssWidth).toBeGreaterThanOrEqual(box.width);
+    expect(cssWidth).toBeGreaterThanOrEqual((box.height * image.width) / image.height);
+    expect(cssWidth).toBeLessThanOrEqual(
+      Math.max(box.width, (box.height * image.width) / image.height) * 1.03 + 1,
+    );
+    expect(homeHeroSizes(source)).toContain("100svh");
+    const avif = responsiveAvif(source, sizes);
+    const preload = picturePreload(source, sizes);
+    expect(preload.imageSrcSet).toBe(avif?.srcSet ?? responsiveImage(source, sizes).srcSet);
+    expect(preload.imageSizes).toBe(sizes);
+    expect(preload.type).toBe(avif ? "image/avif" : undefined);
+    if (avif) expect(avif.sizes).toBe(sizes);
+  }
+  expect(responsiveAvif("/new-photo", "300px")).toBeUndefined();
+  expect(picturePreload("/new-photo", "300px").href).toBe("/new-photo");
+  expect(coverImageSizes("/new-photo", { width: 300, height: 540 })).toBe("557px");
+  expect(homeHeroSizes("/new-photo")).toContain("* 1)");
+});
+
+test("small badges offer retina candidates and preserve unknown CMS fallbacks", () => {
+  const image = thumbnailImage("/michelin-key.webp", "80px");
+  expect(image.sizes).toBe("80px");
+  expect(image.srcSet).toContain("320w");
+  expect(thumbnailImage("/new-badge.png", "80px")).toEqual({ src: "/new-badge.png" });
+});
+
+test("cropped strips preserve cover detail while fullscreen galleries fit within the viewport", () => {
+  const source = Object.keys(images)[0]!;
+  expect(framedImageSizes(source, "260px", "347px", "cover")).toStartWith("max(260px,");
+  expect(framedImageSizes(source, "100vw", "78svh", "contain")).toStartWith("min(100vw,");
+  expect(framedImageSizes("/new-photo", "100vw", "78svh", "contain")).toBe("100vw");
+});
 
 test("new CMS photographs keep their original URL until derivatives are published", () => {
   const source = "https://example.com/new-photo.webp";

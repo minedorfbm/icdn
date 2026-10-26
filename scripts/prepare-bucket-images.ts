@@ -127,7 +127,9 @@ export async function prepareBucketImages(input: string, archiveDir: string, out
     const src =
       native === bytes && existingMaster ? existingMaster : await publish(native, "native.webp");
     const candidates = await sequentialMap(
-      [320, 640, 960, 1280, 1600].filter((w) => w < width),
+      [...(source === "/michelin-key.webp" ? [160, 240] : []), 320, 640, 960, 1280, 1600].filter(
+        (w) => w < width,
+      ),
       async (target): Promise<Candidate> => {
         const encoded = await sharp(bytes)
           .rotate()
@@ -142,14 +144,22 @@ export async function prepareBucketImages(input: string, archiveDir: string, out
       },
     );
     candidates.push({ src, width, bytes: native.length });
-    // AVIF is used by the existing detail picture element. Preserve native HD.
-    const detail = usages.some(
+    // Photos use AVIF with WebP fallback. Preserve native HD and generate from
+    // the verified master, never by recompressing an already resized derivative.
+    const photographic = usages.some(
       (u) =>
         (u.source === source || originals.get(u.source)?.sha256 === hash) &&
-        (u.role === "Fiche agrandie" || u.role === "Galerie"),
+        [
+          "Fiche agrandie",
+          "Galerie",
+          "Card accueil",
+          "Hero",
+          "Publication native",
+          "Fond de niveau",
+        ].includes(u.role),
     );
     const avifs = await sequentialMap(
-      detail ? [...[960, 1280].filter((w) => w < width), width] : [],
+      photographic ? [...[320, 640, 960, 1280, 1600].filter((w) => w < width), width] : [],
       async (target): Promise<Candidate> => {
         const encoded = await sharp(bytes)
           .rotate()

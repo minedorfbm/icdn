@@ -4,7 +4,7 @@ import { useI18n } from "@/i18n";
 import type { Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 import { ResortLink } from "./ResortBrowser";
-import { responsiveImage } from "@/lib/responsive-image";
+import { responsiveImage, responsiveAvif } from "@/lib/responsive-image";
 
 /** The single universal card used everywhere in the hub. */
 export function DestinationPanel({
@@ -12,17 +12,20 @@ export function DestinationPanel({
   active,
   priority,
   near = true,
+  imageSizes,
   onOpen,
 }: Readonly<{
   dest: Destination;
   active: boolean;
   priority: boolean;
   near?: boolean;
+  imageSizes: string | undefined;
   onOpen: () => void;
 }>) {
   const { lang, t, typeLabel, levelLabel, action, linkLabel, description } = useI18n();
   const actions = actionsFor(dest, 3, lang);
   const [loaded, setLoaded] = useState(false);
+  const avif = near && imageSizes ? responsiveAvif(dest.image, imageSizes) : undefined;
 
   return (
     <article
@@ -30,24 +33,27 @@ export function DestinationPanel({
       inert={!active}
       className="destination-panel relative h-full min-h-[inherit] w-full overflow-hidden rounded-[18px] border border-[#e5d3aa]/65 bg-[oklch(0.18_0.02_250)] shadow-[10px_24px_36px_-18px_rgba(0,0,0,0.7)]"
     >
-      <img
-        {...(near ? responsiveImage(dest.image, "(min-width: 768px) 1100px, 900px") : {})}
-        alt={dest.name}
-        loading={priority ? "eager" : "lazy"}
-        decoding="async"
-        {...(priority ? { fetchPriority: "high" as const } : {})}
-        onLoad={() => setLoaded(true)}
-        ref={(el) => {
-          if (el?.complete && el.naturalWidth > 0) setLoaded(true);
-        }}
-        draggable={false}
-        width={768}
-        height={1152}
-        style={{ objectPosition: dest.imagePosition }}
-        className={`absolute inset-0 h-full w-full select-none object-cover transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-          loaded ? "opacity-100" : "opacity-0"
-        } ${active ? "scale-100" : "scale-[1.03] saturate-[0.9]"}`}
-      />
+      <picture className="contents">
+        {avif && <source type="image/avif" srcSet={avif.srcSet} sizes={avif.sizes} />}
+        <img
+          {...(near && imageSizes ? responsiveImage(dest.image, imageSizes) : {})}
+          alt={dest.name}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          {...(priority ? { fetchPriority: "high" as const } : {})}
+          onLoad={() => setLoaded(true)}
+          ref={(el) => {
+            if (el?.complete && el.naturalWidth > 0) setLoaded(true);
+          }}
+          draggable={false}
+          width={768}
+          height={1152}
+          style={{ objectPosition: dest.imagePosition }}
+          className={`absolute inset-0 h-full w-full select-none object-cover transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            loaded ? "opacity-100" : "opacity-0"
+          } ${active ? "scale-100" : "scale-[1.03] saturate-[0.9]"}`}
+        />
+      </picture>
 
       {/* readability gradient only at the bottom */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-black/90 via-black/40 to-transparent" />

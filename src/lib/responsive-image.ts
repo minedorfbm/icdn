@@ -23,6 +23,72 @@ export function responsiveImage(source: string, sizes: string) {
   };
 }
 
+/** The browser applies its own device pixel ratio to this CSS-pixel width.
+ * Cover can require a wider source than the visible frame (landscape in portrait). */
+export function coverImageSizes(source: string, box: { width: number; height: number }) {
+  const image = imageVariants(source);
+  const aspect = image ? image.width / image.height : 1;
+  return `${Math.ceil(Math.max(box.width, box.height * aspect) * 1.03)}px`;
+}
+
+export function responsiveAvif(source: string, sizes: string) {
+  const image = imageVariants(source);
+  return image?.avif
+    ? {
+        src: image.avif.src,
+        srcSet: [...(image.avifVariants ?? []), image.avif]
+          .map((item) => `${item.src} ${item.width}w`)
+          .join(", "),
+        sizes,
+      }
+    : undefined;
+}
+
+export function picturePreload(source: string, sizes: string) {
+  const avif = responsiveAvif(source, sizes);
+  const image = avif ?? responsiveImage(source, sizes);
+  return preloadAttributes(image, Boolean(avif));
+}
+
+function preloadAttributes(image: { src: string; srcSet?: string; sizes?: string }, avif: boolean) {
+  return {
+    href: image.src,
+    imageSrcSet: image.srcSet,
+    imageSizes: image.sizes,
+    type: avif ? "image/avif" : undefined,
+  };
+}
+
+export function thumbnailImage(source: string, sizes: string) {
+  const image = imageVariants(source);
+  return image?.variants.length
+    ? {
+        src: thumbnail(source),
+        srcSet: image.variants.map((item) => `${item.src} ${item.width}w`).join(", "),
+        sizes,
+      }
+    : { src: imageSource(source) };
+}
+
+/** Keep aligned with .hub-hero (100svh, minimum 540px), with no crop changes. */
+export function homeHeroSizes(source: string) {
+  const image = imageVariants(source);
+  const aspect = image ? Number((image.width / image.height).toFixed(4)) : 1;
+  return `max(100vw, calc(max(100svh, 540px) * ${aspect}))`;
+}
+
+export function framedImageSizes(
+  source: string,
+  width: string,
+  height: string,
+  fit: "cover" | "contain",
+) {
+  const image = imageVariants(source);
+  if (!image) return width;
+  const aspect = Number((image.width / image.height).toFixed(4));
+  return `${fit === "cover" ? "max" : "min"}(${width}, calc(${height} * ${aspect}))`;
+}
+
 /** Expanded photos keep their full native resolution with a lighter encoded file.
  * Unknown CMS references retain their original fallback. */
 export function detailHeroImage(source: string) {
@@ -50,25 +116,10 @@ export function detailHeroImage(source: string) {
 
 /** Sized AVIF candidates retain native resolution and the unchanged WebP/original fallback. */
 export function detailHeroAvif(source: string) {
-  const image = imageVariants(source);
-  const avif = image?.avif;
-  return avif
-    ? {
-        src: avif.src,
-        srcSet: [...(image.avifVariants ?? []), avif]
-          .map((item) => `${item.src} ${item.width}w`)
-          .join(", "),
-        sizes: detailHeroImage(source).sizes,
-      }
-    : undefined;
+  return responsiveAvif(source, detailHeroImage(source).sizes ?? "100vw");
 }
 export function detailHeroPreload(source: string) {
   const avif = detailHeroAvif(source);
   const image = avif ?? detailHeroImage(source);
-  return {
-    href: image.src,
-    imageSrcSet: image.srcSet,
-    imageSizes: image.sizes,
-    type: avif ? "image/avif" : undefined,
-  };
+  return preloadAttributes(image, Boolean(avif));
 }

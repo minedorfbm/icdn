@@ -6,6 +6,7 @@ import { DestinationIndex } from "./DestinationIndex";
 import { useHub } from "@/data/hub-context";
 import { type Destination, type Level } from "@/data/resort";
 import { useI18n } from "@/i18n";
+import { imageVariants } from "@/lib/image-source";
 
 interface Props {
   id: Level;
@@ -23,6 +24,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
   const sectionRef = useRef<HTMLElement>(null);
   const { destinations } = useHub();
   const { t, levelLine, cluster: clusterLabel } = useI18n();
+  const backdropAvif = near ? imageVariants(image)?.avif?.src : undefined;
 
   const all = useMemo(
     () =>
@@ -80,7 +82,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
           observer.disconnect();
         }
       },
-      { rootMargin: "800px 0px" },
+      { rootMargin: "400px 0px" },
     );
     observer.observe(section);
     return () => observer.disconnect();
@@ -95,16 +97,19 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
       className="level level-chapter relative"
     >
       <div className="chapter-backdrop pointer-events-none absolute inset-0 overflow-hidden">
-        <img
-          src={near ? image : undefined}
-          alt=""
-          aria-hidden
-          loading="lazy"
-          decoding="async"
-          width={900}
-          height={1400}
-          className="journey-backdrop level-bg absolute -inset-y-12 left-0 h-[calc(100%+96px)] w-full object-cover"
-        />
+        <picture className="contents">
+          {backdropAvif && <source type="image/avif" srcSet={backdropAvif} />}
+          <img
+            src={near ? image : undefined}
+            alt=""
+            aria-hidden
+            loading="lazy"
+            decoding="async"
+            width={900}
+            height={1400}
+            className="journey-backdrop level-bg absolute -inset-y-12 left-0 h-[calc(100%+96px)] w-full object-cover"
+          />
+        </picture>
       </div>
 
       <div className="chapter-layout relative pr-[var(--hub-rail-gutter)]">

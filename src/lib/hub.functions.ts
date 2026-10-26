@@ -59,7 +59,9 @@ export const getHubData = createServerFn({ method: "GET" }).handler(() =>
       });
     }, publicCache());
     if (!data.levels || !data.destinations) throw new Error("Catalogue temporarily unavailable");
-    return data;
+    // This snapshot contains only validated JSON values. A raw response avoids
+    // serializing every field again into the server-function object graph.
+    return Response.json(data, { headers: { "cache-control": "no-store" } });
   }),
 );
 

@@ -1,4 +1,4 @@
-import manifest from "@/data/image-variants.json";
+import manifest from "@/data/image-variants-runtime.json";
 
 type Candidate = { src: string; width: number; bytes?: number };
 export type ImageVariants = {
@@ -11,11 +11,33 @@ export type ImageVariants = {
   avif?: Candidate;
   avifVariants?: Candidate[];
 };
-const images: Record<string, ImageVariants> = manifest;
+const bucket = "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/";
+type CompactImage = {
+  width: number;
+  height: number;
+  aliases: string[];
+  variants: (string | number)[][];
+  avif?: (string | number)[][];
+};
+const images: Record<string, CompactImage> = manifest;
 const aliases = new Map<string, ImageVariants>();
-for (const [source, image] of Object.entries(images)) {
+const candidate = (pair: (string | number)[]): Candidate => ({
+  src: bucket + pair[0],
+  width: Number(pair[1]),
+});
+for (const [name, compact] of Object.entries(images)) {
+  const source = bucket + name;
+  const avifs = compact.avif?.map(candidate);
+  const image: ImageVariants = {
+    src: source,
+    width: compact.width,
+    height: compact.height,
+    variants: compact.variants.map(candidate),
+    ...(avifs?.length ? { avif: avifs.at(-1)!, avifVariants: avifs.slice(0, -1) } : {}),
+  };
   aliases.set(source, image);
-  for (const alias of image.aliases ?? []) aliases.set(alias, image);
+  for (const alias of compact.aliases)
+    aliases.set(alias.startsWith("$") ? bucket + alias.slice(1) : alias, image);
 }
 
 /** Exact reviewed aliases only: cached catalogues and current URLs use the same photo. */

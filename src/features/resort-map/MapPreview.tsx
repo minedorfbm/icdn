@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { ArrowUpRight, ChevronDown, X } from "lucide-react";
 import { useI18n } from "@/i18n";
-import { responsiveImage } from "@/lib/responsive-image";
+import { ResponsivePhoto } from "@/components/ui/responsive-photo";
 import type { Destination } from "@/data/resort";
 import { mapCopy } from "./map-copy";
 import type { MapCamera } from "./map-camera";
@@ -54,9 +54,10 @@ export function MapPreview({
     >
       <div className="atlas-preview-background" aria-hidden="true">
         {primary && !photoFailed && (
-          <img
+          <ResponsivePhoto
             key={primary.image}
-            {...responsiveImage(primary.image, "(min-width: 768px) 520px, 85vw")}
+            source={primary.image}
+            sizes="(min-width: 768px) 520px, 85vw"
             alt=""
             decoding="async"
             style={{ objectPosition: primary.imagePosition }}

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import type { DestinationPhoto } from "@/data/resort";
 import { PhotoLightbox } from "./PhotoLightbox";
-import { responsiveImage } from "@/lib/responsive-image";
+import { framedImageSizes } from "@/lib/responsive-image";
+import { ResponsivePhoto } from "@/components/ui/responsive-photo";
 
 interface Props {
   photos: DestinationPhoto[];
@@ -42,8 +43,14 @@ export function InstagramStrip({ photos, instagramUrl, label }: Readonly<Props>)
             onClick={() => setOpen(i)}
             className="relative aspect-[3/4] w-[58vw] max-w-[260px] shrink-0 snap-start overflow-hidden bg-[oklch(0.18_0.02_250)] transition-opacity active:opacity-80"
           >
-            <img
-              {...responsiveImage(photo.image, "(max-width: 520px) 58vw, 260px")}
+            <ResponsivePhoto
+              source={photo.image}
+              sizes={framedImageSizes(
+                photo.image,
+                "min(58vw, 260px)",
+                "min(77.333vw, 346.667px)",
+                "cover",
+              )}
               alt={photo.caption ?? ""}
               loading="lazy"
               decoding="async"

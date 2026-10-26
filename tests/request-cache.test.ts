@@ -1,6 +1,22 @@
 import { expect, test } from "bun:test";
 import { createRequestCache } from "../src/lib/request-cache";
 
+test("an early catalogue request keeps its original freshness deadline", async () => {
+  let now = 20;
+  const cache = createRequestCache<string>(
+    () => true,
+    30,
+    () => now,
+  );
+  await cache.read("catalogue", async () => "early", false, 0);
+  now = 29;
+  expect(cache.peek("catalogue")).toBe("early");
+  now = 30;
+  expect(cache.peek("catalogue")).toBeUndefined();
+  await cache.read("catalogue", async () => "fresh");
+  expect(cache.peek("catalogue")).toBe("fresh");
+});
+
 test("navigation and media readers share a request, then expire without serving stale data", async () => {
   let now = 0;
   let reads = 0;

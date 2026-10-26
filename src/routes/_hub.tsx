@@ -6,6 +6,7 @@ import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 import { ResortLogo } from "@/components/hub/ResortLogo";
 import { HubHero } from "@/components/hub/HubHero";
 import { HERO_LANDSCAPE_MEDIA, HERO_PORTRAIT_MEDIA } from "@/lib/hero-media";
+import { homeHeroSizes, picturePreload, thumbnailImage } from "@/lib/responsive-image";
 import { HubSearch } from "@/features/search/HubSearch";
 import { HubSearchProvider } from "@/features/search/HubSearchProvider";
 import { DiscoveryPaths } from "@/features/discovery/DiscoveryPaths";
@@ -22,7 +23,8 @@ import { LevelChapter } from "@/components/hub/LevelChapter";
 import { NamTramRail } from "@/components/hub/NamTramRail";
 import { type Level } from "@/data/resort";
 import { HubProvider, useHub } from "@/data/hub-context";
-import type { HubData } from "@/lib/hub.functions";
+import { getHubData, type HubData } from "@/lib/hub.functions";
+import { catalogueBootstrap } from "@/lib/catalogue-bootstrap";
 import {
   loadDestinationCard,
   loadHubData,
@@ -54,20 +56,35 @@ export const Route = createFileRoute("/_hub")({
   },
   staleTime: 0,
   head: ({ loaderData }) => ({
+    scripts: loaderData?.isHome ? [{ children: catalogueBootstrap(getHubData.url) }] : [],
     links: loaderData?.isHome
       ? [
           {
             rel: "preload",
             as: "image",
-            href: resolveHeroImage(loaderData),
+            ...picturePreload(
+              resolveHeroImage(loaderData),
+              homeHeroSizes(resolveHeroImage(loaderData)),
+            ),
             media: HERO_PORTRAIT_MEDIA,
             fetchPriority: "high",
           },
           {
             rel: "preload",
             as: "image",
-            href: resolveHeroImage(loaderData, "landscape"),
+            ...picturePreload(
+              resolveHeroImage(loaderData, "landscape"),
+              homeHeroSizes(resolveHeroImage(loaderData, "landscape")),
+            ),
             media: HERO_LANDSCAPE_MEDIA,
+            fetchPriority: "high",
+          },
+          {
+            rel: "preload",
+            as: "image",
+            href: thumbnailImage("/michelin-key.webp", "80px").src,
+            imageSrcSet: thumbnailImage("/michelin-key.webp", "80px").srcSet,
+            imageSizes: "80px",
             fetchPriority: "high",
           },
         ]

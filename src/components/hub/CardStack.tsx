@@ -5,7 +5,9 @@ import type { Destination } from "@/data/resort";
 import { cardPosition, swipeStep } from "@/lib/card-swipe";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useI18n } from "@/i18n";
-import { responsiveImage } from "@/lib/responsive-image";
+import { preload } from "react-dom";
+import { coverImageSizes, picturePreload } from "@/lib/responsive-image";
+import { useCardImageSize } from "@/lib/use-card-image-size";
 
 /** A front-facing hero and two receding previews, all sharing one responsive stage. */
 // Slot geometry: [horizontal offset, scale, brightness, stacking order, rotation Y].
@@ -61,6 +63,7 @@ export function CardStack({
 }>) {
   const [drag, setDrag] = useState(0); // px, negative = pulling next card in
   const [dragging, setDragging] = useState(false);
+  const { stage, box } = useCardImageSize(items.length, layout);
   const { openDestination } = useDestinationNavigation();
   const { t } = useI18n();
   const moved = useRef(false);
@@ -91,27 +94,15 @@ export function CardStack({
   }, [items]);
 
   // Keep images, text and links out of the per-frame drag renders.
-  // Decode adjacent images at low priority before either swipe direction needs them.
+  // Warm adjacent pictures at low priority, using the same format and size as the panel.
   useEffect(() => {
-    if (!near) return;
+    if (!near || !box) return;
     const neighbours = [items[index - 1], items[index + 1]].filter(Boolean);
-    const images = neighbours.map((item) => {
-      const image = new Image();
-      image.fetchPriority = "low";
-      image.decoding = "async";
-      const source = responsiveImage(item!.image, "(min-width: 768px) 1100px, 900px");
-      if (source.srcSet) image.srcset = source.srcSet;
-      if (source.sizes) image.sizes = source.sizes;
-      image.src = source.src;
-      void image.decode().catch(() => {});
-      return image;
+    neighbours.forEach((item) => {
+      const { href, ...source } = picturePreload(item!.image, coverImageSizes(item!.image, box));
+      preload(href, { as: "image", fetchPriority: "low", ...source });
     });
-    return () => {
-      images.forEach((image) => {
-        image.removeAttribute("src");
-      });
-    };
-  }, [items, index, near]);
+  }, [items, index, near, box]);
 
   const panels = useMemo(
     () =>
@@ -122,6 +113,7 @@ export function CardStack({
           active={i === index}
           priority={near && i === index}
           near={near}
+          imageSizes={box ? coverImageSizes(dest.image, box) : undefined}
           onOpen={() =>
             i === index
               ? openDestination(
@@ -132,7 +124,7 @@ export function CardStack({
           }
         />
       )),
-    [items, index, near, onIndexChange, openDestination],
+    [items, index, near, box, onIndexChange, openDestination],
   );
 
   if (items.length === 0) return null;
@@ -210,6 +202,7 @@ export function CardStack({
     <div className={`w-full select-none ${layout === "discovery" ? "discovery-stack" : ""}`}>
       {/* single shared stage */}
       <div
+        ref={stage}
         className="card-stack-stage relative grid w-full touch-pan-y overflow-hidden py-6"
         onPointerDown={onDown}
         onPointerMove={onMove}
