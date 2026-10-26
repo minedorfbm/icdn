@@ -48,6 +48,10 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, options?: Parameters<ServerEntry["fetch"]>[1]) {
+    if (new URL(request.url).pathname.startsWith("/media/")) {
+      const { serveImage } = await import("./lib/image-edge-cache");
+      return serveImage(request);
+    }
     const requestId = crypto.randomUUID();
     const nonce = createCspNonce();
     const lang = requestLanguage(request.headers.get("accept-language"));

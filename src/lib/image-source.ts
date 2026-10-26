@@ -1,4 +1,5 @@
 import manifest from "@/data/image-variants-runtime.json";
+import { imageBucket as bucket, imageDeliveryUrl } from "./image-delivery";
 
 type Candidate = { src: string; width: number; bytes?: number };
 export type ImageVariants = {
@@ -11,7 +12,6 @@ export type ImageVariants = {
   avif?: Candidate;
   avifVariants?: Candidate[];
 };
-const bucket = "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/";
 type CompactImage = {
   width: number;
   height: number;
@@ -22,20 +22,21 @@ type CompactImage = {
 const images: Record<string, CompactImage> = manifest;
 const aliases = new Map<string, ImageVariants>();
 const candidate = (pair: (string | number)[]): Candidate => ({
-  src: bucket + pair[0],
+  src: imageDeliveryUrl(bucket + pair[0]),
   width: Number(pair[1]),
 });
 for (const [name, compact] of Object.entries(images)) {
   const source = bucket + name;
   const avifs = compact.avif?.map(candidate);
   const image: ImageVariants = {
-    src: source,
+    src: imageDeliveryUrl(source),
     width: compact.width,
     height: compact.height,
     variants: compact.variants.map(candidate),
     ...(avifs?.length ? { avif: avifs.at(-1)!, avifVariants: avifs.slice(0, -1) } : {}),
   };
   aliases.set(source, image);
+  aliases.set(imageDeliveryUrl(source), image);
   for (const alias of compact.aliases)
     aliases.set(alias.startsWith("$") ? bucket + alias.slice(1) : alias, image);
 }

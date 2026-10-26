@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { imageDeliveryUrl } from "../src/lib/image-delivery";
 import { imageSource } from "../src/lib/image-source";
 import {
   thumbnail,
@@ -77,15 +78,15 @@ test("every generated source stays in Storage, including aliases and native fall
       expect(variant.src).toStartWith(bucket);
       expect(variant.bytes).toBeGreaterThan(0);
     }
-    expect(thumbnail(source)).toBe(image.variants[0]?.src ?? source);
+    expect(thumbnail(source)).toBe(imageDeliveryUrl(image.variants[0]?.src ?? source));
     for (const alias of image.aliases) {
-      expect(imageSource(alias)).toBe(source);
+      expect(imageSource(alias)).toBe(imageDeliveryUrl(source));
       expect(responsiveImage(alias, "900px")).toEqual(responsiveImage(source, "900px"));
       expect(detailHeroPreload(alias)).toEqual(detailHeroPreload(source));
     }
     if (image.variants.length) {
       const card = responsiveImage(source, "900px");
-      expect(card.srcSet).toContain(`${source} ${image.width}w`);
+      expect(card.srcSet).toContain(`${imageDeliveryUrl(source)} ${image.width}w`);
       expect(card.sizes).toBe("900px");
       expect(card.srcSet).not.toContain("320w");
     }
@@ -95,14 +96,14 @@ test("every generated source stays in Storage, including aliases and native fall
 test("expanded heroes preserve native dimensions and cover geometry without duplicate candidates", () => {
   for (const [source, image] of Object.entries(images)) {
     const hero = detailHeroImage(source);
-    expect(hero.src).toBe(source);
+    expect(hero.src).toBe(imageDeliveryUrl(source));
     expect(hero.sizes).toContain("58svh");
     expect(hero.sizes).toContain("min-width: 1200px");
     const candidates = hero.srcSet!.split(", ");
     expect(new Set(candidates.map((item) => item.split(" ").at(-1))).size).toBe(candidates.length);
     expect(candidates.at(-1)).toEndWith(`${image.width}w`);
     const native = image.variants.find((variant) => variant.width === image.width);
-    expect(candidates.at(-1)).toBe(`${native?.src ?? source} ${image.width}w`);
+    expect(candidates.at(-1)).toBe(`${imageDeliveryUrl(native?.src ?? source)} ${image.width}w`);
   }
   expect(detailHeroImage("https://example.com/new-photo.webp")).toEqual({
     src: "https://example.com/new-photo.webp",
@@ -114,21 +115,23 @@ test("AVIF preloads agree with the native source and retain a fallback for new C
     const preload = detailHeroPreload(source);
     const avif = detailHeroAvif(source);
     if ("avif" in image) {
-      expect(avif?.src).toBe(image.avif.src);
-      expect(avif?.srcSet?.split(", ").at(-1)).toBe(`${image.avif.src} ${image.width}w`);
+      expect(avif?.src).toBe(imageDeliveryUrl(image.avif.src));
+      expect(avif?.srcSet?.split(", ").at(-1)).toBe(
+        `${imageDeliveryUrl(image.avif.src)} ${image.width}w`,
+      );
       if ("avifVariants" in image)
         for (const variant of image.avifVariants) {
-          expect(avif?.srcSet).toContain(`${variant.src} ${variant.width}w`);
+          expect(avif?.srcSet).toContain(`${imageDeliveryUrl(variant.src)} ${variant.width}w`);
           expect(variant.src).toStartWith(bucket);
         }
       expect(preload.imageSrcSet).toBe(avif?.srcSet);
       expect(preload.imageSizes).toBe(avif?.sizes);
       expect(image.avif.src).toStartWith(bucket);
-      expect(preload.href).toBe(image.avif.src);
+      expect(preload.href).toBe(imageDeliveryUrl(image.avif.src));
       expect(preload.type).toBe("image/avif");
     } else {
       expect(avif).toBeUndefined();
-      expect(preload.href).toBe(source);
+      expect(preload.href).toBe(imageDeliveryUrl(source));
       expect(preload.type).toBeUndefined();
     }
   }

@@ -20,7 +20,10 @@ export const test = base.extend({
     // Layout/network-priority tests use a deterministic image. Real Storage files
     // are separately verified by digest and decoded before publishing the manifest.
     await context.route(
-      "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/**",
+      (url) =>
+        url.pathname.startsWith("/media/") ||
+        (url.hostname === "cxcffaegqyvbhrpzpowa.supabase.co" &&
+          url.pathname.startsWith("/storage/v1/object/public/hub-images/")),
       (route) =>
         route.fulfill({
           path: new URL("../public/intercontinental-touch-icon.png", import.meta.url).pathname,

@@ -1,3 +1,4 @@
+import { imageDeliveryUrl } from "../src/lib/image-delivery";
 import images from "../src/data/image-variants.json" with { type: "json" };
 import { expect, test } from "./fixtures";
 
@@ -13,7 +14,7 @@ test("hosted posts show their images without Instagram and preserve independent 
     const file = image.aliases.find((alias) => alias.startsWith("/instagram-posts/"));
     if (!file) continue;
     for (const candidate of image.variants)
-      await page.route(candidate.src, (route) =>
+      await page.route(imageDeliveryUrl(candidate.src), (route) =>
         route.fulfill({
           path: new URL(`../public${file}`, import.meta.url).pathname,
           contentType: "image/webp",
@@ -36,8 +37,10 @@ test("hosted posts show their images without Instagram and preserve independent 
   const original = Object.values(images).find((image) =>
     image.aliases.includes("/instagram-posts/DGwwT3cCPE5-1.webp"),
   )!;
-  await expect(photo).toHaveAttribute("src", original.src);
-  expect(await photo.getAttribute("srcset")).toContain(`${original.src} ${original.width}w`);
+  await expect(photo).toHaveAttribute("src", imageDeliveryUrl(original.src));
+  expect(await photo.getAttribute("srcset")).toContain(
+    `${imageDeliveryUrl(original.src)} ${original.width}w`,
+  );
   expect(original.width).toBe(1200);
   const secondPhoto = first.getByRole("button").nth(1);
   await secondPhoto.click();

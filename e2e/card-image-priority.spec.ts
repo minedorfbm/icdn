@@ -1,3 +1,4 @@
+import { imageDeliveryUrl } from "../src/lib/image-delivery";
 import { expect, test } from "./fixtures";
 import images from "../src/data/image-variants.json" with { type: "json" };
 const knownPhoto =
@@ -10,9 +11,9 @@ const photo = Object.values(images).find((image) => image.aliases.includes(known
 };
 const photoPaths = new Set([
   new URL(knownPhoto).pathname,
-  ...photo.variants.map((v) => new URL(v.src).pathname),
-  ...photo.avifVariants.map((v) => new URL(v.src).pathname),
-  new URL(photo.avif.src).pathname,
+  ...photo.variants.map((v) => new URL(imageDeliveryUrl(v.src), "http://localhost").pathname),
+  ...photo.avifVariants.map((v) => new URL(imageDeliveryUrl(v.src), "http://localhost").pathname),
+  new URL(imageDeliveryUrl(photo.avif.src), "http://localhost").pathname,
 ]);
 for (const scenario of [
   { label: "new CMS photo", hero: "/intercontinental-touch-icon.png?card-detail-only=citron" },
@@ -86,7 +87,8 @@ for (const scenario of [
         request.url().includes("card-detail-only=") ||
         (photoPaths.has(new URL(request.url()).pathname) &&
           // Visible desktop/tablet picker thumbnails are intentional, not hero transfers.
-          new URL(request.url()).pathname !== new URL(photo.variants[0]!.src).pathname)
+          new URL(request.url()).pathname !==
+            new URL(imageDeliveryUrl(photo.variants[0]!.src), page.url()).pathname)
       )
         requests.push(request.url());
     });
@@ -128,9 +130,14 @@ for (const scenario of [
             .evaluate((image: HTMLImageElement) => image.currentSrc),
         )
         .toBe(
-          Object.values(images).find((image) =>
-            image.aliases.includes("/intercontinental-touch-icon.png"),
-          )!.src,
+          new URL(
+            imageDeliveryUrl(
+              Object.values(images).find((image) =>
+                image.aliases.includes("/intercontinental-touch-icon.png"),
+              )!.src,
+            ),
+            page.url(),
+          ).href,
         );
       expect(requests).toHaveLength(1);
       await page.getByRole("button", { name: "Photo 1", exact: true }).click();
@@ -185,8 +192,8 @@ test.describe("native responsive image on a direct route", () => {
     );
     await page.goto("/design-digital-tour");
     const image = page.locator(".editorial-hero img");
-    await expect(image).toHaveAttribute("src", photo.src);
-    await expect(image).toHaveAttribute("srcset", new RegExp("/hub-images/adj-"));
+    await expect(image).toHaveAttribute("src", imageDeliveryUrl(photo.src));
+    await expect(image).toHaveAttribute("srcset", new RegExp("/media/adj-"));
     await expect(image).not.toHaveAttribute("loading", "lazy");
     await expect
       .poll(() =>

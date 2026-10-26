@@ -87,3 +87,13 @@ Les schémas des fiches, horaires, collections, annonces et avantages restent va
 Comparaison locale du 26 octobre 2026 avec le même verrou de dépendances et le même build de production : fichier d'entrée de 480 257 à 386 536 octets, et de 146 786 à 120 564 octets avec la même compression gzip locale. L'analyse des sourcemaps temporaires ne trouve plus Zod ni l'initialisation `jitless` dans les chunks client. Ce relevé de poids ne représente pas un gain LCP mesuré, ni le transfert Brotli réel de Cloudflare. Les sourcemaps servent seulement à l'analyse locale ; elles ne sont pas activées dans la configuration publiée.
 
 `tests/presentation-boundary.test.ts` construit les fonctions de présentation pour le navigateur et vérifie qu'elles ne réintroduisent ni import Zod ni initialisation de la validation. Les tests de données continuent de vérifier les mêmes schémas et rejets au serveur.
+
+## Cache des photos publiques versionnées
+
+Les variantes raster publiées dans `image-variants-runtime.json` dont le nom commence par `adj-<empreinte>` sont livrées par `/media/<fichier>` sur le domaine du hub. Supabase `hub-images` reste leur origine. Le Worker ne réencode pas les fichiers et ne modifie ni le cadrage ni les candidats responsive. Les SVG, anciennes adresses non versionnées et nouvelles photos CMS hors inventaire conservent leur livraison existante.
+
+La route accepte uniquement GET/HEAD et les fichiers de la liste publiée, sans paramètres. Elle ne transmet aucun cookie, jeton ou en-tête du visiteur à Supabase, refuse les redirections et les types inattendus, et ne met en cache que les réponses 200. Une erreur reste `no-store`. Les réponses réussies utilisent `public, max-age=31536000, immutable` et une empreinte comme ETag ; une nouvelle image doit donc avoir un nouveau nom, jamais écraser un fichier publié.
+
+`x-image-cache` indique HIT, MISS ou BYPASS. Le remplissage utilise `Request.waitUntil`, fourni par l’adaptateur Cloudflare de Nitro, pour ne pas retarder le flux vers le navigateur. Le cache ne concerne pas les documents HTML avec nonce ni les réponses du catalogue.
+
+La [Cache API Cloudflare](https://developers.cloudflare.com/workers/runtime-apis/cache/) est locale au centre de données et n’utilise pas Tiered Cache. Un MISS sur un nouveau centre est normal. Ne pas comparer deux requêtes comme un couple froid/chaud si leurs centres diffèrent. Le pilote Smart Placement des prévisualisations reste distinct du placement de production ; vérifier les réponses et les temps sur le domaine final après fusion avant de conclure à un gain local à Da Nang. Le cache peut être évincé avant sa durée maximale.
