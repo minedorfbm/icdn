@@ -1,0 +1,20 @@
+import type { z } from "zod";
+import type { mapPlaceRow, mapLinkRow } from "@/lib/hub-schema";
+import type { Level } from "@/data/resort";
+export type PlaceCategory =
+  "dining" | "wellness" | "experiences" | "beach" | "bensley" | "accommodation";
+export type MapPoint = { x: number; y: number };
+export type Place = {
+  id: string;
+  pin: number;
+  name: string;
+  level: Level;
+  categories: PlaceCategory[];
+  point: MapPoint;
+  focus: MapPoint & { zoom: number };
+  accommodationGroup?: NonNullable<MapPlaceRow["accommodation_group"]>;
+  coveredLevels: Level[];
+  roomNumbers?: string;
+};
+export type MapPlaceRow = z.infer<typeof mapPlaceRow>;
+export type MapLinkRow = z.infer<typeof mapLinkRow>;

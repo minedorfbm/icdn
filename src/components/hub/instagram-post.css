@@ -1,0 +1,44 @@
+.instagram-post[data-fit-to-screen] {
+  --instagram-preview-width: min(320px, calc(100vw - 2 * var(--editorial-gutter, 24px)));
+  position: relative;
+  width: var(--instagram-preview-width);
+}
+
+/* Measure independently of the fitted post so a shorter viewport cannot
+   repeatedly shrink its width. The carousel follows the painted width. */
+.instagram-post-bounds {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: var(--instagram-preview-width);
+  height: min(800px, max(160px, calc(100svh - 80px)));
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Keep Instagram's stable native layout, with a caption excerpt instead of
+   shrinking all the text to fit. No extra nested scrolling is introduced. */
+.instagram-post[data-fit-to-screen] .instagram-post-content {
+  width: 326px;
+  transform-origin: top left;
+}
+.instagram-post[data-fit-to-screen] .instagram-post-content iframe {
+  display: block;
+  /* Instagram injects inline dimensions and margins; specificity alone cannot
+     override them. Keep the official embed inside the approved caption preview. */
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+.instagram-post-viewport[data-caption-preview] {
+  position: relative;
+}
+.instagram-post-viewport[data-caption-preview]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 28px;
+  background: linear-gradient(transparent, white);
+  pointer-events: none;
+}

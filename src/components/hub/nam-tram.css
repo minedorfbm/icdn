@@ -1,0 +1,191 @@
+.nam-tram {
+  --tram-ebony: oklch(0.17 0.008 155);
+  --tram-brass: oklch(0.79 0.066 83);
+  color: var(--tram-brass);
+}
+
+.nam-tram-rail {
+  color: var(--brand-ink);
+}
+
+.nam-tram-rail[data-level="sky"],
+.nam-tram-rail[data-level="earth"] {
+  color: oklch(0.95 0.01 100);
+}
+
+.nam-tram-rail[data-level="sea"] {
+  color: var(--world-sea-foreground);
+}
+
+.nam-tram-track-segment {
+  position: absolute;
+  inset-inline: 0;
+}
+
+/* Interrupt the cable around each transparent symbol, rather than filling its background. */
+.nam-tram-track-segment::before {
+  content: "";
+  position: absolute;
+  inset: 18px 0;
+  border-inline: 1px solid color-mix(in oklab, currentColor 30%, transparent);
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 23px,
+    color-mix(in oklab, currentColor 15%, transparent) 23px 24px
+  );
+}
+
+.nam-tram-stop {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  max-width: none;
+  color: inherit;
+}
+
+.nam-tram-stop svg {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
+.nam-tram-rail .nam-tram-stop[data-active="true"] {
+  visibility: hidden;
+}
+
+.nam-tram-cabin {
+  display: block;
+  width: 38px;
+  max-width: none;
+  height: auto;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 2px oklch(0 0 0 / 0.4));
+}
+
+.nam-tram-carriage {
+  transform: translateY(calc(var(--tram-progress, 0) * 100%));
+}
+
+.nam-tram-panel {
+  border-color: oklch(0.79 0.066 83 / 0.38);
+  background:
+    radial-gradient(ellipse at 50% 0, oklch(0.3 0.026 83 / 0.22), transparent 60%),
+    var(--tram-ebony);
+  box-shadow: 0 -12px 64px oklch(0 0 0 / 0.3);
+}
+
+/* Keep the close control comfortable to tap without competing with the artwork. */
+.nam-tram-panel > button {
+  display: grid;
+  place-items: center;
+  top: 8px;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--tram-brass);
+}
+
+.nam-tram-panel > button:focus {
+  box-shadow: none;
+}
+
+.nam-tram-panel > button:focus-visible {
+  outline: 1px solid var(--tram-brass);
+  outline-offset: -5px;
+}
+
+.nam-tram-art {
+  margin: 0 auto;
+  width: min(300px, 100%);
+}
+
+.nam-tram-art img {
+  display: block;
+  width: 100%;
+  height: min(180px, 24svh);
+  object-fit: contain;
+  filter: drop-shadow(0 8px 12px oklch(0 0 0 / 0.25));
+}
+
+.nam-tram-heading {
+  align-items: center;
+  margin: 16px 0 20px;
+  color: oklch(0.93 0.025 85);
+}
+
+.nam-tram-heading::after {
+  content: "";
+  width: 40px;
+  height: 1px;
+  margin-top: 16px;
+  background: var(--tram-brass);
+  opacity: 0.55;
+}
+
+.nam-tram-stations {
+  position: relative;
+}
+
+.nam-tram-station {
+  color: oklch(0.82 0.02 85);
+  cursor: pointer;
+  transition: color 200ms;
+}
+
+.nam-tram-station::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50px;
+  right: 0;
+  height: 1px;
+  background: oklch(0.79 0.066 83 / 0.12);
+}
+
+.nam-tram-station:last-child::after {
+  display: none;
+}
+
+.nam-tram-station[aria-current],
+.nam-tram-station:focus-visible {
+  color: var(--tram-brass);
+}
+
+.nam-tram-station-marker {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.nam-tram-station-end {
+  margin-left: auto;
+  margin-right: 4px;
+  width: 5px;
+  height: 5px;
+  border: 1px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.3;
+}
+
+.nam-tram-station[aria-current] .nam-tram-station-end {
+  background: currentColor;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .nam-tram-station:hover {
+    color: var(--tram-brass);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nam-tram-station {
+    transition: none;
+  }
+}

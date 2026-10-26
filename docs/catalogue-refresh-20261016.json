@@ -1,0 +1,388 @@
+{
+  "destinations": [
+    {
+      "id": "citron",
+      "fields": {
+        "image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2026/04/Citron_Landingpage.jpg",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/citron-home-cf8c7ab6531b.webp"
+        },
+        "detail_image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/citron-detail-638d32b73a.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/citron-detail-3b0c495a2769.webp"
+        }
+      }
+    },
+    {
+      "id": "ihg-one-rewards",
+      "fields": {
+        "image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/ihg-one-rewards-home-43918a51e2.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/ihg-one-rewards-home-7d04d86f84ee.webp"
+        },
+        "detail_image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/ihg-one-rewards-detail-3615b80fe8.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/ihg-one-rewards-detail-d46b935eb0df.webp"
+        }
+      }
+    },
+    {
+      "id": "bensley-package",
+      "fields": {
+        "image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/offer-bensley-dca5bf101a26.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/bensley-package-home-9ff5152260e6.webp"
+        }
+      }
+    },
+    {
+      "id": "apec-garden",
+      "fields": {
+        "image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/apec-garden-home-717fa09e00.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/apec-garden-home-8b17b91ddf96.webp"
+        }
+      }
+    },
+    {
+      "id": "culinary-activities",
+      "fields": {
+        "image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2024/05/Citron-Buffet-2-scaled.jpg",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/culinary-activities-home-d80f77cbe569.webp"
+        },
+        "detail_image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2026/04/Citron_Landingpage.jpg",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/culinary-activities-detail-6ff1ae1a839c.webp"
+        }
+      }
+    },
+    {
+      "id": "buffalo-bar",
+      "fields": {
+        "detail_image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2021/10/Buffalo-Bar-_-with-Bartender-scaled-e1634709794933.jpg",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/buffalo-bar-detail-cee8352dc9f8.webp"
+        }
+      }
+    },
+    {
+      "id": "tingara",
+      "fields": {
+        "detail_image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/tingara-detail-6fbfb6722f.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/tingara-detail-090e7789d872.webp"
+        },
+        "detail_description": {
+          "old": "Watch Japanese teppanyaki unfold at a chef-led counter, with premium seafood, exceptional beef and carefully chosen wine and sake. Bill Bensley’s circular bird’s-nest design and rainforest views frame this intimate culinary experience.",
+          "new": "Watch Japanese teppanyaki unfold in a culinary experience guided by Chef Junichi Yoshida, with premium seafood, exceptional beef and carefully chosen wine and sake. Bill Bensley’s circular bird’s-nest design and rainforest views frame this intimate culinary experience."
+        }
+      }
+    },
+    {
+      "id": "heritage-village",
+      "fields": {
+        "detail_image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/heritage-village-detail-9db978579b.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/heritage-village-detail-961d3f8231e2.webp"
+        }
+      }
+    },
+    {
+      "id": "bensley-gallery",
+      "fields": {
+        "detail_image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2022/04/COUPLE-AT-BENSLEY-GALLERY-2-scaled.jpg",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/bensley-gallery-detail-339f94ce6722.webp"
+        }
+      }
+    },
+    {
+      "id": "long-bar",
+      "fields": {
+        "image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2026/04/Longbar_Landingpage.jpg",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/long-bar-home-3868d323bd49.webp"
+        }
+      }
+    },
+    {
+      "id": "nursery",
+      "fields": {
+        "image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2022/11/DSC02279-e1673927393394.jpg",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/nursery-home-1b8a9fbc8b72.webp"
+        },
+        "detail_image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2026/03/Kids-Club-2-scaled.jpg",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/nursery-detail-a5086ebcf69a.webp"
+        }
+      }
+    },
+    {
+      "id": "organic-garden",
+      "fields": {
+        "image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/organic-garden-home-aae26ae34a.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/organic-garden-home-e50730d3a69a.webp"
+        }
+      }
+    },
+    {
+      "id": "destination-experiences",
+      "fields": {
+        "detail_image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/destination-experiences-detail-cdaac3dffb.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/destination-experiences-detail-2eb4384eadfb.webp"
+        }
+      }
+    },
+    {
+      "id": "sea-experiences",
+      "fields": {
+        "image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2023/11/Kayak-2.jpg",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/sea-experiences-home-73ff1aec5edd.webp"
+        },
+        "detail_image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2026/02/z4459883403599_32a8b89fa940541b1b0eab9f96eead70.jpg.jpeg",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/sea-experiences-detail-39e9a31eab62.webp"
+        }
+      }
+    },
+    {
+      "id": "garden-jacuzzi",
+      "fields": {
+        "image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2026/03/05-08-0006_Garden-Pool-2-scaled.jpg",
+          "new": "https://www.danang.intercontinental.com/wp-content/uploads/2025/06/05-08-0008_Garden-Pool-Jacuzzi-1-scaled.jpg"
+        },
+        "detail_image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2025/06/05-08-0008_Garden-Pool-Jacuzzi-1-scaled.jpg",
+          "new": "https://www.danang.intercontinental.com/wp-content/uploads/2026/03/05-08-0006_Garden-Pool-2-scaled.jpg"
+        }
+      }
+    },
+    {
+      "id": "wine-cellar",
+      "fields": {
+        "image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2021/08/Wine-Cellar-2-scaled.jpg",
+          "new": "https://www.danang.intercontinental.com/wp-content/uploads/2021/10/La-Maison-1888-Wine-Cellar.jpg"
+        },
+        "detail_image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2021/10/La-Maison-1888-Wine-Cellar.jpg",
+          "new": "https://www.danang.intercontinental.com/wp-content/uploads/2021/08/Wine-Cellar-2-scaled.jpg"
+        }
+      }
+    },
+    {
+      "id": "long-pool",
+      "fields": {
+        "image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2026/03/Long-Pool-Outside-2-scaled.jpg",
+          "new": "https://www.danang.intercontinental.com/wp-content/uploads/2022/11/DSC05621.jpg"
+        },
+        "detail_image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2022/11/DSC05621.jpg",
+          "new": "https://www.danang.intercontinental.com/wp-content/uploads/2026/03/Long-Pool-Outside-2-scaled.jpg"
+        }
+      }
+    },
+    {
+      "id": "kids-pool",
+      "fields": {
+        "image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2025/08/Pool-Friends-scaled.jpg",
+          "new": "https://www.danang.intercontinental.com/wp-content/uploads/2022/03/ICDN-Resort-Pool-with-family-scaled-1.jpg"
+        },
+        "detail_image_key": {
+          "old": "https://www.danang.intercontinental.com/wp-content/uploads/2022/03/ICDN-Resort-Pool-with-family-scaled-1.jpg",
+          "new": "https://www.danang.intercontinental.com/wp-content/uploads/2025/08/Pool-Friends-scaled.jpg"
+        }
+      }
+    },
+    {
+      "id": "mi-sol-spa",
+      "fields": {
+        "image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/mi-sol-spa-home-7a3827738f.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/mi-sol-spa-detail-d463f7fef7.webp"
+        },
+        "detail_image_key": {
+          "old": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/mi-sol-spa-detail-d463f7fef7.webp",
+          "new": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/mi-sol-spa-home-7a3827738f.webp"
+        }
+      }
+    },
+    {
+      "id": "enchanted-holiday",
+      "fields": {
+        "image_position": {
+          "old": null,
+          "new": "28% 50%"
+        }
+      }
+    },
+    {
+      "id": "summit-cinema",
+      "fields": {
+        "image_position": {
+          "old": null,
+          "new": "85% 50%"
+        },
+        "name": {
+          "old": "Summit Auditorium",
+          "new": "Cinema"
+        }
+      }
+    },
+    {
+      "id": "la-maison-1888",
+      "fields": {
+        "image_position": {
+          "old": null,
+          "new": "55% 50%"
+        }
+      }
+    }
+  ],
+  "links": [
+    {
+      "destination_id": "relaxation-pavilion",
+      "kind": "DISCOVER",
+      "url": "https://www.danang.intercontinental.com/spa-and-wellbeing/",
+      "label": null,
+      "old_url": null
+    },
+    {
+      "destination_id": "enchanted-holiday",
+      "kind": "WEBSITE",
+      "url": "https://www.danang.intercontinental.com/festive-2026/",
+      "label": "Festive programme",
+      "old_url": null
+    },
+    {
+      "destination_id": "enchanted-holiday",
+      "kind": "BROCHURE",
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/InterContinental-Danang-Festive-2026.pdf",
+      "label": "Festive brochure",
+      "old_url": null
+    },
+    {
+      "destination_id": "ihg-one-rewards",
+      "kind": "INFO",
+      "url": "https://apps.apple.com/fr/app/h%C3%B4tels-ihg-r%C3%A9compenses/id368217298",
+      "label": "Download on the App Store",
+      "old_url": null
+    },
+    {
+      "destination_id": "ihg-one-rewards",
+      "kind": "INFO",
+      "url": "https://play.google.com/store/apps/details?id=com.ihg.apps.android",
+      "label": "Get it on Google Play",
+      "old_url": null
+    },
+    {
+      "destination_id": "apec-garden",
+      "kind": "BROCHURE",
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/03/APEC-Sculpture-Garden-Discovery-brochure-Mar26.pdf",
+      "label": "Sculpture guide",
+      "old_url": null
+    },
+    {
+      "destination_id": "nam-tram",
+      "kind": "DISCOVER",
+      "url": "https://www.danang.intercontinental.com/experiences/ride-our-nam-tram/",
+      "label": null,
+      "old_url": "https://www.danang.intercontinental.com/experiences/the-resort/",
+      "legacy_urls": ["https://www.danang.intercontinental.com/"]
+    },
+    {
+      "destination_id": "nam-tram",
+      "kind": "WEBSITE",
+      "url": "https://www.danang.intercontinental.com/namtram-dining-journey/",
+      "label": "Nam Tram Dining",
+      "old_url": null
+    },
+    {
+      "destination_id": "moulin-rouge",
+      "kind": "DISCOVER",
+      "url": "https://www.danang.intercontinental.com/venues/m-rouge/",
+      "label": null,
+      "old_url": null
+    },
+    {
+      "destination_id": "bensley-gallery",
+      "kind": "BROCHURE",
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2024/02/A-HISTORY-OF-VIETNAM-CATALOGUE-FOR-WEB.pdf",
+      "label": "A History of Vietnam",
+      "old_url": null
+    },
+    {
+      "destination_id": "bensley-gallery",
+      "kind": "BROCHURE",
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2025/06/Bill-Bensley-Gallery-Catalogue-June-2025.pdf",
+      "label": "Gallery catalogue",
+      "old_url": null
+    },
+    {
+      "destination_id": "organic-garden",
+      "kind": "DISCOVER",
+      "url": "https://www.danang.intercontinental.com/experiences/nature/",
+      "label": null,
+      "old_url": "https://www.danang.intercontinental.com/recreation/culinary-activities/",
+      "legacy_urls": ["https://www.danang.intercontinental.com/"]
+    },
+    {
+      "destination_id": "dia-tang",
+      "kind": "DISCOVER",
+      "url": "https://www.danang.intercontinental.com/amenities/our-spirit-house/",
+      "label": null,
+      "old_url": "https://www.danang.intercontinental.com/recreation/cultural-activities/",
+      "legacy_urls": ["https://www.danang.intercontinental.com/"]
+    },
+    {
+      "destination_id": "club-beach",
+      "kind": "DISCOVER",
+      "url": "https://www.danang.intercontinental.com/amenities/club-intercontinental/",
+      "label": null,
+      "old_url": "https://www.danang.intercontinental.com/recreation/beach-water-sports/",
+      "legacy_urls": ["https://www.danang.intercontinental.com/"]
+    }
+  ],
+  "relations": [
+    ["summit-cinema", "the-summit"],
+    ["nam-tram", "nam-tram-dining"],
+    ["bensley-gallery", "kate-mccoy"],
+    ["bensley-gallery", "bensley-package"],
+    ["long-bar", "long-pool"],
+    ["nursery", "planet-trekkers"],
+    ["nature-experiences", "things-to-do"],
+    ["shuttle", "things-to-do"],
+    ["destination-experiences", "things-to-do"],
+    ["culinary-activities", "things-to-do"],
+    ["mi-sol-spa", "nail-hair"],
+    ["club-intercontinental", "club-lounge"],
+    ["club-beach", "club-lounge"]
+  ],
+  "primary": [
+    {
+      "destination_id": "bensley-gallery",
+      "kind": "BROCHURE",
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2024/02/A-HISTORY-OF-VIETNAM-CATALOGUE-FOR-WEB.pdf"
+    },
+    {
+      "destination_id": "things-to-do",
+      "kind": "DAILY_SCHEDULE",
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/08/Your-Guide-to-Fun-at-InterContinental-Danang.pdf"
+    },
+    {
+      "destination_id": "nature-experiences",
+      "kind": "BROCHURE",
+      "url": "https://www.danang.intercontinental.com/wp-content/uploads/2026/05/Nature-Discovery-Guide.pdf",
+      "label": "Discovery guide"
+    }
+  ],
+  "tingara_detail": "Watch Japanese teppanyaki unfold in a culinary experience guided by Chef Junichi Yoshida, with premium seafood, exceptional beef and carefully chosen wine and sake. Bill Bensley’s circular bird’s-nest design and rainforest views frame this intimate culinary experience."
+}

@@ -1,0 +1,746 @@
+/* oxlint-disable jsx-a11y/prefer-tag-over-role -- interactive SVG hotspots cannot be HTML buttons. */
+import { useLayoutEffect, useMemo, useRef, useState, type SVGProps, type MouseEvent } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BedDouble,
+  Compass,
+  MapPin,
+  Sparkles,
+  Utensils,
+} from "lucide-react";
+import { ArchitectureArtwork } from "./ArchitectureArtwork";
+import { useI18n } from "@/i18n";
+import { imageSource } from "@/lib/image-source";
+import { mapCopy } from "./map-copy";
+import { ResortLevelIcon } from "@/components/hub/ResortLevelIcon";
+import type { Level } from "@/data/resort";
+import { layoutTramLabels } from "./tram-labels";
+import { layoutPhotoSpots, visibleMapLabels } from "./map-labels";
+import {
+  MAP_SIZE,
+  REFERENCE_IMAGE,
+  beach,
+  cliff,
+  coast,
+  landmass as LANDMASS,
+  levelRoads,
+  palms,
+  stations,
+  trace,
+  trailEast,
+  trailInterior,
+  trailWest,
+  tramAxis,
+} from "./map.geometry";
+import type { PlaceCategory, Place } from "./map.types";
+import type { MapCamera } from "./useMapCamera";
+import type { MapViewport } from "./map-camera";
+import { photoSpots, walkingTimes, type LegendLayers } from "./map.legend";
+
+const collectionIcons = {
+  accommodation: BedDouble,
+  dining: Utensils,
+  wellness: Sparkles,
+  experiences: Compass,
+  beach: MapPin,
+  bensley: Compass,
+};
+
+type MapArtworkProps = {
+  places: Place[];
+  visibleIds: Set<string>;
+  camera: MapCamera;
+  selectedId: string | null;
+  selectedStation: string | null;
+  activeFilters: Set<PlaceCategory>;
+  referenceVisible: boolean;
+  photosVisible: boolean;
+  selectedPhotoId: string | null;
+  previewVisible: boolean;
+  layers: LegendLayers;
+  onSelectPhoto: (id: string) => void;
+  onViewportChange: (viewport: MapViewport) => void;
+  onSelectPlace: (id: string) => void;
+  onSelectStation: (label: string) => void;
+  interactionProps: SVGProps<SVGSVGElement>;
+};
+
+type ViewBox = { x: number; y: number; width: number; height: number };
+
+export function MapArtwork({
+  camera,
+  places,
+  visibleIds,
+  selectedId,
+  selectedStation,
+  activeFilters,
+  referenceVisible,
+  photosVisible,
+  selectedPhotoId,
+  previewVisible,
+  layers,
+  onSelectPhoto,
+  onViewportChange,
+  onSelectPlace,
+  onSelectStation,
+  interactionProps,
+}: Readonly<MapArtworkProps>) {
+  const { lang, levelLabel } = useI18n();
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [viewBox, setViewBox] = useState<ViewBox>({ x: 0, y: 0, ...MAP_SIZE });
+  const [pixelScale, setPixelScale] = useState(1);
+
+  useLayoutEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const update = () => {
+      const { width, height, top } = svg.getBoundingClientRect();
+      if (!width || !height) return;
+      const ratio = width / height;
+      const nextWidth = ratio > 1.5 ? MAP_SIZE.height * ratio : MAP_SIZE.width;
+      const nextHeight = nextWidth / ratio;
+      const next = {
+        x: (MAP_SIZE.width - nextWidth) / 2,
+        y: (MAP_SIZE.height - nextHeight) / 2,
+        width: nextWidth,
+        height: nextHeight,
+      };
+      setViewBox(next);
+      setPixelScale(nextWidth / width);
+      const unit = nextWidth / width;
+      const atlas = svg.closest(".hub-atlas");
+      const dock = atlas?.querySelector(".atlas-bottom")?.getBoundingClientRect();
+      const preview = atlas?.querySelector(".atlas-preview")?.getBoundingClientRect();
+      let right = width - 24;
+      let bottom = (dock ? dock.top - top : height) - 24;
+      if (preview) {
+        // Reserve a stable space from the bubble's size, not its moving position.
+        // Otherwise anchoring the bubble to the camera would create a feedback loop.
+        if (width > 820 || (height < 560 && width > 560))
+          right = Math.min(right, width - preview.width - 48);
+        else bottom = Math.min(bottom, height - preview.height - 170);
+      }
+      // Frame the map in the space actually visible between its controls and sheet.
+      onViewportChange({
+        ...next,
+        frame: {
+          x: next.x + 24 * unit,
+          y: next.y + 24 * unit,
+          width: Math.max(80, right - 24) * unit,
+          height: Math.max(80, bottom - 24) * unit,
+        },
+      });
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(svg);
+    svg
+      .closest(".hub-atlas")
+      ?.querySelectorAll(".atlas-bottom, .atlas-preview")
+      .forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, [onViewportChange, selectedId, selectedPhotoId, lang, previewVisible]);
+
+  const hotspotsRef = useRef<SVGGElement>(null);
+  const interactivePlaces = useMemo(
+    () =>
+      places.filter(
+        (place) =>
+          visibleIds.has(place.id) &&
+          (activeFilters.size === 0 ||
+            place.categories.some((category) => activeFilters.has(category))),
+      ),
+    [places, visibleIds, activeFilters],
+  );
+  const screenScale = camera.scale / pixelScale;
+  const photoOffsets = useMemo(() => layoutPhotoSpots(photoSpots, screenScale), [screenScale]);
+  const stationNames = stations.map((station) => ({
+    ...station,
+    name: levelLabel(station.label.toLowerCase()),
+  }));
+  const stationWidth = Math.max(
+    100,
+    ...stationNames.map((station) => station.name.length * 8 + 40),
+  );
+  const stationSigns = layoutTramLabels(
+    stationNames
+      // Reveal names only when the stops are well separated on screen, or on demand.
+      .filter((station) => station.label === selectedStation || screenScale >= 1.5)
+      .map((station) => ({
+        ...station,
+        x: station.x * screenScale,
+        y: station.y * screenScale,
+      })),
+    stationWidth,
+    [
+      ...interactivePlaces.map((place) => ({
+        x: place.point.x * screenScale - 20,
+        y: place.point.y * screenScale - 20,
+        width: 40,
+        height: place.id === selectedId ? 72 : 40,
+      })),
+      ...interactivePlaces
+        .filter((place) => place.id === selectedId)
+        .map((place) => ({
+          x: place.point.x * screenScale - 96,
+          y: place.point.y * screenScale + 19,
+          width: 192,
+          height: 34,
+        })),
+      // Keep station signs away from the zoom toolbar.
+      {
+        x: (viewBox.x + viewBox.width - camera.x) / pixelScale - 70,
+        y: (viewBox.y - camera.y) / pixelScale,
+        width: 70,
+        height: 160,
+      },
+    ],
+    {
+      x: (viewBox.x - camera.x) / pixelScale,
+      y: (viewBox.y - camera.y) / pixelScale,
+      width: viewBox.width / pixelScale,
+      height: viewBox.height / pixelScale,
+    },
+  );
+  const labelIds = visibleMapLabels(
+    interactivePlaces
+      .filter((place) => {
+        const x = place.point.x * camera.scale + camera.x;
+        const y = place.point.y * camera.scale + camera.y;
+        return (
+          x > viewBox.x + 96 * pixelScale &&
+          x < viewBox.x + viewBox.width - 96 * pixelScale &&
+          y > viewBox.y + 24 * pixelScale &&
+          y < viewBox.y + viewBox.height - 54 * pixelScale
+        );
+      })
+      .map((place) => ({ id: place.id, ...place.point })),
+    selectedId,
+    camera.scale,
+    screenScale,
+    stationSigns.map((sign) => sign.box),
+  );
+  const selectNearestPlace = (event: MouseEvent<SVGGElement>, fallback: Place) => {
+    const matrix = hotspotsRef.current?.getScreenCTM();
+    if (!matrix) return onSelectPlace(fallback.id);
+    // Overlapping touch targets must prefer the marker nearest the finger.
+    const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
+    const distance = (place: Place) => Math.hypot(place.point.x - point.x, place.point.y - point.y);
+    const nearest = interactivePlaces.reduce(
+      (best, place) => (distance(place) < distance(best) ? place : best),
+      fallback,
+    );
+    onSelectPlace(nearest.id);
+  };
+  const selectNearestStation = (event: MouseEvent<SVGGElement>, fallback: string) => {
+    if (event.detail === 0) return onSelectStation(fallback);
+    const matrix = svgRef.current?.getScreenCTM();
+    if (!matrix) return onSelectStation(fallback);
+    const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
+    const distance = (station: (typeof stations)[number]) =>
+      Math.hypot(
+        station.x - (point.x - camera.x) / camera.scale,
+        station.y - (point.y - camera.y) / camera.scale,
+      );
+    // Touch areas can overlap at overview scale; select the stop closest to the tap.
+    const nearest = stations.reduce(
+      (best, station) => (distance(station) < distance(best) ? station : best),
+      stations[0]!,
+    );
+    onSelectStation(nearest.label);
+  };
+
+  const tramCar = { ...stations[0], r: -72 };
+
+  return (
+    <svg
+      {...interactionProps}
+      ref={svgRef}
+      className={`resort-art ${referenceVisible ? "shows-reference" : ""}`}
+      viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+      aria-labelledby="map-title map-description"
+    >
+      <title id="map-title">{mapCopy(lang, "title")}</title>
+      <desc id="map-description">{mapCopy(lang, "note")}</desc>
+      <defs>
+        <linearGradient id="sea-gradient-v2" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#031119" />
+          <stop offset=".48" stopColor="#082b34" />
+          <stop offset="1" stopColor="#0a3440" />
+        </linearGradient>
+        <radialGradient id="sea-light" cx="74%" cy="4%" r="84%">
+          <stop offset="0" stopColor="#5c9ba3" stopOpacity=".26" />
+          <stop offset=".44" stopColor="#174d58" stopOpacity=".09" />
+          <stop offset="1" stopColor="#031119" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="forest-wash" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stopColor="#0b2825" />
+          <stop offset=".48" stopColor="#173e31" stopOpacity=".72" />
+          <stop offset="1" stopColor="#285943" stopOpacity=".55" />
+        </linearGradient>
+        <linearGradient id="sand-gradient-v2" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#c7ae6b" stopOpacity="0" />
+          <stop offset=".22" stopColor="#ead9a2" stopOpacity=".92" />
+          <stop offset=".76" stopColor="#f0e4bd" stopOpacity=".78" />
+          <stop offset="1" stopColor="#c7ae6b" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id="wall-gradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#f5ead1" />
+          <stop offset="1" stopColor="#bfae87" />
+        </linearGradient>
+        <linearGradient id="architecture-ivory" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fff7df" />
+          <stop offset=".55" stopColor="#e3d5b5" />
+          <stop offset="1" stopColor="#b7a37e" />
+        </linearGradient>
+        <linearGradient id="architecture-shade" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#cdbf9e" />
+          <stop offset="1" stopColor="#81775f" />
+        </linearGradient>
+        <linearGradient id="architecture-dark" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#223a3a" />
+          <stop offset="1" stopColor="#08191f" />
+        </linearGradient>
+        <linearGradient id="lagoon-fill" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#79aeb0" stopOpacity=".86" />
+          <stop offset=".58" stopColor="#357b82" stopOpacity=".82" />
+          <stop offset="1" stopColor="#173f49" stopOpacity=".9" />
+        </linearGradient>
+        <linearGradient id="copper-patina" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#bd704c" />
+          <stop offset=".35" stopColor="#7c8d72" />
+          <stop offset=".72" stopColor="#3f8580" />
+          <stop offset="1" stopColor="#244f52" />
+        </linearGradient>
+        <pattern
+          id="charcoal-tiles"
+          width="11"
+          height="8"
+          patternUnits="userSpaceOnUse"
+          patternTransform="skewX(-18)"
+        >
+          <rect width="11" height="8" fill="#1a2d31" />
+          <path d="M0 1h11M0 7h11M5.5 1v6" stroke="#7f8b83" strokeOpacity=".24" strokeWidth=".7" />
+        </pattern>
+        <pattern
+          id="thatch-weave"
+          width="9"
+          height="9"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(18)"
+        >
+          <rect width="9" height="9" fill="#a98652" />
+          <path d="M1 0v9M4 0v9M7 0v9" stroke="#ead29a" strokeOpacity=".36" strokeWidth=".8" />
+        </pattern>
+        <linearGradient id="coral-roof" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#c76e55" />
+          <stop offset="1" stopColor="#733d39" />
+        </linearGradient>
+        <linearGradient id="orchid-roof" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#b28b9d" />
+          <stop offset="1" stopColor="#634b65" />
+        </linearGradient>
+        <linearGradient id="jade-roof" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#5c8668" />
+          <stop offset="1" stopColor="#274c3a" />
+        </linearGradient>
+        <linearGradient id="terra-roof" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#b85a42" />
+          <stop offset="1" stopColor="#69372f" />
+        </linearGradient>
+        <pattern id="water-etch" width="82" height="38" patternUnits="userSpaceOnUse">
+          <path
+            d="M0 20Q19 5 41 20T82 20"
+            fill="none"
+            stroke="#b7d5d3"
+            strokeOpacity=".07"
+            strokeWidth="1"
+          />
+          <path
+            d="M16 31q13-9 26 0t26 0"
+            fill="none"
+            stroke="#b7d5d3"
+            strokeOpacity=".035"
+            strokeWidth="1"
+          />
+        </pattern>
+        <clipPath id="landmass-clip">
+          <path d={LANDMASS} />
+        </clipPath>
+        <filter id="landmark-shadow" x="-60%" y="-60%" width="220%" height="240%">
+          <feDropShadow dx="0" dy="9" stdDeviation="7" floodColor="#000" floodOpacity=".48" />
+        </filter>
+        <filter id="gold-glow-v2" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <rect
+        x={viewBox.x - 120}
+        y={viewBox.y - 120}
+        width={viewBox.width + 240}
+        height={viewBox.height + 240}
+        fill="url(#sea-gradient-v2)"
+      />
+      <rect
+        x={viewBox.x - 120}
+        y={viewBox.y - 120}
+        width={viewBox.width + 240}
+        height={viewBox.height + 240}
+        fill="url(#sea-light)"
+      />
+      <rect
+        x={viewBox.x - 120}
+        y={viewBox.y - 120}
+        width={viewBox.width + 240}
+        height={viewBox.height + 240}
+        fill="url(#water-etch)"
+      />
+
+      <g
+        className="map-scene"
+        transform={`translate(${camera.x} ${camera.y}) scale(${camera.scale})`}
+      >
+        <g className="illustrated-scene" visibility={referenceVisible ? "hidden" : "visible"}>
+          <path className="forest-base" d={LANDMASS} fill="url(#forest-wash)" />
+          <image
+            className="canopy-texture"
+            href={imageSource("/resort-map/canopy.webp")}
+            // Include the curved headland beyond the map's zero baseline.
+            x="-100"
+            y="-180"
+            width="1700"
+            height="1280"
+            preserveAspectRatio="xMidYMid slice"
+            clipPath="url(#landmass-clip)"
+          />
+          <path className="forest-veil" d={LANDMASS} />
+
+          <g className="terrain-contours" fill="none" aria-hidden="true">
+            {[0, 18, 36, 58].map((offset) => (
+              <path key={offset} d={cliff} transform={`translate(${-offset * 0.65} ${offset})`} />
+            ))}
+          </g>
+          <path className="beach-ribbon-v2" d={beach} />
+          <path className="shoreline-v2" d={coast} />
+          <path className="shore-foam" d={coast} transform="translate(0 -4)" />
+          <g className="map-paths" fill="none" strokeLinecap="round" aria-hidden="true">
+            {[trailWest, trailInterior, trailEast].map((d) => (
+              <g key={d}>
+                <path className="path-shadow" d={d} />
+                <path className="discovery-trail" d={d} />
+              </g>
+            ))}
+            {levelRoads.map(({ id, d }) => (
+              <path key={`${id}-${d}`} className={`level-road road-${id}`} d={d} />
+            ))}
+            <path
+              className="entry-road"
+              d={trace([
+                [1650, 1350],
+                [1680, 1400],
+                [1700, 1490],
+              ])}
+            />
+          </g>
+
+          <ArchitectureArtwork
+            places={places}
+            cameraScale={camera.scale}
+            selectedId={
+              selectedId ??
+              (photosVisible
+                ? photoSpots.find((spot) => spot.id === selectedPhotoId)?.parentId
+                : null) ??
+              null
+            }
+            activeFilters={activeFilters}
+          />
+
+          <g className="palm-grove-v2" fill="none" aria-hidden="true">
+            {palms.map(({ x, y, scale }) => (
+              <g key={`${x}-${y}`} transform={`translate(${x} ${y}) scale(${scale})`}>
+                <path d="M0 39Q-2 18 2 0" />
+                <path d="M2 2q-22 0-31 17M2 2q21 1 32 17M2 2Q-9-16-25-11M2 2Q17-17 30-9M2 2Q1-17 8-25" />
+              </g>
+            ))}
+          </g>
+
+          <g className="level-cartouches" aria-hidden="true">
+            <g transform="translate(472 490)">
+              <path d="M0 0h126" />
+              <text className="level-name" x="29" y="-10">
+                {levelLabel("heaven")}
+              </text>
+            </g>
+            <g transform="translate(445 374)">
+              <path d="M0 0h95" />
+              <text className="level-name" x="29" y="-10">
+                {levelLabel("sky")}
+              </text>
+            </g>
+            <g transform="translate(498 232)">
+              <path d="M0 0h104" />
+              <text className="level-name" x="29" y="-10">
+                {levelLabel("earth")}
+              </text>
+            </g>
+            <g transform="translate(880 404)">
+              <path d="M0 0h96" />
+              <text className="level-name" x="29" y="-10">
+                {levelLabel("sea")}
+              </text>
+            </g>
+            <text className="bay-title-v2" x="785" y="110">
+              Bãi Bắc Bay
+            </text>
+            <text className="entrance-caption" x="927" y="847" textAnchor="end">
+              {mapCopy(lang, "entrance")}
+            </text>
+            <text className="lagoon-caption" x="1060" y="530" textAnchor="end">
+              {mapCopy(lang, "lagoon")}
+            </text>
+          </g>
+        </g>
+        {referenceVisible && (
+          <image
+            className="official-plan-layer"
+            href={imageSource("/resort-map/official.webp")}
+            {...REFERENCE_IMAGE}
+            preserveAspectRatio="none"
+          />
+        )}
+
+        {layers.trail && (
+          <g className="trail-highlight" aria-label={mapCopy(lang, "walkNote")}>
+            {[trailWest, trailInterior, trailEast].map((d) => (
+              <path key={d} d={d} />
+            ))}
+          </g>
+        )}
+        {layers.walking && (
+          <g className="walking-time-labels" aria-label={mapCopy(lang, "walkNote")}>
+            {walkingTimes.map((time) => (
+              <g
+                key={`${time.point.x}-${time.point.y}`}
+                transform={`translate(${time.point.x} ${time.point.y}) scale(${pixelScale / camera.scale})`}
+              >
+                <title>{time.minutes} min · Nam Tram</title>
+                <rect x="-30" y="-11" width="60" height="22" rx="11" />
+                <text textAnchor="middle" x={time.direction === "left" ? 7 : -7} y="4">
+                  {time.minutes} min
+                </text>
+                {time.direction === "left" ? (
+                  <ArrowLeft x={-26} y={-6} width={12} height={12} strokeWidth={1.3} aria-hidden />
+                ) : (
+                  <ArrowRight x={14} y={-6} width={12} height={12} strokeWidth={1.3} aria-hidden />
+                )}
+              </g>
+            ))}
+          </g>
+        )}
+
+        <g
+          className={`nam-tram-axis-v2 ${referenceVisible ? "on-reference" : ""}`}
+          aria-label="Nam Tram"
+        >
+          <path className="tram-glow" d={tramAxis} />
+          <path className="tram-rail tram-rail-a" d={tramAxis} transform="translate(-2 -1)" />
+          <path className="tram-rail tram-rail-b" d={tramAxis} transform="translate(2 1)" />
+          <path className="tram-ties" d={tramAxis} />
+          {stations.map(({ x, y, label }) => (
+            <g className="tram-station-v2" key={label} transform={`translate(${x} ${y})`}>
+              <circle className="station-outer" r="7" />
+              <circle className="station-inner" r="2.8" />
+              <title>{levelLabel(label.toLowerCase())}</title>
+            </g>
+          ))}
+          <g
+            className="tram-car-v2"
+            transform={`translate(${tramCar.x} ${tramCar.y}) rotate(${tramCar.r}) scale(.48)`}
+          >
+            <path d="M-18 7Q0-22 18 7l-7 15h-22Z" />
+            <path d="M-10 7h20M0-16V18" />
+          </g>
+        </g>
+
+        <g
+          ref={hotspotsRef}
+          className="hotspots-v2"
+          visibility={photosVisible ? "hidden" : "visible"}
+          aria-hidden={photosVisible}
+        >
+          {[...places]
+            .sort((a, b) => Number(a.id === selectedId) - Number(b.id === selectedId))
+            .map((place) => {
+              const dimmed = !interactivePlaces.includes(place);
+              const Icon = collectionIcons[place.categories[0] ?? "beach"];
+              const labelName = place.accommodationGroup
+                ? mapCopy(lang, place.accommodationGroup)
+                : place.name;
+              const labelWidth = Math.min(184, Math.max(88, labelName.length * 7 + 24));
+              return (
+                // SVG groups cannot be HTML buttons; keyboard behavior mirrors one.
+                <g
+                  key={place.id}
+                  className={`hotspot-v2 ${place.id === selectedId ? "is-selected" : ""} ${dimmed ? "is-dimmed" : ""}`}
+                  transform={`translate(${place.point.x} ${place.point.y})`}
+                  role="button"
+                  tabIndex={photosVisible || dimmed ? -1 : 0}
+                  aria-label={`${place.accommodationGroup ? mapCopy(lang, place.accommodationGroup) : place.name} · ${(place.accommodationGroup ? place.coveredLevels : [place.level]).map((level) => levelLabel(level)).join(" / ")}`}
+                  aria-pressed={place.id === selectedId}
+                  aria-disabled={dimmed}
+                  onClick={(event) => {
+                    if (!dimmed) selectNearestPlace(event, place);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      if (!dimmed) onSelectPlace(place.id);
+                    }
+                  }}
+                >
+                  <g transform={`scale(${pixelScale / camera.scale})`}>
+                    {labelIds.has(place.id) && !dimmed && (
+                      <g className="hotspot-name" aria-hidden="true">
+                        <rect x={-labelWidth / 2} y={23} width={labelWidth} height={26} rx={13} />
+                        <text x={0} y={40} textAnchor="middle">
+                          {(() => {
+                            const name = place.accommodationGroup
+                              ? mapCopy(lang, place.accommodationGroup)
+                              : place.name;
+                            return name.length > 25 ? `${name.slice(0, 24)}…` : name;
+                          })()}
+                        </text>
+                      </g>
+                    )}
+                    <circle className="hotspot-hit" r="22" />
+                    <circle className="hotspot-pulse" r="15" />
+                    <circle className="hotspot-medallion" r="12" />
+                    <Icon
+                      className="hotspot-icon"
+                      x={-7}
+                      y={-7}
+                      width={14}
+                      height={14}
+                      strokeWidth={1.6}
+                      aria-hidden="true"
+                    />
+                  </g>
+                </g>
+              );
+            })}
+        </g>
+
+        <g className="tram-station-targets">
+          {stationNames.map(({ x, y, label, name }) => (
+            // SVG stops use the same accessible button behavior as place markers.
+            <g
+              key={label}
+              className="tram-station-target"
+              transform={`translate(${x} ${y}) scale(${pixelScale / camera.scale})`}
+              role="button"
+              tabIndex={0}
+              aria-label={`Nam Tram · ${name}`}
+              aria-pressed={selectedStation === label}
+              onClick={(event) => selectNearestStation(event, label)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onSelectStation(label);
+                }
+              }}
+            >
+              <circle className="station-hit" r="22" />
+              <circle className="station-focus" r="14" />
+            </g>
+          ))}
+        </g>
+
+        <g
+          className="tram-signs"
+          transform={`scale(${pixelScale / camera.scale})`}
+          pointerEvents="none"
+        >
+          {stationSigns.map(({ x, y, label, name, box }) => {
+            const edge = box.x > x ? box.x : box.x + box.width;
+            return (
+              <g key={label} className="tram-sign" aria-label={`Nam Tram · ${name}`}>
+                <path
+                  className="station-leader"
+                  d={`M${x} ${y}H${edge + (edge > x ? -8 : 8)}L${edge} ${box.y + 15}`}
+                />
+                <g className="station-plaque" transform={`translate(${box.x} ${box.y})`}>
+                  <rect width={box.width} height={box.height} rx="15" />
+                  <ResortLevelIcon
+                    level={label.toLowerCase() as Level}
+                    x={8}
+                    y={5}
+                    width={20}
+                    height={20}
+                  />
+                  <text x={36} y={19}>
+                    {name}
+                  </text>
+                </g>
+              </g>
+            );
+          })}
+        </g>
+
+        {photosVisible && (
+          <g className="photo-hotspots" aria-label={mapCopy(lang, "photos")}>
+            {photoSpots.map((spot) => {
+              const offset = photoOffsets.get(spot.id) ?? spot.offset;
+              return (
+                <g
+                  key={spot.id}
+                  transform={`translate(${spot.point.x} ${spot.point.y}) scale(${pixelScale / camera.scale})`}
+                >
+                  <circle className="photo-anchor" r="3" pointerEvents="none" aria-hidden />
+                  <path
+                    className="photo-leader"
+                    d={`M0 0L${offset.x} ${offset.y}`}
+                    pointerEvents="none"
+                    aria-hidden
+                  />
+                  <g
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${mapCopy(lang, "photos")} ${spot.id}`}
+                    aria-pressed={selectedPhotoId === spot.id}
+                    className={`photo-hotspot ${selectedPhotoId === spot.id ? "is-selected" : ""}`}
+                    transform={`translate(${offset.x} ${offset.y})`}
+                    onClick={() => onSelectPhoto(spot.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onSelectPhoto(spot.id);
+                      }
+                    }}
+                  >
+                    <title>
+                      {spot.id} ·{" "}
+                      {places.find((place) => place.id === spot.parentId)?.name ??
+                        mapCopy(lang, "photos")}
+                    </title>
+                    <circle className="photo-hit" r="22" />
+                    <rect className="photo-marker" x="-15" y="-17" width="30" height="34" rx="8" />
+                    <text textAnchor="middle" y="5">
+                      {spot.id}
+                    </text>
+                  </g>
+                </g>
+              );
+            })}
+          </g>
+        )}
+      </g>
+    </svg>
+  );
+}

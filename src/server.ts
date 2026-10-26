@@ -1,0 +1,81 @@
+import { requestLanguage } from "./i18n/preferred-language";
+import type { Lang } from "./i18n/dictionary";
+import { renderErrorPage } from "./lib/error-page";
+import { withSecurityHeaders } from "./lib/security-headers";
+import { createCspNonce } from "./lib/csp-nonce";
+
+type ServerEntry = typeof import("@tanstack/react-start/server-entry").default;
+
+let serverEntryPromise: Promise<ServerEntry> | undefined;
+
+async function getServerEntry(): Promise<ServerEntry> {
+  serverEntryPromise ??= import("@tanstack/react-start/server-entry").then(
+    (m) => (m.default ?? m) as ServerEntry,
+  );
+  return serverEntryPromise;
+}
+
+// h3 swallows in-handler throws into a normal 500 Response with body
+// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
+async function normalizeCatastrophicSsrResponse(
+  response: Response,
+  requestId: string,
+  lang: Lang,
+  nonce: string,
+): Promise<Response> {
+  if (response.status < 500) return response;
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) return response;
+
+  const body = await response.clone().text();
+  if (!isH3SwallowedErrorBody(body)) return response;
+
+  console.error("[ssr] Upstream handler returned an unhandled error", { requestId });
+  return new Response(renderErrorPage(lang, nonce), {
+    status: 500,
+    headers: { "content-type": "text/html; charset=utf-8" },
+  });
+}
+
+function isH3SwallowedErrorBody(body: string): boolean {
+  try {
+    const payload = JSON.parse(body) as { unhandled?: unknown; message?: unknown };
+    return payload.unhandled === true && payload.message === "HTTPError";
+  } catch {
+    return false;
+  }
+}
+
+export default {
+  async fetch(request: Request, options?: Parameters<ServerEntry["fetch"]>[1]) {
+    if (new URL(request.url).pathname.startsWith("/media/")) {
+      const { serveImage } = await import("./lib/image-edge-cache");
+      return serveImage(request);
+    }
+    const requestId = crypto.randomUUID();
+    const nonce = createCspNonce();
+    const lang = requestLanguage(request.headers.get("accept-language"));
+    try {
+      const handler = await getServerEntry();
+      const response = await handler.fetch(request, {
+        ...options,
+        context: { ...options?.context, nonce },
+      });
+      return withSecurityHeaders(
+        await normalizeCatastrophicSsrResponse(response, requestId, lang, nonce),
+        request,
+        nonce,
+      );
+    } catch (error) {
+      console.error("[ssr] Request failed", { requestId, error });
+      return withSecurityHeaders(
+        new Response(renderErrorPage(lang, nonce), {
+          status: 500,
+          headers: { "content-type": "text/html; charset=utf-8" },
+        }),
+        request,
+        nonce,
+      );
+    }
+  },
+};
