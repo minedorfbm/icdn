@@ -6,6 +6,7 @@ import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 import { ResortLogo } from "@/components/hub/ResortLogo";
 import { HubHero } from "@/components/hub/HubHero";
 import { HERO_LANDSCAPE_MEDIA, HERO_PORTRAIT_MEDIA } from "@/lib/hero-media";
+import { homeHeroSizes, picturePreload, thumbnailImage } from "@/lib/responsive-image";
 import { HubSearch } from "@/features/search/HubSearch";
 import { HubSearchProvider } from "@/features/search/HubSearchProvider";
 import { DiscoveryPaths } from "@/features/discovery/DiscoveryPaths";
@@ -59,15 +60,29 @@ export const Route = createFileRoute("/_hub")({
           {
             rel: "preload",
             as: "image",
-            href: resolveHeroImage(loaderData),
+            ...picturePreload(
+              resolveHeroImage(loaderData),
+              homeHeroSizes(resolveHeroImage(loaderData)),
+            ),
             media: HERO_PORTRAIT_MEDIA,
             fetchPriority: "high",
           },
           {
             rel: "preload",
             as: "image",
-            href: resolveHeroImage(loaderData, "landscape"),
+            ...picturePreload(
+              resolveHeroImage(loaderData, "landscape"),
+              homeHeroSizes(resolveHeroImage(loaderData, "landscape")),
+            ),
             media: HERO_LANDSCAPE_MEDIA,
+            fetchPriority: "high",
+          },
+          {
+            rel: "preload",
+            as: "image",
+            href: thumbnailImage("/michelin-key.webp", "80px").src,
+            imageSrcSet: thumbnailImage("/michelin-key.webp", "80px").srcSet,
+            imageSizes: "80px",
             fetchPriority: "high",
           },
         ]

@@ -5,7 +5,12 @@ import { ArrowDown } from "lucide-react";
 import { lazy, Suspense, useCallback, useState } from "react";
 
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
-import { thumbnail } from "@/lib/responsive-image";
+import {
+  homeHeroSizes,
+  responsiveImage,
+  responsiveAvif,
+  thumbnailImage,
+} from "@/lib/responsive-image";
 
 const MichelinFilm = lazy(() => import("./MichelinFilm"));
 
@@ -16,13 +21,32 @@ export function HubHero({
   const { t } = useI18n();
   const [filmOpen, setFilmOpen] = useState(false);
   const closeFilm = useCallback(() => setFilmOpen(false), []);
+  const portrait = responsiveImage(image, homeHeroSizes(image));
+  const landscape = responsiveImage(landscapeImage, homeHeroSizes(landscapeImage));
+  const portraitAvif = responsiveAvif(image, homeHeroSizes(image));
+  const landscapeAvif = responsiveAvif(landscapeImage, homeHeroSizes(landscapeImage));
   return (
     <section className="brand-ui hub-hero">
       <div className="hero-photograph">
         <picture>
-          <source media={HERO_LANDSCAPE_MEDIA} srcSet={landscapeImage} />
+          {landscapeAvif && (
+            <source
+              media={HERO_LANDSCAPE_MEDIA}
+              type="image/avif"
+              srcSet={landscapeAvif.srcSet}
+              sizes={landscapeAvif.sizes}
+            />
+          )}
+          <source
+            media={HERO_LANDSCAPE_MEDIA}
+            srcSet={landscape.srcSet ?? landscape.src}
+            sizes={landscape.sizes}
+          />
+          {portraitAvif && (
+            <source type="image/avif" srcSet={portraitAvif.srcSet} sizes={portraitAvif.sizes} />
+          )}
           <img
-            src={image}
+            {...portrait}
             alt={t("hero_image_alt")}
             width={695}
             height={1137}
@@ -61,7 +85,9 @@ export function HubHero({
         className="hero-film-button grid place-items-center rounded-full transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4"
       >
         <img
-          src={thumbnail("/michelin-key.webp")}
+          {...thumbnailImage("/michelin-key.webp", "80px")}
+          fetchPriority="high"
+          loading="eager"
           alt=""
           width={494}
           height={585}

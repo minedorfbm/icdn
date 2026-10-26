@@ -3,6 +3,11 @@ import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import { X } from "lucide-react";
 import type { DestinationPhoto } from "@/data/resort";
 import { useI18n } from "@/i18n";
+import { preload } from "react-dom";
+import { framedImageSizes, picturePreload } from "@/lib/responsive-image";
+import { ResponsivePhoto } from "@/components/ui/responsive-photo";
+
+const photoSizes = (source: string) => framedImageSizes(source, "100vw", "78svh", "contain");
 
 interface Props {
   photos: DestinationPhoto[];
@@ -31,8 +36,8 @@ export function PhotoLightbox({ photos, index, onClose }: Readonly<Props>) {
     for (const i of [current + 1, current - 1]) {
       const next = photos[i];
       if (!next) continue;
-      const img = new Image();
-      img.src = next.image;
+      const { href, ...image } = picturePreload(next.image, photoSizes(next.image));
+      preload(href, { as: "image", fetchPriority: "low", ...image });
     }
   }, [current, photos]);
 
@@ -70,7 +75,7 @@ export function PhotoLightbox({ photos, index, onClose }: Readonly<Props>) {
         <X className="size-4" strokeWidth={1.5} />
       </button>
 
-      <img
+      <ResponsivePhoto
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId);
           down(event);
@@ -81,7 +86,8 @@ export function PhotoLightbox({ photos, index, onClose }: Readonly<Props>) {
           start.current = null;
           setDrag({ x: 0, y: 0 });
         }}
-        src={photo.image}
+        source={photo.image}
+        sizes={photoSizes(photo.image)}
         alt={photo.caption ?? ""}
         decoding="async"
         fetchPriority="high"
