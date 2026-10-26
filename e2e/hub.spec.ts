@@ -1,3 +1,4 @@
+import { imageDeliveryUrl } from "../src/lib/image-delivery";
 import managedImages from "../src/data/image-variants.json" with { type: "json" };
 import { expect, test, type Locator, type Page } from "./fixtures";
 
@@ -121,9 +122,12 @@ test("the hero selects the matching photo and preload in portrait and landscape"
     [1194, 834, "intercontinental-favicon.png"],
   ] as const) {
     await page.setViewportSize({ width, height });
+    const source = imageDeliveryUrl(
+      Object.values(managedImages).find((image) => image.aliases.includes(`/${file}`))!.src,
+    );
     await expect
       .poll(() => hero.evaluate((image: HTMLImageElement) => image.currentSrc))
-      .toBe(Object.values(managedImages).find((image) => image.aliases.includes(`/${file}`))!.src);
+      .toBe(new URL(source, page.url()).href);
     const activePreloads = await page
       .locator('link[rel="preload"][as="image"][media]')
       .evaluateAll((links) =>
@@ -131,9 +135,7 @@ test("the hero selects the matching photo and preload in portrait and landscape"
           .filter((link) => matchMedia(link.getAttribute("media") || "all").matches)
           .map((link) => link.getAttribute("href")),
       );
-    expect(activePreloads).toEqual([
-      Object.values(managedImages).find((image) => image.aliases.includes(`/${file}`))!.src,
-    ]);
+    expect(activePreloads).toEqual([source]);
   }
 });
 

@@ -1,3 +1,4 @@
+import { imageDeliveryUrl } from "../src/lib/image-delivery";
 import images from "../src/data/image-variants.json" with { type: "json" };
 import { expect, test } from "./fixtures";
 
@@ -5,7 +6,9 @@ test("Nam Tram uses the angled cabin on the rail and the full front view in its 
   page,
 }, testInfo) => {
   const source = (file: string) =>
-    Object.values(images).find((image) => image.aliases.includes(`src/assets/${file}`))!.src;
+    imageDeliveryUrl(
+      Object.values(images).find((image) => image.aliases.includes(`src/assets/${file}`))!.src,
+    );
   for (const file of ["nam-tram-rail.webp", "nam-tram-selector.webp"]) {
     await page.route(source(file), (route) =>
       route.fulfill({
