@@ -57,12 +57,14 @@ export function HubHero({
         </picture>
       </div>
 
+      <div className="hero-brand">
+        <h1 className="hero-welcome">
+          <ResortLogo tone="black" className="hero-resort-logo" loading="eager" />
+        </h1>
+      </div>
+
       <div className="hero-sky">
         <div className="hero-sky-content">
-          <h1 className="hero-welcome">
-            <ResortLogo tone="black" className="hero-resort-logo" loading="eager" />
-          </h1>
-
           <button onClick={() => scrollToHubSection("discover")} className="hero-invitation">
             <span className="hero-invitation-title font-serif">
               {t("hero_title_1")}
