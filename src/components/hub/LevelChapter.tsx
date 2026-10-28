@@ -122,13 +122,8 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
               <div
                 className={
                   compactCollections
-                    ? "grid gap-1.5 px-6"
+                    ? "chapter-category-row"
                     : "flex snap-x snap-mandatory scroll-px-6 gap-2 overflow-x-auto px-6 pr-14 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                }
-                style={
-                  compactCollections
-                    ? { gridTemplateColumns: `repeat(${groups.length}, minmax(0, 1fr))` }
-                    : undefined
                 }
               >
                 {groups.map((group) => (
@@ -142,7 +137,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
                     }`}
                   >
                     <span
-                      className={`font-serif leading-tight tracking-tight ${compactCollections ? "max-w-full text-[length:calc(clamp(14px,3.6vw,23px)*var(--readable-scale))] [overflow-wrap:anywhere]" : "text-[23px]"}`}
+                      className={`font-serif leading-tight tracking-tight ${compactCollections ? "whitespace-nowrap text-[length:calc(clamp(14px,3.6vw,23px)*var(--readable-scale))]" : "text-[23px]"}`}
                     >
                       {clusterLabel(group.key)}
                     </span>

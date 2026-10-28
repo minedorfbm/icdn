@@ -21,6 +21,22 @@
 .chapter-categories button {
   min-height: 54px;
 }
+.chapter-category-row {
+  display: flex;
+  gap: clamp(4px, 1vw, 12px);
+  padding-inline: clamp(4px, 1.25vw, 12px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.chapter-category-row::-webkit-scrollbar {
+  display: none;
+}
+.chapter-category-row > button {
+  /* Give longer labels their natural width, then share the remaining space. */
+  flex: 1 0 auto;
+  align-items: center;
+  text-align: center;
+}
 .chapter-frame .card-stack-stage {
   height: var(--chapter-card-height);
   padding-block: 0;
