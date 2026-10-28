@@ -8,6 +8,7 @@ import { useI18n } from "@/i18n";
 import { coverImageSizes } from "@/lib/responsive-image";
 import { useCardImageReadiness } from "@/lib/use-card-image-readiness";
 import { useCardImageSize } from "@/lib/use-card-image-size";
+import { useLocation } from "@tanstack/react-router";
 
 /** A front-facing hero and two receding previews, all sharing one responsive stage. */
 // Slot geometry: [horizontal offset, scale, brightness, stacking order, rotation Y].
@@ -66,6 +67,7 @@ export function CardStack({
   const { stage, box } = useCardImageSize(items.length, layout);
   const { canLoad, onSettled } = useCardImageReadiness(items, index, near, Boolean(box));
   const { openDestination } = useDestinationNavigation();
+  const pathname = useLocation({ select: (location) => location.pathname });
   const { t } = useI18n();
   const moved = useRef(false);
   const frame = useRef<number | null>(null);
@@ -102,6 +104,7 @@ export function CardStack({
           dest={dest}
           active={i === index}
           priority={near && i === index}
+          prepareDetail={near && i === index && (pathname === "/" || pathname === "/surprise-me")}
           near={canLoad(dest)}
           onImageSettled={() => onSettled(dest)}
           imageSizes={box ? coverImageSizes(dest.image, box) : undefined}
@@ -115,7 +118,7 @@ export function CardStack({
           }
         />
       )),
-    [items, index, near, box, onIndexChange, openDestination, canLoad, onSettled],
+    [items, index, near, box, onIndexChange, openDestination, canLoad, onSettled, pathname],
   );
 
   if (items.length === 0) return null;
