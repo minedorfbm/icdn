@@ -5,10 +5,12 @@ export function ResortLogo({
   tone = "dark",
   className = "",
   loading = "lazy",
+  fetchPriority,
 }: Readonly<{
   tone?: "dark" | "light" | "black";
   className?: string;
   loading?: "eager" | "lazy";
+  fetchPriority?: "high" | "low" | "auto";
 }>) {
   return (
     <img
@@ -17,6 +19,7 @@ export function ResortLogo({
       width={1230}
       height={384}
       loading={loading}
+      fetchPriority={fetchPriority}
       decoding="async"
       className={`resort-logo ${className}`}
     />

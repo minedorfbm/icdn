@@ -25,11 +25,11 @@ export function OpeningHours({ hours }: Readonly<{ hours: Hours[] }>) {
                   : `${hoursTime(row.opens_minutes)} – ${hoursTime(row.closes_minutes)}`}
               </span>
             </div>
-            <p className="mt-1 text-[length:var(--readable-11)] opacity-65">
+            <p className="mt-1 text-[length:var(--readable-11)] opacity-80">
               {hoursDays(row.days, lang, t("hours_daily"))}
             </p>
             {row.last_order_minutes !== null && (
-              <p className="mt-1 text-[length:var(--readable-11)] opacity-65">
+              <p className="mt-1 text-[length:var(--readable-11)] opacity-80">
                 {t("hours_last_order")} {hoursTime(row.last_order_minutes)}
               </p>
             )}
