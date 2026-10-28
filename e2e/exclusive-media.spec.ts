@@ -133,6 +133,13 @@ for (const mobile of [true, false]) {
       await expect(instagram.locator("body")).toHaveAttribute("data-playing", "true");
       await expect(second.locator("body")).toHaveAttribute("data-playing", "false");
       const instagramInstance = await instagram.locator("body").getAttribute("data-instance");
+      // A delayed play event from the old iframe must not interrupt Instagram.
+      await second
+        .getByRole("button", { name: "YouTube Play" })
+        .evaluate((button) => button.click());
+      await expect(second.locator("body")).toHaveAttribute("data-playing", "false");
+      await expect(instagram.locator("body")).toHaveAttribute("data-instance", instagramInstance!);
+      await expect(instagram.locator("body")).toHaveAttribute("data-playing", "true");
 
       await players.first().scrollIntoViewIfNeeded();
       await activate(first.getByRole("button", { name: "YouTube Play" }));

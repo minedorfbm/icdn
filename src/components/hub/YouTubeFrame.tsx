@@ -33,7 +33,7 @@ export function YouTubeFrame({ videoId, title }: Readonly<{ videoId: string; tit
     frame.allowFullscreen = true;
     container.append(frame);
 
-    const participant = mediaPlayback.register((reason) => {
+    const pause = (reason: "handoff" | "document") => {
       if (cancelled) return;
       if (ready && player) {
         try {
@@ -45,7 +45,10 @@ export function YouTubeFrame({ videoId, title }: Readonly<{ videoId: string; tit
       }
       // Also stop a native player if its optional API is slow or blocked.
       if (reason === "document" || mayHavePlayed) setAttempt((value) => value + 1);
-    });
+    };
+    const participant = mediaPlayback.register(pause);
+    const anotherFrameHasFocus = () =>
+      document.activeElement instanceof HTMLIFrameElement && document.activeElement !== frame;
     const unobserve = observeMediaFrameFocus(frame, () => {
       mayHavePlayed = true;
       participant.activate();
@@ -59,12 +62,15 @@ export function YouTubeFrame({ videoId, title }: Readonly<{ videoId: string; tit
             onReady: ({ target }) => {
               if (cancelled) return;
               ready = true;
-              if (mediaPlayback.isSuspended()) target.pauseVideo();
+              if (mediaPlayback.isSuspended() || anotherFrameHasFocus()) target.pauseVideo();
             },
             onStateChange: ({ data }) => {
               if (!cancelled && data === 1) {
                 mayHavePlayed = true;
-                participant.activate();
+                // An older provider can deliver PLAYING after the visitor has
+                // already moved to Instagram. It must not steal playback back.
+                if (anotherFrameHasFocus()) pause("handoff");
+                else participant.activate();
               }
             },
           },
