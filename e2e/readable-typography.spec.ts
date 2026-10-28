@@ -40,6 +40,7 @@ for (const viewport of [
     await page.getByRole("button", { name: /Explore the resort map/ }).click();
     const map = page.getByRole("dialog", { name: "Resort map", exact: true });
     await expect(map).toBeVisible();
+    await expect(map.locator(".atlas-dock button")).toHaveCount(4);
     const labels = await map.locator(".atlas-dock button").evaluateAll((buttons) =>
       buttons.map((button) => ({
         size: Number.parseFloat(getComputedStyle(button).fontSize),
