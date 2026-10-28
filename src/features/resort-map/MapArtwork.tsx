@@ -22,6 +22,8 @@ import { ArchitectureArtwork } from "./ArchitectureArtwork";
 import { useI18n } from "@/i18n";
 import { imageSource } from "@/lib/image-source";
 import { mapBackgroundSource } from "./map-background";
+import { useMapBackground } from "./use-map-background";
+import { overviewScale } from "./map-camera";
 import { mapCopy } from "./map-copy";
 import { ResortLevelIcon } from "@/components/hub/ResortLevelIcon";
 import type { Level } from "@/data/resort";
@@ -102,7 +104,9 @@ export function MapArtwork({
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewBox, setViewBox] = useState<ViewBox>({ x: 0, y: 0, ...MAP_SIZE });
   const [pixelScale, setPixelScale] = useState(1);
+  const [overviewZoom, setOverviewZoom] = useState(1);
   const [backgroundReady, setBackgroundReady] = useState(false);
+  const backgroundSource = useMapBackground(backgroundReady && camera.scale > overviewZoom * 1.5);
   const settled = useRef(false);
   const settleBackground = useCallback(() => {
     if (settled.current) return;
@@ -155,7 +159,7 @@ export function MapArtwork({
         else bottom = Math.min(bottom, height - preview.height - 170);
       }
       // Frame the map in the space actually visible between its controls and sheet.
-      onViewportChange({
+      const viewport = {
         ...next,
         frame: {
           x: next.x + 24 * unit,
@@ -163,7 +167,9 @@ export function MapArtwork({
           width: Math.max(80, right - 24) * unit,
           height: Math.max(80, bottom - 24) * unit,
         },
-      });
+      };
+      setOverviewZoom(overviewScale(viewport));
+      onViewportChange(viewport);
     };
     update();
     const observer = new ResizeObserver(update);
@@ -444,7 +450,7 @@ export function MapArtwork({
           <path className="forest-base" d={LANDMASS} fill="url(#forest-wash)" />
           <image
             className="canopy-texture"
-            href={mapBackgroundSource()}
+            href={backgroundSource}
             onLoad={settleBackground}
             onError={settleBackground}
             // Include the curved headland beyond the map's zero baseline.

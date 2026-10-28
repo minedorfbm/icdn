@@ -3,7 +3,9 @@ import images from "../src/data/image-variants.json" with { type: "json" };
 import { expect, test } from "./fixtures";
 
 const backgroundUrl = imageDeliveryUrl(
-  Object.values(images).find((image) => image.aliases.includes("/resort-map/canopy.webp"))!.src,
+  Object.values(images)
+    .find((image) => image.aliases.includes("/resort-map/canopy.webp"))!
+    .variants.find((image) => image.width === 1600)!.src,
 );
 
 for (const [path, name] of [
