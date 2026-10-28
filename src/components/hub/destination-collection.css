@@ -35,7 +35,7 @@
 .destination-collection-key {
   display: block;
   margin-bottom: 5px;
-  font: 11px var(--brand-sans);
+  font: var(--readable-11) var(--brand-sans);
   color: var(--editorial-accent);
 }
 .destination-collection svg {
@@ -45,6 +45,6 @@
   padding: 0 10px;
   margin: 12px 0 0;
   color: var(--editorial-muted);
-  font-size: 14px;
+  font-size: var(--readable-14);
   line-height: 1.65;
 }

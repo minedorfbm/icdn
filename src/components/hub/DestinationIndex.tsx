@@ -35,7 +35,7 @@ export function DestinationIndex({
         style={{ backgroundColor: "var(--level-bg)", color: "var(--level-fg)" }}
       >
         <SheetHeader className="mb-8 text-left">
-          <p className="text-[10px] tracking-[0.3em] opacity-55">{title}</p>
+          <p className="text-[length:var(--readable-10)] tracking-[0.3em] opacity-55">{title}</p>
           <SheetTitle className="font-serif text-[42px] font-normal leading-none text-current">
             {t("all_places")}
           </SheetTitle>
@@ -44,7 +44,7 @@ export function DestinationIndex({
         {groups.map((group) => (
           <section key={group.key || level} className="mt-7">
             {group.key && (
-              <h3 className="mb-3 border-b border-current/25 pb-3 text-[10px] tracking-[0.28em]">
+              <h3 className="mb-3 border-b border-current/25 pb-3 text-[length:var(--readable-10)] tracking-[0.28em]">
                 {cluster(group.key)} <span className="ml-2 opacity-50">{group.items.length}</span>
               </h3>
             )}
@@ -70,7 +70,7 @@ export function DestinationIndex({
                     <span className="block font-serif text-[22px] leading-tight">
                       {destination.name}
                     </span>
-                    <span className="mt-1 block text-[9px] tracking-[0.18em] opacity-60">
+                    <span className="mt-1 block text-[length:var(--readable-9)] tracking-[0.18em] opacity-60">
                       {typeLabel(destination.type)}
                     </span>
                   </span>

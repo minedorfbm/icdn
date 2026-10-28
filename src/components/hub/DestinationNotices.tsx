@@ -15,11 +15,13 @@ export function DestinationNotices({ notices }: Readonly<{ notices: DestinationN
             key={notice.id}
             className="rounded-[18px] border border-current/20 bg-current/[0.03] px-5 py-4"
           >
-            <h3 className="flex items-start gap-2 text-[13px] font-medium">
+            <h3 className="flex items-start gap-2 text-[length:var(--readable-13)] font-medium">
               <Info className="mt-0.5 size-4 shrink-0" strokeWidth={1.5} aria-hidden />
               {copy.title}
             </h3>
-            <p className="mt-2 text-[13px] leading-relaxed opacity-80">{copy.body}</p>
+            <p className="mt-2 text-[length:var(--readable-13)] leading-relaxed opacity-80">
+              {copy.body}
+            </p>
           </article>
         );
       })}

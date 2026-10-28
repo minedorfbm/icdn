@@ -63,7 +63,13 @@ test("desktop uses facing columns and both tablet orientations use the portrait 
         expect(intro.width).toBe(photo.width);
       }
     }).toPass({ timeout: 5000 });
-    await expect(card.locator(".editorial-description")).toHaveCSS("font-size", "18px");
+    await expect
+      .poll(() =>
+        card
+          .locator(".editorial-description")
+          .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize)),
+      )
+      .toBeCloseTo(21.6, 1);
     await expect(card.getByRole("button", { name: "BACK", exact: true })).toBeVisible();
     await expect
       .poll(() => scroller.evaluate((node) => node.scrollWidth - node.clientWidth))
@@ -102,7 +108,13 @@ test("the large photo picker switches images without changing the approved mobil
   await expect
     .poll(() => hero.evaluate((image: HTMLImageElement) => image.currentSrc))
     .toContain(initialSource!);
-  await expect(page.locator(".editorial-description")).toHaveCSS("font-size", "16px");
+  await expect
+    .poll(() =>
+      page
+        .locator(".editorial-description")
+        .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize)),
+    )
+    .toBeCloseTo(19.2, 1);
   await expect(page.getByRole("button", { name: "BACK", exact: true })).toBeVisible();
 });
 

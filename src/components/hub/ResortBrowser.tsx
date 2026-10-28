@@ -115,7 +115,7 @@ function ResortPageDialog({ page, onClose }: Readonly<{ page: ResortPage; onClos
             <X aria-hidden className="size-5" strokeWidth={1.4} />
           </button>
           <p
-            className="min-w-0 truncate text-center font-serif text-[16px] tracking-[0.025em]"
+            className="min-w-0 truncate text-center font-serif text-[length:var(--readable-16)] tracking-[0.025em]"
             title={page.title}
           >
             {page.title}

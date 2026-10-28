@@ -12,7 +12,7 @@
 }
 .chapter-frame {
   --chapter-card-height: calc(max(360px, 100lvh - 184px) * 0.85);
-  margin-top: 16px;
+  margin-top: 8px;
   padding-bottom: 12px;
 }
 .chapter-categories {
@@ -20,6 +20,32 @@
 }
 .chapter-categories button {
   min-height: 54px;
+}
+.chapter-category-row {
+  display: flex;
+  gap: clamp(4px, 1vw, 12px);
+  padding-inline: clamp(4px, 1.25vw, 12px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+@media (max-width: 359px) {
+  .level-chapter .chapter-categories {
+    /* The rail icons sit below this row; keep a 24px edge for wider serif fallbacks. */
+    width: calc(100% + var(--hub-rail-gutter) - 24px);
+  }
+  .chapter-category-row {
+    gap: 0;
+    padding-inline: 0;
+  }
+}
+.chapter-category-row::-webkit-scrollbar {
+  display: none;
+}
+.chapter-category-row > button {
+  /* Give longer labels their natural width, then share the remaining space. */
+  flex: 1 0 auto;
+  align-items: center;
+  text-align: center;
 }
 .chapter-frame .card-stack-stage {
   height: var(--chapter-card-height);
@@ -124,7 +150,7 @@
     padding-inline: 0;
   }
   .level-chapter .chapter-categories button > span:first-child {
-    font-size: 18px;
+    font-size: var(--readable-18);
   }
   .level-chapter .chapter-stack {
     width: 100%;
@@ -142,13 +168,13 @@
     font-size: clamp(30px, 11cqi, 46px);
   }
   .level-chapter .destination-panel-meta {
-    font-size: 11px;
+    font-size: var(--readable-11);
   }
   .level-chapter .destination-panel-summary {
-    font-size: 17px;
+    font-size: var(--readable-17);
   }
   .level-chapter .destination-panel-actions a {
-    font-size: 11px;
+    font-size: var(--readable-11);
   }
   /* Daylight blue keeps ivory-to-navy clear rather than passing through grey. */
   .chapter-gradient[data-from="heaven"] {

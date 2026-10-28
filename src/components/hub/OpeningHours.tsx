@@ -10,14 +10,14 @@ export function OpeningHours({ hours }: Readonly<{ hours: Hours[] }>) {
       className="opening-hours mt-8 rounded-[18px] border border-current/15 px-5 py-5"
       aria-label={t("opening_hours")}
     >
-      <h3 className="flex items-center gap-2 text-[10px] tracking-[0.2em]">
+      <h3 className="flex items-center gap-2 text-[length:var(--readable-10)] tracking-[0.2em]">
         <Clock3 size={15} strokeWidth={1.4} aria-hidden />
         {t("opening_hours")}
       </h3>
       <ul className="opening-hours-list mt-4 divide-y divide-current/10">
         {hours.map((row) => (
           <li key={row.id} className="py-3 first:pt-0 last:pb-0">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-[13px]">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-[length:var(--readable-13)]">
               <span>{t(`hours_${row.service}`)}</span>
               <span className="tabular-nums">
                 {row.opens_minutes === 0 && row.closes_minutes === 1440
@@ -25,11 +25,11 @@ export function OpeningHours({ hours }: Readonly<{ hours: Hours[] }>) {
                   : `${hoursTime(row.opens_minutes)} – ${hoursTime(row.closes_minutes)}`}
               </span>
             </div>
-            <p className="mt-1 text-[11px] opacity-65">
+            <p className="mt-1 text-[length:var(--readable-11)] opacity-65">
               {hoursDays(row.days, lang, t("hours_daily"))}
             </p>
             {row.last_order_minutes !== null && (
-              <p className="mt-1 text-[11px] opacity-65">
+              <p className="mt-1 text-[length:var(--readable-11)] opacity-65">
                 {t("hours_last_order")} {hoursTime(row.last_order_minutes)}
               </p>
             )}

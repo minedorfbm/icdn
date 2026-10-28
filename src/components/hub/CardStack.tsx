@@ -262,7 +262,7 @@ export function CardStack({
             aria-live="polite"
           >
             {String(index + 1).padStart(2, "0")}
-            <span className="ml-1 text-[15px] opacity-50">
+            <span className="ml-1 text-[length:var(--readable-15)] opacity-50">
               / {String(items.length).padStart(2, "0")}
             </span>
           </span>

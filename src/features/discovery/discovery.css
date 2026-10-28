@@ -15,7 +15,7 @@
 }
 .discovery-heading p,
 .surprise-heading p {
-  font-size: 10px;
+  font-size: var(--readable-10);
   letter-spacing: 0.22em;
   color: var(--brand-muted);
   line-height: 1.7;
@@ -78,7 +78,7 @@
   overflow-wrap: anywhere;
 }
 .discovery-choice-note {
-  font-size: 12px;
+  font-size: var(--readable-12);
   line-height: 1.5;
   letter-spacing: 0.035em;
   color: var(--brand-muted);
@@ -258,7 +258,7 @@
   padding: 4px 22px 8px;
   width: 100%;
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: var(--readable-12);
   line-height: 1.5;
   letter-spacing: 0.04em;
   color: var(--brand-muted);

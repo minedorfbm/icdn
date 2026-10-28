@@ -87,7 +87,7 @@
   border-radius: 30px;
   background: var(--editorial-button);
   color: var(--editorial-button-text);
-  font-size: 11px;
+  font-size: var(--readable-11);
   letter-spacing: 2px;
 }
 .editorial-back:focus:not(:focus-visible) {
@@ -105,7 +105,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
-  font-size: 11px;
+  font-size: var(--readable-11);
   letter-spacing: 1.8px;
   color: var(--editorial-accent);
 }
@@ -134,7 +134,7 @@
 }
 .editorial-description {
   font-family: var(--brand-serif);
-  font-size: 16px;
+  font-size: var(--readable-16);
   line-height: 1.65;
   color: var(--editorial-muted);
 }
@@ -149,7 +149,7 @@
   border-radius: 36px;
   background: var(--editorial-button);
   color: var(--editorial-button-text);
-  font-size: 16px;
+  font-size: var(--readable-16);
 }
 .editorial-primary svg {
   flex-shrink: 0;
@@ -174,7 +174,7 @@
   width: 100%;
   min-height: 44px;
   padding-block: 8px;
-  font-size: 13px;
+  font-size: var(--readable-13);
   text-align: left;
 }
 .editorial-map span {
@@ -192,7 +192,7 @@
   margin-bottom: 18px;
 }
 .editorial-section-heading > p {
-  font-size: 11px;
+  font-size: var(--readable-11);
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--editorial-accent);
@@ -222,7 +222,7 @@
   border: 1px solid var(--editorial-border);
   border-radius: 22px;
   background: var(--editorial-panel);
-  font-size: 12px;
+  font-size: var(--readable-12);
   line-height: 1.4;
   letter-spacing: 0.6px;
   text-align: left;
@@ -276,13 +276,13 @@
   display: grid;
   gap: 3px;
   margin-top: 9px;
-  font-size: 11px;
+  font-size: var(--readable-11);
   line-height: 1.5;
   color: var(--editorial-muted);
 }
 .editorial-event-content {
   padding: 0 20px 20px;
-  font-size: 15px;
+  font-size: var(--readable-15);
   line-height: 1.65;
 }
 .editorial-event-content a,
@@ -292,12 +292,12 @@
   gap: 12px;
   min-height: 44px;
   margin-top: 14px;
-  font-size: 11px;
+  font-size: var(--readable-11);
   letter-spacing: 1px;
 }
 .editorial-loading {
   margin-top: 20px;
-  font-size: 13px;
+  font-size: var(--readable-13);
   color: var(--editorial-muted);
 }
 .editorial-loading button {
@@ -333,7 +333,7 @@
   border-bottom: 1px solid var(--editorial-border);
 }
 .benefits-header p {
-  font-size: 13px;
+  font-size: var(--readable-13);
   color: var(--editorial-muted);
   margin: 0 0 8px;
 }
@@ -366,7 +366,7 @@
 .benefits-body li {
   padding-left: 6px;
   margin-bottom: 18px;
-  font-size: 16px;
+  font-size: var(--readable-16);
   line-height: 1.65;
 }
 .benefits-body li::marker {
@@ -472,7 +472,7 @@
     flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 16px;
-    font-size: 12px;
+    font-size: var(--readable-12);
     letter-spacing: 1.8px;
     color: var(--editorial-accent);
   }
@@ -488,7 +488,7 @@
   }
   .editorial-description {
     max-width: 70ch;
-    font-size: 18px;
+    font-size: var(--readable-18);
     line-height: 1.65;
   }
   .editorial-primary {
@@ -514,7 +514,7 @@
     display: grid;
     justify-content: start;
     gap: 5px;
-    font-size: 14px;
+    font-size: var(--readable-14);
   }
   .editorial-section,
   .editorial-photo-strip,
@@ -523,7 +523,7 @@
     margin-top: 0;
   }
   .editorial-section-heading > p {
-    font-size: 12px;
+    font-size: var(--readable-12);
   }
   .editorial-section-heading h3 {
     font-size: 36px;
@@ -537,7 +537,7 @@
     min-height: 72px;
     padding: 18px 20px;
     border-radius: 16px;
-    font-size: 14px;
+    font-size: var(--readable-14);
   }
   .editorial-events {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -564,7 +564,7 @@
     padding-inline: 0;
   }
   .editorial-photo-strip > p {
-    font-size: 12px;
+    font-size: var(--readable-12);
     letter-spacing: 2px;
   }
   .editorial-media-row > :only-child {

@@ -263,7 +263,9 @@ function PostCard({ post, handle }: Readonly<{ post: DestinationPost; handle: st
         <span className="grid size-8 place-items-center rounded-full border border-current/25">
           <InstagramIcon className="size-3.5" strokeWidth={1.5} />
         </span>
-        <span className="text-[11px] tracking-[0.18em] opacity-85">{handle ?? "instagram"}</span>
+        <span className="text-[length:var(--readable-11)] tracking-[0.18em] opacity-85">
+          {handle ?? "instagram"}
+        </span>
       </header>
       {post.image && (
         <img
@@ -275,7 +277,7 @@ function PostCard({ post, handle }: Readonly<{ post: DestinationPost; handle: st
         />
       )}
       {post.caption && (
-        <p className="px-4 pb-2 pt-4 text-[13px] leading-relaxed opacity-80">
+        <p className="px-4 pb-2 pt-4 text-[length:var(--readable-13)] leading-relaxed opacity-80">
           {handle && <span className="mr-1.5 opacity-100">{handle}</span>}
           {post.caption}
         </p>
@@ -284,7 +286,7 @@ function PostCard({ post, handle }: Readonly<{ post: DestinationPost; handle: st
         href={instagramLink(post.post_url)}
         target="_blank"
         rel="noreferrer"
-        className="flex items-center justify-between px-4 pb-4 pt-3 text-[10px] tracking-[0.3em] opacity-70 transition-opacity hover:opacity-100"
+        className="flex items-center justify-between px-4 pb-4 pt-3 text-[length:var(--readable-10)] tracking-[0.3em] opacity-70 transition-opacity hover:opacity-100"
       >
         {t("view_on_instagram")}
         <ArrowUpRight className="size-4 shrink-0 opacity-50" strokeWidth={1.3} aria-hidden />

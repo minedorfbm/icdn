@@ -70,7 +70,7 @@ export function DestinationPanel({
 
       <div className="relative flex h-full min-h-[inherit] flex-col justify-between gap-6 touch-pan-y overflow-y-auto overscroll-y-contain px-4 py-5 sm:px-7 sm:py-9 text-[oklch(0.98_0.005_90)]">
         <div className="flex items-start justify-between gap-3">
-          <p className="destination-panel-meta text-[9px] tracking-[0.18em] opacity-80">
+          <p className="destination-panel-meta text-[length:var(--readable-9)] tracking-[0.18em] opacity-80">
             {levelLabel(dest.level)} / {typeLabel(dest.type)}
           </p>
           {dest.instagram_spot && (
@@ -99,7 +99,7 @@ export function DestinationPanel({
               <span className="drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]">{dest.name}</span>
             </button>
           </h3>
-          <p className="destination-panel-summary mt-3 max-w-[30ch] font-serif text-[15px] italic leading-snug opacity-85">
+          <p className="destination-panel-summary mt-3 max-w-[30ch] font-serif text-[length:var(--readable-15)] italic leading-snug opacity-85">
             {description(dest.id, dest.short_description)}
           </p>
         </div>
@@ -111,7 +111,7 @@ export function DestinationPanel({
               href={a.url}
               pageTitle={`${dest.name} · ${a.label ? linkLabel(a.label) : action(a.kind)}`}
               tabIndex={active ? 0 : -1}
-              className="pointer-events-auto inline-flex min-h-11 max-w-full items-center py-2 text-[10px] leading-relaxed tracking-[0.2em] text-white transition-colors hover:text-[#e5d3aa] focus-visible:outline-2 focus-visible:outline-offset-4"
+              className="pointer-events-auto inline-flex min-h-11 max-w-full items-center py-2 text-[length:var(--readable-10)] leading-relaxed tracking-[0.2em] text-white transition-colors hover:text-[#e5d3aa] focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               {a.label ? linkLabel(a.label) : action(a.kind)}
             </ResortLink>

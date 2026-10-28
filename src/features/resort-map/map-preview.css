@@ -84,7 +84,7 @@
   touch-action: none;
   cursor: ns-resize;
   color: #f0e5ca;
-  font-size: 11px;
+  font-size: var(--readable-11);
   letter-spacing: 0.08em;
   line-height: 1.5;
   text-transform: uppercase;
@@ -128,7 +128,7 @@
   border-radius: 12px;
   background: var(--preview-paper);
   color: var(--preview-ink);
-  font-size: 13px;
+  font-size: var(--readable-13);
   text-align: left;
 }
 .hub-atlas .atlas-preview-summary {
@@ -137,18 +137,18 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-family: var(--font-serif), Georgia, serif;
-  font-size: 14px;
+  font-size: var(--readable-14);
   line-height: 1.45;
   margin: 0;
 }
 .hub-atlas .atlas-description {
   font-family: var(--font-serif), Georgia, serif;
-  font-size: 17px;
+  font-size: var(--readable-17);
   line-height: 1.5;
   margin: 8px 0 12px;
 }
 .hub-atlas .atlas-related > p {
-  font-size: 11px;
+  font-size: var(--readable-11);
   letter-spacing: 0.08em;
   color: #f0e5ca;
   margin: 10px 0 4px;
@@ -161,7 +161,7 @@
   min-height: 44px;
   width: 100%;
   border-top: 1px solid #fffefa40;
-  font-size: 13px;
+  font-size: var(--readable-13);
   line-height: 1.4;
   text-align: left;
   overflow-wrap: anywhere;

@@ -114,7 +114,9 @@ export function LanguageSwitch() {
           aria-label={`${t("language")} · ${current.label}`}
           className="brand-ui brand-floating brand-control flex min-h-11 items-center gap-2 px-3 py-2 transition-transform active:scale-95"
         >
-          <span className="text-[10px] tracking-[0.18em]">{current.label}</span>
+          <span className="text-[length:var(--readable-10)] tracking-[0.18em]">
+            {current.label}
+          </span>
           <ChevronDown size={10} strokeWidth={1.5} className="opacity-60" />
         </button>
       </SheetTrigger>
@@ -125,7 +127,7 @@ export function LanguageSwitch() {
         className="brand-ui brand-language-sheet z-[60] border-t px-5 pb-8 pt-5"
       >
         <SheetHeader className="mb-5 items-center">
-          <SheetTitle className="text-[11px] font-normal uppercase tracking-[0.3em] text-[var(--brand-ink)]">
+          <SheetTitle className="text-[length:var(--readable-11)] font-normal uppercase tracking-[0.3em] text-[var(--brand-ink)]">
             {t("language")}
           </SheetTitle>
         </SheetHeader>
@@ -141,8 +143,12 @@ export function LanguageSwitch() {
                 className="brand-language-option brand-control flex items-center justify-between px-4 py-3.5 text-left transition-colors"
               >
                 <span className="flex items-baseline gap-3">
-                  <span className="w-8 text-[12px] tracking-[0.12em]">{label}</span>
-                  <span className="text-[13px] font-light tracking-wide opacity-80">{name}</span>
+                  <span className="w-8 text-[length:var(--readable-12)] tracking-[0.12em]">
+                    {label}
+                  </span>
+                  <span className="text-[length:var(--readable-13)] font-light tracking-wide opacity-80">
+                    {name}
+                  </span>
                 </span>
                 {active && (
                   <Check size={16} strokeWidth={1.5} className="text-[var(--brand-ink)]" />

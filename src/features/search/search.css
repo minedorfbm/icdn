@@ -30,7 +30,7 @@
   min-height: 44px;
   padding: 8px 14px;
   border-radius: var(--brand-radius);
-  font-size: 11px;
+  font-size: var(--readable-11);
   letter-spacing: 0.08em;
 }
 .hub-search-dialog {
@@ -93,7 +93,7 @@
   min-width: 0;
   flex: 1;
   height: 50px;
-  font-size: 16px;
+  font-size: var(--readable-16);
   outline: none;
   padding-right: 8px;
   background: transparent;
@@ -112,7 +112,7 @@
   padding: 9px 4px;
   border: 1px solid var(--brand-border);
   border-radius: var(--brand-radius);
-  font-size: clamp(9px, 2.6vw, 12px);
+  font-size: max(var(--readable-min), calc(clamp(9px, 2.6vw, 12px) * var(--readable-scale)));
   letter-spacing: 0.025em;
   overflow-wrap: anywhere;
 }
@@ -125,7 +125,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  font-size: 11px;
+  font-size: var(--readable-11);
   color: var(--brand-muted);
 }
 .hub-search-summary button {
@@ -147,7 +147,7 @@
   margin-top: 32px;
 }
 .hub-search-results h3 {
-  font-size: 12px;
+  font-size: var(--readable-12);
   letter-spacing: 0.1em;
 }
 .hub-search-moods > div {
@@ -161,7 +161,7 @@
   padding: 8px 14px;
   border: 1px solid var(--brand-border);
   border-radius: var(--brand-radius);
-  font-size: 12px;
+  font-size: var(--readable-12);
 }
 .hub-search-moods button:active {
   background: var(--brand-paper);
@@ -205,13 +205,13 @@
 }
 .hub-search-meta {
   margin-top: 5px;
-  font-size: 9px;
+  font-size: var(--readable-9);
   letter-spacing: 0.07em;
   color: var(--brand-muted);
 }
 .hub-search-result-text > .hub-search-description {
   margin-top: 6px;
-  font-size: 12px;
+  font-size: var(--readable-12);
   line-height: 1.4;
   color: var(--brand-muted);
   display: -webkit-box;
@@ -225,7 +225,7 @@
 }
 .hub-search-empty p {
   margin-top: 12px;
-  font-size: 14px;
+  font-size: var(--readable-14);
   color: var(--brand-muted);
 }
 .hub-search-empty button {
