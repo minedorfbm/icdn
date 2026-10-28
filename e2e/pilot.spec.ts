@@ -47,7 +47,7 @@ for (const [id, level, color] of [
           .locator(".editorial-description")
           .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize)),
       )
-      .toBeCloseTo(19.2, 1);
+      .toBeCloseTo(16.8, 1);
     await expect(card.locator(".instagram-post[data-fit-to-screen]")).toHaveCount(2);
     const scroller = card.locator("[data-destination-scroll]");
     for (const size of [

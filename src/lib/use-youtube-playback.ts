@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { loadYouTubePlayer, type YouTubePlayer } from "./youtube-player";
+import { mediaPlayback } from "./media-playback";
 
-/** Mount only after a visitor chooses a video; share recovery across card and home players. */
+/** Start a visitor-opened film and cancel late autoplay when another surface takes over. */
 export function useYouTubePlayback({
   videoId,
   title,
@@ -23,6 +24,12 @@ export function useYouTubePlayback({
     let player: YouTubePlayer | undefined;
     const container = host.current;
     if (!container) return;
+    let allowAutoplay = true;
+    const participant = mediaPlayback.register(() => {
+      allowAutoplay = false;
+      player?.pauseVideo?.();
+    });
+    if (!participant.activate()) allowAutoplay = false;
     setLoading(true);
     setFailed(false);
     const unavailable = () => {
@@ -59,9 +66,11 @@ export function useYouTubePlayback({
                 target.setVolume(volume);
                 target.unMute();
               }
-              target.playVideo();
+              if (allowAutoplay && participant.activate()) target.playVideo();
+              else target.pauseVideo();
             },
             onStateChange: ({ data }) => {
+              if (!cancelled && data === 1) participant.activate();
               if (!cancelled && data === 0) onEnded?.();
             },
             onError: () => {
@@ -80,6 +89,7 @@ export function useYouTubePlayback({
     return () => {
       cancelled = true;
       window.clearTimeout(timeout);
+      participant.unregister();
       player?.destroy();
       container.replaceChildren();
     };

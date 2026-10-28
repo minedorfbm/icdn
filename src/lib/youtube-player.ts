@@ -1,25 +1,27 @@
 export interface YouTubePlayer {
   destroy(): void;
+  pauseVideo(): void;
 }
 
 type YouTubeOptions = {
-  host: string;
-  videoId: string;
-  width: string;
-  height: string;
-  playerVars: Record<string, string | number>;
+  host?: string;
+  videoId?: string;
+  width?: string;
+  height?: string;
+  playerVars?: Record<string, string | number>;
   events: {
-    onReady: (event: {
+    onReady?: (event: {
       target: {
         unMute(): void;
         setVolume(volume: number): void;
         playVideo(): void;
+        pauseVideo(): void;
         getIframe(): HTMLIFrameElement;
       };
     }) => void;
-    onStateChange: (event: { data: number }) => void;
-    onError: () => void;
-    onAutoplayBlocked: () => void;
+    onStateChange?: (event: { data: number }) => void;
+    onError?: () => void;
+    onAutoplayBlocked?: () => void;
   };
 };
 
@@ -30,7 +32,7 @@ type YouTubeWindow = Window & {
 };
 let pending: Promise<PlayerConstructor> | undefined;
 
-/** Download the official player API only after a visitor opens a film. */
+/** Load the shared control API only when an embedded player is needed. */
 export function loadYouTubePlayer(): Promise<PlayerConstructor> {
   const browser = window as YouTubeWindow;
   if (browser.YT?.Player) return Promise.resolve(browser.YT.Player);

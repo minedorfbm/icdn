@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useRef,
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from "react";
@@ -16,6 +17,7 @@ import { embeddedResortUrl, isResortPdf, resortLinkTarget } from "@/lib/resort-b
 import { useI18n } from "@/i18n";
 import { HubSearch } from "@/features/search/HubSearch";
 import { ConciergeContact } from "./ConciergeContact";
+import { mediaPlayback } from "@/lib/media-playback";
 
 type ResortPage = Readonly<{ url: string; title: string }>;
 const OpenResortPage = createContext<((page: ResortPage) => void) | null>(null);
@@ -25,10 +27,21 @@ const PdfMenu = lazy(preparePdfMenu);
 /** One on-demand browser, outside the swipe deck and above any open destination detail. */
 export function ResortBrowserProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [page, setPage] = useState<ResortPage | null>(null);
+  const releasePlayback = useRef<(() => void) | undefined>(undefined);
+  const openPage = useCallback((next: ResortPage) => {
+    releasePlayback.current ??= mediaPlayback.suspend();
+    setPage(next);
+  }, []);
+  const closePage = useCallback(() => {
+    setPage(null);
+    releasePlayback.current?.();
+    releasePlayback.current = undefined;
+  }, []);
+  useEffect(() => () => releasePlayback.current?.(), []);
   return (
-    <OpenResortPage.Provider value={setPage}>
+    <OpenResortPage.Provider value={openPage}>
       {children}
-      {page && <ResortPageDialog key={page.url} page={page} onClose={() => setPage(null)} />}
+      {page && <ResortPageDialog key={page.url} page={page} onClose={closePage} />}
     </OpenResortPage.Provider>
   );
 }

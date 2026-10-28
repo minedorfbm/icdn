@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { DestinationVideo } from "@/data/resort";
 import { useI18n } from "@/i18n";
 import { imageSource } from "@/lib/image-source";
+import { YouTubeFrame } from "./YouTubeFrame";
 
 function YouTubeVideo({
   video,
@@ -65,14 +66,7 @@ function DeferredYouTubePlayer({
   return (
     <div ref={container} className="absolute inset-0" data-youtube-player>
       {nearby ? (
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${video.video_id}?autoplay=0&playsinline=1&rel=0`}
-          title={title}
-          className="size-full border-0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
+        <YouTubeFrame videoId={video.video_id} title={title} />
       ) : (
         <img
           src={imageSource(`https://i.ytimg.com/vi/${video.video_id}/hqdefault.jpg`)}

@@ -159,6 +159,13 @@
 @layer base {
   * {
     border-color: var(--color-border);
+    scrollbar-width: none;
+  }
+
+  /* Hide native scrollbars without disabling touch, wheel or keyboard scrolling.
+     The Nam Tram navigation is a separate, custom-drawn interface. */
+  *::-webkit-scrollbar {
+    display: none;
   }
 
   html {

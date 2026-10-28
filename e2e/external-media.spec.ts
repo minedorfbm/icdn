@@ -65,6 +65,7 @@ for (const [path, name] of [
     const card = page.getByRole("dialog", { name, exact: true });
     const player = card.locator("[data-youtube-player]").first();
     await expect(card.locator('iframe[src*="youtube-nocookie"]')).toHaveCount(0);
+    expect(scripts).toBe(0);
     await player.scrollIntoViewIfNeeded();
     const frame = player.locator("iframe");
     await expect(
@@ -76,7 +77,7 @@ for (const [path, name] of [
     await expect(card.getByRole("link", { name: "Play video · YouTube", exact: true })).toHaveCount(
       0,
     );
-    expect(scripts).toBe(0);
+    await expect.poll(() => scripts).toBe(1);
     await card.getByRole("button", { name: "BACK", exact: true }).click();
     await expect(card).toHaveCount(0);
     await expect(page.locator('iframe[src*="youtube-nocookie"]')).toHaveCount(0);

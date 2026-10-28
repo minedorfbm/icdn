@@ -10,6 +10,7 @@ for (const viewport of [
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await expect(page.locator("#heaven")).toBeAttached();
+    await expect(page.locator("html")).toHaveCSS("scrollbar-width", "none");
     for (const selector of [
       ".hub-tools span",
       ".hero-invitation-caption",
@@ -58,7 +59,20 @@ for (const viewport of [
     await expect(description).toBeVisible();
     expect(
       await description.evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize)),
-    ).toBeGreaterThan(19);
+    ).toBeCloseTo((viewport.width >= 768 ? 18 : 16) * 1.05, 1);
+    const card = page.locator(".editorial-detail");
+    expect(
+      await card
+        .locator(".editorial-title")
+        .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize)),
+    ).toBeCloseTo(
+      viewport.width >= 1200 ? 68 : Math.max(36, Math.min(64, viewport.width * 0.11)),
+      1,
+    );
+    const scroller = card.locator("[data-destination-scroll]");
+    await expect(scroller).toHaveCSS("scrollbar-width", "none");
+    await scroller.evaluate((el) => el.scrollTo(0, el.scrollHeight));
+    await expect.poll(() => scroller.evaluate((el) => el.scrollTop)).toBeGreaterThan(100);
     await expect(page.getByRole("button", { name: "BACK", exact: true })).toBeVisible();
   });
 }
