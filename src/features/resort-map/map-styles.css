@@ -1,0 +1,5 @@
+/* Preserve the map module's existing cascade, but deliver it before its first paint. */
+@import "./map-preview.css";
+@import "./bensley-tour.css";
+@import "./artwork.css";
+@import "./resort-map.css";

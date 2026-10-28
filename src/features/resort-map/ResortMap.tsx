@@ -29,8 +29,6 @@ import { mapCopy } from "./map-copy";
 import { BensleyTour } from "./BensleyTour";
 import type { MapMode, MapRequest } from "./map-context";
 import type { PlaceCategory } from "./map.types";
-import "./artwork.css";
-import "./resort-map.css";
 
 const photoParent = (id: string) => photoSpots.find((p) => p.id === id)?.parentId;
 const modes = [

@@ -19,6 +19,7 @@ import { destinationPlace } from "./map-links";
 import { mapCopy } from "./map-copy";
 import { useHubScreenNavigation } from "@/lib/use-hub-screen-navigation";
 import { mapRequest, prepareMapBackground } from "./map-background";
+import mapStyles from "./map-styles.css?url";
 const ResortMap = lazy(() => import("./ResortMap"));
 class MapBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -77,25 +78,28 @@ export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }
     <MapContext.Provider value={value}>
       {children}
       {visible && (
-        <FullscreenDialog
-          title={mapCopy(lang, "title")}
-          onClose={close}
-          // Keep map and SSR card dialogs as siblings: a body portal would hide
-          // the card's main ancestor while the map stays mounted behind it.
-          portalled={false}
-          overlayClassName="fixed inset-0 z-[89] bg-black/40"
-          className="fixed inset-0 z-[90] h-dvh overflow-hidden brand-ui brand-surface"
-        >
-          <MapBoundary fallback={message(mapCopy(lang, "unavailable"))}>
-            <Suspense fallback={message(mapCopy(lang, "loading"))}>
-              <ResortMap
-                request={request}
-                onClose={close}
-                onDestination={(id) => openDestination(id)}
-              />
-            </Suspense>
-          </MapBoundary>
-        </FullscreenDialog>
+        <>
+          <link rel="stylesheet" href={mapStyles} precedence="resort-map" data-hub-map-style="" />
+          <FullscreenDialog
+            title={mapCopy(lang, "title")}
+            onClose={close}
+            // Keep map and SSR card dialogs as siblings: a body portal would hide
+            // the card's main ancestor while the map stays mounted behind it.
+            portalled={false}
+            overlayClassName="fixed inset-0 z-[89] bg-black/40"
+            className="fixed inset-0 z-[90] h-dvh overflow-hidden brand-ui brand-surface"
+          >
+            <MapBoundary fallback={message(mapCopy(lang, "unavailable"))}>
+              <Suspense fallback={message(mapCopy(lang, "loading"))}>
+                <ResortMap
+                  request={request}
+                  onClose={close}
+                  onDestination={(id) => openDestination(id)}
+                />
+              </Suspense>
+            </MapBoundary>
+          </FullscreenDialog>
+        </>
       )}
     </MapContext.Provider>
   );

@@ -3,7 +3,6 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { useI18n } from "@/i18n";
 import { mapCopy } from "./map-copy";
 import { BENSLEY_TOUR_SOURCE, tourCopy } from "./tour-copy";
-import "./bensley-tour.css";
 
 /** Keep the official document mounted while consulting the map, without reading its contents. */
 export function BensleyTour({ open, onReturn }: Readonly<{ open: boolean; onReturn: () => void }>) {
