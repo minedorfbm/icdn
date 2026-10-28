@@ -100,7 +100,9 @@ export default function HubJourney() {
       </section>
 
       {/* FIXED CONCIERGE BUTTON */}
-      <ConciergeContact />
+      <div className="hub-contact-tool">
+        <ConciergeContact />
+      </div>
     </div>
   );
 }
