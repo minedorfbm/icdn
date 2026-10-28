@@ -299,6 +299,8 @@ test("language and search remain usable when browser storage is denied", async (
   await page.locator(".hub-tools button").last().click();
   await page.getByRole("button", { name: /日本語/ }).click();
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
+  await expect(page.locator("#heaven")).toBeAttached();
+  await page.locator("#discover").evaluate((section) => section.scrollIntoView({ block: "start" }));
   await page.locator(".hub-search-tool button").first().click();
   await page.getByRole("searchbox").fill("Citron");
   await page.locator(".hub-search-results button").filter({ hasText: "Citron" }).click();
