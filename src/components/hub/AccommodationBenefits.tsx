@@ -5,6 +5,7 @@ import { useI18n } from "@/i18n";
 import { localizedBenefits, type BenefitContent } from "@/lib/accommodation-benefits";
 import { getAccommodationBenefits } from "@/lib/accommodation-benefits.functions";
 import type { Destination } from "@/data/resort";
+import { useInteractiveReady } from "@/lib/use-interactive-ready";
 
 function BenefitsContent({
   loading,
@@ -99,10 +100,12 @@ export function AccommodationBenefits({
 }>) {
   const [open, setOpen] = useState(false);
   const { linkLabel } = useI18n();
+  const interactive = useInteractiveReady();
   return (
     <>
       <button
         type="button"
+        disabled={!interactive}
         className={className}
         onClick={(event) => {
           event.currentTarget.focus({ preventScroll: true });

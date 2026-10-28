@@ -24,6 +24,8 @@ import { NavigationProgress } from "@/components/hub/NavigationProgress";
 import { I18nProvider, LanguageSwitch, useI18n } from "@/i18n";
 import { resolveHeroImage } from "@/data/hub-value";
 import { ResortBrowserProvider } from "@/components/hub/ResortBrowser";
+import { EMPTY_HUB_SHELL, isHubScreen } from "@/lib/hub-screen";
+import { mapBackgroundSource } from "@/features/resort-map/map-background";
 
 const prepareHubJourney = () => import("@/components/hub/HubJourney");
 const HubJourney = lazy(prepareHubJourney);
@@ -33,15 +35,16 @@ export const Route = createFileRoute("/_hub")({
     // Finish HTML without streaming a deferred catalogue (mobile browsers may buffer it).
     // A direct card needs only its own published content, including all its translations.
     const isHome = location.pathname === "/";
+    const screen = isHubScreen(location.pathname) ? location.pathname : null;
     const catalogue = peekHubData() ?? null;
     const id = canonicalDestinationId(location.pathname.slice(1));
-    if (!isHome && !/^[a-z0-9-]{1,120}$/.test(id)) throw notFound();
+    if (!isHome && !screen && !/^[a-z0-9-]{1,120}$/.test(id)) throw notFound();
     const [settings, card] = await Promise.all([
       loadHubSettings(),
-      isHome || catalogue ? Promise.resolve(null) : loadDestinationCard(id),
+      isHome || screen || catalogue ? Promise.resolve(null) : loadDestinationCard(id),
     ]);
-    if (!isHome && !catalogue && !card) throw notFound();
-    return { settings, catalogue, card, isHome };
+    if (!isHome && !screen && !catalogue && !card) throw notFound();
+    return { settings, catalogue, card, isHome, screen };
   },
   staleTime: 0,
   head: ({ loaderData }) => ({
@@ -77,7 +80,9 @@ export const Route = createFileRoute("/_hub")({
             fetchPriority: "high",
           },
         ]
-      : [],
+      : loaderData?.screen === "/map"
+        ? [{ rel: "preload", as: "image", href: mapBackgroundSource(), fetchPriority: "high" }]
+        : [],
     meta: [
       { title: "InterContinental Danang — Digital Discovery | Heaven to Sea" },
       {
@@ -103,6 +108,7 @@ function HubRoute() {
   const { settings, catalogue, card } = Route.useLoaderData();
   useEffect(() => primeHubSnapshots(settings, catalogue), [settings, catalogue]);
   const location = useLocation();
+  const screen = isHubScreen(location.pathname);
   // History state survives a refresh. Keep the hub behind a card only when this
   // mounted page actually came from the homepage during client navigation.
   const [hasVisitedHome, setHasVisitedHome] = useState(location.pathname === "/");
@@ -141,8 +147,8 @@ function HubRoute() {
   }, [card]);
   const focused = card ?? focusedCard;
   const presentation = useMemo(
-    () => data ?? (focused ? cardHubData(focused) : null),
-    [data, focused],
+    () => data ?? (focused ? cardHubData(focused) : screen ? EMPTY_HUB_SHELL : null),
+    [data, focused, screen],
   );
   const providerData = useMemo(
     () => (presentation ? { ...presentation, settings } : undefined),

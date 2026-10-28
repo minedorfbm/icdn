@@ -7,17 +7,20 @@ import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
 import type { Destination } from "@/data/resort";
 import { useI18n } from "@/i18n";
 import { discoveryCopy } from "./discovery-copy";
+import { CataloguePending } from "@/components/hub/CataloguePending";
 
 export function SurpriseDiscovery({
   items,
   index,
   onIndexChange,
   onClose,
+  pending = false,
 }: Readonly<{
   items: Destination[];
   index: number;
   onIndexChange: Dispatch<SetStateAction<number>>;
   onClose: () => void;
+  pending?: boolean;
 }>) {
   const { lang, t } = useI18n();
   const copy = (key: Parameters<typeof discoveryCopy>[1]) => discoveryCopy(lang, key);
@@ -25,11 +28,12 @@ export function SurpriseDiscovery({
     <FullscreenDialog
       title={copy("surprise")}
       onClose={onClose}
+      portalled={false}
       overlayClassName="fixed inset-0 z-[69] bg-black/40"
       className="surprise-discovery fixed inset-0 z-[70] h-dvh overflow-hidden"
     >
       <div className="surprise-tools">
-        <HubSearch compact onNavigate={onClose} />
+        <HubSearch compact />
         <button type="button" onClick={onClose} aria-label={t("close")}>
           <X size={22} strokeWidth={1.4} />
         </button>
@@ -42,7 +46,9 @@ export function SurpriseDiscovery({
             <h2>{copy("surprise")}</h2>
           </div>
         </header>
-        {items.length ? (
+        {pending ? (
+          <CataloguePending />
+        ) : items.length ? (
           <>
             <p className="surprise-hint">{copy("hint")}</p>
             <div className="surprise-deck">

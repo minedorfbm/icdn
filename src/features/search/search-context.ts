@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import type { SearchCollection } from "./search";
+import type { Destination } from "@/data/resort";
 
 export interface SearchSnapshot {
   query: string;
@@ -9,7 +10,13 @@ export interface SearchSnapshot {
 }
 
 export const EMPTY_SEARCH: SearchSnapshot = { query: "", collection: "", scrollTop: 0 };
-export const SearchContext = createContext<((onNavigate?: () => void) => void) | null>(null);
+export type SearchOptions = {
+  placesOnly?: boolean;
+  onSelect?: (destination: Destination) => boolean;
+};
+export const SearchContext = createContext<
+  ((onNavigate?: () => void, options?: SearchOptions) => void) | null
+>(null);
 
 export function useHubSearch() {
   const open = useContext(SearchContext);

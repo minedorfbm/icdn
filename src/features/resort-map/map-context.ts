@@ -3,6 +3,7 @@ export type MapMode = "explore" | "photos" | "walk" | "tour";
 export interface MapRequest {
   placeId?: string;
   mode?: MapMode;
+  from?: string;
 }
 export const MapContext = createContext<{
   openMap: (request?: MapRequest) => void;

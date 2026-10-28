@@ -11,6 +11,51 @@ const heroPaths = new Set(
     .map((candidate) => new URL(imageDeliveryUrl(candidate.src), "http://localhost").pathname),
 );
 
+for (const [id, title] of [
+  ["tingara", "TINGARA"],
+  ["mi-sol-spa", "Mi Sol Spa & Wellness"],
+] as const) {
+  test(`${id} also keeps its primary photo ahead of the full catalogue`, async ({ page }) => {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let photosRequested = 0;
+    let catalogueReads = 0;
+    await page.route(
+      (url) =>
+        url.pathname.startsWith("/media/") ||
+        url.pathname === "/intercontinental-touch-icon.png" ||
+        (url.pathname.startsWith("/assets/") && /\.(webp|avif)$/.test(url.pathname)),
+      async (route) => {
+        photosRequested++;
+        await gate;
+        await route.fulfill({
+          path: new URL("../public/intercontinental-touch-icon.png", import.meta.url).pathname,
+          contentType: "image/png",
+        });
+      },
+    );
+    await page.route("**/_serverFn/**", async (route) => {
+      const response = await route.fetch();
+      if (response.headers()["server-timing"]?.includes("catalogue;")) catalogueReads++;
+      await route.fulfill({ response });
+    });
+    await page.goto(`/${id}`, { waitUntil: "domcontentloaded" });
+    try {
+      await expect(page.locator(".editorial-title")).toHaveText(title);
+      await expect.poll(() => photosRequested).toBeGreaterThan(0);
+      await expect(page.locator(".editorial-hero img")).toHaveAttribute("fetchpriority", "high");
+      await page.waitForTimeout(600);
+      expect(catalogueReads).toBe(0);
+      release();
+      await expect.poll(() => catalogueReads).toBe(1);
+    } finally {
+      release();
+    }
+  });
+}
+
 for (const releaseBy of ["photo", "search", "timeout"] as const) {
   test(`direct card prioritizes its hero until ${releaseBy}, without downloading the home journey`, async ({
     page,
