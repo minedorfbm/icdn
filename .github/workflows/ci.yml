@@ -9,11 +9,16 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # Only superseded PR revisions are cancelled; running main checks finish.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  validate:
+  checks:
+    name: Code and data checks
     runs-on: ubuntu-latest
-    # Functional and instrumented browser suites both run; keep time for their analysis.
-    timeout-minutes: 50
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -35,17 +40,118 @@ jobs:
       - run: bun run test:coverage
       - run: bun run typecheck
       - run: bun run lint
-      - run: bun run build
-      - run: bun run test:mobile:install
-      - run: bun run test:mobile
-      - run: bun run deploy:check
-      - run: bun run test:mobile:coverage
-      - run: bun run coverage:check-production
+      - name: Save unit coverage
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: unit-coverage
+          path: coverage/lcov.info
+          if-no-files-found: error
+          retention-days: 14
+
+  browser:
+    name: ${{ matrix.mode }} / ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [production, coverage]
+        project: [iphone-webkit, android-chrome]
+        include:
+          - project: iphone-webkit
+            browser: webkit
+          - project: android-chrome
+            browser: chromium
+    env:
+      HUB_TEST_PROJECT: ${{ matrix.project }}
+      HUB_BROWSER_COVERAGE: ${{ matrix.mode == 'coverage' && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - name: Build production application
+        if: matrix.mode == 'production'
+        run: bun run build
+      - name: Verify production deployment and instrumentation isolation
+        if: matrix.mode == 'production'
+        run: |
+          bun run deploy:check
+          bun run coverage:check-production
+      - name: Build instrumented test application
+        if: matrix.mode == 'coverage'
+        run: bun run build:coverage
+      - name: Install selected browser
+        env:
+          TEST_BROWSER: ${{ matrix.browser }}
+        run: node node_modules/@playwright/test/cli.js install --with-deps "$TEST_BROWSER"
+      - name: Run complete selected-browser suite
+        env:
+          TEST_PROJECT: ${{ matrix.project }}
+        run: node node_modules/@playwright/test/cli.js test --project="$TEST_PROJECT"
+      - name: Save browser coverage snapshots
+        if: matrix.mode == 'coverage'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: browser-coverage-${{ matrix.project }}
+          path: coverage/browser/raw/*.json
+          if-no-files-found: error
+          retention-days: 14
+
+  validate:
+    name: validate
+    needs: [checks, browser]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Require every code and browser check to succeed
+        env:
+          CODE_RESULT: ${{ needs.checks.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+        run: |
+          if [ "$CODE_RESULT" != 'success' ] || [ "$BROWSER_RESULT" != 'success' ]; then
+            echo '::error::All code checks and all four browser jobs must pass.'
+            exit 1
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - name: Restore unit coverage
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: unit-coverage
+          path: coverage
+      - name: Restore both browser coverage collections
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: browser-coverage-*
+          path: coverage/browser/raw
+          merge-multiple: true
+      - name: Merge and validate browser coverage
+        run: bun scripts/report-browser-coverage.ts
       - name: Save unit and mobile coverage reports
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: test-coverage
-          path: coverage/
+          path: |
+            coverage/lcov.info
+            coverage/browser/lcov.info
+            coverage/browser/coverage-summary.json
+            coverage/browser/summary.md
           if-no-files-found: error
           retention-days: 14
       # Enable only after SONAR_TOKEN is configured and automatic analysis has
