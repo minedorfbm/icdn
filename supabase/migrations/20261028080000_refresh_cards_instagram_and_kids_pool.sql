@@ -52,8 +52,8 @@ BEGIN
  IF current_card.image_key = 'https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-bb9752c8607d0136d5c9a276-native.webp' AND current_card.detail_image_key = 'https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-1b52a248131ca61b697083a8-native.webp' THEN RETURN; END IF;
  -- Fresh installations still carry the reviewed September source URLs.
  -- Publish the same final bucket pair there; never overwrite an unknown CMS edit.
- IF current_card.image_key = 'https://www.danang.intercontinental.com/wp-content/uploads/2025/08/Pool-Friends-scaled.jpg'
-    AND current_card.detail_image_key = 'https://www.danang.intercontinental.com/wp-content/uploads/2022/03/ICDN-Resort-Pool-with-family-scaled-1.jpg' THEN
+ IF current_card.image_key = 'https://www.danang.intercontinental.com/wp-content/uploads/2022/03/ICDN-Resort-Pool-with-family-scaled-1.jpg'
+    AND current_card.detail_image_key = 'https://www.danang.intercontinental.com/wp-content/uploads/2025/08/Pool-Friends-scaled.jpg' THEN
    UPDATE public.destinations SET
      image_key='https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-bb9752c8607d0136d5c9a276-native.webp',
      detail_image_key='https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-1b52a248131ca61b697083a8-native.webp'
