@@ -65,6 +65,18 @@ const discoveryPreservedState = async () =>
   `)
   ).rows;
 
+const mediaMigration = readFileSync(
+  new URL("20261016120000_external_media_reliability.sql", directory),
+  "utf8",
+);
+const mediaState = async () =>
+  (
+    await db.query(`
+    SELECT id, destination_id, post_url, display_order, active, embed_mode
+    FROM destination_posts ORDER BY id
+  `)
+  ).rows;
+
 async function applyAndCheckMigration(file: string): Promise<void> {
   try {
     const beforePhotos =
@@ -82,6 +94,65 @@ async function applyAndCheckMigration(file: string): Promise<void> {
     const beforeLongBar = file === longBarMigration ? await longBarPreservedState() : undefined;
     const migration = readFileSync(new URL(file, directory), "utf8");
     await db.exec(migration);
+    if (file === "20261023093000_pause_pending_instagram_videos.sql") {
+      const beforeReplay = await mediaState();
+      await db.exec(mediaMigration);
+      assert.deepEqual(
+        await mediaState(),
+        beforeReplay,
+        "Replaying media corrections must not duplicate or reorder posts",
+      );
+      const { rows: media } = await db.query<{
+        links: number;
+        replacement: number;
+        otherWatersports: number;
+      }>(`
+    SELECT
+      count(*) FILTER (WHERE active AND embed_mode = 'link')::int AS links,
+      count(*) FILTER (WHERE destination_id='la-maison-1888' AND active
+        AND post_url LIKE '%/DTkauDdEt51/' AND display_order=4)::int AS replacement,
+      count(*) FILTER (WHERE destination_id<>'la-maison-1888' AND active
+        AND post_url LIKE '%/Dc2etiKCC_C/')::int AS "otherWatersports"
+    FROM destination_posts
+  `);
+      assert.deepEqual(media[0], { links: 3, replacement: 1, otherWatersports: 2 });
+      await db.exec(`BEGIN; UPDATE destination_links SET url='https://example.com/newer-schedule.pdf'
+    WHERE destination_id='things-to-do' AND kind='DAILY_SCHEDULE' AND active`);
+      await assert.rejects(
+        db.exec(mediaMigration),
+        /schedule changed since audit/,
+        "Do not overwrite a newer editorial schedule",
+      );
+      await db.exec("ROLLBACK");
+    }
+
+    // Historical replays belong at their own point, before later editorial changes.
+    if (file === "20261018151000_instagram_spots_guide.sql") {
+      const guideMigration = readFileSync(
+        new URL("20261018151000_instagram_spots_guide.sql", directory),
+        "utf8",
+      );
+      const guideState = async () =>
+        (
+          await db.query(`SELECT
+      (SELECT jsonb_agg(c ORDER BY key) FROM destination_collection_items c) AS collection,
+      (SELECT jsonb_agg(p ORDER BY id) FROM destination_posts p) AS posts,
+      (SELECT jsonb_agg(v ORDER BY id) FROM destination_videos v) AS videos,
+      (SELECT jsonb_agg(l ORDER BY id) FROM destination_links l) AS links,
+      (SELECT jsonb_agg(t ORDER BY link_id,locale) FROM destination_link_translations t) AS translations,
+      (SELECT jsonb_agg(d ORDER BY id) FROM destinations d) AS destinations
+    `)
+        ).rows;
+      const guideBefore = await guideState();
+      await db.exec(readFileSync(new URL("20261018150500_publish_lobby.sql", directory), "utf8"));
+      await db.exec(guideMigration);
+      assert.deepEqual(
+        await guideState(),
+        guideBefore,
+        "Guide replay preserves every card and media association",
+      );
+    }
+
     if (beforePhotos) {
       assert.deepEqual(
         (
@@ -216,29 +287,6 @@ try {
   await checkCatalogueSnapshot(db);
   await checkDestinationMediaSnapshot(db);
   await checkDestinationCardSnapshot(db);
-  const guideMigration = readFileSync(
-    new URL("20261018151000_instagram_spots_guide.sql", directory),
-    "utf8",
-  );
-  const guideState = async () =>
-    (
-      await db.query(`SELECT
-    (SELECT jsonb_agg(c ORDER BY key) FROM destination_collection_items c) AS collection,
-    (SELECT jsonb_agg(p ORDER BY id) FROM destination_posts p) AS posts,
-    (SELECT jsonb_agg(v ORDER BY id) FROM destination_videos v) AS videos,
-    (SELECT jsonb_agg(l ORDER BY id) FROM destination_links l) AS links,
-    (SELECT jsonb_agg(t ORDER BY link_id,locale) FROM destination_link_translations t) AS translations,
-    (SELECT jsonb_agg(d ORDER BY id) FROM destinations d) AS destinations
-  `)
-    ).rows;
-  const guideBefore = await guideState();
-  await db.exec(readFileSync(new URL("20261018150500_publish_lobby.sql", directory), "utf8"));
-  await db.exec(guideMigration);
-  assert.deepEqual(
-    await guideState(),
-    guideBefore,
-    "Guide replay preserves every card and media association",
-  );
   const guide = (
     await db.query<{ key: string; translations: Record<string, unknown>; description: string }>(
       "SELECT key,translations,description FROM destination_collection_items WHERE destination_id='instagram-spots' ORDER BY display_order",
@@ -474,38 +522,6 @@ try {
     "Preserve a newer editorial photograph",
   );
   await db.exec("ROLLBACK");
-  const mediaMigration = readFileSync(
-    new URL("20261016120000_external_media_reliability.sql", directory),
-    "utf8",
-  );
-  const mediaState = async () =>
-    (
-      await db.query(`
-    SELECT id, destination_id, post_url, display_order, active, embed_mode
-    FROM destination_posts ORDER BY id
-  `)
-    ).rows;
-  const beforeReplay = await mediaState();
-  await db.exec(mediaMigration);
-  assert.deepEqual(
-    await mediaState(),
-    beforeReplay,
-    "Replaying media corrections must not duplicate or reorder posts",
-  );
-  const { rows: media } = await db.query<{
-    links: number;
-    replacement: number;
-    otherWatersports: number;
-  }>(`
-    SELECT
-      count(*) FILTER (WHERE active AND embed_mode = 'link')::int AS links,
-      count(*) FILTER (WHERE destination_id='la-maison-1888' AND active
-        AND post_url LIKE '%/DTkauDdEt51/' AND display_order=4)::int AS replacement,
-      count(*) FILTER (WHERE destination_id<>'la-maison-1888' AND active
-        AND post_url LIKE '%/Dc2etiKCC_C/')::int AS "otherWatersports"
-    FROM destination_posts
-  `);
-  assert.deepEqual(media[0], { links: 3, replacement: 1, otherWatersports: 2 });
   const { rows: pausedVideos } = await db.query<{ total: number; active: number }>(`
     SELECT count(*)::int AS total,
       count(*) FILTER (WHERE active)::int AS active
@@ -554,14 +570,6 @@ try {
   assert.deepEqual(beachMap, [
     { destination_id: "sea-experiences", active: true, is_primary: true },
   ]);
-  await db.exec(`UPDATE destination_links SET url='https://example.com/newer-schedule.pdf'
-    WHERE destination_id='things-to-do' AND kind='DAILY_SCHEDULE' AND active`);
-  await assert.rejects(
-    db.exec(mediaMigration),
-    /schedule changed since audit/,
-    "Do not overwrite a newer editorial schedule",
-  );
-  await db.exec("ROLLBACK");
   // Fresh UUID resolution must stay strict: two matching menu rows cannot be chosen arbitrarily.
   await db.exec(`INSERT INTO destination_links(destination_id,kind,url,label,active)
     SELECT destination_id,kind,url,label,active FROM destination_links
