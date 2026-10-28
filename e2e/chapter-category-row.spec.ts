@@ -44,30 +44,33 @@ test("three enlarged categories remain centered and unbroken across formats", as
       "WELLNESS",
       "EXPERIENCES",
     ]);
-    const geometry = await row.evaluate((el) => ({
-      width: el.clientWidth,
-      scrollWidth: el.scrollWidth,
-      clipped: el.scrollWidth > el.clientWidth + 1,
-      labels: [...el.querySelectorAll<HTMLButtonElement>("button")].map((button) => {
-        const label = button.querySelector("span")!;
-        const b = button.getBoundingClientRect();
-        const r = label.getBoundingClientRect();
-        const style = getComputedStyle(label);
-        return {
-          width: r.width,
-          height: r.height,
-          line: Number.parseFloat(style.lineHeight),
-          size: Number.parseFloat(style.fontSize),
-          offset: Math.abs(r.left + r.width / 2 - b.left - b.width / 2),
-        };
-      }),
-    }));
-    expect(geometry.clipped, JSON.stringify({ viewport, geometry })).toBe(false);
-    for (const label of geometry.labels) {
-      expect(label.height).toBeLessThanOrEqual(label.line + 1);
-      expect(label.size).toBeGreaterThanOrEqual(16.7);
-      expect(label.offset).toBeLessThan(1);
-    }
+    // Viewport changes can paint one frame with the previous media-query sizes.
+    await expect(async () => {
+      const geometry = await row.evaluate((el) => ({
+        width: el.clientWidth,
+        scrollWidth: el.scrollWidth,
+        clipped: el.scrollWidth > el.clientWidth + 1,
+        labels: [...el.querySelectorAll<HTMLButtonElement>("button")].map((button) => {
+          const label = button.querySelector("span")!;
+          const b = button.getBoundingClientRect();
+          const r = label.getBoundingClientRect();
+          const style = getComputedStyle(label);
+          return {
+            width: r.width,
+            height: r.height,
+            line: Number.parseFloat(style.lineHeight),
+            size: Number.parseFloat(style.fontSize),
+            offset: Math.abs(r.left + r.width / 2 - b.left - b.width / 2),
+          };
+        }),
+      }));
+      expect(geometry.clipped, JSON.stringify({ viewport, geometry })).toBe(false);
+      for (const label of geometry.labels) {
+        expect(label.height).toBeLessThanOrEqual(label.line + 1);
+        expect(label.size).toBeGreaterThanOrEqual(16.7);
+        expect(label.offset).toBeLessThan(1);
+      }
+    }).toPass({ timeout: 5000 });
     await row.getByRole("button", { name: "WELLNESS", exact: true }).click();
     await expect(
       chapter.getByRole("button", { name: "Wellness layout test", exact: true }),
@@ -79,13 +82,15 @@ test("three enlarged categories remain centered and unbroken across formats", as
     content: ".chapter-category-row button > span:first-child { font-family: Georgia, serif; }",
   });
   await page.setViewportSize({ width: 320, height: 640 });
-  const fallbackBounds = await row.evaluate((el) => ({
-    width: el.clientWidth,
-    scrollWidth: el.scrollWidth,
-  }));
-  expect(fallbackBounds.scrollWidth, JSON.stringify(fallbackBounds)).toBeLessThanOrEqual(
-    fallbackBounds.width + 1,
-  );
+  await expect(async () => {
+    const fallbackBounds = await row.evaluate((el) => ({
+      width: el.clientWidth,
+      scrollWidth: el.scrollWidth,
+    }));
+    expect(fallbackBounds.scrollWidth, JSON.stringify(fallbackBounds)).toBeLessThanOrEqual(
+      fallbackBounds.width + 1,
+    );
+  }).toPass({ timeout: 5000 });
 
   // Additional collections keep their scrollable navigation instead of compressing labels.
   catalogue.destinations.push({
