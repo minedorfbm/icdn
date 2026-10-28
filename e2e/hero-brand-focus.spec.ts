@@ -24,7 +24,7 @@ for (const viewport of [
       );
       expect((await page.locator(".hero-film-button").boundingBox())!.width).toBe(80);
       await expect(page.locator(".hero-invitation-title")).toHaveCSS("font-size", "44px");
-      await expect(page.locator(".hero-invitation-caption")).toHaveCSS("font-size", "10px");
+      await expect(page.locator(".hero-invitation-caption")).toHaveCSS("font-size", "12px");
       return;
     }
     await expect(search).toBeHidden();

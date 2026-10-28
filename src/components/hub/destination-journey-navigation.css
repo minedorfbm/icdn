@@ -20,7 +20,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 10px;
+  font-size: var(--readable-10);
   line-height: 1.5;
   letter-spacing: 1.3px;
 }

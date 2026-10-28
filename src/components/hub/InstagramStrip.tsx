@@ -30,7 +30,7 @@ export function InstagramStrip({ photos, instagramUrl, label }: Readonly<Props>)
       className="editorial-instagram-section editorial-photo-strip mt-12"
       data-destination-swipe-ignore
     >
-      <p className="px-0 text-[9px] tracking-[0.38em] opacity-45">
+      <p className="px-0 text-[length:var(--readable-9)] tracking-[0.38em] opacity-45">
         {label}
         {handle && <span className="ml-2 opacity-80">· {handle}</span>}
       </p>
@@ -59,7 +59,7 @@ export function InstagramStrip({ photos, instagramUrl, label }: Readonly<Props>)
               className="h-full w-full object-cover"
             />
             {photo.caption && (
-              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-left text-[10px] tracking-[0.16em] text-white/85">
+              <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-left text-[length:var(--readable-10)] tracking-[0.16em] text-white/85">
                 {photo.caption}
               </span>
             )}

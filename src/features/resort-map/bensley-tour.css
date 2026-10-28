@@ -35,7 +35,7 @@
 }
 .hub-atlas .atlas-tour-header button {
   justify-self: start;
-  font-size: 14px;
+  font-size: var(--readable-14);
   line-height: 1.2;
   text-align: start;
 }
@@ -48,7 +48,7 @@
 }
 .hub-atlas .atlas-tour-header h2 {
   font-family: var(--font-serif), Georgia, serif;
-  font-size: 17px;
+  font-size: var(--readable-17);
   font-weight: 400;
 }
 .hub-atlas .atlas-tour-reader iframe {

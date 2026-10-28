@@ -70,7 +70,7 @@ export default function HubJourney() {
                 <button
                   type="button"
                   onClick={() => openMap()}
-                  className="flex w-full items-center justify-between py-3 text-[11px] tracking-[0.22em]"
+                  className="flex w-full items-center justify-between py-3 text-[length:var(--readable-11)] tracking-[0.22em]"
                 >
                   {mapCopy(lang, "open").toUpperCase()}
                   <ArrowUpRight aria-hidden className="size-4 shrink-0" strokeWidth={1.3} />
@@ -86,7 +86,7 @@ export default function HubJourney() {
                   pageTitle={linkLabel(label)}
                   target={label === "Contact" ? undefined : "_blank"}
                   rel={label === "Contact" ? undefined : "noreferrer"}
-                  className="flex items-center justify-between py-3 text-[11px] tracking-[0.22em]"
+                  className="flex items-center justify-between py-3 text-[length:var(--readable-11)] tracking-[0.22em]"
                 >
                   {linkLabel(label).toUpperCase()}
                   <ArrowUpRight aria-hidden className="size-4 shrink-0" strokeWidth={1.3} />
@@ -96,7 +96,9 @@ export default function HubJourney() {
           ))}
         </ul>
 
-        <p className="mt-16 text-[9px] tracking-[0.3em] opacity-70">{t("footer_credit")}</p>
+        <p className="mt-16 text-[length:var(--readable-9)] tracking-[0.3em] opacity-70">
+          {t("footer_credit")}
+        </p>
       </section>
 
       {/* FIXED CONCIERGE BUTTON */}

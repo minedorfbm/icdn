@@ -19,7 +19,9 @@ function YouTubeVideo({
       >
         <DeferredYouTubePlayer video={video} title={title} />
       </div>
-      {showTitle && <h4 className="mt-3 font-serif text-[18px] leading-snug">{title}</h4>}
+      {showTitle && (
+        <h4 className="mt-3 font-serif text-[length:var(--readable-18)] leading-snug">{title}</h4>
+      )}
     </article>
   );
 }

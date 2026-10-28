@@ -101,7 +101,7 @@ export function PhotoLightbox({ photos, index, onClose }: Readonly<Props>) {
 
       <div className="absolute inset-x-0 bottom-9 flex flex-col items-center gap-4 px-8 text-center">
         {photo.caption && (
-          <p className="max-w-[34ch] font-serif text-[14px] italic leading-relaxed text-[oklch(0.95_0.005_90/0.8)]">
+          <p className="max-w-[34ch] font-serif text-[length:var(--readable-14)] italic leading-relaxed text-[oklch(0.95_0.005_90/0.8)]">
             {photo.caption}
           </p>
         )}

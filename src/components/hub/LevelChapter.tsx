@@ -108,7 +108,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
               <ChevronDown aria-hidden className="size-3.5 shrink-0 opacity-60" strokeWidth={1.3} />
             </button>
           </h2>
-          <p className="mt-3 text-[14px] leading-relaxed tracking-[0.18em] uppercase opacity-70">
+          <p className="mt-3 text-[length:var(--readable-14)] leading-relaxed tracking-[0.18em] uppercase opacity-70">
             {levelLine(id, line)}
           </p>
         </header>
@@ -142,7 +142,7 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
                     }`}
                   >
                     <span
-                      className={`font-serif leading-tight tracking-tight ${compactCollections ? "max-w-full text-[clamp(14px,3.6vw,23px)] [overflow-wrap:anywhere]" : "text-[23px]"}`}
+                      className={`font-serif leading-tight tracking-tight ${compactCollections ? "max-w-full text-[length:calc(clamp(14px,3.6vw,23px)*var(--readable-scale))] [overflow-wrap:anywhere]" : "text-[23px]"}`}
                     >
                       {clusterLabel(group.key)}
                     </span>

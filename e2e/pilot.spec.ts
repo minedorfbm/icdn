@@ -41,7 +41,13 @@ for (const [id, level, color] of [
     await expect(card).not.toContainText("Local time");
     await expect(card.locator(".editorial-meta svg")).toHaveCount(1);
     await expect(card.locator(".editorial-title + .editorial-description")).toHaveCount(1);
-    await expect(card.locator(".editorial-description")).toHaveCSS("font-size", "16px");
+    await expect
+      .poll(() =>
+        card
+          .locator(".editorial-description")
+          .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize)),
+      )
+      .toBeCloseTo(19.2, 1);
     await expect(card.locator(".instagram-post[data-fit-to-screen]")).toHaveCount(2);
     const scroller = card.locator("[data-destination-scroll]");
     for (const size of [

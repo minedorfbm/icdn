@@ -1,6 +1,21 @@
 /* Editorial interface palette inspired by the resort's white, charcoal and grey UI.
    Keep the four immersive Journey worlds on their own level palettes. */
 :root {
+  /* Readable small text without scaling rem-based spacing or display titles. */
+  --readable-scale: 1.2;
+  --readable-min: 12px;
+  --readable-8: max(var(--readable-min), calc(8px * var(--readable-scale)));
+  --readable-9: max(var(--readable-min), calc(9px * var(--readable-scale)));
+  --readable-10: max(var(--readable-min), calc(10px * var(--readable-scale)));
+  --readable-11: max(var(--readable-min), calc(11px * var(--readable-scale)));
+  --readable-12: max(var(--readable-min), calc(12px * var(--readable-scale)));
+  --readable-13: max(var(--readable-min), calc(13px * var(--readable-scale)));
+  --readable-14: max(var(--readable-min), calc(14px * var(--readable-scale)));
+  --readable-15: max(var(--readable-min), calc(15px * var(--readable-scale)));
+  --readable-16: max(var(--readable-min), calc(16px * var(--readable-scale)));
+  --readable-17: max(var(--readable-min), calc(17px * var(--readable-scale)));
+  --readable-18: max(var(--readable-min), calc(18px * var(--readable-scale)));
+
   --brand-white: #ffffff;
   --brand-paper: #f7f7f6;
   --brand-ink: #292827;

@@ -12,7 +12,7 @@
 }
 .chapter-frame {
   --chapter-card-height: calc(max(360px, 100lvh - 184px) * 0.85);
-  margin-top: 16px;
+  margin-top: 8px;
   padding-bottom: 12px;
 }
 .chapter-categories {
@@ -124,7 +124,7 @@
     padding-inline: 0;
   }
   .level-chapter .chapter-categories button > span:first-child {
-    font-size: 18px;
+    font-size: var(--readable-18);
   }
   .level-chapter .chapter-stack {
     width: 100%;
@@ -142,13 +142,13 @@
     font-size: clamp(30px, 11cqi, 46px);
   }
   .level-chapter .destination-panel-meta {
-    font-size: 11px;
+    font-size: var(--readable-11);
   }
   .level-chapter .destination-panel-summary {
-    font-size: 17px;
+    font-size: var(--readable-17);
   }
   .level-chapter .destination-panel-actions a {
-    font-size: 11px;
+    font-size: var(--readable-11);
   }
   /* Daylight blue keeps ivory-to-navy clear rather than passing through grey. */
   .chapter-gradient[data-from="heaven"] {
