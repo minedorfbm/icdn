@@ -1,6 +1,14 @@
 import { expect, test } from "bun:test";
 import { isDestinationPath, isHubScreen } from "../src/lib/hub-screen";
-import { mapRequest } from "../src/features/resort-map/map-background";
+import { mapBackgroundSource, mapRequest } from "../src/features/resort-map/map-background";
+import { imageSource, imageVariants } from "../src/lib/image-source";
+
+test("map entry uses the Sharp overview while close zoom retains the native HD source", () => {
+  const image = imageVariants("/resort-map/canopy.webp")!;
+  expect(mapBackgroundSource()).toBe(image.variants.find((variant) => variant.width === 1600)!.src);
+  expect(mapBackgroundSource(true)).toBe(imageSource("/resort-map/canopy.webp"));
+  expect(mapBackgroundSource()).not.toBe(mapBackgroundSource(true));
+});
 
 test("feature paths do not request a destination snapshot or create a previous-card trail", () => {
   for (const path of ["/map", "/search", "/surprise-me"]) {
