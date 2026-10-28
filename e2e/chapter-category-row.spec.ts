@@ -62,7 +62,7 @@ test("three enlarged categories remain centered and unbroken across formats", as
         };
       }),
     }));
-    expect(geometry.clipped, `${viewport.width}px`).toBe(false);
+    expect(geometry.clipped, JSON.stringify({ viewport, geometry })).toBe(false);
     for (const label of geometry.labels) {
       expect(label.height).toBeLessThanOrEqual(label.line + 1);
       expect(label.size).toBeGreaterThanOrEqual(16.7);
@@ -74,6 +74,19 @@ test("three enlarged categories remain centered and unbroken across formats", as
     ).toBeVisible();
     await row.getByRole("button", { name: "DINING", exact: true }).click();
   }
+  // A wider serif fallback must fit without shrinking text or hiding a category.
+  await page.addStyleTag({
+    content: ".chapter-category-row button > span:first-child { font-family: Georgia, serif; }",
+  });
+  await page.setViewportSize({ width: 320, height: 640 });
+  const fallbackBounds = await row.evaluate((el) => ({
+    width: el.clientWidth,
+    scrollWidth: el.scrollWidth,
+  }));
+  expect(fallbackBounds.scrollWidth, JSON.stringify(fallbackBounds)).toBeLessThanOrEqual(
+    fallbackBounds.width + 1,
+  );
+
   // Additional collections keep their scrollable navigation instead of compressing labels.
   catalogue.destinations.push({
     ...catalogue.destinations[0],

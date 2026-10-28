@@ -28,6 +28,12 @@
   overflow-x: auto;
   scrollbar-width: none;
 }
+@media (max-width: 359px) {
+  .chapter-category-row {
+    gap: 0;
+    padding-inline: 0;
+  }
+}
 .chapter-category-row::-webkit-scrollbar {
   display: none;
 }
