@@ -59,6 +59,17 @@ describe("external content boundaries", () => {
     expect(instagramEmbedUrl("https://instagram.com/p/Abc123/extra")).toBeUndefined();
   });
 
+  test("account-prefixed reel shares use the canonical embed permalink", () => {
+    const shared = "https://www.instagram.com/intercontinentaldanang/reel/DfBhhlvAGem/";
+    expect(instagramLink(shared)).toBe(shared);
+    expect(instagramEmbedUrl(shared)).toBe("https://www.instagram.com/reel/DfBhhlvAGem/");
+    expect(
+      instagramEmbedUrl("https://instagram.com/resort.name/reels/Abc_123-/?utm_source=share"),
+    ).toBe("https://instagram.com/reels/Abc_123-/?utm_source=share");
+    expect(instagramEmbedUrl(shared + "extra")).toBeUndefined();
+    expect(instagramEmbedUrl("https://instagram.com/account/other/reel/Abc123/")).toBeUndefined();
+  });
+
   test("explicit direct links survive grouping while older rows still use embeds", () => {
     const common = {
       destination_id: "citron",

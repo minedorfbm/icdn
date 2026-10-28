@@ -4,6 +4,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { checkDestinationCardSnapshot } from "./check-destination-card-snapshot";
 import { checkCatalogueSnapshot } from "./check-catalogue-snapshot";
 import { checkDestinationMediaSnapshot } from "./check-destination-media-snapshot";
+import { checkInstagramRestoration } from "./check-instagram-restoration";
 
 // Real PostgreSQL execution in an isolated, disposable database. Never connects to Supabase.
 const directory = new URL("../supabase/migrations/", import.meta.url);
@@ -287,6 +288,7 @@ try {
   await checkCatalogueSnapshot(db);
   await checkDestinationMediaSnapshot(db);
   await checkDestinationCardSnapshot(db);
+  await checkInstagramRestoration(db);
   const guide = (
     await db.query<{ key: string; translations: Record<string, unknown>; description: string }>(
       "SELECT key,translations,description FROM destination_collection_items WHERE destination_id='instagram-spots' ORDER BY display_order",
@@ -323,8 +325,8 @@ try {
         (SELECT count(*)::int FROM destination_posts WHERE destination_id='reception' AND active) AS posts,
         (SELECT count(*)::int FROM destination_videos WHERE destination_id='reception' AND active) AS videos`)
     ).rows,
-    [{ posts: 2, videos: 1 }],
-    "Shared media import publishes both Lobby posts and its design video",
+    [{ posts: 4, videos: 1 }],
+    "Lobby keeps the new posts followed by both previous posts and its design video",
   );
   await db.exec("SET ROLE anon");
   assert.equal((await db.query("SELECT key FROM destination_collection_items")).rows.length, 9);

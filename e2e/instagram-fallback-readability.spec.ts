@@ -1,6 +1,54 @@
 import { fromCrossJSON, toCrossJSON } from "seroval";
 import { expect, test } from "./fixtures";
 
+test("account-prefixed karaoke reel shares reach the embed SDK as canonical permalinks", async ({
+  page,
+}) => {
+  await page.route("**/_serverFn/**", async (route) => {
+    const response = await route.fetch();
+    if (!response.headers()["server-timing"]?.includes("media;")) {
+      await route.fulfill({ response });
+      return;
+    }
+    const envelope = fromCrossJSON(await response.json(), {}) as { result: { posts: unknown[] } };
+    envelope.result.posts = [
+      {
+        destination_id: "citron",
+        post_url: "https://www.instagram.com/intercontinentaldanang/reel/DfBhhlvAGem/",
+        embed_mode: "embed",
+        account: null,
+        caption: null,
+        image_url: null,
+        posted_at: null,
+        display_order: 0,
+      },
+    ];
+    await route.fulfill({ response, body: JSON.stringify(toCrossJSON(envelope)) });
+  });
+  await page.route("https://www.instagram.com/embed.js", (route) =>
+    route.fulfill({
+      contentType: "application/javascript",
+      body: `window.instgrm={Embeds:{process(){
+      document.querySelectorAll('blockquote.instagram-media').forEach(post=>{
+        const frame=document.createElement('iframe');
+        frame.title=post.dataset.instgrmPermalink;
+        frame.style.cssText='display:block;width:100%;height:500px;border:0';
+        frame.srcdoc='<p>Karaoke reel</p>';
+        post.replaceWith(frame);
+      });
+    }}};`,
+    }),
+  );
+  await page.goto("/citron");
+  const post = page.locator(".instagram-post");
+  await post.scrollIntoViewIfNeeded();
+  await expect(post.locator("iframe")).toHaveAttribute(
+    "title",
+    "https://www.instagram.com/reel/DfBhhlvAGem/",
+  );
+  await expect(post.getByRole("link", { name: "VIEW ON INSTAGRAM", exact: true })).toHaveCount(0);
+});
+
 test("Instagram fallback captions stay readable with and without an account", async ({ page }) => {
   await page.route("**/_serverFn/**", async (route) => {
     const response = await route.fetch();

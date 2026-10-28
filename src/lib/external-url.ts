@@ -36,5 +36,12 @@ export function instagramLink(value: string | undefined): string | undefined {
 
 export function instagramEmbedUrl(value: string): string | undefined {
   const url = httpsUrl(value, INSTAGRAM_HOSTS);
-  return url && /^\/(?:p|reel|reels|tv)\/[A-Za-z0-9_-]+\/?$/.test(url.pathname) ? value : undefined;
+  if (!url) return undefined;
+  if (/^\/(?:p|reel|reels|tv)\/[A-Za-z0-9_-]+\/?$/.test(url.pathname)) return value;
+  // Instagram also shares reels with the account in the path. The embed SDK
+  // expects the same reel's canonical permalink without that account segment.
+  const reel = /^\/[A-Za-z0-9._]+\/(reels?)\/([A-Za-z0-9_-]+)\/?$/.exec(url.pathname);
+  if (!reel) return undefined;
+  url.pathname = `/${reel[1]}/${reel[2]}/`;
+  return url.href;
 }
