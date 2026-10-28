@@ -110,6 +110,18 @@ function HubRoute() {
     if (location.pathname === "/") setHasVisitedHome(true);
   }, [location.pathname]);
   const showHub = location.pathname === "/" || (hasVisitedHome && location.state.hubCard === true);
+  const [heroActive, setHeroActive] = useState(true);
+  useEffect(() => {
+    if (!showHub) return;
+    const hero = document.querySelector(".hub-hero");
+    if (!hero) return;
+    const update = () => setHeroActive(hero.getBoundingClientRect().bottom > 1);
+    update();
+    // Only observe the hero boundary; no work on every scroll frame.
+    const observer = new IntersectionObserver(update, { rootMargin: "-1px 0px 0px 0px" });
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, [showHub]);
   // On home, start the journey chunk alongside the catalogue, not after it.
   // Direct cards never request it until the visitor returns to the homepage.
   useEffect(() => {
@@ -170,7 +182,10 @@ function HubRoute() {
   return (
     <I18nProvider editorial={presentation?.editorial}>
       <NavigationProgress />
-      <main className="min-h-svh bg-background text-foreground">
+      <main
+        className="min-h-svh bg-background text-foreground"
+        data-hero-active={showHub && heroActive ? "true" : undefined}
+      >
         {showHub && (
           <>
             <div className="hub-tools">

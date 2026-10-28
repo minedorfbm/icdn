@@ -213,6 +213,8 @@
 }
 
 .hub-hero {
+  --hero-photo-width: max(100cqw, calc(100cqh * 0.61126));
+  --hero-photo-height: max(100cqh, calc(100cqw * 1.63597));
   position: relative;
   container-type: size;
   height: 100svh;
@@ -240,11 +242,50 @@
   object-fit: cover;
 }
 
+.hero-brand {
+  position: absolute;
+  z-index: 1;
+  top: max(calc(min(64cqw, 460px) * 0.1561 + 12px), calc(50% - var(--hero-photo-height) * 0.38));
+  left: 50%;
+  width: min(64%, 460px);
+  transform: translate(-50%, -50%);
+  isolation: isolate;
+}
+
+.hero-desktop-brand {
+  display: none;
+}
+
+.hero-brand .hero-welcome {
+  width: 100%;
+}
+
+.hero-photograph::after {
+  /* Only the portrait photo's louver band (y 109–247 of 1137).
+     Keep the ceiling, columns and sky sharp as object-fit crops the photograph. */
+  content: "";
+  position: absolute;
+  top: calc(50% - var(--hero-photo-height) * 0.404);
+  left: 50%;
+  width: calc(var(--hero-photo-width) * 0.925);
+  height: calc(var(--hero-photo-height) * 0.121);
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at 50% 64%,
+    rgb(255 247 231 / 58%),
+    rgb(255 247 231 / 42%) 60%,
+    transparent 90%
+  );
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+  pointer-events: none;
+}
+
 .hero-sky {
   /* Match object-fit: cover, then locate the clear sky in the supplied portrait photo.
      Portrait: x 211–484, y 321–621 in 695×1137. No resize/scroll JavaScript. */
-  --hero-photo-width: max(100cqw, calc(100cqh * 0.61126));
-  --hero-photo-height: max(100cqh, calc(100cqw * 1.63597));
   position: absolute;
   z-index: 1;
   top: calc(50% - var(--hero-photo-height) * 0.2177);
@@ -260,12 +301,11 @@
 .hero-sky-content {
   width: 100%;
   height: 100%;
-  padding: clamp(6px, 4cqw, 12px);
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: clamp(8px, 5cqh, 24px);
+  justify-content: center;
 }
 
 .hero-welcome {
@@ -284,6 +324,7 @@
 
 .hero-resort-logo {
   width: 100%;
+  aspect-ratio: 1230 / 384;
 }
 
 .footer-resort-logo {
@@ -303,16 +344,16 @@
 }
 
 .hero-invitation-title {
-  font-size: clamp(20px, 14cqw, 44px);
+  font-size: clamp(20px, 18cqw, 68px);
   line-height: 1.08;
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
 
 .hero-invitation-caption {
-  font-size: clamp(8px, 3.8cqw, 10px);
+  font-size: clamp(9px, 5.4cqw, 17px);
   line-height: 1.5;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.1em;
 }
 
 .hero-invitation-arrow {
@@ -325,8 +366,8 @@
   z-index: 2;
   bottom: max(32px, calc(env(safe-area-inset-bottom) + 12px));
   left: 24px;
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   color: white;
 }
 
@@ -348,19 +389,59 @@
 }
 
 @media (min-width: 768px) and (orientation: landscape) {
-  .hero-welcome {
+  .hub-hero {
+    --hero-photo-width: max(100cqw, calc(100cqh * 1.5));
+    --hero-photo-height: max(100cqh, calc(100cqw * 0.66667));
+  }
+  .hero-brand {
+    display: none;
+  }
+  .hero-photograph::after {
+    display: none;
+  }
+  .hero-desktop-brand {
+    display: block;
     margin-block: auto;
+  }
+  .hero-sky-content {
+    padding: clamp(6px, 4cqw, 12px);
+    justify-content: space-between;
+    gap: clamp(8px, 5cqh, 24px);
+  }
+  .hero-invitation-title {
+    font-size: clamp(20px, 14cqw, 44px);
+  }
+  .hero-invitation-caption {
+    font-size: clamp(8px, 3.8cqw, 10px);
+    letter-spacing: 0.13em;
+  }
+  .hero-film-button {
+    width: 80px;
+    height: 80px;
   }
   .threshold-img {
     animation: slow-zoom 4000ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   .hero-sky {
     /* Landscape: clear central opening above the horizon, in 1536×1024. */
-    --hero-photo-width: max(100cqw, calc(100cqh * 1.5));
-    --hero-photo-height: max(100cqh, calc(100cqw * 0.66667));
     top: calc(50% - var(--hero-photo-height) * 0.375);
     width: calc(var(--hero-photo-width) * 0.265625);
     height: calc(var(--hero-photo-height) * 0.39);
+  }
+}
+
+/* Portrait/mobile keeps one hero control; desktop retains its existing toolbar. */
+@media (max-width: 767px), (orientation: portrait) {
+  [data-hero-active="true"] .hub-search-tool,
+  [data-hero-active="true"] .hub-contact-tool {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  [data-hero-active="true"] .hub-tools {
+    top: auto;
+    right: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
   }
 }
 

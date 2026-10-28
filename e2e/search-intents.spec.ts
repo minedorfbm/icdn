@@ -16,6 +16,8 @@ test("mood buttons, combined requirements and category filters work on mobile", 
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator("#heaven")).toBeAttached();
+  await page.locator("#discover").evaluate((section) => section.scrollIntoView({ block: "start" }));
   await page.locator(".hub-search-tool button").click();
   const search = page.getByRole("dialog", { name: "Search", exact: true });
   await search
@@ -54,6 +56,8 @@ test("map intent search still excludes marketing offers and destination stories"
 
 test("accommodation category works in global search and map search", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator("#heaven")).toBeAttached();
+  await page.locator("#discover").evaluate((section) => section.scrollIntoView({ block: "start" }));
   await page.locator(".hub-search-tool button").click();
   const search = page.getByRole("dialog", { name: "Search", exact: true });
   const category = search

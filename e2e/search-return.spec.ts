@@ -4,6 +4,8 @@ test("Back and browser history restore the query, category, result order and scr
   page,
 }, testInfo) => {
   await page.goto("/");
+  await expect(page.locator("#heaven")).toBeAttached();
+  await page.locator("#discover").evaluate((section) => section.scrollIntoView({ block: "start" }));
   await page.locator(".hub-search-tool button").click();
   const search = page.getByRole("dialog", { name: "Search", exact: true });
   await search.getByRole("searchbox").fill("dining");
@@ -72,6 +74,8 @@ test("search from a direct card survives a related-card trail and closes back to
 
 test("a second search has its own results without losing the first search", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator("#heaven")).toBeAttached();
+  await page.locator("#discover").evaluate((section) => section.scrollIntoView({ block: "start" }));
   await page.locator(".hub-search-tool button").click();
   const search = page.getByRole("dialog", { name: "Search", exact: true });
   await search.getByRole("searchbox").fill("Citron");
@@ -90,6 +94,8 @@ test("a second search has its own results without losing the first search", asyn
 
 test("viewing a search result on the resort map keeps the map accessible", async ({ page }) => {
   await page.goto("/");
+  await expect(page.locator("#heaven")).toBeAttached();
+  await page.locator("#discover").evaluate((section) => section.scrollIntoView({ block: "start" }));
   await page.locator(".hub-search-tool button").click();
   const search = page.getByRole("dialog", { name: "Search", exact: true });
   await search.getByRole("searchbox").fill("Citron");
@@ -122,6 +128,8 @@ test("results remain visible while the destination screen loads", async ({ page 
     await route.continue();
   });
   await page.goto("/");
+  await expect(page.locator("#heaven")).toBeAttached();
+  await page.locator("#discover").evaluate((section) => section.scrollIntoView({ block: "start" }));
   await page.locator(".hub-search-tool button").click();
   const search = page.getByRole("dialog", { name: "Search", exact: true });
   await search.getByRole("searchbox").fill("Citron");
@@ -146,6 +154,8 @@ test("a refreshed card restores saved search scroll after the complete catalogue
   page,
 }) => {
   await page.goto("/");
+  await expect(page.locator("#heaven")).toBeAttached();
+  await page.locator("#discover").evaluate((section) => section.scrollIntoView({ block: "start" }));
   await page.locator(".hub-search-tool button").click();
   const search = page.getByRole("dialog", { name: "Search", exact: true });
   await search.getByRole("searchbox").fill("dining");
