@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { InstagramIcon } from "@/components/ui/instagram-icon";
 import type { DestinationPost } from "@/data/resort";
@@ -6,6 +6,8 @@ import { useI18n } from "@/i18n";
 import { instagramEmbedUrl, instagramLink } from "@/lib/external-url";
 import { nativeInstagramPost } from "@/data/native-instagram-posts";
 import { NativeInstagramPostCard } from "./NativeInstagramPostCard";
+import { mediaPlayback } from "@/lib/media-playback";
+import { observeMediaFrameFocus } from "@/lib/media-frame-focus";
 import "./instagram-post.css";
 
 const SCRIPT_SRC = "https://www.instagram.com/embed.js";
@@ -93,6 +95,11 @@ function OfficialInstagramPostEmbed({
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null);
   const bounds = useRef<HTMLDivElement>(null);
+  const suspended = useSyncExternalStore(
+    mediaPlayback.subscribe,
+    mediaPlayback.isSuspended,
+    () => false,
+  );
   // Only single posts/reels can be embedded; account links show the post card.
   const permalink = instagramEmbedUrl(post.post_url);
   const embeddable = !!permalink && post.embed_mode !== "link";
@@ -105,11 +112,12 @@ function OfficialInstagramPostEmbed({
     setFailed(!embeddable);
     setReady(false);
     const node = host.current;
-    if (!node || !embeddable || !enabled) return;
+    if (!node || !embeddable || !enabled || suspended) return;
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
     let frame: HTMLIFrameElement | null = null;
+    let releasePlayback: (() => void) | undefined;
     let displayed = false;
     const sizes = new ResizeObserver(() => rendered());
     // Instagram inserts a zero-height iframe before its content is ready. Keep
@@ -118,9 +126,23 @@ function OfficialInstagramPostEmbed({
       if (cancelled) return;
       const next = node.querySelector("iframe");
       if (next !== frame) {
+        releasePlayback?.();
+        releasePlayback = undefined;
         if (frame) sizes.unobserve(frame);
         frame = next;
-        if (frame) sizes.observe(frame);
+        if (frame) {
+          sizes.observe(frame);
+          const participant = mediaPlayback.register(() => {
+            // Instagram has no documented pause API. A fresh embed stops its
+            // browsing context immediately and returns to its native poster.
+            if (!cancelled) setAttempt((value) => value + 1);
+          });
+          const unobserve = observeMediaFrameFocus(frame, () => participant.activate());
+          releasePlayback = () => {
+            unobserve();
+            participant.unregister();
+          };
+        }
       }
       // Measure before the transform: measuring the painted rectangle would
       // repeatedly shrink an already scaled iframe after each resize message.
@@ -189,9 +211,10 @@ function OfficialInstagramPostEmbed({
       observer.disconnect();
       mutations.disconnect();
       sizes.disconnect();
+      releasePlayback?.();
       if (timer) clearTimeout(timer);
     };
-  }, [post.post_url, embeddable, enabled, attempt]);
+  }, [post.post_url, embeddable, enabled, suspended, attempt]);
 
   const handle = post.account ? `@${post.account.replace(/^@/, "")}` : null;
 
@@ -203,7 +226,7 @@ function OfficialInstagramPostEmbed({
       style={ready && !failed ? { width: fit.width } : undefined}
     >
       <div ref={bounds} className="instagram-post-bounds" aria-hidden />
-      {embeddable && enabled && (
+      {embeddable && enabled && !suspended && (
         <div
           data-caption-preview={(ready && fit.clipped) || undefined}
           className={`instagram-post-viewport overflow-hidden rounded-[18px] bg-white transition-opacity [&_blockquote]:invisible ${
