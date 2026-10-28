@@ -278,10 +278,10 @@
      Follow the photo crop, with transparent edges rather than a full-width band. */
   content: "";
   position: absolute;
-  top: calc(50% - var(--hero-photo-height) * 0.42);
+  top: calc(50% - var(--hero-photo-height) * 0.43);
   left: 50%;
-  width: min(calc(min(64cqw, 460px) * 1.6), calc(var(--hero-photo-width) * 0.94));
-  height: calc(var(--hero-photo-height) * 0.16);
+  width: min(calc(min(64cqw, 460px) * 1.74), var(--hero-photo-width));
+  height: calc(var(--hero-photo-height) * 0.18);
   transform: translateX(-50%);
   background: rgb(255 247 231 / 88%);
   -webkit-backdrop-filter: blur(10px);
