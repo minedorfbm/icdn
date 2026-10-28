@@ -213,6 +213,8 @@
 }
 
 .hub-hero {
+  --hero-photo-width: max(100cqw, calc(100cqh * 0.61126));
+  --hero-photo-height: max(100cqh, calc(100cqw * 1.63597));
   position: relative;
   container-type: size;
   height: 100svh;
@@ -240,11 +242,32 @@
   object-fit: cover;
 }
 
+.hero-brand {
+  position: absolute;
+  z-index: 1;
+  top: clamp(84px, calc(50% - var(--hero-photo-height) * 0.34), 24cqh);
+  left: 50%;
+  width: min(86%, 620px);
+  transform: translate(-50%, -50%);
+  isolation: isolate;
+}
+
+.hero-brand::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -12% -8%;
+  background: rgb(255 247 231 / 62%);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  -webkit-mask-image: radial-gradient(ellipse, #000 30%, transparent 72%);
+  mask-image: radial-gradient(ellipse, #000 30%, transparent 72%);
+  pointer-events: none;
+}
+
 .hero-sky {
   /* Match object-fit: cover, then locate the clear sky in the supplied portrait photo.
      Portrait: x 211–484, y 321–621 in 695×1137. No resize/scroll JavaScript. */
-  --hero-photo-width: max(100cqw, calc(100cqh * 0.61126));
-  --hero-photo-height: max(100cqh, calc(100cqw * 1.63597));
   position: absolute;
   z-index: 1;
   top: calc(50% - var(--hero-photo-height) * 0.2177);
@@ -260,16 +283,15 @@
 .hero-sky-content {
   width: 100%;
   height: 100%;
-  padding: clamp(6px, 4cqw, 12px);
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: clamp(8px, 5cqh, 24px);
+  justify-content: center;
 }
 
 .hero-welcome {
-  width: min(100%, 360px);
+  width: 100%;
   flex-shrink: 0;
   line-height: 0;
   text-align: center;
@@ -284,6 +306,7 @@
 
 .hero-resort-logo {
   width: 100%;
+  aspect-ratio: 1230 / 384;
 }
 
 .footer-resort-logo {
@@ -303,16 +326,16 @@
 }
 
 .hero-invitation-title {
-  font-size: clamp(20px, 14cqw, 44px);
+  font-size: clamp(20px, 18cqw, 68px);
   line-height: 1.08;
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
 
 .hero-invitation-caption {
-  font-size: clamp(8px, 3.8cqw, 10px);
+  font-size: clamp(9px, 5.4cqw, 17px);
   line-height: 1.5;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.1em;
 }
 
 .hero-invitation-arrow {
@@ -325,13 +348,19 @@
   z-index: 2;
   bottom: max(32px, calc(env(safe-area-inset-bottom) + 12px));
   left: 24px;
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   color: white;
 }
 
 .hero-film-button img {
   filter: brightness(0) invert(1) drop-shadow(0 2px 3px rgb(0 0 0 / 35%));
+}
+
+@media (max-width: 767px) {
+  .hero-brand {
+    top: clamp(84px, calc(50% - var(--hero-photo-height) * 0.37), 24cqh);
+  }
 }
 
 @container hero-sky (max-height: 180px) {
@@ -348,20 +377,40 @@
 }
 
 @media (min-width: 768px) and (orientation: landscape) {
-  .hero-welcome {
-    margin-block: auto;
+  .hub-hero {
+    --hero-photo-width: max(100cqw, calc(100cqh * 1.5));
+    --hero-photo-height: max(100cqh, calc(100cqw * 0.66667));
+  }
+  .hero-brand {
+    top: clamp(108px, calc(50% - var(--hero-photo-height) * 0.32), 27cqh);
+    width: min(64%, 660px);
+  }
+  .hero-sky-content {
+    justify-content: flex-end;
+    padding-bottom: 4cqh;
   }
   .threshold-img {
     animation: slow-zoom 4000ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
   .hero-sky {
     /* Landscape: clear central opening above the horizon, in 1536×1024. */
-    --hero-photo-width: max(100cqw, calc(100cqh * 1.5));
-    --hero-photo-height: max(100cqh, calc(100cqw * 0.66667));
     top: calc(50% - var(--hero-photo-height) * 0.375);
     width: calc(var(--hero-photo-width) * 0.265625);
     height: calc(var(--hero-photo-height) * 0.39);
   }
+}
+
+/* The hero keeps one utility control. Discovery restores the shared tools. */
+[data-hero-active="true"] .hub-search-tool,
+[data-hero-active="true"] .hub-contact-tool {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+[data-hero-active="true"] .hub-tools {
+  top: auto;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
 }
 
 @media (prefers-reduced-motion: reduce) {
