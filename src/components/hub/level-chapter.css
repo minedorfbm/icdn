@@ -29,6 +29,10 @@
   scrollbar-width: none;
 }
 @media (max-width: 359px) {
+  .level-chapter .chapter-categories {
+    /* The rail icons sit below this row; keep a 24px edge for wider serif fallbacks. */
+    width: calc(100% + var(--hub-rail-gutter) - 24px);
+  }
   .chapter-category-row {
     gap: 0;
     padding-inline: 0;

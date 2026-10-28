@@ -48,6 +48,7 @@ test("three enlarged categories remain centered and unbroken across formats", as
     await expect(async () => {
       const geometry = await row.evaluate((el) => ({
         width: el.clientWidth,
+        right: el.getBoundingClientRect().right,
         scrollWidth: el.scrollWidth,
         clipped: el.scrollWidth > el.clientWidth + 1,
         labels: [...el.querySelectorAll<HTMLButtonElement>("button")].map((button) => {
@@ -65,6 +66,7 @@ test("three enlarged categories remain centered and unbroken across formats", as
         }),
       }));
       expect(geometry.clipped, JSON.stringify({ viewport, geometry })).toBe(false);
+      expect(geometry.right).toBeLessThanOrEqual(viewport.width);
       for (const label of geometry.labels) {
         expect(label.height).toBeLessThanOrEqual(label.line + 1);
         expect(label.size).toBeGreaterThanOrEqual(16.7);
