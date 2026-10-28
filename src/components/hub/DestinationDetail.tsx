@@ -24,6 +24,7 @@ import { DestinationJourneyNavigation } from "./DestinationJourneyNavigation";
 import { ResortLogo } from "./ResortLogo";
 import { ResortLevelIcon } from "./ResortLevelIcon";
 import "./editorial-detail.css";
+import { prepareMapBackground } from "@/features/resort-map/map-background";
 import { thumbnail, detailHeroImage, detailHeroAvif } from "@/lib/responsive-image";
 
 function SectionHeading({ label, title }: Readonly<{ label: string; title?: string | undefined }>) {
@@ -184,6 +185,11 @@ export function DestinationDetail({
   const { openMap, locate } = useResortMap();
   const placeId = locate(dest.id);
   const mapMode = destinationMapModes[dest.id];
+  const mapRequest = {
+    ...(placeId ? { placeId } : {}),
+    ...(mapMode ? { mode: mapMode } : {}),
+  };
+  const mapHref = `/map?${new URLSearchParams({ ...mapRequest, from: dest.id })}`;
   const { primary, secondary } = detailActions(dest, lang);
   const events = (dest.events ?? []).map((item) => event(item));
   const collection = collectionLabel(dest);
@@ -254,20 +260,29 @@ export function DestinationDetail({
                 <section className="editorial-practical" aria-label={t("practical_information")}>
                   <OpeningHours hours={media.hours} />
                   {(placeId || mapMode) && (
-                    <button
-                      type="button"
+                    <a
+                      href={mapHref}
+                      role="button"
                       className="editorial-map"
-                      onClick={() =>
-                        openMap({
-                          ...(placeId ? { placeId } : {}),
-                          ...(mapMode ? { mode: mapMode } : {}),
-                        })
-                      }
+                      onPointerEnter={prepareMapBackground}
+                      onFocus={prepareMapBackground}
+                      onClick={(event) => {
+                        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+                          return;
+                        event.preventDefault();
+                        openMap(mapRequest);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === " ") {
+                          event.preventDefault();
+                          openMap(mapRequest);
+                        }
+                      }}
                     >
                       <MapPin size={18} strokeWidth={1.5} aria-hidden />
                       <span>{mapCopy(lang, placeId ? "locate" : "open")}</span>
                       <ArrowUpRight size={18} strokeWidth={1.5} aria-hidden />
-                    </button>
+                    </a>
                   )}
                 </section>
               )}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ArrowDown, ArrowUpRight, Compass, Map as MapIcon, Sparkles } from "lucide-react";
 import type { Destination } from "@/data/resort";
 import { useHub } from "@/data/hub-context";
@@ -6,12 +6,10 @@ import { useI18n } from "@/i18n";
 import { useResortMap } from "@/features/resort-map/map-context";
 import { imageSource } from "@/lib/image-source";
 import { discoveryCopy } from "./discovery-copy";
-import { readDiscovery, restoreDiscovery, type SavedDiscovery } from "./surprise-order";
-import { SurpriseDiscovery } from "./SurpriseDiscovery";
+import { useHubScreenNavigation } from "@/lib/use-hub-screen-navigation";
 import "./discovery.css";
 import { thumbnail } from "@/lib/responsive-image";
 
-const STORAGE_KEY = "adj-discovery-v1";
 const choices = [
   { key: "journey", note: "journeyNote", Icon: Compass, Arrow: ArrowDown },
   { key: "map", note: "mapNote", Icon: MapIcon, Arrow: ArrowUpRight },
@@ -67,18 +65,8 @@ export function DiscoveryPaths({ onJourney }: Readonly<{ onJourney: () => void }
   const { destinations, levels } = useHub();
   const { lang } = useI18n();
   const { openMap } = useResortMap();
-  const [open, setOpen] = useState(false);
-  const [order, setOrder] = useState<string[]>([]);
-  const [index, setIndex] = useState(0);
+  const { openScreen } = useHubScreenNavigation();
   const copy = (key: Parameters<typeof discoveryCopy>[1]) => discoveryCopy(lang, key);
-  const items = useMemo(() => {
-    const live = new Map(destinations.filter((d) => d.active).map((d) => [d.id, d]));
-    return order.flatMap((id) => {
-      const card = live.get(id);
-      return card ? [card] : [];
-    });
-  }, [destinations, order]);
-  const activeIndex = Math.min(index, Math.max(0, items.length - 1));
   const previews = useMemo(
     () =>
       levels
@@ -89,34 +77,6 @@ export function DiscoveryPaths({ onJourney }: Readonly<{ onJourney: () => void }
         .slice(0, 3),
     [destinations, levels],
   );
-
-  const openSurprise = () => {
-    let saved: SavedDiscovery | null = order.length
-      ? { order, currentId: items[activeIndex]?.id }
-      : null;
-    if (!saved) {
-      try {
-        saved = readDiscovery(sessionStorage.getItem(STORAGE_KEY));
-      } catch {
-        /* Storage is optional. */
-      }
-    }
-    const restored = restoreDiscovery(saved, destinations);
-    setOrder(restored.order);
-    setIndex(restored.index);
-    setOpen(true);
-  };
-  useEffect(() => {
-    if (!open) return;
-    try {
-      sessionStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ order, currentId: items[activeIndex]?.id }),
-      );
-    } catch {
-      /* Continue in memory when browser storage is unavailable. */
-    }
-  }, [open, order, items, activeIndex]);
 
   return (
     <section id="discover" className="discovery-paths" aria-labelledby="discovery-title">
@@ -130,7 +90,13 @@ export function DiscoveryPaths({ onJourney }: Readonly<{ onJourney: () => void }
             <button
               key={key}
               type="button"
-              onClick={{ journey: onJourney, map: () => openMap(), surprise: openSurprise }[key]}
+              onClick={
+                {
+                  journey: onJourney,
+                  map: () => openMap(),
+                  surprise: () => void openScreen("/surprise-me"),
+                }[key]
+              }
               className={`discovery-choice discovery-${key}`}
             >
               <span className="discovery-choice-text">
@@ -144,14 +110,6 @@ export function DiscoveryPaths({ onJourney }: Readonly<{ onJourney: () => void }
           ))}
         </div>
       </div>
-      {open && (
-        <SurpriseDiscovery
-          items={items}
-          index={activeIndex}
-          onIndexChange={setIndex}
-          onClose={() => setOpen(false)}
-        />
-      )}
     </section>
   );
 }

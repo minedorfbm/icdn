@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as HubRouteImport } from './routes/_hub'
 import { Route as HubIndexRouteImport } from './routes/_hub.index'
 import { Route as HubDestinationIdRouteImport } from './routes/_hub.$destinationId'
+import { Route as HubMapRouteImport } from './routes/_hub.map'
+import { Route as HubSearchRouteImport } from './routes/_hub.search'
+import { Route as HubSurpriseMeRouteImport } from './routes/_hub.surprise-me'
 import { Route as ApiResortPdfRouteImport } from './routes/api/resort-pdf'
 
 const HubRoute = HubRouteImport.update({
@@ -28,6 +31,21 @@ const HubDestinationIdRoute = HubDestinationIdRouteImport.update({
   path: '/$destinationId',
   getParentRoute: () => HubRoute,
 } as any)
+const HubMapRoute = HubMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubSearchRoute = HubSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubSurpriseMeRoute = HubSurpriseMeRouteImport.update({
+  id: '/surprise-me',
+  path: '/surprise-me',
+  getParentRoute: () => HubRoute,
+} as any)
 const ApiResortPdfRoute = ApiResortPdfRouteImport.update({
   id: '/api/resort-pdf',
   path: '/api/resort-pdf',
@@ -37,10 +55,16 @@ const ApiResortPdfRoute = ApiResortPdfRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof HubIndexRoute
   '/$destinationId': typeof HubDestinationIdRoute
+  '/map': typeof HubMapRoute
+  '/search': typeof HubSearchRoute
+  '/surprise-me': typeof HubSurpriseMeRoute
   '/api/resort-pdf': typeof ApiResortPdfRoute
 }
 export interface FileRoutesByTo {
   '/$destinationId': typeof HubDestinationIdRoute
+  '/map': typeof HubMapRoute
+  '/search': typeof HubSearchRoute
+  '/surprise-me': typeof HubSurpriseMeRoute
   '/api/resort-pdf': typeof ApiResortPdfRoute
   '/': typeof HubIndexRoute
 }
@@ -48,16 +72,38 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_hub': typeof HubRouteWithChildren
   '/_hub/$destinationId': typeof HubDestinationIdRoute
+  '/_hub/map': typeof HubMapRoute
+  '/_hub/search': typeof HubSearchRoute
+  '/_hub/surprise-me': typeof HubSurpriseMeRoute
   '/api/resort-pdf': typeof ApiResortPdfRoute
   '/_hub/': typeof HubIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$destinationId' | '/api/resort-pdf'
+  fullPaths:
+    | '/'
+    | '/$destinationId'
+    | '/map'
+    | '/search'
+    | '/surprise-me'
+    | '/api/resort-pdf'
   fileRoutesByTo: FileRoutesByTo
-  to: '/$destinationId' | '/api/resort-pdf' | '/'
+  to:
+    | '/$destinationId'
+    | '/map'
+    | '/search'
+    | '/surprise-me'
+    | '/api/resort-pdf'
+    | '/'
   id:
-    '__root__' | '/_hub' | '/_hub/$destinationId' | '/api/resort-pdf' | '/_hub/'
+    | '__root__'
+    | '/_hub'
+    | '/_hub/$destinationId'
+    | '/_hub/map'
+    | '/_hub/search'
+    | '/_hub/surprise-me'
+    | '/api/resort-pdf'
+    | '/_hub/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -88,6 +134,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubDestinationIdRouteImport
       parentRoute: typeof HubRoute
     }
+    '/_hub/map': {
+      id: '/_hub/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof HubMapRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/_hub/search': {
+      id: '/_hub/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof HubSearchRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/_hub/surprise-me': {
+      id: '/_hub/surprise-me'
+      path: '/surprise-me'
+      fullPath: '/surprise-me'
+      preLoaderRoute: typeof HubSurpriseMeRouteImport
+      parentRoute: typeof HubRoute
+    }
     '/api/resort-pdf': {
       id: '/api/resort-pdf'
       path: '/api/resort-pdf'
@@ -100,11 +167,17 @@ declare module '@tanstack/react-router' {
 
 interface HubRouteChildren {
   HubDestinationIdRoute: typeof HubDestinationIdRoute
+  HubMapRoute: typeof HubMapRoute
+  HubSearchRoute: typeof HubSearchRoute
+  HubSurpriseMeRoute: typeof HubSurpriseMeRoute
   HubIndexRoute: typeof HubIndexRoute
 }
 
 const HubRouteChildren: HubRouteChildren = {
   HubDestinationIdRoute: HubDestinationIdRoute,
+  HubMapRoute: HubMapRoute,
+  HubSearchRoute: HubSearchRoute,
+  HubSurpriseMeRoute: HubSurpriseMeRoute,
   HubIndexRoute: HubIndexRoute,
 }
 

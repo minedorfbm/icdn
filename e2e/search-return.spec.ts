@@ -65,7 +65,7 @@ test("search from a direct card survives a related-card trail and closes back to
     .click();
   await expect(page.locator(".editorial-title")).toHaveText("Wine Cellar");
   await page.getByRole("button", { name: "BACK", exact: true }).click();
-  await expect(page).toHaveURL("/citron");
+  await expect(page).toHaveURL("/search");
   await expect(search.getByRole("searchbox")).toHaveValue("La Maison");
   await search.getByRole("button", { name: "Close", exact: true }).click();
   await expect(search).toHaveCount(0);
@@ -109,8 +109,8 @@ test("viewing a search result on the resort map keeps the map accessible", async
     .locator(".atlas-header")
     .getByRole("button", { name: "Close map", exact: true })
     .click();
-  await expect(page).toHaveURL("/");
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page).toHaveURL("/citron");
+  await expect(page.getByRole("dialog", { name: "Citron", exact: true })).toBeVisible();
 });
 
 test("results remain visible while the destination screen loads", async ({ page }) => {

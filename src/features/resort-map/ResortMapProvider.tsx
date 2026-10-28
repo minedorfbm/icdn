@@ -1,6 +1,15 @@
-import { Component, lazy, Suspense, useCallback, useMemo, useState, type ReactNode } from "react";
-import { CataloguePending } from "@/components/hub/CataloguePending";
-import { useCatalogueStatus } from "@/data/catalogue-status";
+import {
+  Component,
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { useLocation } from "@tanstack/react-router";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
 import { FullscreenDialog } from "@/components/ui/fullscreen-dialog";
@@ -8,6 +17,8 @@ import { useDestinationNavigation } from "@/lib/use-destination-navigation";
 import { MapContext, type MapRequest } from "./map-context";
 import { destinationPlace } from "./map-links";
 import { mapCopy } from "./map-copy";
+import { useHubScreenNavigation } from "@/lib/use-hub-screen-navigation";
+import { mapRequest, prepareMapBackground } from "./map-background";
 const ResortMap = lazy(() => import("./ResortMap"));
 class MapBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -24,23 +35,35 @@ class MapBoundary extends Component<
 
 export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }>) {
   const { mapPlaces, mapLinks } = useHub();
-  const { ready } = useCatalogueStatus();
-  const { openDestination, closeToHub, isDestination } = useDestinationNavigation();
+  const { openDestination } = useDestinationNavigation();
+  const location = useLocation();
+  const { openScreen, closeScreen } = useHubScreenNavigation();
   const { lang, t } = useI18n();
-  const [request, setRequest] = useState<(MapRequest & { revision: number }) | null>(null);
+  const [request, setRequest] = useState<MapRequest & { revision: number }>(() => ({
+    ...mapRequest(location.search),
+    revision: 0,
+  }));
+  const lastEntry = useRef<string | undefined>(undefined);
+  const visible = location.pathname === "/map" || location.state.hubMap === true;
+  useEffect(() => {
+    if (location.pathname !== "/map" || lastEntry.current === location.state.__TSR_key) return;
+    lastEntry.current = location.state.__TSR_key;
+    prepareMapBackground();
+    setRequest((previous) => ({ ...mapRequest(location.search), revision: previous.revision + 1 }));
+  }, [location.pathname, location.search, location.state.__TSR_key]);
   const openMap = useCallback(
     (next: MapRequest = {}) => {
-      if (isDestination) closeToHub();
-      setRequest((prev) => ({ ...next, revision: (prev?.revision ?? 0) + 1 }));
+      prepareMapBackground();
+      void openScreen("/map", next);
     },
-    [isDestination, closeToHub],
+    [openScreen],
   );
   const value = useMemo(
     () => ({ openMap, locate: (id: string) => destinationPlace(id, mapLinks, mapPlaces) }),
     [openMap, mapLinks, mapPlaces],
   );
   const close = () => {
-    setRequest(null);
+    closeScreen();
   };
   const message = (text: string) => (
     <div className="flex h-full flex-col items-center justify-center gap-6 p-8 text-center">
@@ -53,7 +76,7 @@ export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }
   return (
     <MapContext.Provider value={value}>
       {children}
-      {request && (
+      {visible && (
         <FullscreenDialog
           title={mapCopy(lang, "title")}
           onClose={close}
@@ -65,20 +88,11 @@ export function ResortMapProvider({ children }: Readonly<{ children: ReactNode }
         >
           <MapBoundary fallback={message(mapCopy(lang, "unavailable"))}>
             <Suspense fallback={message(mapCopy(lang, "loading"))}>
-              {ready ? (
-                <ResortMap
-                  request={request}
-                  onClose={close}
-                  onDestination={(id) => openDestination(id)}
-                />
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center">
-                  <CataloguePending />
-                  <button className="min-h-11 border-b px-4" onClick={close}>
-                    {t("close")}
-                  </button>
-                </div>
-              )}
+              <ResortMap
+                request={request}
+                onClose={close}
+                onDestination={(id) => openDestination(id)}
+              />
             </Suspense>
           </MapBoundary>
         </FullscreenDialog>

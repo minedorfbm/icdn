@@ -13,7 +13,11 @@ import {
 } from "lucide-react";
 import { useHub } from "@/data/hub-context";
 import { useI18n } from "@/i18n";
-import { SearchDialog, SearchTrigger } from "@/features/search/HubSearch";
+import { SearchTrigger } from "@/features/search/HubSearch";
+import { useHubSearch } from "@/features/search/search-context";
+import { useLocation } from "@tanstack/react-router";
+import { CataloguePending } from "@/components/hub/CataloguePending";
+import { useCatalogueStatus } from "@/data/catalogue-status";
 import { ConciergeContact } from "@/components/hub/ConciergeContact";
 import { LEVELS, type Destination, type Level } from "@/data/resort";
 import { MapPreview } from "./MapPreview";
@@ -46,11 +50,16 @@ export default function ResortMap({
   onDestination: (id: string) => void;
 }>) {
   const { mapPlaces, mapLinks, destinations } = useHub();
+  const { ready } = useCatalogueStatus();
+  const openSearch = useHubSearch();
+  const searchOpen = useLocation({ select: (location) => location.pathname === "/search" });
+  const [backgroundReady, setBackgroundReady] = useState(false);
+  const backgroundLoaded = useCallback(() => setBackgroundReady(true), []);
   const { lang, t, cluster, levelLabel, typeLabel } = useI18n();
   const copy = useCallback((key: Parameters<typeof mapCopy>[1]) => mapCopy(lang, key), [lang]);
   const places = useMemo(
-    () => liveMapPlaces(mapPlaces, mapLinks, destinations),
-    [mapPlaces, mapLinks, destinations],
+    () => (ready ? liveMapPlaces(mapPlaces, mapLinks, destinations) : []),
+    [ready, mapPlaces, mapLinks, destinations],
   );
   const [selectedId, setSelectedId] = useState<string | null>(request.placeId ?? null);
   const [selectedStation, setSelectedStation] = useState<string | null>(null);
@@ -62,7 +71,6 @@ export default function ResortMap({
   const [tourLoaded, setTourLoaded] = useState(request.mode === "tour");
   const tourTrigger = useRef<HTMLButtonElement>(null);
   const appliedRequest = useRef<number | null>(null);
-  const [searchOpen, setSearchOpen] = useState(false);
   const [options, setOptions] = useState(false);
   const [reference, setReference] = useState(false);
   const [collection, setCollection] = useState<PlaceCategory | null>(null);
@@ -106,7 +114,6 @@ export default function ResortMap({
       if (!place) return;
       setSelectedId(id);
       setSelectedStation(null);
-      setSearchOpen(false);
       setOptions(false);
       // Keep accommodation zones wider than individual venues.
       focusOn(place.focus, Math.max(place.focus.zoom, place.accommodationGroup ? 2.4 : 3.4));
@@ -151,7 +158,6 @@ export default function ResortMap({
     setPhotoId(null);
     setCollection(null);
     setLevel(null);
-    setSearchOpen(false);
     setOptions(false);
     fit();
   };
@@ -180,13 +186,13 @@ export default function ResortMap({
   const chooseSearchResult = (destination: Destination) => {
     const placeId = destinationPlace(destination.id, mapLinks, mapPlaces);
     if (!placeId) {
-      onDestination(destination.id);
-      return;
+      return false;
     }
     setMode("explore");
     setCollection(null);
     setLevel(null);
     select(placeId);
+    return true;
   };
 
   return (
@@ -197,7 +203,10 @@ export default function ResortMap({
             <X size={20} strokeWidth={1.4} aria-hidden />
           </button>
           <h2>{copy("title")}</h2>
-          <SearchTrigger compact onOpen={() => setSearchOpen(true)} />
+          <SearchTrigger
+            compact
+            onOpen={() => openSearch(undefined, { placesOnly: true, onSelect: chooseSearchResult })}
+          />
           <ConciergeContact className="relative" />
           <button
             type="button"
@@ -208,179 +217,176 @@ export default function ResortMap({
             <Layers size={19} strokeWidth={1.4} aria-hidden />
           </button>
         </header>
-        {places.length === 0 ? (
-          <output className="atlas-empty">{copy("unavailable")}</output>
-        ) : (
-          <>
-            <div className="atlas-canvas">
-              <MapArtwork
-                camera={camera}
-                places={places}
-                visibleIds={visibleIds}
-                selectedId={selectedId}
-                selectedStation={selectedStation}
-                activeFilters={filters}
-                referenceVisible={reference}
-                photosVisible={mode === "photos"}
-                selectedPhotoId={photoId}
-                previewVisible={hasPreview}
-                layers={{
-                  trail: mode === "walk",
-                  walking: mode === "walk",
-                }}
-                onSelectPhoto={choosePhoto}
-                onSelectStation={(station) => {
-                  if (allowPlaceClick())
-                    setSelectedStation((current) => (current === station ? null : station));
-                }}
-                onViewportChange={onViewportChange}
-                onSelectPlace={(id) => {
-                  if (allowPlaceClick()) {
-                    select(id);
-                  }
-                }}
-                interactionProps={{
-                  ...handlers,
-                  tabIndex: 0,
-                  "aria-label": copy("gestures"),
-                  onClick: (event) => {
-                    if (
-                      event.target instanceof Element &&
-                      !event.target.closest('[role="button"]') &&
-                      allowPlaceClick()
-                    )
-                      setSelectedStation(null);
-                  },
-                  onKeyDown: (event) => {
-                    if (event.key === "Home" || event.key === "0") setSelectedStation(null);
-                    handlers.onKeyDown(event);
-                  },
-                }}
-              />
-            </div>
-            {options && (
-              <section className="atlas-options" aria-label={copy("layers")}>
-                <button
-                  type="button"
-                  aria-pressed={reference}
-                  onClick={() => setReference(!reference)}
-                >
-                  {reference ? copy("illustrated") : copy("official")}
-                </button>
-                <div className="atlas-levels">
-                  <button type="button" aria-pressed={!level} onClick={() => applyLevel(null)}>
-                    {copy("all")}
-                  </button>
-                  {LEVELS.map((l) => (
-                    <button
-                      type="button"
-                      key={l.id}
-                      aria-pressed={level === l.id}
-                      onClick={() => applyLevel(l.id)}
-                    >
-                      {levelLabel(l.id)}
-                    </button>
-                  ))}
-                </div>
-              </section>
-            )}
-            <div className="atlas-zoom">
-              <button type="button" aria-label={copy("zoomIn")} onClick={() => zoomBy(0.35)}>
-                <Plus size={18} />
-              </button>
-              <button type="button" aria-label={copy("zoomOut")} onClick={() => zoomBy(-0.35)}>
-                <Minus size={18} />
-              </button>
-              <button
-                type="button"
-                aria-label={copy("fit")}
-                onClick={() => {
-                  setSelectedStation(null);
-                  fit();
-                }}
-              >
-                <LocateFixed size={18} />
-              </button>
-            </div>
-            {mode === "walk" && !hasPreview && <p className="atlas-context">{copy("walkNote")}</p>}
-            {mode === "photos" && !hasPreview && !searchOpen && photoGuide && (
-              <button
-                type="button"
-                className="atlas-photo-guide"
-                onClick={() => onDestination(photoGuide.id)}
-              >
-                <span>{photoGuide.name}</span>
-                <ArrowUpRight size={18} aria-hidden />
-              </button>
-            )}
-            {hasPreview && previewPlace && (
-              <MapPreview
-                key={`${previewPlace.id}:${photoId ?? ""}`}
-                anchor={
-                  mode === "photos"
-                    ? (photoSpots.find((spot) => spot.id === photoId)?.point ?? previewPlace.point)
-                    : previewPlace.point
+        <>
+          <div className="atlas-canvas">
+            <MapArtwork
+              camera={camera}
+              onBackgroundReady={backgroundLoaded}
+              places={places}
+              visibleIds={visibleIds}
+              selectedId={selectedId}
+              selectedStation={selectedStation}
+              activeFilters={filters}
+              referenceVisible={reference}
+              photosVisible={mode === "photos"}
+              selectedPhotoId={photoId}
+              previewVisible={hasPreview}
+              layers={{
+                trail: mode === "walk",
+                walking: mode === "walk",
+              }}
+              onSelectPhoto={choosePhoto}
+              onSelectStation={(station) => {
+                if (allowPlaceClick())
+                  setSelectedStation((current) => (current === station ? null : station));
+              }}
+              onViewportChange={onViewportChange}
+              onSelectPlace={(id) => {
+                if (allowPlaceClick()) {
+                  select(id);
                 }
-                camera={camera}
-                title={previewTitle}
-                area={previewPlace.accommodationGroup ? previewPlace : undefined}
-                destinations={related}
-                onDestination={onDestination}
-                onClose={() => {
-                  setSelectedId(null);
-                  setPhotoId(null);
-                }}
-                kicker={previewKicker}
-              />
-            )}
-            <div className="atlas-bottom">
-              {mode === "explore" && !hasPreview && !searchOpen && (
-                <div className="atlas-collections" aria-label={t("collections")}>
-                  {(["dining", "wellness", "experiences", "accommodation"] as const).map((c) => (
-                    <button
-                      type="button"
-                      aria-pressed={collection === c}
-                      key={c}
-                      onClick={() => {
-                        setSelectedStation(null);
-                        setCollection(collection === c ? null : c);
-                        fit();
-                      }}
-                    >
-                      {c === "accommodation"
-                        ? typeLabel("accommodation")
-                        : cluster(c.toUpperCase())}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <nav className="atlas-dock" aria-label={copy("title")}>
-                {modes.map(({ id, Icon }) => (
+              }}
+              interactionProps={{
+                ...handlers,
+                tabIndex: 0,
+                "aria-label": copy("gestures"),
+                onClick: (event) => {
+                  if (
+                    event.target instanceof Element &&
+                    !event.target.closest('[role="button"]') &&
+                    allowPlaceClick()
+                  )
+                    setSelectedStation(null);
+                },
+                onKeyDown: (event) => {
+                  if (event.key === "Home" || event.key === "0") setSelectedStation(null);
+                  handlers.onKeyDown(event);
+                },
+              }}
+            />
+          </div>
+          {options && (
+            <section className="atlas-options" aria-label={copy("layers")}>
+              <button
+                type="button"
+                aria-pressed={reference}
+                onClick={() => setReference(!reference)}
+              >
+                {reference ? copy("illustrated") : copy("official")}
+              </button>
+              <div className="atlas-levels">
+                <button type="button" aria-pressed={!level} onClick={() => applyLevel(null)}>
+                  {copy("all")}
+                </button>
+                {LEVELS.map((l) => (
                   <button
                     type="button"
-                    key={id}
-                    ref={id === "tour" ? tourTrigger : undefined}
-                    aria-pressed={id === "tour" ? tourOpen : mode === id}
-                    onClick={() => changeMode(id)}
+                    key={l.id}
+                    aria-pressed={level === l.id}
+                    onClick={() => applyLevel(l.id)}
                   >
-                    <Icon size={18} />
-                    <span>{copy(id)}</span>
+                    {levelLabel(l.id)}
                   </button>
                 ))}
-              </nav>
-            </div>
-            <p className="atlas-footnote">{copy("note")}</p>
-          </>
+              </div>
+            </section>
+          )}
+          <div className="atlas-zoom">
+            <button type="button" aria-label={copy("zoomIn")} onClick={() => zoomBy(0.35)}>
+              <Plus size={18} />
+            </button>
+            <button type="button" aria-label={copy("zoomOut")} onClick={() => zoomBy(-0.35)}>
+              <Minus size={18} />
+            </button>
+            <button
+              type="button"
+              aria-label={copy("fit")}
+              onClick={() => {
+                setSelectedStation(null);
+                fit();
+              }}
+            >
+              <LocateFixed size={18} />
+            </button>
+          </div>
+          {mode === "walk" && !hasPreview && <p className="atlas-context">{copy("walkNote")}</p>}
+          {mode === "photos" && !hasPreview && !searchOpen && photoGuide && (
+            <button
+              type="button"
+              className="atlas-photo-guide"
+              onClick={() => onDestination(photoGuide.id)}
+            >
+              <span>{photoGuide.name}</span>
+              <ArrowUpRight size={18} aria-hidden />
+            </button>
+          )}
+          {backgroundReady && hasPreview && previewPlace && (
+            <MapPreview
+              key={`${previewPlace.id}:${photoId ?? ""}`}
+              anchor={
+                mode === "photos"
+                  ? (photoSpots.find((spot) => spot.id === photoId)?.point ?? previewPlace.point)
+                  : previewPlace.point
+              }
+              camera={camera}
+              title={previewTitle}
+              area={previewPlace.accommodationGroup ? previewPlace : undefined}
+              destinations={related}
+              onDestination={onDestination}
+              onClose={() => {
+                setSelectedId(null);
+                setPhotoId(null);
+              }}
+              kicker={previewKicker}
+            />
+          )}
+          <div className="atlas-bottom">
+            {mode === "explore" && !hasPreview && !searchOpen && (
+              <div className="atlas-collections" aria-label={t("collections")}>
+                {(["dining", "wellness", "experiences", "accommodation"] as const).map((c) => (
+                  <button
+                    type="button"
+                    aria-pressed={collection === c}
+                    key={c}
+                    onClick={() => {
+                      setSelectedStation(null);
+                      setCollection(collection === c ? null : c);
+                      fit();
+                    }}
+                  >
+                    {c === "accommodation" ? typeLabel("accommodation") : cluster(c.toUpperCase())}
+                  </button>
+                ))}
+              </div>
+            )}
+            <nav className="atlas-dock" aria-label={copy("title")}>
+              {modes.map(({ id, Icon }) => (
+                <button
+                  type="button"
+                  key={id}
+                  ref={id === "tour" ? tourTrigger : undefined}
+                  aria-pressed={id === "tour" ? tourOpen : mode === id}
+                  onClick={() => changeMode(id)}
+                >
+                  <Icon size={18} />
+                  <span>{copy(id)}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+          <p className="atlas-footnote">{copy("note")}</p>
+        </>
+        {(!ready || !backgroundReady) && (
+          <div className="atlas-catalogue-pending">
+            {ready ? (
+              <output className="block p-8">{copy("loading")}</output>
+            ) : (
+              <CataloguePending />
+            )}
+          </div>
         )}
-        {searchOpen && (
-          <SearchDialog
-            placesOnly
-            onClose={() => setSearchOpen(false)}
-            onSelectDestination={(destination) => {
-              setSearchOpen(false);
-              chooseSearchResult(destination);
-            }}
-          />
+        {ready && places.length === 0 && (
+          <output className="atlas-empty">{copy("unavailable")}</output>
         )}
       </div>
       {tourLoaded && <BensleyTour open={tourOpen} onReturn={returnToMap} />}

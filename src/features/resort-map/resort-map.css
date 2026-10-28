@@ -72,6 +72,16 @@
   position: relative;
   overflow: hidden;
 }
+.atlas-catalogue-pending {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  border-radius: var(--brand-radius);
+  background: var(--brand-white);
+  color: var(--brand-ink);
+}
 .hub-atlas .atlas-zoom {
   position: absolute;
   right: 14px;

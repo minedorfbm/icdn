@@ -17,6 +17,7 @@ import { searchCopy } from "./search-copy";
 import { ConciergeContact } from "@/components/hub/ConciergeContact";
 import "./search.css";
 import { thumbnail } from "@/lib/responsive-image";
+import { useInteractiveReady } from "@/lib/use-interactive-ready";
 
 export function HubSearch({
   compact = false,
@@ -31,9 +32,11 @@ export function SearchTrigger({
   compact = false,
 }: Readonly<{ onOpen: () => void; compact?: boolean }>) {
   const { lang } = useI18n();
+  const interactive = useInteractiveReady();
   return (
     <button
       type="button"
+      disabled={!interactive}
       onClick={onOpen}
       className={`brand-ui brand-floating hub-search-trigger ${compact ? "hub-search-compact" : ""}`}
       aria-haspopup="dialog"

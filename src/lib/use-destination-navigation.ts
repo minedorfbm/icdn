@@ -6,6 +6,7 @@ import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { destinationSlug } from "@/lib/destination-route";
 import { loadDestinationMedia } from "./hub-client";
 import type { SearchSnapshot } from "@/features/search/search-context";
+import { isDestinationPath, isHubScreen } from "./hub-screen";
 
 declare module "@tanstack/react-router" {
   interface HistoryState {
@@ -24,7 +25,7 @@ export function useDestinationNavigation() {
   const { destinations } = useHub();
   const navigate = useNavigate();
   const location = useLocation();
-  const isDestination = location.pathname !== "/";
+  const isDestination = isDestinationPath(location.pathname);
   const openDestination = useCallback(
     (destinationId: string, sequence?: string[]) => {
       const slug = destinationSlug(destinationId);
@@ -40,7 +41,8 @@ export function useDestinationNavigation() {
       // The endpoint still verifies publication; errors remain retryable in the card.
       void loadDestinationMedia(destinationId).catch(() => {});
       const ordered = sequence ?? (isDestination ? location.state.hubSequence : undefined);
-      const homeIndex = isDestination ? location.state.hubHomeIndex : location.state.__TSR_index;
+      const homeIndex =
+        location.pathname === "/" ? location.state.__TSR_index : location.state.hubHomeIndex;
       const searchIndex = location.state.hubSearch
         ? location.state.__TSR_index
         : location.state.hubSearchIndex;
@@ -51,6 +53,12 @@ export function useDestinationNavigation() {
           hubCard: true,
           ...(homeIndex !== undefined ? { hubHomeIndex: homeIndex } : {}),
           ...(searchIndex !== undefined ? { hubSearchIndex: searchIndex } : {}),
+          ...(isHubScreen(location.pathname)
+            ? { hubScreenIndex: location.state.__TSR_index }
+            : location.state.hubScreenIndex !== undefined
+              ? { hubScreenIndex: location.state.hubScreenIndex }
+              : {}),
+          ...(location.pathname === "/map" || location.state.hubMap ? { hubMap: true } : {}),
           ...(isDestination && !location.state.hubSearch
             ? { hubPreviousCard: location.pathname.slice(1) }
             : {}),
@@ -82,11 +90,17 @@ export function useDestinationNavigation() {
     router,
   ]);
   const closeDestination = useCallback(() => {
-    const searchIndex = location.state.hubSearchIndex;
+    const searchIndex = location.state.hubSearchIndex ?? location.state.hubScreenIndex;
     const distance = searchIndex === undefined ? 0 : location.state.__TSR_index - searchIndex;
     if (distance > 0) router.history.go(-distance);
     else closeToHub();
-  }, [location.state.hubSearchIndex, location.state.__TSR_index, closeToHub, router]);
+  }, [
+    location.state.hubSearchIndex,
+    location.state.hubScreenIndex,
+    location.state.__TSR_index,
+    closeToHub,
+    router,
+  ]);
   return {
     openDestination,
     closeDestination,
