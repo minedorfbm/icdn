@@ -13,6 +13,20 @@ for (const viewport of [
     const search = page.locator(".hub-search-tool button");
     const contact = page.locator(".hub-contact-tool button");
     await expect(page.locator("#heaven")).toBeAttached();
+    if (viewport.width >= 768 && viewport.width > viewport.height) {
+      await expect(page.locator(".hero-brand")).toBeHidden();
+      await expect(page.locator(".hero-desktop-brand")).toBeVisible();
+      await expect(search).toBeVisible();
+      await expect(contact).toBeVisible();
+      expect((await language.boundingBox())!.y).toBeLessThan(30);
+      expect((await page.locator(".hero-desktop-brand").boundingBox())!.width).toBeLessThanOrEqual(
+        360,
+      );
+      expect((await page.locator(".hero-film-button").boundingBox())!.width).toBe(80);
+      await expect(page.locator(".hero-invitation-title")).toHaveCSS("font-size", "44px");
+      await expect(page.locator(".hero-invitation-caption")).toHaveCSS("font-size", "10px");
+      return;
+    }
     await expect(search).toBeHidden();
     await expect(contact).toBeHidden();
     await expect(language).toBeVisible();
