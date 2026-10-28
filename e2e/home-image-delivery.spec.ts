@@ -71,9 +71,14 @@ for (const viewport of [
           (candidate) => new URL(imageDeliveryUrl(candidate.src), page.url()).href,
         ),
       );
-      // The discovery chooser intentionally downloads its separate 320px thumbnail.
-      const thumbnail = new URL(imageDeliveryUrl(photo.variants[0]!.src), page.url()).href;
-      expect(calls.filter((url) => allCandidates.has(url) && url !== thumbnail)).toEqual([
+      // Discovery may select the 320px AVIF instead of its same-size WebP fallback.
+      const thumbnails = new Set(
+        [
+          photo.variants[0]!,
+          ...("avif" in photo ? photo.avifVariants.filter((v) => v.width === 320) : []),
+        ].map((candidate) => new URL(imageDeliveryUrl(candidate.src), page.url()).href),
+      );
+      expect(calls.filter((url) => allCandidates.has(url) && !thumbnails.has(url))).toEqual([
         geometry.source,
       ]);
     }

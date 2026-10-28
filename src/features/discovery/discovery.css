@@ -152,16 +152,19 @@
   box-shadow: 0 8px 18px #0007;
   transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
-.discovery-mini-deck img:nth-child(1) {
+.discovery-mini-deck picture {
+  display: contents;
+}
+.discovery-mini-deck picture:nth-child(1) img {
   transform: translateX(-12%) rotate(-10deg);
   z-index: 3;
 }
-.discovery-mini-deck img:nth-child(2) {
+.discovery-mini-deck picture:nth-child(2) img {
   transform: translateX(12%) rotate(4deg);
   z-index: 2;
   filter: brightness(0.65);
 }
-.discovery-mini-deck img:nth-child(3) {
+.discovery-mini-deck picture:nth-child(3) img {
   transform: translateX(36%) rotate(17deg);
   z-index: 1;
   filter: brightness(0.4);
@@ -170,13 +173,13 @@
   .discovery-journey:is(:hover, :focus-visible) .discovery-tram img {
     transform: translate(5%, 4px) rotate(-0.75deg);
   }
-  .discovery-surprise:is(:hover, :focus-visible) .discovery-mini-deck img:nth-child(1) {
+  .discovery-surprise:is(:hover, :focus-visible) .discovery-mini-deck picture:nth-child(1) img {
     transform: translate(-17%, -3px) rotate(-13deg);
   }
-  .discovery-surprise:is(:hover, :focus-visible) .discovery-mini-deck img:nth-child(2) {
+  .discovery-surprise:is(:hover, :focus-visible) .discovery-mini-deck picture:nth-child(2) img {
     transform: translate(13%, -5px) rotate(5deg);
   }
-  .discovery-surprise:is(:hover, :focus-visible) .discovery-mini-deck img:nth-child(3) {
+  .discovery-surprise:is(:hover, :focus-visible) .discovery-mini-deck picture:nth-child(3) img {
     transform: translate(42%, -2px) rotate(21deg);
   }
 }
@@ -188,13 +191,13 @@
   .discovery-journey:active .discovery-tram img {
     transform: translate(5%, 4px) rotate(-0.75deg);
   }
-  .discovery-surprise:active .discovery-mini-deck img:nth-child(1) {
+  .discovery-surprise:active .discovery-mini-deck picture:nth-child(1) img {
     transform: translate(-17%, -3px) rotate(-13deg);
   }
-  .discovery-surprise:active .discovery-mini-deck img:nth-child(2) {
+  .discovery-surprise:active .discovery-mini-deck picture:nth-child(2) img {
     transform: translate(13%, -5px) rotate(5deg);
   }
-  .discovery-surprise:active .discovery-mini-deck img:nth-child(3) {
+  .discovery-surprise:active .discovery-mini-deck picture:nth-child(3) img {
     transform: translate(42%, -2px) rotate(21deg);
   }
 }

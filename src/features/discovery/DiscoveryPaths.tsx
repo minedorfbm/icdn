@@ -8,7 +8,7 @@ import { imageSource } from "@/lib/image-source";
 import { discoveryCopy } from "./discovery-copy";
 import { useHubScreenNavigation } from "@/lib/use-hub-screen-navigation";
 import "./discovery.css";
-import { thumbnail } from "@/lib/responsive-image";
+import { thumbnail, thumbnailAvif } from "@/lib/responsive-image";
 
 const choices = [
   { key: "journey", note: "journeyNote", Icon: Compass, Arrow: ArrowDown },
@@ -47,16 +47,15 @@ function ChoiceArtwork({
     );
   return (
     <span className="discovery-art discovery-mini-deck" aria-hidden>
-      {previews.map((card) => (
-        <img
-          key={card.id}
-          src={thumbnail(card.image)}
-          alt=""
-          loading="lazy"
-          width={80}
-          height={110}
-        />
-      ))}
+      {previews.map((card) => {
+        const avif = thumbnailAvif(card.image);
+        return (
+          <picture key={card.id}>
+            {avif && <source type="image/avif" srcSet={avif} />}
+            <img src={thumbnail(card.image)} alt="" loading="lazy" width={80} height={110} />
+          </picture>
+        );
+      })}
     </span>
   );
 }
