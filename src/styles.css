@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @import "tw-animate-css";
 @import "./brand.css";
+@import "./features/search/search-trigger.css";
 @source "../src";
 
 @custom-variant dark (&:is(.dark *));
