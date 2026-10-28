@@ -27,7 +27,7 @@ for (const viewport of [
       if (request.url().endsWith(file)) logos.push(request.url());
     });
     await page.goto("/");
-    const logo = page.locator(".hero-resort-logo");
+    const logo = page.locator(".hero-resort-logo:visible");
     await expect(logo).toHaveAttribute("src", `/media/${file}`);
     await expect
       .poll(() => logo.evaluate((img: HTMLImageElement) => img.naturalWidth))
