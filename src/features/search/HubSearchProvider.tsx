@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useRouterState } from "@tanstack/react-router
 import { useDestinationNavigation } from "@/lib/use-destination-navigation";
 import type { Destination } from "@/data/resort";
 import { SearchDialog } from "./HubSearch";
+import searchStyles from "./search.css?url";
 import { EMPTY_SEARCH, SearchContext, type SearchSnapshot } from "./search-context";
 import type { SearchOptions } from "./search-context";
 import { useHubScreenNavigation } from "@/lib/use-hub-screen-navigation";
@@ -112,13 +113,23 @@ export function HubSearchProvider({ children }: Readonly<{ children: ReactNode }
     <SearchContext.Provider value={openSearch}>
       {children}
       {visibleSearch && (
-        <SearchDialog
-          key={selection?.historyIndex ?? location.state.__TSR_index}
-          initialState={visibleSearch}
-          placesOnly={!!location.state.hubSearchPlacesOnly}
-          onClose={closeSearch}
-          onSelectDestination={(destination, snapshot) => void selectResult(destination, snapshot)}
-        />
+        <>
+          <link
+            rel="stylesheet"
+            href={searchStyles}
+            precedence="hub-search"
+            data-hub-search-style=""
+          />
+          <SearchDialog
+            key={selection?.historyIndex ?? location.state.__TSR_index}
+            initialState={visibleSearch}
+            placesOnly={!!location.state.hubSearchPlacesOnly}
+            onClose={closeSearch}
+            onSelectDestination={(destination, snapshot) =>
+              void selectResult(destination, snapshot)
+            }
+          />
+        </>
       )}
     </SearchContext.Provider>
   );

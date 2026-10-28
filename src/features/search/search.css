@@ -1,47 +1,6 @@
-.hub-search-tool {
-  position: fixed;
-  top: calc(max(12px, env(safe-area-inset-top)) + 52px);
-  right: 12px;
-  z-index: 50;
-}
-.hub-tools {
-  position: fixed;
-  top: max(12px, env(safe-area-inset-top));
-  right: 12px;
-  z-index: 50;
-  display: flex;
-  gap: 8px;
-  max-width: calc(100vw - 24px);
-}
-.hub-tools .brand-control {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  justify-content: center;
-  gap: 0;
-}
-.hub-tools .brand-control svg {
-  display: none;
-}
-.hub-search-trigger {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  padding: 8px 14px;
-  border-radius: var(--brand-radius);
-  font-size: var(--readable-11);
-  letter-spacing: 0.08em;
-}
 .hub-search-dialog {
   height: 100dvh;
   overflow: hidden;
-}
-.hub-search-trigger.hub-search-compact {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  justify-content: center;
 }
 .hub-search-shell {
   display: flex;

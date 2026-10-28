@@ -15,7 +15,6 @@ import {
 } from "./search";
 import { searchCopy } from "./search-copy";
 import { ConciergeContact } from "@/components/hub/ConciergeContact";
-import "./search.css";
 import { thumbnail } from "@/lib/responsive-image";
 import { useInteractiveReady } from "@/lib/use-interactive-ready";
 
