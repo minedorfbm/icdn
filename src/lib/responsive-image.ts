@@ -5,6 +5,17 @@ export function thumbnail(source: string): string {
   return imageVariants(source)?.variants[0]?.src ?? imageSource(source);
 }
 
+/** Prefer the existing AVIF at exactly the same width as the WebP thumbnail. */
+export function thumbnailAvif(source: string): string | undefined {
+  const image = imageVariants(source);
+  const width = image?.variants[0]?.width;
+  if (!width) return undefined;
+  return (
+    image?.avifVariants?.find((candidate) => candidate.width === width)?.src ??
+    (image?.avif?.width === width ? image.avif.src : undefined)
+  );
+}
+
 /** No crop or focal-position changes. Native HD remains the largest candidate. */
 export function responsiveImage(source: string, sizes: string) {
   source = imageSource(source);
