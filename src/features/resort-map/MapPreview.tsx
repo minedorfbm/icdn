@@ -6,7 +6,6 @@ import type { Destination } from "@/data/resort";
 import { mapCopy } from "./map-copy";
 import type { MapCamera } from "./map-camera";
 import { useMapBubblePosition } from "./useMapBubblePosition";
-import "./map-preview.css";
 import type { MapPoint, Place } from "./map.types";
 
 export function MapPreview({
