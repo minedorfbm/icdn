@@ -1,16 +1,18 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { InstagramIcon } from "@/components/ui/instagram-icon";
 import { useI18n } from "@/i18n";
 import type { Destination } from "@/data/resort";
 import { actionsFor, instagramUrl } from "@/lib/destination-actions";
 import { ResortLink } from "./ResortBrowser";
 import { responsiveImage, responsiveAvif } from "@/lib/responsive-image";
+import { useDetailPhotoReadiness } from "@/lib/use-detail-photo-readiness";
 
 /** The single universal card used everywhere in the hub. */
 export function DestinationPanel({
   dest,
   active,
   priority,
+  prepareDetail,
   near = true,
   imageSizes,
   onOpen,
@@ -19,6 +21,7 @@ export function DestinationPanel({
   dest: Destination;
   active: boolean;
   priority: boolean;
+  prepareDetail: boolean;
   near?: boolean;
   imageSizes: string | undefined;
   onOpen: () => void;
@@ -27,10 +30,16 @@ export function DestinationPanel({
   const { lang, t, typeLabel, levelLabel, action, linkLabel, description } = useI18n();
   const actions = actionsFor(dest, 3, lang);
   const [loaded, setLoaded] = useState(false);
+  const panel = useRef<HTMLElement>(null);
+  const preparePhoto = useDetailPhotoReadiness(panel, dest.detailImage, prepareDetail, loaded);
   const avif = near && imageSizes ? responsiveAvif(dest.image, imageSizes) : undefined;
 
   return (
     <article
+      ref={panel}
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") preparePhoto();
+      }}
       aria-hidden={!active}
       inert={!active}
       className="destination-panel relative h-full min-h-[inherit] w-full overflow-hidden rounded-[18px] border border-[#e5d3aa]/65 bg-[oklch(0.18_0.02_250)] shadow-[10px_24px_36px_-18px_rgba(0,0,0,0.7)]"
@@ -89,6 +98,7 @@ export function DestinationPanel({
             {/* Stretch the native button over the card without nesting its separate links. */}
             <button
               type="button"
+              onFocus={preparePhoto}
               onClick={(event) => {
                 event.currentTarget.focus({ preventScroll: true });
                 onOpen();

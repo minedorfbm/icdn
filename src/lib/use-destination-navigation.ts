@@ -1,7 +1,6 @@
 import { useCallback } from "react";
-import { preload } from "react-dom";
 import { useHub } from "@/data/hub-context";
-import { detailHeroPreload } from "./responsive-image";
+import { prepareDetailPhoto } from "./prepare-detail-photo";
 import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import { destinationSlug } from "@/lib/destination-route";
 import { loadDestinationMedia } from "./hub-client";
@@ -34,8 +33,7 @@ export function useDestinationNavigation() {
       // This warms bytes, never a catalogue or card snapshot, and matches the final picture.
       const destination = destinations.find((item) => item.id === destinationId);
       if (destination?.detailImage) {
-        const { href, ...image } = detailHeroPreload(destination.detailImage);
-        preload(href, { ...image, as: "image", fetchPriority: "high" });
+        prepareDetailPhoto(destination.detailImage);
       }
       // Start the independent media read alongside navigation, not after mounting.
       // The endpoint still verifies publication; errors remain retryable in the card.
