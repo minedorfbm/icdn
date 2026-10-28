@@ -34,7 +34,7 @@ test("Instagram fallback captions stay readable with and without an account", as
     await expect(post.locator("p")).toContainText(caption);
     expect(
       await post.locator("p").evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize)),
-    ).toBeGreaterThanOrEqual(15.5);
+    ).toBeCloseTo(13.65, 1);
     await expect(post.getByRole("link")).toHaveAttribute(
       "href",
       `https://www.instagram.com/p/CAPTION${index}/`,

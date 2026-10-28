@@ -1,5 +1,8 @@
 /* Shared expanded-card palette, including raised surfaces and featured actions. */
 .editorial-detail {
+  /* Keep the enlarged small text at +5%; display titles and spacing stay intact. */
+  --readable-scale: 1.05;
+  --readable-min: 10.5px;
   --level-bg: var(--world-heaven);
   --level-fg: var(--world-heaven-foreground);
   --editorial-accent: #65533d;
@@ -13,6 +16,7 @@
   background: var(--level-bg);
   color: var(--level-fg);
   font-family: var(--brand-sans);
+  font-size: var(--readable-16);
 }
 .editorial-detail[data-level="sky"] {
   --level-bg: var(--world-sky);

@@ -4,6 +4,10 @@
   /* Readable small text without scaling rem-based spacing or display titles. */
   --readable-scale: 1.2;
   --readable-min: 12px;
+}
+/* Recompute these inherited tokens where expanded cards use their own scale. */
+:root,
+.editorial-detail {
   --readable-8: max(var(--readable-min), calc(8px * var(--readable-scale)));
   --readable-9: max(var(--readable-min), calc(9px * var(--readable-scale)));
   --readable-10: max(var(--readable-min), calc(10px * var(--readable-scale)));
@@ -15,7 +19,8 @@
   --readable-16: max(var(--readable-min), calc(16px * var(--readable-scale)));
   --readable-17: max(var(--readable-min), calc(17px * var(--readable-scale)));
   --readable-18: max(var(--readable-min), calc(18px * var(--readable-scale)));
-
+}
+:root {
   --brand-white: #ffffff;
   --brand-paper: #f7f7f6;
   --brand-ink: #292827;

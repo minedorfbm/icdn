@@ -67,8 +67,6 @@
   padding: 12px 16px 14px;
   overflow: auto;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: #fffefa66 transparent;
   border-radius: inherit;
 }
 .hub-atlas .atlas-preview-header {

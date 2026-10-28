@@ -69,7 +69,7 @@ test("desktop uses facing columns and both tablet orientations use the portrait 
           .locator(".editorial-description")
           .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize)),
       )
-      .toBeCloseTo(21.6, 1);
+      .toBeCloseTo(18.9, 1);
     await expect(card.getByRole("button", { name: "BACK", exact: true })).toBeVisible();
     await expect
       .poll(() => scroller.evaluate((node) => node.scrollWidth - node.clientWidth))
@@ -114,7 +114,7 @@ test("the large photo picker switches images without changing the approved mobil
         .locator(".editorial-description")
         .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize)),
     )
-    .toBeCloseTo(19.2, 1);
+    .toBeCloseTo(16.8, 1);
   await expect(page.getByRole("button", { name: "BACK", exact: true })).toBeVisible();
 });
 
