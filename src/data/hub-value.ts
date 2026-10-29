@@ -43,14 +43,14 @@ export function resolveHeroImage(
     format === "landscape"
       ? (settings?.["hero_image_landscape"] ?? settings?.["hero_image"])
       : settings?.["hero_image"];
-  return (
-    resolveImage(reference ?? "") ||
-    imageSource(
-      format === "landscape"
-        ? "src/assets/hero-lobby-landscape-no-chandelier-f06bd383569a.webp"
-        : "src/assets/hero-lobby-portrait-no-chandelier-e29f7810e97a.webp",
-    )
+  const resolved = resolveImage(reference ?? "");
+  // Retire the previous portrait without changing landscape or future CMS choices.
+  const previousPortrait = imageSource(
+    "src/assets/hero-lobby-portrait-no-chandelier-e29f7810e97a.webp",
   );
+  if (format === "portrait" && (!resolved || resolved === previousPortrait))
+    return imageSource("/hero-lobby-portrait-fountain-20261029.webp");
+  return resolved || imageSource("src/assets/hero-lobby-landscape-no-chandelier-f06bd383569a.webp");
 }
 
 export function createHubValue(data?: HubData): HubValue {

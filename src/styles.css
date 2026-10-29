@@ -258,29 +258,12 @@
 .hero-brand {
   position: absolute;
   z-index: 1;
-  top: max(calc(min(64cqw, 460px) * 0.1561 + 12px), calc(50% - var(--hero-photo-height) * 0.38));
+  /* New portrait: bottom-anchored crop, logo centred on the fountain marble. */
+  top: calc(100cqh - max(100cqh, calc(100cqw * 1.77683)) * 0.4482);
   left: 50%;
   width: min(64%, 460px);
   transform: translate(-50%, -50%);
   isolation: isolate;
-}
-
-.hero-brand::before {
-  /* Retain the original feathered halo above the cloud for clear black lettering. */
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: 0;
-  left: 50%;
-  width: 174%;
-  height: calc(var(--hero-photo-height) * 0.18);
-  transform: translateX(-50%);
-  background: rgb(255 247 231 / 88%);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 45%, transparent 100%);
-  mask-image: radial-gradient(ellipse closest-side, #000 45%, transparent 100%);
-  pointer-events: none;
 }
 
 .hero-desktop-brand {
@@ -291,39 +274,14 @@
   width: 100%;
 }
 
-.hero-photograph::before,
-.hero-photograph::after {
-  content: "";
-  position: absolute;
-  top: calc(50% - var(--hero-photo-height) * 0.515);
-  left: 50%;
-  width: var(--hero-photo-width);
-  height: calc(var(--hero-photo-height) * 0.278);
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-.hero-photograph::before {
-  /* The cloud's alpha softly diffuses the portrait louvers behind the sharp logo. */
-  background: rgb(255 248 232 / 12%);
-  -webkit-backdrop-filter: blur(5px);
-  backdrop-filter: blur(5px);
-  -webkit-mask: url("/hero-cloud-ivory.webp") center / 100% 100% no-repeat;
-  mask: url("/hero-cloud-ivory.webp") center / 100% 100% no-repeat;
-}
-
-.hero-photograph::after {
-  /* Static backlit ivory cloud, restricted to the ceiling and portrait louvers. */
-  background: url("/hero-cloud-ivory.webp") center / 100% 100% no-repeat;
-  opacity: 0.82;
-}
-
 .hero-sky {
-  /* Match object-fit: cover, then locate the clear sky in the supplied portrait photo.
-     Portrait: x 211–484, y 321–621 in 695×1137. No resize/scroll JavaScript. */
+  /* Keep the invitation in the new portrait opening, above the fountain logo.
+     The existing landscape rule retains its own original placement. */
   position: absolute;
   z-index: 1;
-  top: calc(50% - var(--hero-photo-height) * 0.2177);
+  top: calc(
+    100cqh - max(100cqh, calc(100cqw * 1.77683)) * 0.6264 - var(--hero-photo-height) * 0.132
+  );
   left: 50%;
   width: calc(var(--hero-photo-width) * 0.392);
   height: calc(var(--hero-photo-height) * 0.264);
@@ -431,10 +389,6 @@
   .hero-brand {
     display: none;
   }
-  .hero-photograph::before,
-  .hero-photograph::after {
-    display: none;
-  }
   .hero-desktop-brand {
     display: block;
     margin-block: auto;
@@ -468,6 +422,12 @@
 
 /* Portrait/mobile keeps one hero control; desktop retains its existing toolbar. */
 @media (max-width: 767px), (orientation: portrait) {
+  .threshold-img {
+    object-position: center bottom;
+    transform: scale(1.08);
+    transform-origin: center bottom;
+  }
+
   [data-hero-active="true"] .hub-search-tool,
   [data-hero-active="true"] .hub-contact-tool {
     visibility: hidden;

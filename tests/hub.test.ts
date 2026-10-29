@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { imageSource } from "../src/lib/image-source";
 import { createHubValue, resolveHeroImage } from "../src/data/hub-value";
 import { actionsFor, instagramUrl } from "../src/lib/destination-actions";
 import { safeExternalUrl } from "../src/lib/external-url";
@@ -266,6 +267,18 @@ describe("CMS image URLs", () => {
       }),
     ).toBe(resolveHeroImage());
     expect(resolveHeroImage()).toBeTruthy();
+  });
+  test("the retired portrait upgrades without changing desktop or a new CMS selection", () => {
+    const previous = "src/assets/hero-lobby-portrait-no-chandelier-e29f7810e97a.webp";
+    const landscape = "https://example.com/desktop.webp";
+    const settings = { hero_image: previous, hero_image_landscape: landscape };
+    expect(resolveHeroImage({ settings })).toBe(
+      imageSource("/hero-lobby-portrait-fountain-20261029.webp"),
+    );
+    expect(resolveHeroImage({ settings }, "landscape")).toBe(landscape);
+    expect(resolveHeroImage({ settings: { hero_image: "https://example.com/future.webp" } })).toBe(
+      "https://example.com/future.webp",
+    );
   });
   test("legacy keys continue to work before storage migration", () => {
     expect(toDestination({ ...row, image_key: "d-citron" }).image).toBeTruthy();
