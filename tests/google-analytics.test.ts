@@ -23,33 +23,17 @@ function browser(hostname = "icdn.artdigitaljourney.com", pathname = "/", comple
   return { window, scripts, events, tasks, run };
 }
 
-test("the supplied Google tag is queued once and downloaded only after load and idle", () => {
+test("the supplied commands are queued once without downloading third-party code", () => {
   const b = browser();
   b.run();
   b.run();
   expect(b.scripts).toHaveLength(0);
   expect(b.tasks).toHaveLength(0);
+  expect(b.events.size).toBe(0);
   expect(b.window.dataLayer.map((args) => Array.from(args))).toEqual([
     ["js", expect.any(Date)],
     ["config", GOOGLE_ANALYTICS_ID],
   ]);
-  b.events.get("load")!();
-  expect(b.scripts).toHaveLength(0);
-  b.tasks[0]!();
-  expect(b.scripts).toEqual([
-    { async: true, src: `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}` },
-  ]);
-});
-
-test("already loaded pages and browsers without idle callbacks still load asynchronously", () => {
-  const b = browser(undefined, undefined, true);
-  Reflect.deleteProperty(b.window, "requestIdleCallback");
-  b.run();
-  expect(b.scripts).toHaveLength(0);
-  expect(b.events.size).toBe(0);
-  expect(b.tasks).toHaveLength(1);
-  b.tasks[0]!();
-  expect(b.scripts).toHaveLength(1);
 });
 
 test.each([

@@ -1,6 +1,7 @@
 import { CardEntryProvider } from "@/components/hub/CardEntryProvider";
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { HubHero } from "@/components/hub/HubHero";
+import { GoogleAnalytics } from "@/components/hub/GoogleAnalytics";
 import { HERO_CLOUD_SOURCE, HERO_LANDSCAPE_MEDIA, HERO_PORTRAIT_MEDIA } from "@/lib/hero-media";
 import { homeHeroSizes, picturePreload, thumbnailImage } from "@/lib/responsive-image";
 import { HubSearchProvider } from "@/features/search/HubSearchProvider";
@@ -195,6 +196,7 @@ function HubRoute() {
   }, [catalogue, attempt, result.data, showHub]);
   return (
     <I18nProvider editorial={presentation?.editorial}>
+      <GoogleAnalytics ready={!!data || result.failed} waitForJourney={showHub && !!data} />
       <NavigationProgress />
       <main
         className="min-h-svh bg-background text-foreground"
