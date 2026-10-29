@@ -1,4 +1,5 @@
 import { imageDeliveryUrl } from "../src/lib/image-delivery";
+import { HERO_CLOUD_SOURCE } from "../src/lib/hero-media";
 import managedImages from "../src/data/image-variants.json" with { type: "json" };
 import { expect, test, type Locator, type Page } from "./fixtures";
 
@@ -135,7 +136,9 @@ test("the hero selects the matching photo and preload in portrait and landscape"
           .filter((link) => matchMedia(link.getAttribute("media") || "all").matches)
           .map((link) => link.getAttribute("href")),
       );
-    expect(activePreloads).toEqual([source]);
+    expect(activePreloads).toEqual(
+      width < 768 || height >= width ? [source, HERO_CLOUD_SOURCE] : [source],
+    );
   }
 });
 

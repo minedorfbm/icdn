@@ -1,7 +1,7 @@
 import { CardEntryProvider } from "@/components/hub/CardEntryProvider";
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { HubHero } from "@/components/hub/HubHero";
-import { HERO_LANDSCAPE_MEDIA, HERO_PORTRAIT_MEDIA } from "@/lib/hero-media";
+import { HERO_CLOUD_SOURCE, HERO_LANDSCAPE_MEDIA, HERO_PORTRAIT_MEDIA } from "@/lib/hero-media";
 import { homeHeroSizes, picturePreload, thumbnailImage } from "@/lib/responsive-image";
 import { HubSearchProvider } from "@/features/search/HubSearchProvider";
 import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
@@ -69,6 +69,14 @@ export const Route = createFileRoute("/_hub")({
               homeHeroSizes(resolveHeroImage(loaderData, "landscape")),
             ),
             media: HERO_LANDSCAPE_MEDIA,
+            fetchPriority: "high",
+          },
+          {
+            rel: "preload",
+            as: "image",
+            href: HERO_CLOUD_SOURCE,
+            type: "image/webp",
+            media: HERO_PORTRAIT_MEDIA,
             fetchPriority: "high",
           },
           {

@@ -1,4 +1,5 @@
 import { expect, test } from "./fixtures";
+import { HERO_CLOUD_SOURCE, HERO_PORTRAIT_MEDIA } from "../src/lib/hero-media";
 
 for (const viewport of [
   { width: 390, height: 680 },
@@ -68,3 +69,48 @@ for (const viewport of [
     await expect(language).toBeVisible();
   });
 }
+
+test("portrait atmosphere starts before the render-blocking stylesheet", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const cloudRequests: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === HERO_CLOUD_SOURCE) cloudRequests.push(request.url());
+  });
+  let releaseStyles!: () => void;
+  const stylesReady = new Promise<void>((resolve) => {
+    releaseStyles = resolve;
+  });
+  await page.route("**/assets/styles-*.css", async (route) => {
+    await stylesReady;
+    await route.continue();
+  });
+  const navigation = page.goto("/", { waitUntil: "domcontentloaded" });
+  try {
+    await expect.poll(() => cloudRequests.length).toBe(1);
+  } finally {
+    releaseStyles();
+  }
+  await navigation;
+  await expect(page.locator(`link[rel="preload"][href="${HERO_CLOUD_SOURCE}"]`)).toHaveAttribute(
+    "media",
+    HERO_PORTRAIT_MEDIA,
+  );
+  await expect(page.locator(".hero-brand")).toBeVisible();
+  expect(cloudRequests).toHaveLength(1);
+});
+
+test("desktop and direct cards do not download the portrait atmosphere", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const cloudRequests: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === HERO_CLOUD_SOURCE) cloudRequests.push(request.url());
+  });
+  await page.goto("/");
+  await expect(page.locator(".hero-desktop-brand")).toBeVisible();
+  expect(cloudRequests).toHaveLength(0);
+  await page.goto("/citron");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator(".editorial-hero")).toBeVisible();
+  expect(cloudRequests).toHaveLength(0);
+  expect(await page.locator(`link[rel="preload"][href="${HERO_CLOUD_SOURCE}"]`).count()).toBe(0);
+});
