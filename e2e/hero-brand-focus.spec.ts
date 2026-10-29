@@ -44,7 +44,7 @@ for (const viewport of [
       };
     });
     expect(layout.brand.width).toBeGreaterThan(Math.min(viewport.width * 0.55, 450));
-    expect(layout.brand.width).toBeLessThanOrEqual(viewport.width * 0.65);
+    expect(layout.brand.width).toBeLessThanOrEqual(viewport.width * 0.74);
     expect(layout.brand.top).toBeGreaterThanOrEqual(0);
     expect(layout.brand.bottom).toBeLessThan(layout.invitation.top);
     expect(layout.invitation.left).toBeGreaterThanOrEqual(layout.sky.left - 1);

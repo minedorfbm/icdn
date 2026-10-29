@@ -258,11 +258,31 @@
 .hero-brand {
   position: absolute;
   z-index: 1;
-  top: max(calc(min(64cqw, 460px) * 0.1561 + 12px), calc(50% - var(--hero-photo-height) * 0.38));
+  top: calc(
+    max(calc(min(72cqw, 500px) * 0.1561 + 12px), calc(50% - var(--hero-photo-height) * 0.38)) + 14px
+  );
   left: 50%;
-  width: min(64%, 460px);
+  width: min(72%, 500px);
   transform: translate(-50%, -50%);
   isolation: isolate;
+}
+
+.hero-brand::before {
+  /* Retain the original feathered halo above the cloud for clear black lettering. */
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 50%;
+  width: 174%;
+  height: calc(var(--hero-photo-height) * 0.18);
+  transform: translateX(-50%);
+  background: rgb(255 247 231 / 88%);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 45%, transparent 100%);
+  mask-image: radial-gradient(ellipse closest-side, #000 45%, transparent 100%);
+  pointer-events: none;
 }
 
 .hero-desktop-brand {
@@ -273,22 +293,31 @@
   width: 100%;
 }
 
+.hero-photograph::before,
 .hero-photograph::after {
-  /* A feathered aura around the portrait logo's lettering on the louvers.
-     Follow the photo crop, with transparent edges rather than a full-width band. */
   content: "";
   position: absolute;
-  top: calc(50% - var(--hero-photo-height) * 0.43);
+  top: calc(50% - var(--hero-photo-height) * 0.515);
   left: 50%;
-  width: min(calc(min(64cqw, 460px) * 1.74), var(--hero-photo-width));
-  height: calc(var(--hero-photo-height) * 0.18);
+  width: var(--hero-photo-width);
+  height: calc(var(--hero-photo-height) * 0.278);
   transform: translateX(-50%);
-  background: rgb(255 247 231 / 88%);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 45%, transparent 100%);
-  mask-image: radial-gradient(ellipse closest-side, #000 45%, transparent 100%);
   pointer-events: none;
+}
+
+.hero-photograph::before {
+  /* The cloud's alpha softly diffuses the portrait louvers behind the sharp logo. */
+  background: rgb(255 248 232 / 12%);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  -webkit-mask: url("/hero-cloud-ivory.webp") center / 100% 100% no-repeat;
+  mask: url("/hero-cloud-ivory.webp") center / 100% 100% no-repeat;
+}
+
+.hero-photograph::after {
+  /* Static backlit ivory cloud, restricted to the ceiling and portrait louvers. */
+  background: url("/hero-cloud-ivory.webp") center / 100% 100% no-repeat;
+  opacity: 0.82;
 }
 
 .hero-sky {
@@ -404,6 +433,7 @@
   .hero-brand {
     display: none;
   }
+  .hero-photograph::before,
   .hero-photograph::after {
     display: none;
   }
