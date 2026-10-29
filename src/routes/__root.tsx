@@ -7,6 +7,7 @@ import { NotFoundPage } from "../components/NotFoundPage";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { imageSource } from "../lib/image-source";
+import { googleAnalyticsBootstrap } from "../lib/google-analytics";
 
 function ErrorComponent({ error }: Readonly<{ error: unknown }>) {
   const router = useRouter();
@@ -64,6 +65,7 @@ function ErrorComponent({ error }: Readonly<{ error: unknown }>) {
 
 export const Route = createRootRoute({
   head: () => ({
+    scripts: [{ children: googleAnalyticsBootstrap() }],
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
