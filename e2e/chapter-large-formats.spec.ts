@@ -22,6 +22,11 @@ test("large formats keep the editorial heading, portrait cards and controls with
     );
     const chapter = page.locator("#heaven");
     await chapter.evaluate((el) => el.scrollIntoView({ behavior: "instant" }));
+    // The deck can mount after the resize frames when the catalogue/chunk is late.
+    // Measure its settled layout, not the +10px group-enter animation offset.
+    await chapter.locator(".chapter-stack").evaluate(async (deck) => {
+      await Promise.allSettled(deck.getAnimations().map((animation) => animation.finished));
+    });
     const geometry = await chapter.evaluate((el) => {
       const box = (selector: string) => el.querySelector(selector)!.getBoundingClientRect();
       const size = (selector: string) =>
