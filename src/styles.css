@@ -258,9 +258,11 @@
 .hero-brand {
   position: absolute;
   z-index: 1;
-  top: max(calc(min(64cqw, 460px) * 0.1561 + 12px), calc(50% - var(--hero-photo-height) * 0.38));
+  top: calc(
+    max(calc(min(72cqw, 500px) * 0.1561 + 12px), calc(50% - var(--hero-photo-height) * 0.38)) + 14px
+  );
   left: 50%;
-  width: min(64%, 460px);
+  width: min(72%, 500px);
   transform: translate(-50%, -50%);
   isolation: isolate;
 }
