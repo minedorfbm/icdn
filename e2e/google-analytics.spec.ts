@@ -1,6 +1,10 @@
 import { expect, test, type Page } from "./fixtures";
 import { GOOGLE_ANALYTICS_ID } from "../src/lib/google-analytics";
 
+// This spec serves the local instrumented build under a virtual production host.
+// Include its real counters in coverage without collecting external provider code.
+test.use({ coverageOrigins: ["http://127.0.0.1:4173", "https://icdn.artdigitaljourney.com"] });
+
 async function productionPage(page: Page, catalogue?: () => Promise<void>) {
   await page.route("https://icdn.artdigitaljourney.com/**", async (route) => {
     const url = new URL(route.request().url());

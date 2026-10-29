@@ -11,8 +11,9 @@ declare global {
   }
 }
 
-export const test = base.extend({
-  context: async ({ context }, runWithContext) => {
+export const test = base.extend<{ coverageOrigins: string[] }>({
+  coverageOrigins: [["http://127.0.0.1:4173"], { option: true }],
+  context: async ({ context, coverageOrigins }, runWithContext) => {
     // Keep browser regressions deterministic. Playback-specific page routes override this.
     await context.route("https://www.youtube-nocookie.com/embed/**", (route) =>
       route.fulfill({ contentType: "text/html", body: "<button>YouTube Play</button>" }),
@@ -37,8 +38,9 @@ export const test = base.extend({
     // Replace each document's last snapshot instead of double-counting pagehide/teardown.
     // The binding is Playwright-only: no collection endpoint exists in the application.
     const snapshots = new Map<string, CoverageMapData>();
+    const allowedOrigins = new Set(coverageOrigins);
     await context.exposeBinding("__saveHubCoverage", ({ frame }, id, coverage) => {
-      if (new URL(frame.url()).origin === "http://127.0.0.1:4173") snapshots.set(id, coverage);
+      if (allowedOrigins.has(new URL(frame.url()).origin)) snapshots.set(id, coverage);
     });
     await context.addInitScript(() => {
       window.__hubCoverageDocument = crypto.randomUUID();
