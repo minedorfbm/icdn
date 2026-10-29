@@ -1,11 +1,12 @@
 import { cspNonce } from "./csp-nonce";
 
-// Only framework/recovery scripts bearing this response's nonce may run inline.
+// Only first-party/framework scripts bearing this response's nonce may run inline.
 // Approved external providers remain allowed; inline handlers and eval stay blocked.
 const FRAME_POLICY =
   "frame-src https://www.youtube-nocookie.com https://www.youtube.com https://www.instagram.com https://danang.intercontinental.com https://www.danang.intercontinental.com https://tablecheck.com https://www.tablecheck.com";
 const WORKER_POLICY = "worker-src 'self' blob:";
-const CONNECT_POLICY = "connect-src 'self' https://www.instagram.com";
+const CONNECT_POLICY =
+  "connect-src 'self' https://www.instagram.com https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com";
 const RESOURCE_POLICY = [
   "default-src 'self'",
   "script-src-attr 'none'",
@@ -35,7 +36,7 @@ export function withSecurityHeaders(
   const headers = new Headers(response.headers);
   const scriptNonce = cspNonce(nonce);
   const authorization = scriptNonce ? ` 'nonce-${scriptNonce}'` : "";
-  const scripts = `script-src 'self'${authorization} https://www.instagram.com https://www.youtube.com`;
+  const scripts = `script-src 'self'${authorization} https://www.instagram.com https://www.youtube.com https://www.googletagmanager.com`;
   const resources = `${RESOURCE_POLICY}; ${scripts}`;
   // Supersede the observation header if an upstream response still carries it.
   headers.delete("content-security-policy-report-only");
