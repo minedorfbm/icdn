@@ -56,7 +56,7 @@ export const Route = createFileRoute("/_hub")({
             as: "image",
             ...picturePreload(
               resolveHeroImage(loaderData),
-              homeHeroSizes(resolveHeroImage(loaderData), 1.08),
+              homeHeroSizes(resolveHeroImage(loaderData)),
             ),
             media: HERO_PORTRAIT_MEDIA,
             fetchPriority: "high",

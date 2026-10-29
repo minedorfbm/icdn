@@ -547,21 +547,6 @@
       ["adj-2ac78d04d137c1c34ffdde16-native.webp", 480]
     ]
   },
-  "adj-2cdc3710c5ebdb92bb633224-native.webp": {
-    "width": 941,
-    "height": 1672,
-    "aliases": ["/hero-lobby-portrait-fountain-20261029.webp"],
-    "variants": [
-      ["adj-05b77658dc50c75f4139e27f-320.webp", 320],
-      ["adj-36fa65dad846c498110ff027-640.webp", 640],
-      ["adj-2cdc3710c5ebdb92bb633224-native.webp", 941]
-    ],
-    "avif": [
-      ["adj-01ddc108f3cf4c867af8330c-320.avif", 320],
-      ["adj-fb310c240c0994626fe1e606-640.avif", 640],
-      ["adj-f257d3404a055b67f026167a-941.avif", 941]
-    ]
-  },
   "adj-2cfb3c24c4405d1ad30816a7-native.webp": {
     "width": 480,
     "height": 360,

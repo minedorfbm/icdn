@@ -1675,47 +1675,6 @@
       }
     ]
   },
-  "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-2cdc3710c5ebdb92bb633224-native.webp": {
-    "aliases": ["/hero-lobby-portrait-fountain-20261029.webp"],
-    "original": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-2cdc3710c5ebdb92bb633224-native.webp",
-    "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-2cdc3710c5ebdb92bb633224-native.webp",
-    "width": 941,
-    "height": 1672,
-    "variants": [
-      {
-        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-05b77658dc50c75f4139e27f-320.webp",
-        "width": 320,
-        "bytes": 31084
-      },
-      {
-        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-36fa65dad846c498110ff027-640.webp",
-        "width": 640,
-        "bytes": 84248
-      },
-      {
-        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-2cdc3710c5ebdb92bb633224-native.webp",
-        "width": 941,
-        "bytes": 136974
-      }
-    ],
-    "avif": {
-      "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-f257d3404a055b67f026167a-941.avif",
-      "width": 941,
-      "bytes": 91380
-    },
-    "avifVariants": [
-      {
-        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-01ddc108f3cf4c867af8330c-320.avif",
-        "width": 320,
-        "bytes": 19616
-      },
-      {
-        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-fb310c240c0994626fe1e606-640.avif",
-        "width": 640,
-        "bytes": 55556
-      }
-    ]
-  },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-2cfb3c24c4405d1ad30816a7-native.webp": {
     "aliases": ["https://i.ytimg.com/vi/qY8aV6q1sjk/hqdefault.jpg"],
     "original": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-b6aa7de40f51556fc4359043-original.jpg",

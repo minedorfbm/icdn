@@ -21,9 +21,9 @@ export function HubHero({
   const { t } = useI18n();
   const [filmOpen, setFilmOpen] = useState(false);
   const closeFilm = useCallback(() => setFilmOpen(false), []);
-  const portrait = responsiveImage(image, homeHeroSizes(image, 1.08));
+  const portrait = responsiveImage(image, homeHeroSizes(image));
   const landscape = responsiveImage(landscapeImage, homeHeroSizes(landscapeImage));
-  const portraitAvif = responsiveAvif(image, homeHeroSizes(image, 1.08));
+  const portraitAvif = responsiveAvif(image, homeHeroSizes(image));
   const landscapeAvif = responsiveAvif(landscapeImage, homeHeroSizes(landscapeImage));
   return (
     <section className="brand-ui hub-hero">
@@ -48,8 +48,8 @@ export function HubHero({
           <img
             {...portrait}
             alt={t("hero_image_alt")}
-            width={941}
-            height={1672}
+            width={695}
+            height={1137}
             fetchPriority="high"
             decoding="async"
             className="threshold-img"

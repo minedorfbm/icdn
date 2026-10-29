@@ -81,12 +81,11 @@ export function thumbnailImage(source: string, sizes: string) {
     : { src: imageSource(source) };
 }
 
-/** Keep the preload and picture aligned with the hero frame and its optional crop scale. */
-export function homeHeroSizes(source: string, scale = 1) {
+/** Keep aligned with .hub-hero (100svh, minimum 540px), with no crop changes. */
+export function homeHeroSizes(source: string) {
   const image = imageVariants(source);
   const aspect = image ? Number((image.width / image.height).toFixed(4)) : 1;
-  const cover = `max(100vw, calc(max(100svh, 540px) * ${aspect}))`;
-  return scale === 1 ? cover : `calc(${cover} * ${scale})`;
+  return `max(100vw, calc(max(100svh, 540px) * ${aspect}))`;
 }
 
 export function framedImageSizes(
