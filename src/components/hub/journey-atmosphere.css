@@ -7,7 +7,8 @@
 .journey-worlds > .level-chapter {
   transition: none;
 }
-.journey-atmosphere {
+.journey-atmosphere,
+.journey-atmosphere-foreground {
   position: sticky;
   top: 0;
   height: 100lvh;
@@ -15,6 +16,9 @@
   overflow: clip;
   pointer-events: none;
   z-index: 0;
+}
+.journey-atmosphere-foreground {
+  z-index: 2;
 }
 .journey-worlds[data-atmosphere="true"][data-atmosphere-ready="true"] > .level-chapter {
   background: transparent;
@@ -194,7 +198,8 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .journey-atmosphere {
+  .journey-atmosphere,
+  .journey-atmosphere-foreground {
     display: none;
   }
 }

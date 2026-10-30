@@ -37,6 +37,18 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     await page.goto("/");
     await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
     await expect(page.locator(".chapter-gradient")).toHaveCount(0);
+    const layers = await page.locator(".journey-worlds").evaluate((el) => {
+      const foreground = el.querySelector<HTMLElement>(".journey-atmosphere-foreground")!;
+      return {
+        background: Number(getComputedStyle(el.querySelector(".journey-atmosphere")!).zIndex),
+        content: Number(getComputedStyle(el.querySelector(".level-chapter")!).zIndex),
+        foreground: Number(getComputedStyle(foreground).zIndex),
+        pointerEvents: getComputedStyle(foreground).pointerEvents,
+      };
+    });
+    expect(layers.foreground).toBeGreaterThan(layers.content);
+    expect(layers.background).toBeLessThan(layers.content);
+    expect(layers.pointerEvents).toBe("none");
     expect(requests).toEqual([]);
     const before = await stations(page),
       viewport = await page.evaluate(() => innerHeight);
@@ -46,6 +58,8 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       await position(page, y);
       const group = page.locator(`[data-atmosphere-effect="${station.id}"]`);
       await expect(group).toHaveCSS("visibility", "visible");
+      if (station.id === "sea")
+        await expect(group.locator("img").first()).toHaveAttribute("src", /corner-waves.*\.svg/);
       const world = page.locator(`[data-atmosphere-level="${station.id}"]`);
       const blend = await world.evaluate((el) => Number(getComputedStyle(el).opacity));
       expect(blend).toBeGreaterThan(0);
@@ -89,7 +103,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     ).toBe(true);
     expect(errors).toEqual([]);
     // A fully completed effect has no continuing JS style writes.
-    const mutations = await page.locator(".journey-atmosphere").evaluate(
+    const mutations = await page.locator(".journey-worlds").evaluate(
       (el) =>
         new Promise<number>((resolve) => {
           let count = 0;
@@ -223,6 +237,7 @@ test("reduced motion preserves static palette/photos and never requests effect a
   await page.goto("/");
   await expect(page.locator("#heaven")).toHaveCount(1);
   await expect(page.locator(".journey-atmosphere")).toHaveCSS("display", "none");
+  await expect(page.locator(".journey-atmosphere-foreground")).toHaveCSS("display", "none");
   await expect(page.locator("[data-atmosphere-level]")).toHaveCount(0);
   for (const station of await stations(page)) {
     await position(page, station.top);

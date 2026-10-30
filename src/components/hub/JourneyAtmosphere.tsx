@@ -26,83 +26,87 @@ const plants = [
   { source: leafSmall, width: 72, height: 28 },
 ];
 
-/** A paint-only viewport, bounded by the real journey. No extra space or public controls. */
+/** Two zero-flow planes: existing photos below the content, transparent artwork above it. */
 export function JourneyAtmosphere({
   onBackdropRoot,
 }: Readonly<{
   onBackdropRoot: (element: HTMLDivElement | null) => void;
 }>) {
   return (
-    <div className="journey-atmosphere" aria-hidden="true">
-      <div className="journey-atmosphere-photos" ref={onBackdropRoot} />
-      <div className="journey-atmosphere-decor">
-        <div data-atmosphere-effect="heaven" className="atmosphere-effect">
-          <div className="atmosphere-halo" />
-          <div className="atmosphere-rays" />
-          {[0, 1].map((part) => (
-            <img
-              key={part}
-              className="atmosphere-cloud"
-              data-part={part}
-              data-src="/hero-cloud-ivory-a26e472d.webp"
-              width={960}
-              height={321}
-              alt=""
-              decoding="async"
-              fetchPriority="low"
-              draggable={false}
-            />
-          ))}
-        </div>
-        <div data-atmosphere-effect="sky" className="atmosphere-effect">
-          {birds.map(({ source, width, height }, part) => (
-            <img
-              key={source}
-              className="atmosphere-bird"
-              data-part={part}
-              data-src={source}
-              width={width}
-              height={height}
-              alt=""
-              decoding="async"
-              fetchPriority="low"
-              draggable={false}
-            />
-          ))}
-        </div>
-        <div data-atmosphere-effect="earth" className="atmosphere-effect">
-          {plants.map(({ source, width, height }, part) => (
-            <img
-              key={source}
-              className="atmosphere-plant"
-              data-part={part}
-              data-src={source}
-              width={width}
-              height={height}
-              alt=""
-              decoding="async"
-              fetchPriority="low"
-              draggable={false}
-            />
-          ))}
-        </div>
-        <div data-atmosphere-effect="sea" className="atmosphere-effect">
-          {[0, 1].map((part) => (
-            <img
-              key={part}
-              className="atmosphere-wave"
-              data-part={part}
-              data-src={waves}
-              width={1200}
-              height={360}
-              alt=""
-              decoding="async"
-              fetchPriority="low"
-              draggable={false}
-            />
-          ))}
+    <>
+      <div className="journey-atmosphere" aria-hidden="true">
+        <div className="journey-atmosphere-photos" ref={onBackdropRoot} />
+      </div>
+      <div className="journey-atmosphere-foreground" aria-hidden="true">
+        <div className="journey-atmosphere-decor">
+          <div data-atmosphere-effect="heaven" className="atmosphere-effect">
+            <div className="atmosphere-halo" />
+            <div className="atmosphere-rays" />
+            {[0, 1].map((part) => (
+              <img
+                key={part}
+                className="atmosphere-cloud"
+                data-part={part}
+                data-src="/hero-cloud-ivory-a26e472d.webp"
+                width={960}
+                height={321}
+                alt=""
+                decoding="async"
+                fetchPriority="low"
+                draggable={false}
+              />
+            ))}
+          </div>
+          <div data-atmosphere-effect="sky" className="atmosphere-effect">
+            {birds.map(({ source, width, height }, part) => (
+              <img
+                key={source}
+                className="atmosphere-bird"
+                data-part={part}
+                data-src={source}
+                width={width}
+                height={height}
+                alt=""
+                decoding="async"
+                fetchPriority="low"
+                draggable={false}
+              />
+            ))}
+          </div>
+          <div data-atmosphere-effect="earth" className="atmosphere-effect">
+            {plants.map(({ source, width, height }, part) => (
+              <img
+                key={source}
+                className="atmosphere-plant"
+                data-part={part}
+                data-src={source}
+                width={width}
+                height={height}
+                alt=""
+                decoding="async"
+                fetchPriority="low"
+                draggable={false}
+              />
+            ))}
+          </div>
+          <div data-atmosphere-effect="sea" className="atmosphere-effect">
+            {[0, 1].map((part) => (
+              <img
+                key={part}
+                className="atmosphere-wave"
+                data-part={part}
+                data-src={waves}
+                width={1200}
+                height={360}
+                alt=""
+                decoding="async"
+                fetchPriority="low"
+                draggable={false}
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
