@@ -1,8 +1,26 @@
-import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { DestinationPanel } from "./DestinationPanel";
 import { useDestinationNavigation } from "@/lib/use-destination-navigation";
 import type { Destination } from "@/data/resort";
-import { cardPosition, swipeStep } from "@/lib/card-swipe";
+import { swipeStep } from "@/lib/card-swipe";
+import {
+  stackFrame,
+  stackPhoto,
+  STACK_ORIGIN,
+  STACK_SETTLE,
+  STACK_VISIBLE,
+  type StackBox,
+  type StackOrigin,
+} from "@/lib/card-stack-motion";
+import "./card-stack-motion.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useI18n } from "@/i18n";
 import { coverImageSizes } from "@/lib/responsive-image";
@@ -11,43 +29,6 @@ import { useCardImageSize } from "@/lib/use-card-image-size";
 import { useLocation } from "@tanstack/react-router";
 
 /** A front-facing hero and two receding previews, all sharing one responsive stage. */
-// Slot geometry: [horizontal offset, scale, brightness, stacking order, rotation Y].
-type Slot = [number, number, number, number, number];
-const SLOTS: Slot[] = [
-  [4, 1, 1, 40, 0],
-  [22, 0.88, 0.65, 30, -16],
-  [38, 0.76, 0.43, 20, -24],
-];
-const EXIT: Slot = [-88, 0.94, 0.8, 50, 12];
-const VISIBLE = SLOTS.length;
-
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
-}
-
-/** Interpolated transform for a continuous position `pos` (0 = active). */
-function slotAt(pos: number): Slot {
-  if (pos <= -1) return EXIT;
-  if (pos < 0) {
-    const t = pos + 1; // -1..0
-    const a = SLOTS[0]!;
-    return [
-      lerp(EXIT[0], a[0], t),
-      lerp(EXIT[1], a[1], t),
-      lerp(EXIT[2], a[2], t),
-      EXIT[3],
-      lerp(EXIT[4], a[4], t),
-    ];
-  }
-  if (pos >= VISIBLE - 1) return SLOTS[VISIBLE - 1]!;
-  const i = Math.floor(pos);
-  const t = pos - i;
-  const a = SLOTS[i]!;
-  const b = SLOTS[i + 1]!;
-  return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t), a[3], lerp(a[4], b[4], t)];
-}
-
-const SETTLE = "360ms cubic-bezier(0.22,1,0.36,1)";
 
 export function CardStack({
   items,
@@ -64,6 +45,10 @@ export function CardStack({
 }>) {
   const [drag, setDrag] = useState(0); // px, negative = pulling next card in
   const [dragging, setDragging] = useState(false);
+  const [reduced, setReduced] = useState(false);
+  const metrics = useRef<StackBox>({ width: 0, height: 0, top: 0, stageHeight: 0 });
+  const origin = useRef<StackOrigin>({ ...STACK_ORIGIN });
+  const settling = useRef<{ index: number; position: number; x: number } | null>(null);
   const { stage, box } = useCardImageSize(items.length, layout);
   const { canLoad, onSettled } = useCardImageReadiness(items, index, near, Boolean(box));
   const { openDestination } = useDestinationNavigation();
@@ -88,9 +73,41 @@ export function CardStack({
   } | null>(null);
 
   useEffect(() => {
+    const preference = matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReduced(preference.matches);
+    update();
+    preference.addEventListener("change", update);
+    return () => preference.removeEventListener("change", update);
+  }, []);
+
+  useLayoutEffect(() => {
+    const element = stage.current;
+    const card = element?.querySelector<HTMLElement>(".perspective-card");
+    if (box && element && card)
+      metrics.current = { ...box, top: card.offsetTop, stageHeight: element.clientHeight };
+  }, [box, stage]);
+
+  useLayoutEffect(() => {
+    for (const element of stage.current?.querySelectorAll<HTMLElement>(".perspective-card") ?? []) {
+      const photo = element.querySelector<HTMLImageElement>(".destination-panel > picture > img");
+      if (!photo) continue;
+      const offset = Number(element.dataset["cardOffset"]);
+      const position =
+        offset + (dragging && !reduced ? origin.current.position + drag / travel.current : 0);
+      const photoMotion = stackPhoto(offset, position, metrics.current.width, reduced);
+      const translate = `${photoMotion.photoX}px 0`,
+        scale = String(photoMotion.photoScale);
+      if (photo.style.translate !== translate) photo.style.translate = translate;
+      if (photo.style.scale !== scale) photo.style.scale = scale;
+    }
+  }, [drag, dragging, index, items, box, reduced, stage]);
+
+  useEffect(() => {
     cancelFrame();
     start.current = null;
     pendingDrag.current = 0;
+    origin.current = { ...STACK_ORIGIN };
+    settling.current = null;
     setDragging(false);
     setDrag(0);
     return cancelFrame;
@@ -126,6 +143,33 @@ export function CardStack({
   const last = items.length - 1;
   const clamp = (i: number) => Math.min(last, Math.max(0, i));
 
+  const captureOrigin = () => {
+    const active = stage.current?.querySelector<HTMLElement>(
+      '.destination-panel[aria-hidden="false"]',
+    )?.parentElement;
+    if (!active || reduced) {
+      origin.current = { ...STACK_ORIGIN };
+      return;
+    }
+    const matrix = new DOMMatrix(getComputedStyle(active).transform);
+    const width = metrics.current.width;
+    const x = matrix.m41 - (width * 4) / 75;
+    const lastSettle = settling.current;
+    const span = width * (x < 0 ? 92 / 75 : 18 / 75);
+    const position =
+      lastSettle?.index === index && Math.abs(lastSettle.x) > 0.01
+        ? lastSettle.position * Math.min(1, Math.max(0, x / lastSettle.x))
+        : x / Math.max(1, span);
+    origin.current = {
+      position: Math.min(1, Math.max(-1, position)),
+      x,
+      y: matrix.m42,
+      tilt: (Math.atan2(matrix.m12, matrix.m22) * 180) / Math.PI,
+      scale: Math.hypot(matrix.m12, matrix.m22),
+      rotation: (Math.atan2(-matrix.m13, matrix.m11) * 180) / Math.PI,
+    };
+  };
+
   const onDown = (e: React.PointerEvent) => {
     if (!e.isPrimary || e.button !== 0 || start.current) return;
     travel.current = Math.max(1, e.currentTarget.getBoundingClientRect().width * 0.75);
@@ -151,6 +195,7 @@ export function CardStack({
       // only card navigation when horizontal clearly exceeds vertical
       s.locked = Math.abs(dx) > Math.abs(dy) * 1.2;
       if (s.locked) {
+        captureOrigin();
         setDragging(true);
         (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
       }
@@ -180,9 +225,30 @@ export function CardStack({
     cancelFrame();
     start.current = null;
     setDragging(false);
-    if (s.locked && !cancelled) {
-      const step = swipeStep(pendingDrag.current, travel.current, s.v, e.timeStamp - s.lastT);
-      onIndexChange((i) => clamp(i + step));
+    if (s.locked) {
+      const step = cancelled
+        ? 0
+        : swipeStep(pendingDrag.current, travel.current, s.v, e.timeStamp - s.lastT);
+      const target = clamp(index + step),
+        offset = target - index;
+      const from = stackFrame(
+        offset,
+        pendingDrag.current,
+        travel.current,
+        true,
+        metrics.current,
+        origin.current,
+        reduced,
+      );
+      const active = stage.current?.querySelector<HTMLElement>(
+        `.perspective-card[data-card-offset="${offset}"]`,
+      );
+      const fromX = active
+        ? new DOMMatrix(getComputedStyle(active).transform).m41 - (metrics.current.width * 4) / 75
+        : 0;
+      settling.current = { index: target, position: from.position, x: fromX };
+      origin.current = { ...STACK_ORIGIN };
+      if (!cancelled) onIndexChange((i) => clamp(i + step));
     }
     if (cancelled) moved.current = true;
     pendingDrag.current = 0;
@@ -197,6 +263,7 @@ export function CardStack({
       {/* single shared stage */}
       <div
         ref={stage}
+        data-card-dragging={dragging ? "true" : undefined}
         className="card-stack-stage relative grid w-full touch-pan-y overflow-hidden py-6"
         onPointerDown={onDown}
         onPointerMove={onMove}
@@ -210,24 +277,34 @@ export function CardStack({
       >
         {items.map((dest, i) => {
           const offset = i - index;
-          if (offset < -1 || offset > VISIBLE) return null;
+          if (offset < -1 || offset > STACK_VISIBLE) return null;
 
-          // continuous position influenced by the in-flight drag
-          const pos = cardPosition(offset, drag, travel.current);
-          const [x, scale, bright, z, rotation] = slotAt(pos);
+          const pose = stackFrame(
+            offset,
+            drag,
+            travel.current,
+            dragging,
+            metrics.current,
+            origin.current,
+            reduced,
+          );
           const active = offset === 0;
 
           return (
             <div
               key={dest.id}
               data-destination-id={dest.id}
+              data-card-offset={offset}
               className={`perspective-card relative col-start-1 row-start-1 h-[90svh] w-[75%] origin-left ${near ? "will-change-transform" : ""}`}
               style={{
                 height: layout === "discovery" ? "var(--discovery-card-height)" : undefined,
-                transform: `translate3d(${(x / 75) * 100}%,0,0) perspective(1200px) rotateY(${rotation}deg) scale(${scale})`,
-                zIndex: z,
-                opacity: Math.max(0, Math.min(1, VISIBLE - pos)),
-                transition: dragging ? "none" : `transform ${SETTLE}, opacity ${SETTLE}`,
+                transform: pose.transform,
+                zIndex: pose.zIndex,
+                opacity: pose.opacity,
+                pointerEvents: pose.opacity === 0 ? "none" : undefined,
+                transition: dragging
+                  ? "none"
+                  : `transform ${STACK_SETTLE}, opacity ${STACK_SETTLE}`,
                 cursor: "pointer",
               }}
               onClickCapture={(e) => {
@@ -251,7 +328,10 @@ export function CardStack({
               <div
                 aria-hidden
                 className="pointer-events-none absolute inset-0 rounded-[18px] bg-black"
-                style={{ opacity: 1 - bright, transition: dragging ? "none" : `opacity ${SETTLE}` }}
+                style={{
+                  opacity: 1 - pose.brightness,
+                  transition: dragging ? "none" : `opacity ${STACK_SETTLE}`,
+                }}
               />
             </div>
           );
@@ -271,8 +351,12 @@ export function CardStack({
           </span>
           <div className="h-px flex-1 bg-current/25" aria-hidden>
             <div
-              className="h-px bg-current transition-[width] duration-300"
-              style={{ width: `${((index + 1) / items.length) * 100}%` }}
+              data-card-progress
+              className="h-px w-full origin-left bg-current"
+              style={{
+                transform: `scaleX(${Math.min(items.length, Math.max(1, index + 1 - (dragging && !reduced ? origin.current.position + drag / travel.current : 0))) / items.length})`,
+                transition: dragging ? "none" : `transform ${STACK_SETTLE}`,
+              }}
             />
           </div>
           <div className="chapter-deck-controls">
