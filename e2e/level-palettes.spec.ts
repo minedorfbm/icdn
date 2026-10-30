@@ -14,7 +14,10 @@ test("home chapters share the expanded-card foreground and background palettes",
     await chapter.scrollIntoViewIfNeeded();
     const colors = await chapter.evaluate((el) => {
       const css = getComputedStyle(el);
-      return { background: css.backgroundColor, foreground: css.color };
+      // During atmospheric enhancement the existing palette is painted in the shared plane.
+      const world = document.querySelector(`[data-atmosphere-level="${el.id}"]`);
+      const background = world ? getComputedStyle(world).backgroundColor : css.backgroundColor;
+      return { background, foreground: css.color };
     });
     await chapter.screenshot({ path: testInfo.outputPath(`${level}-home.png`) });
     await page.goto(`/${id}`);

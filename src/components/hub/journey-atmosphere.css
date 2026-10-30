@@ -1,6 +1,8 @@
 .journey-worlds {
   position: relative;
   isolation: isolate;
+  /* A zero-flow sticky surface must not paint beyond the final station. */
+  clip-path: inset(0);
 }
 .journey-worlds > .level-chapter {
   transition: none;

@@ -102,6 +102,18 @@ for (const width of [320, 390, 768, 1024, 1440]) {
         }),
     );
     expect(mutations).toBe(0);
+    const bounded = await page.locator(".journey-worlds").evaluate((el) => {
+      const style = getComputedStyle(el),
+        box = el.getBoundingClientRect();
+      const footer = document.querySelector(".sea-footer")!.getBoundingClientRect();
+      return {
+        clipped:
+          style.clipPath !== "none" || style.overflow === "clip" || style.contain.includes("paint"),
+        gap: Math.abs(footer.top - box.bottom),
+      };
+    });
+    expect(bounded.clipped).toBe(true);
+    expect(bounded.gap).toBeLessThan(1);
   });
 }
 
