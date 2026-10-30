@@ -23,13 +23,13 @@ Sharp utilise WebP qualité 85/effort 5 et AVIF qualité 60/effort 4. Les taille
 
 Le réglage public `site_settings.hero_image_desktop` sélectionne la photographie sur les écrans paysage d'au moins 1200 pixels. Les réglages `hero_image` (portrait/mobile) et `hero_image_landscape` (tablette paysage) restent indépendants et inchangés. En l'absence de réglage desktop, la source paysage existante reste le repli.
 
-Le lot du 30 octobre part du fichier de lobby avec lustre déjà agrandi par Real-ESRGAN à 6144 × 4096 pixels ; ce n'est pas une nouvelle prise de vue HD native. Le master `adj-0f78b754bd10acded9be37bb-original.png` reste dans Storage pour régénération et n'entre ni dans les candidats du navigateur ni dans la liste du cache `/media/`. Les versions d'affichage, encodées avec Sharp, sont limitées à 1920, 2560 et 3840 pixels : AVIF qualité 65/effort 4, WebP qualité 88/effort 5. Le maximum servi est donc 3840 × 2560, jamais le PNG de 36 Mo.
+Le lot du 30 octobre utilise exclusivement le fichier sans lustre fourni par l'utilisateur, `lobby-desktop-sans-lustre.png` (1536 × 1024 pixels). Le master `adj-9583b8a4148a668fb530b654-original.png` reste dans Storage pour régénération et n'entre ni dans les candidats du navigateur ni dans la liste du cache `/media/`. Les versions d'affichage sont agrandies avec le filtre Lanczos3 de Sharp à 1920, 2560 et 3840 pixels, puis encodées en AVIF qualité 65/effort 4 et WebP qualité 88/effort 5. Ces dérivés ne reconstituent pas des détails HD natifs absents de la source. La version avec lustre préparée initialement est exclue du manifeste final et du réglage publié.
 
 | Largeur |           AVIF |           WebP |
 | ------- | -------------: | -------------: |
-| 1920 px | 141 500 octets | 241 486 octets |
-| 2560 px | 200 776 octets | 340 458 octets |
-| 3840 px | 338 438 octets | 558 676 octets |
+| 1920 px | 129 313 octets | 219 984 octets |
+| 2560 px | 175 889 octets | 302 360 octets |
+| 3840 px | 276 367 octets | 477 500 octets |
 
 Le `picture` et les préchargements serveur partagent les mêmes tailles et des media queries distinctes pour le desktop, la tablette paysage et le portrait. Le navigateur choisit une seule variante en fonction de la fenêtre et de sa densité de pixels ; aucune image basse définition préalable n'est téléchargée pour ce hero. La photo reste visible dès son décodage natif, sans attente de JavaScript ou fondu masquant le LCP. Le zoom d'entrée de 8 % est supprimé sur desktop ; le recadrage nécessaire pour remplir le cadre reste actif. Les nuages et le logo de la PR 208 sont conservés.
 

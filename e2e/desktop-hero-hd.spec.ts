@@ -4,7 +4,7 @@ import { HERO_DESKTOP_MEDIA } from "../src/lib/hero-media";
 
 const hero =
   images[
-    "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-ac8d45688b7edb5bf37d68e3-native.webp"
+    "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-4830a6c2e6a1fae17872c55c-3840.webp"
   ];
 const names = new Set(
   [...hero.variants, ...hero.avifVariants, hero.avif].map((image) =>
@@ -41,7 +41,7 @@ for (const screen of [
         names.has(new URL(url).pathname.split("/").at(-1)),
       );
       expect(
-        requests.some((url) => url.includes("adj-0f78b754bd10acded9be37bb-original.png")),
+        requests.some((url) => url.includes("adj-9583b8a4148a668fb530b654-original.png")),
       ).toBe(false);
       if (!screen.hd) {
         expect(hdRequests).toEqual([]);
