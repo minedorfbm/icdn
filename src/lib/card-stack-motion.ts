@@ -9,7 +9,9 @@ const slots: Slot[] = [
 ];
 const exit: Slot = [-88, 0.94, 0.8, 50, 12];
 export const STACK_VISIBLE = slots.length;
-export const STACK_SETTLE = "460ms cubic-bezier(0.22,1,0.36,1)";
+export const STACK_DURATION = 650;
+export const STACK_EASING = "cubic-bezier(0.25,0.65,0.25,1)";
+export const STACK_SETTLE = `${STACK_DURATION}ms ${STACK_EASING}`;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp = (x: number, min = 0, max = 1) => Math.min(max, Math.max(min, x));
 
@@ -92,6 +94,7 @@ export function stackFrame(
   box: StackBox,
   origin = STACK_ORIGIN,
   reduced = false,
+  followPointer = true,
 ) {
   const moving = dragging && !reduced;
   const position = offset + (moving ? origin.position + cardPosition(0, distance, travel) : 0);
@@ -107,9 +110,12 @@ export function stackFrame(
     rotation = 5 * Math.sin(Math.PI * clamp(-position));
   }
   if (active) {
-    tilt = clamp(origin.tilt + (6 * distance) / travel, -6, 6);
-    rotation =
-      origin.rotation * (1 - amount) + (distance < 0 ? 5 : -5) * Math.sin(Math.PI * amount);
+    tilt = followPointer
+      ? clamp(origin.tilt + (6 * distance) / (travel * 0.45), -6, 6)
+      : Math.sign(distance) * 6 * Math.sin(Math.PI * amount);
+    rotation = followPointer
+      ? origin.rotation * (1 - amount) + (distance < 0 ? 5 : -5) * Math.sin(Math.PI * amount)
+      : restingRotation + Math.sign(distance) * 3 * Math.sin(Math.PI * amount);
     scale = lerp(origin.scale, distance < 0 ? 0.94 : 0.88, amount);
     y = origin.y * (1 - amount) - Math.sin(Math.PI * amount) * Math.min(8, box.top);
   }
@@ -117,9 +123,10 @@ export function stackFrame(
     ({ scale, y } = fit(box, scale, rotation, tilt, y));
   const fade = clamp((-position - 0.7) / 0.3);
   const opacity = position < 0 ? 1 - fade * fade * (3 - 2 * fade) : clamp(STACK_VISIBLE - position);
-  const translateX = active
-    ? `calc(${(4 / 75) * 100}% + ${origin.x + distance}px)`
-    : `${(x / 75) * 100}%`;
+  const translateX =
+    active && followPointer
+      ? `calc(${(4 / 75) * 100}% + ${origin.x + distance}px)`
+      : `${(x / 75) * 100}%`;
   const photo = stackPhoto(offset, position, box.width, reduced);
   return {
     position,
@@ -139,10 +146,33 @@ export function stackFrame(
 export function stackPhoto(offset: number, position: number, width: number, reduced: boolean) {
   const photoX =
     (!reduced && position > -1 && position < 1
-      ? -Math.sin(Math.PI * position) * Math.min(4, width * 0.008)
+      ? -Math.sin(Math.PI * position) * Math.min(6, width * 0.014)
       : 0) || 0;
   return {
     photoX,
     photoScale: (offset === 0 ? 1 : 1.03) * (1 + (2 * Math.abs(photoX)) / Math.max(1, width)),
   };
+}
+
+/** Native click keyframes use the same suspended pose and land exactly on the target slot. */
+export function stackNavigationFrame(
+  offset: number,
+  delta: number,
+  progress: number,
+  box: StackBox,
+) {
+  const pose = stackFrame(
+    offset,
+    -delta * box.width * progress,
+    Math.max(1, box.width),
+    true,
+    box,
+    STACK_ORIGIN,
+    false,
+    false,
+  );
+  if (progress === 1) return stackFrame(offset - delta, 0, 1, false, box);
+  const from = offset === 0 ? 1 : 1.03,
+    to = offset - delta === 0 ? 1 : 1.03;
+  return { ...pose, photoScale: (pose.photoScale / from) * lerp(from, to, progress) };
 }

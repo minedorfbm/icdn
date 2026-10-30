@@ -26,6 +26,7 @@ import { useI18n } from "@/i18n";
 import { coverImageSizes } from "@/lib/responsive-image";
 import { useCardImageReadiness } from "@/lib/use-card-image-readiness";
 import { useCardImageSize } from "@/lib/use-card-image-size";
+import { useCardStackTransition } from "@/lib/use-card-stack-transition";
 import { useLocation } from "@tanstack/react-router";
 
 /** A front-facing hero and two receding previews, all sharing one responsive stage. */
@@ -102,7 +103,17 @@ export function CardStack({
     }
   }, [drag, dragging, index, items, box, reduced, stage]);
 
+  const { select: selectCard, stop: stopNavigation } = useCardStackTransition(
+    stage,
+    metrics,
+    index,
+    items.length,
+    reduced,
+    onIndexChange,
+  );
+
   useEffect(() => {
+    stopNavigation();
     cancelFrame();
     start.current = null;
     pendingDrag.current = 0;
@@ -111,7 +122,7 @@ export function CardStack({
     setDragging(false);
     setDrag(0);
     return cancelFrame;
-  }, [items]);
+  }, [items, stopNavigation]);
 
   const panels = useMemo(
     () =>
@@ -131,11 +142,11 @@ export function CardStack({
                   dest.id,
                   items.map((item) => item.id),
                 )
-              : onIndexChange(i)
+              : selectCard(i)
           }
         />
       )),
-    [items, index, near, box, onIndexChange, openDestination, canLoad, onSettled, pathname],
+    [items, index, near, box, selectCard, openDestination, canLoad, onSettled, pathname],
   );
 
   if (items.length === 0) return null;
@@ -154,7 +165,7 @@ export function CardStack({
     const matrix = new DOMMatrix(getComputedStyle(active).transform);
     const width = metrics.current.width;
     const x = matrix.m41 - (width * 4) / 75;
-    const lastSettle = settling.current;
+    const lastSettle = stage.current?.dataset["cardNavigation"] ? null : settling.current;
     const span = width * (x < 0 ? 92 / 75 : 18 / 75);
     const position =
       lastSettle?.index === index && Math.abs(lastSettle.x) > 0.01
@@ -196,6 +207,7 @@ export function CardStack({
       s.locked = Math.abs(dx) > Math.abs(dy) * 1.2;
       if (s.locked) {
         captureOrigin();
+        stopNavigation();
         setDragging(true);
         (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
       }
@@ -322,11 +334,12 @@ export function CardStack({
                   aria-hidden
                   tabIndex={-1}
                   className="absolute inset-0 rounded-[18px]"
-                  onClick={() => onIndexChange(i)}
+                  onClick={() => selectCard(i)}
                 />
               )}
               <div
                 aria-hidden
+                data-card-shade
                 className="pointer-events-none absolute inset-0 rounded-[18px] bg-black"
                 style={{
                   opacity: 1 - pose.brightness,
@@ -364,7 +377,7 @@ export function CardStack({
               type="button"
               aria-label={`${t("previous_discovery")} · ${items[index - 1]?.name ?? ""}`}
               disabled={index === 0}
-              onClick={() => onIndexChange((i) => clamp(i - 1))}
+              onClick={() => selectCard(index - 1)}
             >
               <ChevronLeft size={19} strokeWidth={1.4} aria-hidden />
             </button>
@@ -372,7 +385,7 @@ export function CardStack({
               type="button"
               aria-label={`${t("continue_journey")} · ${items[index + 1]?.name ?? ""}`}
               disabled={index === last}
-              onClick={() => onIndexChange((i) => clamp(i + 1))}
+              onClick={() => selectCard(index + 1)}
             >
               <ChevronRight size={19} strokeWidth={1.4} aria-hidden />
             </button>

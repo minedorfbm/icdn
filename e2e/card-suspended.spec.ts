@@ -215,6 +215,78 @@ test("reduced motion leaves the card still during drag and changes the selected 
   await expect(stage.locator('[data-card-offset="0"]')).toHaveCSS("transition-duration", "0s");
 });
 
+for (const layout of ["journey", "surprise"]) {
+  test(`desktop ${layout} plays a visible suspended transition from its click controls`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await catalogue(page);
+    await page.goto(layout === "journey" ? "/" : "/surprise-me");
+    const stage = page.locator(
+      layout === "journey" ? "#heaven .card-stack-stage" : ".discovery-stack .card-stack-stage",
+    );
+    await stage.scrollIntoViewIfNeeded();
+    const active = stage.locator('article[aria-hidden="false"]');
+    await expect(active).toContainText("Citron");
+    const before = await envelope(stage);
+    // A real mouse click in the exposed preview, outside the front card.
+    const clickPreview = async (id: string) => {
+      const front = await active.boundingBox();
+      const next = await stage.locator(`[data-destination-id="${id}"]`).boundingBox();
+      expect(front).not.toBeNull();
+      expect(next).not.toBeNull();
+      const x = next!.x + next!.width - 8;
+      expect(x).toBeGreaterThan(front!.x + front!.width);
+      await page.mouse.click(x, next!.y + next!.height / 2);
+    };
+    if (layout === "journey")
+      await page.locator("#heaven .chapter-deck-controls button").last().click();
+    else await clickPreview("tingara");
+    await expect(active).toContainText("TINGARA");
+    await expect(stage).toHaveAttribute("data-card-navigation", "true");
+    const timeline = await stage.evaluate((el) => {
+      const animations = el.getAnimations({ subtree: true });
+      for (const animation of animations) {
+        animation.pause();
+        animation.currentTime = 325;
+      }
+      const card = el.querySelector<HTMLElement>('[data-destination-id="citron"]')!;
+      const matrix = new DOMMatrix(getComputedStyle(card).transform);
+      return {
+        tilt: Math.abs((Math.atan2(matrix.m12, matrix.m22) * 180) / Math.PI),
+        durations: animations.map((a) => a.effect?.getTiming().duration),
+      };
+    });
+    expect(timeline.tilt).toBeGreaterThan(1);
+    expect(timeline.durations).toContain(650);
+    expect(await envelope(stage)).toEqual(before);
+    await stage.evaluate((el) => {
+      for (const animation of el.getAnimations({ subtree: true })) animation.finish();
+    });
+    await expect(stage).not.toHaveAttribute("data-card-navigation");
+    await clickPreview("swipe-third");
+    await expect(active).toContainText("Third place");
+    if (layout === "journey") {
+      await page.locator("#heaven .chapter-deck-controls button").first().click();
+      await expect(active).toContainText("TINGARA");
+      await page.locator("#heaven .chapter-deck-controls button").first().click();
+      await expect(active).toContainText("Citron");
+    }
+    await expect(stage).not.toHaveAttribute("data-card-navigation", "true", { timeout: 2000 });
+    expect(await envelope(stage)).toEqual(before);
+    if (layout === "surprise") {
+      await gesture(stage, 240);
+      await expect(active).toContainText("TINGARA");
+    }
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    if (layout === "journey")
+      await page.locator("#heaven .chapter-deck-controls button").last().click();
+    else await clickPreview("swipe-third");
+    await expect(stage).not.toHaveAttribute("data-card-navigation", "true");
+  });
+}
+
 test("native vertical touch scroll cancels the card gesture without navigating", async ({
   page,
   browserName,

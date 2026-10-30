@@ -1,5 +1,10 @@
 import { expect, test } from "bun:test";
-import { stackFrame, stackVerticalBounds, STACK_ORIGIN } from "../src/lib/card-stack-motion";
+import {
+  stackFrame,
+  stackNavigationFrame,
+  stackVerticalBounds,
+  STACK_ORIGIN,
+} from "../src/lib/card-stack-motion";
 
 const boxes = [
   { width: 240, height: 388, top: 0, stageHeight: 388 },
@@ -44,11 +49,26 @@ test("the suspended card follows the finger and stays inside the existing vertic
         const bounds = stackVerticalBounds(box, frame.scale, frame.rotation, frame.tilt);
         expect(bounds.min + frame.y).toBeGreaterThanOrEqual(-0.01);
         expect(bounds.max + frame.y).toBeLessThanOrEqual(box.stageHeight + 0.01);
-        expect(Math.abs(frame.photoX)).toBeLessThanOrEqual(4);
+        expect(Math.abs(frame.photoX)).toBeLessThanOrEqual(6);
         expect(frame.photoScale).toBeGreaterThanOrEqual(
           1 + (2 * Math.abs(frame.photoX)) / box.width,
         );
       }
+});
+
+test("short mobile gestures already expose the tilt, still capped at six degrees", () => {
+  expect(Math.abs(stackFrame(0, -70, 292.5, true, boxes[1]!).tilt)).toBeGreaterThan(3);
+  expect(Math.abs(stackFrame(0, -150, 292.5, true, boxes[1]!).tilt)).toBe(6);
+});
+
+test("click choreography tilts midway and lands exactly on the next or previous resting slot", () => {
+  for (const delta of [-1, 1]) {
+    expect(Math.abs(stackNavigationFrame(0, delta, 0.5, boxes[1]!).tilt)).toBe(6);
+    for (const offset of [-1, 0, 1, 2]) {
+      const end = stackNavigationFrame(offset, delta, 1, boxes[1]!);
+      expect(end).toEqual(stackFrame(offset - delta, 0, 1, false, boxes[1]!));
+    }
+  }
 });
 
 test("incoming previews advance continuously while photo overscan covers the tiny offset", () => {
