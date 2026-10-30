@@ -11,7 +11,7 @@ import {
 } from "./atmosphere-motion";
 
 export type AtmosphereStation = { id: Level; top: number; height: number };
-const durations: Record<Level, number> = { heaven: 1900, sky: 950, earth: 750, sea: 1400 };
+const durations: Record<Level, number> = { heaven: 2100, sky: 950, earth: 750, sea: 1700 };
 function write(element: HTMLElement | undefined | null, property: string, value: string) {
   if (element && element.style.getPropertyValue(property) !== value)
     element.style.setProperty(property, value);
@@ -129,9 +129,13 @@ export function createJourneyAtmosphere(root: HTMLElement) {
   ) {
     if (
       !root.dataset["heavenIlluminated"] &&
-      y >= first.top - viewport * 0.25 &&
+      y >= first.top - viewport * 0.07 &&
       y < first.top + viewport * 0.2 &&
-      (!target || target === "heaven")
+      (!target || target === "heaven") &&
+      (sprites.get("heaven") ?? []).every((element) => {
+        const image = element as HTMLImageElement;
+        return image.complete && image.naturalWidth > 0;
+      })
     ) {
       root.dataset["heavenIlluminated"] = "true";
       introStart = now;

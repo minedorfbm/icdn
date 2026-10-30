@@ -8,7 +8,7 @@ import fern from "@/assets/journey-effects/fern-3c37df926b.webp?no-inline";
 import leafGreen from "@/assets/journey-effects/leaf-green-192cab1cbd.webp?no-inline";
 import leafGold from "@/assets/journey-effects/leaf-gold-2afa1bf432.webp?no-inline";
 import leafSmall from "@/assets/journey-effects/leaf-small-71d189f850.webp?no-inline";
-import waves from "@/assets/journey-effects/corner-waves-ecdd27bba8.webp?no-inline";
+import waves from "@/assets/journey-effects/corner-waves.svg?no-inline";
 import "./journey-atmosphere.css";
 
 const birds = [
@@ -93,8 +93,8 @@ export function JourneyAtmosphere({
               className="atmosphere-wave"
               data-part={part}
               data-src={waves}
-              width={960}
-              height={320}
+              width={1200}
+              height={360}
               alt=""
               decoding="async"
               fetchPriority="low"

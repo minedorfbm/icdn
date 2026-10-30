@@ -157,6 +157,8 @@ export function useJourneyMotion(
     // The translated discovery choices above the levels can also change their offsets.
     resize.observe(root);
     window.addEventListener("scroll", schedule, { passive: true });
+    // A cold cloud asset may become ready after scrolling has already stopped.
+    root.addEventListener("load", schedule, true);
     window.addEventListener("resize", refresh);
     reducedMotion.addEventListener("change", refresh);
     const visibility = () => {
@@ -171,6 +173,7 @@ export function useJourneyMotion(
     return () => {
       resize.disconnect();
       window.removeEventListener("scroll", schedule);
+      root.removeEventListener("load", schedule, true);
       window.removeEventListener("resize", refresh);
       reducedMotion.removeEventListener("change", refresh);
       document.removeEventListener("visibilitychange", visibility);

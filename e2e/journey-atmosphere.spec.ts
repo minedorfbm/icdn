@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "./fixtures";
 
 const effects =
-  /(?:bee-eater|drongo|sunbird|branch-left|branch-right|liana-|fern-|leaf-green|leaf-gold|leaf-small|corner-waves).*\.webp/;
+  /(?:bee-eater|drongo|sunbird|branch-left|branch-right|liana-|fern-|leaf-green|leaf-gold|leaf-small|corner-waves).*\.(?:webp|svg)/;
 async function position(page: Page, y: number) {
   await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
   await page.evaluate(
@@ -126,8 +126,22 @@ test("Heaven illuminates once, native scrolling stays free and hidden tabs stop 
   await page.goto("/");
   await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
   const tops = await stations(page);
-  await position(page, tops[0]!.top);
   const heaven = page.locator('[data-atmosphere-effect="heaven"]');
+  await position(page, tops[0]!.top - 844 * 0.2);
+  await expect
+    .poll(() =>
+      heaven
+        .locator("img")
+        .evaluateAll((images) =>
+          images.every(
+            (image) =>
+              (image as HTMLImageElement).complete && (image as HTMLImageElement).naturalWidth > 0,
+          ),
+        ),
+    )
+    .toBe(true);
+  await expect(heaven).toHaveCSS("visibility", "hidden");
+  await position(page, tops[0]!.top);
   await expect(heaven).toHaveCSS("visibility", "visible");
   await expect
     .poll(() =>
@@ -158,6 +172,44 @@ test("Heaven illuminates once, native scrolling stays free and hidden tabs stop 
     delete (document as unknown as { hidden?: boolean }).hidden;
     document.dispatchEvent(new Event("visibilitychange"));
   });
+});
+
+test("Heaven waits for arrival and loaded clouds, including a cold load after scroll stops", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  let release!: () => void;
+  const pending = new Promise<void>((resolve) => (release = resolve));
+  await page.route("**/hero-cloud-ivory-*.webp", async (route) => {
+    await pending;
+    await route.fulfill({
+      path: "public/hero-cloud-ivory-a26e472d.webp",
+      contentType: "image/webp",
+    });
+  });
+  try {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
+    const tops = await stations(page);
+    const heaven = page.locator('[data-atmosphere-effect="heaven"]');
+    await position(page, tops[0]!.top - 844 * 0.2);
+    await expect(heaven).toHaveCSS("visibility", "hidden");
+    await position(page, tops[0]!.top);
+    await expect(heaven).toHaveCSS("visibility", "hidden");
+    await page.waitForTimeout(150);
+    release();
+    // No further scroll: the actual image load wakes the shared scheduler once.
+    await expect(heaven).toHaveCSS("visibility", "visible");
+    await expect
+      .poll(() =>
+        heaven.locator(".atmosphere-halo").evaluate((el) => Number(getComputedStyle(el).opacity)),
+      )
+      .toBeGreaterThan(0.05);
+    await expect(heaven).toHaveCSS("visibility", "hidden", { timeout: 3000 });
+  } finally {
+    release();
+  }
 });
 
 test("reduced motion preserves static palette/photos and never requests effect assets", async ({

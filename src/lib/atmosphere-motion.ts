@@ -125,23 +125,23 @@ export function plantPoses(phase: number, boundary: number, width: number, heigh
 export function wavePoses(phase: number, width: number, height: number) {
   const p = clampAtmosphere(phase),
     t = clampAtmosphere(phase - 1);
-  const envelope = smoothAtmosphere((p - 0.05) / 0.4) * (1 - smoothAtmosphere((t - 0.2) / 0.8));
-  const entry = smoothAtmosphere((p - 0.12) / 0.78),
+  const envelope = smoothAtmosphere((p - 0.14) / 0.52) * (1 - smoothAtmosphere(t));
+  const entry = smoothAtmosphere((p - 0.12) / 0.88),
     retreat = smoothAtmosphere(t);
   return [
     pose(
-      (1 - entry) * width * 0.21 + width * 0.025 - retreat * width * 0.04,
-      (1 - entry) * height * 0.21 + retreat * height * 0.19,
-      -12 + entry * 4,
+      (1 - entry) * width * 0.11 + width * 0.025 + retreat * width * 0.09,
+      (1 - entry) * height * 0.11 + retreat * height * 0.12,
+      -6 + entry * 2,
       1,
-      envelope * 0.32,
+      envelope * 0.27,
     ),
     pose(
-      (1 - entry) * width * 0.16 - retreat * width * 0.018,
-      (1 - entry) * height * 0.26 + retreat * height * 0.16,
-      -10 + entry * 4 + retreat * 3,
+      (1 - entry) * width * 0.14 + retreat * width * 0.12,
+      (1 - entry) * height * 0.15 + retreat * height * 0.13,
+      -5 + entry * 2,
       1,
-      envelope * 0.72,
+      envelope * 0.64,
     ),
   ];
 }

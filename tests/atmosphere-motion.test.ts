@@ -58,3 +58,19 @@ test("botanical and wave tails finish transparent at mobile and desktop sizes", 
     }
   }
 });
+
+test("wave arrival is continuous and withdrawal follows the incoming diagonal back out", () => {
+  const arriving = wavePoses(1, 390, 844),
+    justArrived = wavePoses(1.00001, 390, 844),
+    leaving = wavePoses(1.8, 390, 844);
+  arriving.forEach((wave, index) => {
+    const next = justArrived[index]!,
+      retreat = leaving[index]!;
+    expect(Math.abs(next.x - wave.x)).toBeLessThan(0.01);
+    expect(Math.abs(next.y - wave.y)).toBeLessThan(0.01);
+    expect(Math.abs(next.opacity - wave.opacity)).toBeLessThan(0.01);
+    expect(retreat.x).toBeGreaterThan(wave.x);
+    expect(retreat.y).toBeGreaterThan(wave.y);
+    expect(retreat.opacity).toBeLessThan(wave.opacity);
+  });
+});
