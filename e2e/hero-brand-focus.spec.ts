@@ -4,7 +4,9 @@ import { HERO_CLOUD_SOURCE, HERO_PORTRAIT_MEDIA } from "../src/lib/hero-media";
 for (const viewport of [
   { width: 390, height: 680 },
   { width: 834, height: 1194 },
+  { width: 1024, height: 768 },
   { width: 1440, height: 900 },
+  { width: 1920, height: 1080 },
 ]) {
   test(`hero branding and contextual tools at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
@@ -15,16 +17,36 @@ for (const viewport of [
     const contact = page.locator(".hub-contact-tool button");
     await expect(page.locator("#heaven")).toBeAttached();
     if (viewport.width >= 768 && viewport.width > viewport.height) {
-      await expect(page.locator(".hero-brand")).toBeHidden();
-      await expect(page.locator(".hero-desktop-brand")).toBeVisible();
+      const desktop = viewport.width >= 1200;
+      const brand = page.locator(desktop ? ".hero-brand" : ".hero-desktop-brand");
+      await expect(brand).toBeVisible();
+      await expect(page.locator(desktop ? ".hero-desktop-brand" : ".hero-brand")).toBeHidden();
+      const brandBounds = (await brand.boundingBox())!;
+      if (desktop) {
+        expect(brandBounds.width).toBeGreaterThan(viewport.width * 0.33);
+        expect(brandBounds.y).toBeGreaterThanOrEqual(0);
+        expect(brandBounds.y + brandBounds.height).toBeLessThan(
+          (await page.locator(".hero-invitation").boundingBox())!.y,
+        );
+        await expect
+          .poll(() =>
+            page
+              .locator(".hero-photograph")
+              .evaluate((el) => getComputedStyle(el, "::after").opacity),
+          )
+          .toBe("0.78");
+      } else {
+        expect(brandBounds.width).toBeLessThanOrEqual(360);
+      }
       await expect(search).toBeVisible();
       await expect(contact).toBeVisible();
       expect((await language.boundingBox())!.y).toBeLessThan(30);
-      expect((await page.locator(".hero-desktop-brand").boundingBox())!.width).toBeLessThanOrEqual(
-        360,
-      );
       expect((await page.locator(".hero-film-button").boundingBox())!.width).toBe(80);
-      await expect(page.locator(".hero-invitation-title")).toHaveCSS("font-size", "44px");
+      const titleSize = await page
+        .locator(".hero-invitation-title")
+        .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
+      expect(titleSize).toBeGreaterThanOrEqual(40);
+      expect(titleSize).toBeLessThanOrEqual(44);
       await expect(page.locator(".hero-invitation-caption")).toHaveCSS("font-size", "12px");
       return;
     }
@@ -99,18 +121,25 @@ test("portrait atmosphere starts before the render-blocking stylesheet", async (
   expect(cloudRequests).toHaveLength(1);
 });
 
-test("desktop and direct cards do not download the portrait atmosphere", async ({ page }) => {
+test("desktop reuses the cloud while landscape tablets and direct cards do not download it", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const cloudRequests: string[] = [];
   page.on("request", (request) => {
     if (new URL(request.url()).pathname === HERO_CLOUD_SOURCE) cloudRequests.push(request.url());
   });
   await page.goto("/");
-  await expect(page.locator(".hero-desktop-brand")).toBeVisible();
-  expect(cloudRequests).toHaveLength(0);
+  await expect(page.locator(".hero-brand")).toBeVisible();
+  await expect.poll(() => cloudRequests.length).toBe(1);
+  cloudRequests.length = 0;
   await page.goto("/citron");
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator(".editorial-hero")).toBeVisible();
   expect(cloudRequests).toHaveLength(0);
   expect(await page.locator(`link[rel="preload"][href="${HERO_CLOUD_SOURCE}"]`).count()).toBe(0);
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/");
+  await expect(page.locator(".hero-desktop-brand")).toBeVisible();
+  expect(cloudRequests).toHaveLength(0);
 });

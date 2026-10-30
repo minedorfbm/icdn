@@ -457,6 +457,51 @@
   }
 }
 
+@media (min-width: 1200px) and (orientation: landscape) {
+  .hub-hero {
+    --hero-desktop-brand-width: min(calc(var(--hero-photo-width) * 0.35), 65cqh);
+    --hero-desktop-brand-top: max(24px, calc(50% - var(--hero-photo-height) * 0.4));
+    --hero-desktop-invitation-top: max(
+      calc(50% - var(--hero-photo-height) * 0.16),
+      calc(var(--hero-desktop-brand-top) + var(--hero-desktop-brand-width) * 0.3122 + 20px)
+    );
+  }
+
+  .hero-brand {
+    /* Anchor the approved desktop composition to the photograph's cover crop. */
+    display: block;
+    top: var(--hero-desktop-brand-top);
+    width: var(--hero-desktop-brand-width);
+    transform: translateX(-50%);
+  }
+
+  .hero-brand::before,
+  .hero-desktop-brand {
+    display: none;
+  }
+
+  .hero-photograph::after {
+    display: block;
+    top: max(0px, calc(var(--hero-desktop-brand-top) - var(--hero-desktop-brand-width) * 0.0857));
+    width: calc(var(--hero-desktop-brand-width) * 1.4857);
+    height: calc(var(--hero-desktop-brand-width) * 0.4968);
+    opacity: 0.78;
+  }
+
+  .hero-sky {
+    top: var(--hero-desktop-invitation-top);
+    width: calc(var(--hero-photo-width) * 0.27);
+    height: min(
+      calc(var(--hero-photo-height) * 0.22),
+      calc(100cqh - var(--hero-desktop-invitation-top) - 80px)
+    );
+  }
+
+  .hero-sky-content {
+    justify-content: center;
+  }
+}
+
 /* Portrait/mobile keeps one hero control; desktop retains its existing toolbar. */
 @media (max-width: 767px), (orientation: portrait) {
   [data-hero-active="true"] .hub-search-tool,
