@@ -1,4 +1,4 @@
-const seenByDocument = new WeakMap<Document, Set<number>>();
+const enteredDocuments = new WeakSet<Document>();
 const endings = new Set([
   "discovery-heading-enter",
   "discovery-tram-enter",
@@ -12,57 +12,43 @@ export function mountDiscoveryMotion(section: HTMLElement) {
   const doc = section.ownerDocument;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
   const nodes = [...section.querySelectorAll<HTMLElement>(".discovery-heading, .discovery-choice")];
-  const seen = seenByDocument.get(doc) ?? new Set<number>();
-  seenByDocument.set(doc, seen);
-  const visible = new Set<HTMLElement>();
-  let nextStart = 0;
 
   function sync() {
     for (const node of nodes) {
       if (node.dataset["discoveryEntry"] === "enter")
-        node.style.setProperty(
-          "--discovery-play",
-          visible.has(node) && !doc.hidden ? "running" : "paused",
-        );
+        node.style.setProperty("--discovery-play", doc.hidden ? "paused" : "running");
     }
   }
 
   function finish(node: HTMLElement) {
-    seen.add(nodes.indexOf(node));
     node.dataset["discoveryEntry"] = "done";
     node.style.removeProperty("--discovery-delay");
     node.style.removeProperty("--discovery-play");
-    observer.unobserve(node);
   }
 
   const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        const node = entry.target as HTMLElement;
-        if (entry.intersectionRatio > 0.01) visible.add(node);
-        else visible.delete(node);
-      }
-      // DOM order, including when several cards become visible in one observer delivery.
+    ([entry]) => {
+      if (!entry || entry.intersectionRatio < 0.01 || enteredDocuments.has(doc)) return;
+      enteredDocuments.add(doc);
+      // One viewport signal starts the entire timeline; scrolling never pauses or seeks it.
       for (const [index, node] of nodes.entries()) {
-        if (
-          seen.has(index) ||
-          !entries.some((entry) => entry.target === node && entry.intersectionRatio >= 0.2)
-        )
-          continue;
-        seen.add(index);
-        const now = performance.now();
-        const delay = Math.max(0, nextStart - now);
-        node.style.setProperty("--discovery-delay", `${delay}ms`);
+        if (node.dataset["discoveryEntry"] === "done") continue;
+        node.style.setProperty(
+          "--discovery-delay",
+          `${index === 0 ? 0 : 450 + (index - 1) * 180}ms`,
+        );
         node.dataset["discoveryEntry"] = "enter";
-        nextStart = now + delay + (index === 0 ? 450 : 180);
       }
       sync();
+      observer.disconnect();
     },
-    { threshold: [0.01, 0.2] },
+    { threshold: 0.01 },
   );
 
   function preference() {
     if (!reduced.matches) return;
+    enteredDocuments.add(doc);
+    observer.disconnect();
     for (const node of nodes) finish(node);
   }
 
@@ -79,10 +65,10 @@ export function mountDiscoveryMotion(section: HTMLElement) {
     if (node) finish(node);
   }
 
-  for (const [index, node] of nodes.entries()) {
-    if (reduced.matches || seen.has(index)) finish(node);
-    else observer.observe(node);
-  }
+  if (reduced.matches || enteredDocuments.has(doc)) {
+    enteredDocuments.add(doc);
+    for (const node of nodes) finish(node);
+  } else observer.observe(section);
   section.addEventListener("animationend", ended);
   section.addEventListener("focusin", focus);
   doc.addEventListener("visibilitychange", sync);

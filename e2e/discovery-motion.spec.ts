@@ -50,6 +50,16 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       "data-discovery-entry",
       "enter",
     );
+    await expect(page.locator('[data-discovery-entry="enter"]')).toHaveCount(4);
+    // Freeze the autonomous sequence so geometry checks do not race its natural completion.
+    await page.locator(".discovery-paths").evaluate(async (el) => {
+      const animations = [el, ...el.querySelectorAll("*")].flatMap((node) => node.getAnimations());
+      const entries = animations.filter(
+        (a) => a instanceof CSSAnimation && a.animationName.startsWith("discovery-"),
+      );
+      for (const animation of entries) animation.pause();
+      await Promise.all(entries.map((animation) => animation.ready));
+    });
     await finishEntry(page, ".discovery-heading");
     for (const kind of ["journey", "map", "surprise"]) {
       const card = page.locator(`.discovery-${kind}`);
@@ -109,20 +119,42 @@ for (const width of [320, 390, 768, 1024, 1440]) {
   });
 }
 
-test("offscreen and hidden-document entrances pause; reduced motion finishes immediately", async ({
+test("approaching Discovery starts every card; scrolling never controls the timeline", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 390, height: 500 });
   await page.emulateMedia({ reducedMotion: "no-preference" });
+  await threePreviews(page);
   await page.goto("/");
+  await expect(page.locator(".discovery-choice")).toHaveCount(3);
+  await expect(page.locator('[data-discovery-entry="enter"]')).toHaveCount(0);
+  await page.locator(".discovery-paths").evaluate((el) =>
+    window.scrollTo({
+      top: el.getBoundingClientRect().top + scrollY - innerHeight + 30,
+      behavior: "instant",
+    }),
+  );
+  await expect(page.locator('[data-discovery-entry="enter"]')).toHaveCount(4);
+  // Even cards still below the screen start as part of the same sequence.
+  const last = page.locator(".discovery-surprise");
+  expect(await last.evaluate((el) => el.getBoundingClientRect().top)).toBeGreaterThan(500);
+  await expect(last).toHaveCSS("animation-play-state", "running");
   const first = page.locator(".discovery-journey");
-  await first.scrollIntoViewIfNeeded();
-  await expect(first).toHaveAttribute("data-discovery-entry", "enter");
   await page
     .locator(".hub-hero")
     .evaluate((el) => el.scrollIntoView({ block: "start", behavior: "instant" }));
-  await expect(first).toHaveCSS("animation-play-state", "paused");
-  await first.scrollIntoViewIfNeeded();
   await expect(first).toHaveCSS("animation-play-state", "running");
+  const motion = page.locator(".discovery-tram img");
+  await motion.evaluate((el) =>
+    Promise.all(el.getAnimations().map((animation) => animation.ready)),
+  );
+  const time = await motion.evaluate((el) => Number(el.getAnimations()[0]!.currentTime));
+  await page.evaluate(
+    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+  );
+  expect(await motion.evaluate((el) => Number(el.getAnimations()[0]!.currentTime))).toBeGreaterThan(
+    time,
+  );
   await page.evaluate(() => {
     Object.defineProperty(document, "hidden", { configurable: true, value: true });
     document.dispatchEvent(new Event("visibilitychange"));
