@@ -842,5 +842,9 @@
   {
     "source": "src/assets/nam-tram-selector.webp",
     "role": "Ressource fixe"
+  },
+  {
+    "source": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-9583b8a4148a668fb530b654-original.png",
+    "role": "Hero desktop sans lustre - source 1536 px, derives Sharp agrandis jusque 3840 px (docs/images.md)"
   }
 ]

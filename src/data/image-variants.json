@@ -2568,6 +2568,47 @@
     "height": 384,
     "variants": []
   },
+  "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-4830a6c2e6a1fae17872c55c-3840.webp": {
+    "aliases": [],
+    "original": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-9583b8a4148a668fb530b654-original.png",
+    "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-4830a6c2e6a1fae17872c55c-3840.webp",
+    "width": 3840,
+    "height": 2560,
+    "variants": [
+      {
+        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-f37ca81de4a30f7b5f34ec56-1920.webp",
+        "width": 1920,
+        "bytes": 219984
+      },
+      {
+        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-a66d0122bb1ea13bf96304ef-2560.webp",
+        "width": 2560,
+        "bytes": 302360
+      },
+      {
+        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-4830a6c2e6a1fae17872c55c-3840.webp",
+        "width": 3840,
+        "bytes": 477500
+      }
+    ],
+    "avif": {
+      "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-bc782fd3776ebc718c48eb21-3840.avif",
+      "width": 3840,
+      "bytes": 276367
+    },
+    "avifVariants": [
+      {
+        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-751f5dccbab584a45b77ce2f-1920.avif",
+        "width": 1920,
+        "bytes": 129313
+      },
+      {
+        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-f6ffdf994e5491dce1f4e385-2560.avif",
+        "width": 2560,
+        "bytes": 175889
+      }
+    ]
+  },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-4989f8581780c5ffcb02c9b6-native.webp": {
     "aliases": [
       "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/airport-lounge-home-hd-3cbdabe6da1d.webp"

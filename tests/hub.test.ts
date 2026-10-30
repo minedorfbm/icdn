@@ -258,6 +258,13 @@ describe("CMS image URLs", () => {
     const responsive = { settings: { hero_image: image, hero_image_landscape: landscape } };
     expect(resolveHeroImage(responsive)).toBe(image);
     expect(resolveHeroImage(responsive, "landscape")).toBe(landscape);
+    expect(resolveHeroImage(responsive, "desktop")).toBe(landscape);
+    const desktop = "https://example.com/hero-desktop.webp";
+    const desktopConfigured = { settings: { ...responsive.settings, hero_image_desktop: desktop } };
+    expect(resolveHeroImage(desktopConfigured, "desktop")).toBe(desktop);
+    expect(resolveHeroImage(desktopConfigured, "landscape")).toBe(landscape);
+    expect(resolveHeroImage(desktopConfigured)).toBe(image);
+    expect(resolveHeroImage(undefined, "desktop")).toBe(resolveHeroImage(undefined, "landscape"));
     expect(resolveHeroImage(undefined, "landscape")).not.toBe(resolveHeroImage());
     expect(
       resolveHeroImage({

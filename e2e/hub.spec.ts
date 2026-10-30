@@ -110,7 +110,7 @@ test("the hero displays before a slow catalogue and media waits for an opened ca
   expect(errors).toEqual([]);
 });
 
-test("the hero selects the matching photo and preload in portrait and landscape", async ({
+test("the hero selects the matching photo and preload in portrait, tablet landscape and desktop", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -123,12 +123,26 @@ test("the hero selects the matching photo and preload in portrait and landscape"
     [1194, 834, "intercontinental-favicon.png"],
   ] as const) {
     await page.setViewportSize({ width, height });
+    const desktop = width >= 1200 && width > height;
+    const hd =
+      managedImages[
+        "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-4830a6c2e6a1fae17872c55c-3840.webp"
+      ];
     const source = imageDeliveryUrl(
-      Object.values(managedImages).find((image) => image.aliases.includes(`/${file}`))!.src,
+      desktop
+        ? hd.avif.src
+        : Object.values(managedImages).find((image) => image.aliases.includes(`/${file}`))!.src,
     );
+    const candidates = desktop
+      ? [...hd.avifVariants, hd.avif].map((image) => imageDeliveryUrl(image.src))
+      : [source];
     await expect
-      .poll(() => hero.evaluate((image: HTMLImageElement) => image.currentSrc))
-      .toBe(new URL(source, page.url()).href);
+      .poll(async () =>
+        candidates
+          .map((candidate) => new URL(candidate, page.url()).href)
+          .includes(await hero.evaluate((image: HTMLImageElement) => image.currentSrc)),
+      )
+      .toBe(true);
     const activePreloads = await page
       .locator('link[rel="preload"][as="image"][media]')
       .evaluateAll((links) =>

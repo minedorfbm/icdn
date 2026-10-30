@@ -36,19 +36,21 @@ export interface HubValue {
 /** The hero and its matching preload share the same CMS source for each format. */
 export function resolveHeroImage(
   data?: Pick<HubData, "settings">,
-  format: "portrait" | "landscape" = "portrait",
+  format: "portrait" | "landscape" | "desktop" = "portrait",
 ): string {
   const settings = data?.settings;
   const reference =
-    format === "landscape"
-      ? (settings?.["hero_image_landscape"] ?? settings?.["hero_image"])
-      : settings?.["hero_image"];
+    format === "portrait"
+      ? settings?.["hero_image"]
+      : ((format === "desktop" ? settings?.["hero_image_desktop"] : undefined) ??
+        settings?.["hero_image_landscape"] ??
+        settings?.["hero_image"]);
   return (
     resolveImage(reference ?? "") ||
     imageSource(
-      format === "landscape"
-        ? "src/assets/hero-lobby-landscape-no-chandelier-f06bd383569a.webp"
-        : "src/assets/hero-lobby-portrait-no-chandelier-e29f7810e97a.webp",
+      format === "portrait"
+        ? "src/assets/hero-lobby-portrait-no-chandelier-e29f7810e97a.webp"
+        : "src/assets/hero-lobby-landscape-no-chandelier-f06bd383569a.webp",
     )
   );
 }

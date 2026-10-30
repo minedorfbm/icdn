@@ -281,6 +281,11 @@ const tables: Record<string, unknown[]> = {
   site_settings: [
     { key: "hero_image", value: "/intercontinental-touch-icon.png" },
     { key: "hero_image_landscape", value: "/intercontinental-favicon.png" },
+    {
+      key: "hero_image_desktop",
+      value:
+        "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-4830a6c2e6a1fae17872c55c-3840.webp",
+    },
     { key: "contact", value: "tel:+842363938888" },
     { key: "whatsapp", value: "https://wa.me/842363938888" },
     { key: "zalo", value: "https://zalo.me/842363938888" },

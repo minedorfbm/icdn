@@ -458,6 +458,11 @@
 }
 
 @media (min-width: 1200px) and (orientation: landscape) {
+  .threshold-img {
+    /* Draw the preloaded photo directly: no initial 8% enlargement or resampling. */
+    animation: none;
+  }
+
   .hub-hero {
     --hero-desktop-brand-width: min(calc(var(--hero-photo-width) * 0.35), 65cqh);
     --hero-desktop-brand-top: max(24px, calc(50% - var(--hero-photo-height) * 0.4));

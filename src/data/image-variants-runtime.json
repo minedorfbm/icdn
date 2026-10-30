@@ -834,6 +834,21 @@
     "aliases": ["/intercontinental-danang-logo-light.svg"],
     "variants": []
   },
+  "adj-4830a6c2e6a1fae17872c55c-3840.webp": {
+    "width": 3840,
+    "height": 2560,
+    "aliases": [],
+    "variants": [
+      ["adj-f37ca81de4a30f7b5f34ec56-1920.webp", 1920],
+      ["adj-a66d0122bb1ea13bf96304ef-2560.webp", 2560],
+      ["adj-4830a6c2e6a1fae17872c55c-3840.webp", 3840]
+    ],
+    "avif": [
+      ["adj-751f5dccbab584a45b77ce2f-1920.avif", 1920],
+      ["adj-f6ffdf994e5491dce1f4e385-2560.avif", 2560],
+      ["adj-bc782fd3776ebc718c48eb21-3840.avif", 3840]
+    ]
+  },
   "adj-4989f8581780c5ffcb02c9b6-native.webp": {
     "width": 2560,
     "height": 1336,
