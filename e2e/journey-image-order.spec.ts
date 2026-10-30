@@ -87,10 +87,9 @@ for (const width of [390, 1440]) {
       expect(calls).not.toContain("heaven-3.png");
       expect(calls).not.toContain("heaven-wellness.png");
       expect(calls.filter((name) => /^(earth|sea)-/.test(name))).toEqual([]);
-      await expect(page.locator("#heaven .journey-backdrop")).toHaveAttribute(
-        "fetchpriority",
-        "low",
-      );
+      await expect(
+        page.locator('[data-atmosphere-level="heaven"] .journey-backdrop'),
+      ).toHaveAttribute("fetchpriority", "low");
       await expect(page.locator('[data-destination-id="heaven-1"] img')).toHaveAttribute(
         "fetchpriority",
         "low",
@@ -172,10 +171,12 @@ for (const width of [390, 1440]) {
     await expect.poll(() => calls.includes("sea-0.png")).toBe(true);
     await expect
       .poll(() => page.locator("#sea").evaluate((el) => Math.abs(el.getBoundingClientRect().top)))
-      .toBeLessThan(150);
+      .toBeLessThan(2);
     expect(calls.filter((name) => /^(sky|earth)-/.test(name) && !beforeJump.has(name))).toEqual([]);
     // Ordinary scrolling becomes eligible again once the jump finishes.
-    await page.locator("#earth").scrollIntoViewIfNeeded();
+    await page
+      .locator("#earth")
+      .evaluate((el) => el.scrollIntoView({ block: "start", behavior: "instant" }));
     await expect.poll(() => calls.includes("earth-0.png")).toBe(true);
   });
 }

@@ -72,26 +72,20 @@ test("level heading, controls, categories and full cards fit together on mobile"
       await expect(chapter.locator(".card-stack-pagination")).toContainText("01");
     }
   }
-  await expect(page.locator(".chapter-gradient")).toHaveCount(3);
+  await expect(page.locator(".chapter-gradient")).toHaveCount(0);
   expect(
-    await page.locator(".chapter-gradient").evaluateAll((elements) =>
-      elements.every((el) => {
-        const gradient = getComputedStyle(el);
-        const next = el.nextElementSibling!;
-        const previous = el.previousElementSibling!;
-        const title = next.querySelector<HTMLElement>("h2")!;
-        const bounds = el.getBoundingClientRect();
-        return (
-          bounds.height >= 120 &&
-          bounds.height <= 180 &&
-          gradient.backgroundImage.includes("linear-gradient") &&
-          bounds.top === previous.getBoundingClientRect().bottom &&
-          bounds.bottom === next.getBoundingClientRect().top &&
-          bounds.bottom <= title.getBoundingClientRect().top &&
-          getComputedStyle(el, "::before").content === "none"
-        );
-      }),
-    ),
+    await page
+      .locator(".level-chapter")
+      .evaluateAll((elements) =>
+        elements
+          .slice(0, -1)
+          .every(
+            (el, i) =>
+              Math.abs(
+                el.getBoundingClientRect().bottom - elements[i + 1]!.getBoundingClientRect().top,
+              ) < 1,
+          ),
+      ),
   ).toBe(true);
 });
 

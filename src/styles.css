@@ -607,10 +607,6 @@
   opacity: var(--journey-deck-opacity, 1);
 }
 
-.level[data-journey-near="true"] .journey-backdrop {
-  will-change: transform;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .journey-backdrop,
   .journey-heading,

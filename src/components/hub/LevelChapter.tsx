@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown } from "lucide-react";
 import "./level-chapter.css";
 import { CardStack } from "./CardStack";
@@ -16,9 +17,17 @@ interface Props {
   line: string;
   image: string;
   clusters?: string[];
+  backdropTarget?: HTMLElement | null;
 }
 
-export function LevelChapter({ id, title, line, image, clusters }: Readonly<Props>) {
+export function LevelChapter({
+  id,
+  title,
+  line,
+  image,
+  clusters,
+  backdropTarget,
+}: Readonly<Props>) {
   const [cluster, setCluster] = useState(clusters?.[0]);
   const [cardIndex, setCardIndex] = useState(0);
   const [indexOpen, setIndexOpen] = useState(false);
@@ -68,6 +77,25 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
     requestAnimationFrame(() => scrollToHubSection(id));
   };
 
+  const backdrop = (
+    <div className="chapter-backdrop pointer-events-none absolute inset-0 overflow-hidden">
+      <picture className="contents">
+        {backdropAvif && <source type="image/avif" srcSet={backdropAvif} />}
+        <img
+          src={showBackdrop ? image : undefined}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          fetchPriority="low"
+          decoding="async"
+          width={900}
+          height={1400}
+          className="journey-backdrop level-bg absolute -inset-y-12 left-0 h-[calc(100%+96px)] w-full object-cover"
+        />
+      </picture>
+    </div>
+  );
+
   return (
     <section
       ref={sectionRef}
@@ -76,22 +104,14 @@ export function LevelChapter({ id, title, line, image, clusters }: Readonly<Prop
       data-cluster={activeCluster}
       className="level level-chapter relative"
     >
-      <div className="chapter-backdrop pointer-events-none absolute inset-0 overflow-hidden">
-        <picture className="contents">
-          {backdropAvif && <source type="image/avif" srcSet={backdropAvif} />}
-          <img
-            src={showBackdrop ? image : undefined}
-            alt=""
-            aria-hidden
-            loading="lazy"
-            fetchPriority="low"
-            decoding="async"
-            width={900}
-            height={1400}
-            className="journey-backdrop level-bg absolute -inset-y-12 left-0 h-[calc(100%+96px)] w-full object-cover"
-          />
-        </picture>
-      </div>
+      {backdropTarget
+        ? createPortal(
+            <div className="journey-world" data-atmosphere-level={id}>
+              {backdrop}
+            </div>,
+            backdropTarget,
+          )
+        : backdrop}
 
       <div className="chapter-layout relative pr-[var(--hub-rail-gutter)]">
         <header className="journey-heading mx-auto max-w-[740px] px-6">

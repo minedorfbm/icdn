@@ -1,0 +1,198 @@
+.journey-worlds {
+  position: relative;
+  isolation: isolate;
+}
+.journey-worlds > .level-chapter {
+  transition: none;
+}
+.journey-atmosphere {
+  position: sticky;
+  top: 0;
+  height: 100lvh;
+  margin-bottom: -100lvh;
+  overflow: clip;
+  pointer-events: none;
+  z-index: 0;
+}
+.journey-worlds[data-atmosphere="true"][data-atmosphere-ready="true"] > .level-chapter {
+  background: transparent;
+  z-index: 1;
+}
+.journey-atmosphere-photos,
+.journey-atmosphere-decor,
+.journey-world,
+.atmosphere-effect {
+  position: absolute;
+  inset: 0;
+}
+.journey-atmosphere-decor {
+  contain: layout paint;
+  height: 100dvh;
+  bottom: auto;
+}
+.journey-world {
+  opacity: 0;
+  background: var(--world-heaven);
+}
+.journey-world[data-atmosphere-level="heaven"] {
+  background: var(--world-heaven);
+}
+.journey-world[data-atmosphere-level="sky"] {
+  background: var(--world-sky);
+}
+.journey-world[data-atmosphere-level="earth"] {
+  background: var(--world-earth);
+}
+.journey-world[data-atmosphere-level="sea"] {
+  background: var(--world-sea);
+}
+.journey-world:first-child {
+  opacity: 1;
+}
+.journey-world .chapter-backdrop {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+.journey-world .level-bg {
+  opacity: 0.1;
+}
+.atmosphere-effect {
+  visibility: hidden;
+}
+.atmosphere-effect img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: auto;
+  opacity: 0;
+}
+.atmosphere-cloud {
+  width: 86%;
+}
+.atmosphere-effect .atmosphere-cloud {
+  top: -18%;
+  left: -26%;
+}
+.atmosphere-effect .atmosphere-cloud[data-part="1"] {
+  left: auto;
+  right: -30%;
+  top: -13%;
+}
+.atmosphere-halo,
+.atmosphere-rays {
+  position: absolute;
+  inset: -10%;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+.atmosphere-halo {
+  background: radial-gradient(
+    ellipse at 40% 0%,
+    #fffef7f0,
+    #ffedb572 15%,
+    #f4cd5530 32%,
+    transparent 58%
+  );
+}
+.atmosphere-rays {
+  inset: -10% -15%;
+  transform-origin: 40% 0;
+  background: conic-gradient(
+    from 125deg at 40% 0%,
+    transparent 0 15deg,
+    #fff2ccaa 20deg,
+    #fff9e166 24deg,
+    transparent 30deg 35deg,
+    #fff3ce77 39deg,
+    transparent 44deg 51deg,
+    #fff8df88 54deg,
+    transparent 60deg
+  );
+  mask-image: linear-gradient(#000, #0009 40%, transparent 85%);
+}
+.atmosphere-bird {
+  width: clamp(84px, 10vw, 145px);
+  transform-origin: center;
+}
+.atmosphere-plant {
+  width: clamp(180px, 23vw, 290px);
+  transform-origin: 0 0;
+}
+.atmosphere-plant[data-part="1"] {
+  width: clamp(150px, 18vw, 230px);
+  transform-origin: 100% 0;
+}
+.atmosphere-plant[data-part="2"] {
+  width: clamp(35px, 4vw, 62px);
+  transform-origin: 50% 0;
+}
+.atmosphere-plant[data-part="3"] {
+  width: clamp(140px, 18vw, 220px);
+  transform-origin: 0 100%;
+}
+.atmosphere-plant[data-part="4"],
+.atmosphere-plant[data-part="5"],
+.atmosphere-plant[data-part="6"] {
+  width: clamp(24px, 2.8vw, 38px);
+  transform-origin: center;
+}
+.atmosphere-effect .atmosphere-wave {
+  top: auto;
+  left: auto;
+  right: -20%;
+  bottom: -8%;
+  width: 85%;
+  transform-origin: 80% 90%;
+}
+.atmosphere-effect .atmosphere-wave[data-part="0"] {
+  right: -25%;
+  bottom: -3%;
+  width: 88%;
+}
+@media (max-width: 767px) {
+  .atmosphere-effect .atmosphere-cloud {
+    width: 150%;
+    left: -60%;
+    top: -13%;
+  }
+  .atmosphere-effect .atmosphere-cloud[data-part="1"] {
+    left: auto;
+    right: -60%;
+    top: -12%;
+  }
+  .atmosphere-bird {
+    width: clamp(78px, 26vw, 112px);
+  }
+  .atmosphere-plant {
+    width: min(46vw, 180px);
+  }
+  .atmosphere-plant[data-part="1"] {
+    width: min(37vw, 145px);
+  }
+  .atmosphere-plant[data-part="2"] {
+    width: 34px;
+  }
+  .atmosphere-plant[data-part="3"] {
+    width: min(38vw, 150px);
+  }
+  .atmosphere-plant[data-part="4"],
+  .atmosphere-plant[data-part="5"],
+  .atmosphere-plant[data-part="6"] {
+    width: 24px;
+  }
+  .atmosphere-effect .atmosphere-wave {
+    width: 160%;
+    right: -59%;
+    bottom: 8%;
+  }
+  .atmosphere-effect .atmosphere-wave[data-part="0"] {
+    width: 165%;
+    right: -64%;
+    bottom: 12%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-atmosphere {
+    display: none;
+  }
+}
