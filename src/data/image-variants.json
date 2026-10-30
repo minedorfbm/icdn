@@ -6108,6 +6108,47 @@
       }
     ]
   },
+  "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-ac8d45688b7edb5bf37d68e3-native.webp": {
+    "aliases": [],
+    "original": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-0f78b754bd10acded9be37bb-original.png",
+    "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-ac8d45688b7edb5bf37d68e3-native.webp",
+    "width": 3840,
+    "height": 2560,
+    "variants": [
+      {
+        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-9ea4bf100002dd4a9a9147da-1920.webp",
+        "width": 1920,
+        "bytes": 241486
+      },
+      {
+        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-051c86ba8c757a960059de23-2560.webp",
+        "width": 2560,
+        "bytes": 340458
+      },
+      {
+        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-ac8d45688b7edb5bf37d68e3-native.webp",
+        "width": 3840,
+        "bytes": 558676
+      }
+    ],
+    "avif": {
+      "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-24ea9b5f44e718a2fc819377-3840.avif",
+      "width": 3840,
+      "bytes": 338438
+    },
+    "avifVariants": [
+      {
+        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-15216b0b1a70bd079d2549bb-1920.avif",
+        "width": 1920,
+        "bytes": 141500
+      },
+      {
+        "src": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-14126cdad16cdc646391c65d-2560.avif",
+        "width": 2560,
+        "bytes": 200776
+      }
+    ]
+  },
   "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-ad0bc958ed892b63ca4e7275-native.webp": {
     "aliases": [
       "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/sea-experiences-detail-39e9a31eab62.webp"

@@ -1980,6 +1980,21 @@
       ["adj-ad808139e040c4f08c501a12-1024.avif", 1024]
     ]
   },
+  "adj-ac8d45688b7edb5bf37d68e3-native.webp": {
+    "width": 3840,
+    "height": 2560,
+    "aliases": [],
+    "variants": [
+      ["adj-9ea4bf100002dd4a9a9147da-1920.webp", 1920],
+      ["adj-051c86ba8c757a960059de23-2560.webp", 2560],
+      ["adj-ac8d45688b7edb5bf37d68e3-native.webp", 3840]
+    ],
+    "avif": [
+      ["adj-15216b0b1a70bd079d2549bb-1920.avif", 1920],
+      ["adj-14126cdad16cdc646391c65d-2560.avif", 2560],
+      ["adj-24ea9b5f44e718a2fc819377-3840.avif", 3840]
+    ]
+  },
   "adj-ad0bc958ed892b63ca4e7275-native.webp": {
     "width": 1600,
     "height": 1080,

@@ -842,5 +842,9 @@
   {
     "source": "src/assets/nam-tram-selector.webp",
     "role": "Ressource fixe"
+  },
+  {
+    "source": "https://cxcffaegqyvbhrpzpowa.supabase.co/storage/v1/object/public/hub-images/adj-0f78b754bd10acded9be37bb-original.png",
+    "role": "Hero desktop HD - master RealESRGAN, affichage limite a 3840 px (docs/images.md)"
   }
 ]

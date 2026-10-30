@@ -2,7 +2,12 @@ import { CardEntryProvider } from "@/components/hub/CardEntryProvider";
 import { NotFoundPage } from "@/components/NotFoundPage";
 import { HubHero } from "@/components/hub/HubHero";
 import { GoogleAnalytics } from "@/components/hub/GoogleAnalytics";
-import { HERO_CLOUD_SOURCE, HERO_LANDSCAPE_MEDIA, HERO_PORTRAIT_MEDIA } from "@/lib/hero-media";
+import {
+  HERO_CLOUD_SOURCE,
+  HERO_DESKTOP_MEDIA,
+  HERO_PORTRAIT_MEDIA,
+  HERO_TABLET_LANDSCAPE_MEDIA,
+} from "@/lib/hero-media";
 import { homeHeroSizes, picturePreload, thumbnailImage } from "@/lib/responsive-image";
 import { HubSearchProvider } from "@/features/search/HubSearchProvider";
 import { ResortMapProvider } from "@/features/resort-map/ResortMapProvider";
@@ -69,7 +74,17 @@ export const Route = createFileRoute("/_hub")({
               resolveHeroImage(loaderData, "landscape"),
               homeHeroSizes(resolveHeroImage(loaderData, "landscape")),
             ),
-            media: HERO_LANDSCAPE_MEDIA,
+            media: HERO_TABLET_LANDSCAPE_MEDIA,
+            fetchPriority: "high",
+          },
+          {
+            rel: "preload",
+            as: "image",
+            ...picturePreload(
+              resolveHeroImage(loaderData, "desktop"),
+              homeHeroSizes(resolveHeroImage(loaderData, "desktop")),
+            ),
+            media: HERO_DESKTOP_MEDIA,
             fetchPriority: "high",
           },
           {
@@ -210,6 +225,7 @@ function HubRoute() {
             <HubHero
               image={resolveHeroImage({ settings })}
               landscapeImage={resolveHeroImage({ settings }, "landscape")}
+              desktopImage={resolveHeroImage({ settings }, "desktop")}
             />
           </>
         )}

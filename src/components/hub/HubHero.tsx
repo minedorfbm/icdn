@@ -1,4 +1,4 @@
-import { HERO_LANDSCAPE_MEDIA } from "@/lib/hero-media";
+import { HERO_DESKTOP_MEDIA, HERO_LANDSCAPE_MEDIA } from "@/lib/hero-media";
 import { ResortLogo } from "./ResortLogo";
 import { useI18n } from "@/i18n";
 import { ArrowDown } from "lucide-react";
@@ -17,18 +17,34 @@ const MichelinFilm = lazy(() => import("./MichelinFilm"));
 export function HubHero({
   image,
   landscapeImage,
-}: Readonly<{ image: string; landscapeImage: string }>) {
+  desktopImage,
+}: Readonly<{ image: string; landscapeImage: string; desktopImage: string }>) {
   const { t } = useI18n();
   const [filmOpen, setFilmOpen] = useState(false);
   const closeFilm = useCallback(() => setFilmOpen(false), []);
   const portrait = responsiveImage(image, homeHeroSizes(image));
   const landscape = responsiveImage(landscapeImage, homeHeroSizes(landscapeImage));
+  const desktop = responsiveImage(desktopImage, homeHeroSizes(desktopImage));
   const portraitAvif = responsiveAvif(image, homeHeroSizes(image));
   const landscapeAvif = responsiveAvif(landscapeImage, homeHeroSizes(landscapeImage));
+  const desktopAvif = responsiveAvif(desktopImage, homeHeroSizes(desktopImage));
   return (
     <section className="brand-ui hub-hero">
       <div className="hero-photograph">
         <picture>
+          {desktopAvif && (
+            <source
+              media={HERO_DESKTOP_MEDIA}
+              type="image/avif"
+              srcSet={desktopAvif.srcSet}
+              sizes={desktopAvif.sizes}
+            />
+          )}
+          <source
+            media={HERO_DESKTOP_MEDIA}
+            srcSet={desktop.srcSet ?? desktop.src}
+            sizes={desktop.sizes}
+          />
           {landscapeAvif && (
             <source
               media={HERO_LANDSCAPE_MEDIA}
