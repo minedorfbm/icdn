@@ -45,7 +45,10 @@ export const Route = createFileRoute("/_hub/$destinationId")({
             { name: "description", content: destination.short_description },
             { property: "og:title", content: `${destination.name} — InterContinental Danang` },
             { property: "og:description", content: destination.short_description },
-            { property: "og:image", content: destination.image },
+            {
+              property: "og:image",
+              content: new URL(destination.image, "https://icdn.artdigitaljourney.com").href,
+            },
             { name: "twitter:card", content: "summary_large_image" },
           ],
         }

@@ -342,12 +342,20 @@ test("top Back skips the card trail and restores the home's selected card and sc
   await expect(page).toHaveURL("/tingara");
   await expect(page.locator('article[data-destination-id="tingara"]')).toBeVisible();
   await expect(page.locator("[data-previous-destination]")).toHaveCount(0);
-  await page.locator("[data-next-destination]").click();
+  // This scenario checks the card trail and Back, not an embed resizing mid-click.
+  // Wait for the deterministic Instagram fixture and its fitted layout before clicking.
+  const continueJourney = async () => {
+    const post = page.locator(".editorial-instagram-section .instagram-post-viewport").first();
+    await post.scrollIntoViewIfNeeded();
+    await expect(post).toHaveCSS("opacity", "1");
+    await page.locator("[data-next-destination]").click();
+  };
+  await continueJourney();
   await expect(page).toHaveURL("/pilot-citron");
   // History commits before the route loader finishes: wait for the new card,
   // otherwise the second click can still target TINGARA's old next button.
   await expect(page.locator('article[data-destination-id="pilot-citron"]')).toBeVisible();
-  await page.locator("[data-next-destination]").click();
+  await continueJourney();
   await expect(page).toHaveURL("/citron");
   await expect(page.locator('article[data-destination-id="citron"]')).toBeVisible();
   await page.getByRole("button", { name: "BACK", exact: true }).click();

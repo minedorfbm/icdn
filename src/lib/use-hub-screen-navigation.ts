@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
 import type { HubScreen } from "./hub-screen";
 import type { MapRequest } from "@/features/resort-map/map-context";
 import { mapRequest } from "@/features/resort-map/map-background";
+import { isDestinationPath } from "./hub-screen";
 import type { SearchSnapshot } from "@/features/search/search-context";
 
 declare module "@tanstack/react-router" {
@@ -61,7 +62,12 @@ export function useHubScreenNavigation() {
       void navigate({
         to: fallback ? "/" : source,
         replace: true,
-        state: fallback ? {} : (location.state.hubScreenFromState ?? {}),
+        state: fallback
+          ? {}
+          : {
+              ...location.state.hubScreenFromState,
+              ...(isDestinationPath(source) ? { hubCardHistoryDetached: true } : {}),
+            },
         resetScroll: false,
       });
       return;
