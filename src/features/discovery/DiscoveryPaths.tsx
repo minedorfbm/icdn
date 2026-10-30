@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { ArrowDown, ArrowUpRight, Compass, Map as MapIcon, Sparkles } from "lucide-react";
 import type { Destination } from "@/data/resort";
 import { useHub } from "@/data/hub-context";
@@ -8,6 +8,7 @@ import { imageSource } from "@/lib/image-source";
 import { discoveryCopy } from "./discovery-copy";
 import { useHubScreenNavigation } from "@/lib/use-hub-screen-navigation";
 import "./discovery.css";
+import { mountDiscoveryMotion } from "./discovery-motion";
 import { thumbnail, thumbnailAvif } from "@/lib/responsive-image";
 
 const choices = [
@@ -61,6 +62,11 @@ function ChoiceArtwork({
 }
 
 export function DiscoveryPaths({ onJourney }: Readonly<{ onJourney: () => void }>) {
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    return mountDiscoveryMotion(sectionRef.current);
+  }, []);
   const { destinations, levels } = useHub();
   const { lang } = useI18n();
   const { openMap } = useResortMap();
@@ -78,7 +84,12 @@ export function DiscoveryPaths({ onJourney }: Readonly<{ onJourney: () => void }
   );
 
   return (
-    <section id="discover" className="discovery-paths" aria-labelledby="discovery-title">
+    <section
+      ref={sectionRef}
+      id="discover"
+      className="discovery-paths"
+      aria-labelledby="discovery-title"
+    >
       <div className="discovery-inner">
         <header className="discovery-heading">
           <p>{copy("kicker")}</p>

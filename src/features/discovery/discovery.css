@@ -310,3 +310,145 @@
     transition: none;
   }
 }
+
+/* Finite entrances: the static rules above remain the source of truth at rest. */
+@keyframes discovery-heading-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes discovery-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes discovery-tram-enter {
+  0% {
+    opacity: 0;
+    transform: translate(calc(8% + 8px), -17px);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(8%, 0);
+  }
+  68% {
+    opacity: 1;
+    transform: translate(calc(8% - 5px), 11px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(8%);
+  }
+}
+@keyframes discovery-map-enter {
+  from {
+    opacity: 0.3;
+    transform: scale(1.15) rotate(-19deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.15) rotate(-12deg);
+  }
+}
+@keyframes discovery-photo-first-enter {
+  0% {
+    opacity: 0;
+    transform: translate(0, 8px) rotate(0deg);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(-12%, 0) rotate(-10deg);
+  }
+  72% {
+    opacity: 1;
+    transform: translate(-20%, -3px) rotate(-14deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-12%) rotate(-10deg);
+  }
+}
+@keyframes discovery-photo-second-enter {
+  0% {
+    opacity: 0;
+    transform: translate(0, 8px) rotate(0deg);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(12%, 0) rotate(4deg);
+  }
+  72% {
+    opacity: 1;
+    transform: translate(15%, -5px) rotate(6deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(12%) rotate(4deg);
+  }
+}
+@keyframes discovery-photo-third-enter {
+  0% {
+    opacity: 0;
+    transform: translate(0, 8px) rotate(0deg);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(36%, 0) rotate(17deg);
+  }
+  72% {
+    opacity: 1;
+    transform: translate(46%, -3px) rotate(22deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(36%) rotate(17deg);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .discovery-heading[data-discovery-entry="enter"] {
+    animation: discovery-heading-enter 1s cubic-bezier(0.33, 1, 0.68, 1) var(--discovery-delay)
+      backwards;
+  }
+  .discovery-choice[data-discovery-entry="enter"] {
+    animation: discovery-card-enter 0.95s cubic-bezier(0.33, 1, 0.68, 1) var(--discovery-delay)
+      backwards;
+  }
+  .discovery-choice[data-discovery-entry="enter"] .discovery-tram img {
+    animation: discovery-tram-enter 2.4s cubic-bezier(0.33, 1, 0.68, 1)
+      calc(var(--discovery-delay) + 0.4s) backwards;
+  }
+  .discovery-choice[data-discovery-entry="enter"] .discovery-map-art img {
+    animation: discovery-map-enter 1.9s cubic-bezier(0.33, 1, 0.68, 1)
+      calc(var(--discovery-delay) + 0.6s) backwards;
+  }
+  .discovery-choice[data-discovery-entry="enter"] .discovery-mini-deck img {
+    animation-duration: 2.4s;
+    animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+    animation-delay: calc(var(--discovery-delay) + 0.75s);
+    animation-fill-mode: backwards;
+  }
+  .discovery-choice[data-discovery-entry="enter"] .discovery-mini-deck picture:nth-child(1) img {
+    animation-name: discovery-photo-first-enter;
+  }
+  .discovery-choice[data-discovery-entry="enter"] .discovery-mini-deck picture:nth-child(2) img {
+    animation-name: discovery-photo-second-enter;
+  }
+  .discovery-choice[data-discovery-entry="enter"] .discovery-mini-deck picture:nth-child(3) img {
+    animation-name: discovery-photo-third-enter;
+  }
+  .discovery-heading[data-discovery-entry="enter"],
+  .discovery-choice[data-discovery-entry="enter"],
+  .discovery-choice[data-discovery-entry="enter"] .discovery-art img {
+    animation-play-state: var(--discovery-play, running);
+  }
+}
