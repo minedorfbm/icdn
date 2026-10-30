@@ -4,6 +4,7 @@ import {
   birdPoses,
   passageProgress,
   plantPoses,
+  waveLayout,
   wavePoses,
 } from "../src/lib/atmosphere-motion";
 
@@ -59,7 +60,18 @@ test("botanical and wave tails finish transparent at mobile and desktop sizes", 
   }
 });
 
-test("wave arrival is continuous and withdrawal follows the incoming diagonal back out", () => {
+test("waves travel right to left, hold fully visible at the real card centre, then fade in place", () => {
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    const card = { left: width * 0.08, width: width * 0.75, centerY: 510 };
+    const layout = waveLayout(width, 844, card);
+    expect(layout.left).toBeGreaterThanOrEqual(0);
+    expect(layout.left + layout.width).toBeLessThanOrEqual(width);
+    expect(layout.top + layout.width * 0.15).toBe(card.centerY);
+    expect(wavePoses(0.4, width, 844, card)[1]!.x).toBeGreaterThan(
+      wavePoses(0.8, width, 844, card)[1]!.x,
+    );
+    expect(wavePoses(1, width, 844, card)).toEqual(wavePoses(1.4, width, 844, card));
+  }
   const arriving = wavePoses(1, 390, 844),
     justArrived = wavePoses(1.00001, 390, 844),
     leaving = wavePoses(1.8, 390, 844);
@@ -69,8 +81,8 @@ test("wave arrival is continuous and withdrawal follows the incoming diagonal ba
     expect(Math.abs(next.x - wave.x)).toBeLessThan(0.01);
     expect(Math.abs(next.y - wave.y)).toBeLessThan(0.01);
     expect(Math.abs(next.opacity - wave.opacity)).toBeLessThan(0.01);
-    expect(retreat.x).toBeGreaterThan(wave.x);
-    expect(retreat.y).toBeGreaterThan(wave.y);
+    expect(retreat.x).toBe(wave.x);
+    expect(retreat.y).toBe(wave.y);
     expect(retreat.opacity).toBeLessThan(wave.opacity);
   });
 });

@@ -143,17 +143,10 @@
   transform-origin: center;
 }
 .atmosphere-effect .atmosphere-wave {
-  top: auto;
-  left: auto;
-  right: -20%;
-  bottom: -8%;
-  width: 85%;
-  transform-origin: 80% 90%;
-}
-.atmosphere-effect .atmosphere-wave[data-part="0"] {
-  right: -25%;
-  bottom: -3%;
-  width: 88%;
+  top: 0;
+  left: 0;
+  width: var(--atmosphere-wave-width, 90vw);
+  transform-origin: left center;
 }
 @media (max-width: 767px) {
   .atmosphere-effect .atmosphere-cloud {
@@ -185,16 +178,6 @@
   .atmosphere-plant[data-part="5"],
   .atmosphere-plant[data-part="6"] {
     width: 24px;
-  }
-  .atmosphere-effect .atmosphere-wave {
-    width: 160%;
-    right: -59%;
-    bottom: 8%;
-  }
-  .atmosphere-effect .atmosphere-wave[data-part="0"] {
-    width: 165%;
-    right: -64%;
-    bottom: 12%;
   }
 }
 @media (prefers-reduced-motion: reduce) {

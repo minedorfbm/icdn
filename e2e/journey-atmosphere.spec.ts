@@ -76,6 +76,21 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       ).toEqual(pose);
       await position(page, station.top);
       await expect(world).toHaveCSS("opacity", "1");
+      if (station.id === "sea") {
+        const wave = group.locator('img[data-part="1"]');
+        const bounds = await wave.boundingBox();
+        const card = await page
+          .locator('#sea .perspective-card[data-card-offset="0"]')
+          .boundingBox();
+        expect(bounds!.x).toBeGreaterThanOrEqual(0);
+        expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
+        expect(Math.abs(bounds!.y + bounds!.height / 2 - card!.y - card!.height / 2)).toBeLessThan(
+          2,
+        );
+        const held = await wave.getAttribute("style");
+        await page.waitForTimeout(200);
+        expect(await wave.getAttribute("style")).toBe(held);
+      }
       await expect(group).toHaveCSS("visibility", "hidden", { timeout: 2500 });
       await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
         "data-atmosphere-moving",
@@ -141,7 +156,9 @@ test("Heaven illuminates once, native scrolling stays free and hidden tabs stop 
   await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
   const tops = await stations(page);
   const heaven = page.locator('[data-atmosphere-effect="heaven"]');
-  await position(page, tops[0]!.top - 844 * 0.2);
+  await position(page, tops[0]!.top - 844 - 10);
+  await expect(heaven).toHaveCSS("visibility", "hidden");
+  await position(page, tops[0]!.top - 844 * 0.94);
   await expect
     .poll(() =>
       heaven
@@ -154,7 +171,23 @@ test("Heaven illuminates once, native scrolling stays free and hidden tabs stop 
         ),
     )
     .toBe(true);
-  await expect(heaven).toHaveCSS("visibility", "hidden");
+  await expect(heaven).toHaveCSS("visibility", "visible");
+  await position(page, tops[0]!.top - 844 * 0.2);
+  const approaching = await heaven
+    .locator("img")
+    .evaluateAll((es) => es.map((e) => e.getAttribute("style")));
+  await position(page, tops[0]!.top - 844 * 0.5);
+  expect(
+    await heaven.locator("img").evaluateAll((es) => es.map((e) => e.getAttribute("style"))),
+  ).not.toEqual(approaching);
+  await position(page, tops[0]!.top - 844 * 0.2);
+  expect(
+    await heaven.locator("img").evaluateAll((es) => es.map((e) => e.getAttribute("style"))),
+  ).toEqual(approaching);
+  await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
+    "data-atmosphere-moving",
+    "false",
+  );
   await position(page, tops[0]!.top);
   await expect(heaven).toHaveCSS("visibility", "visible");
   await expect
@@ -188,7 +221,7 @@ test("Heaven illuminates once, native scrolling stays free and hidden tabs stop 
   });
 });
 
-test("Heaven waits for arrival and loaded clouds, including a cold load after scroll stops", async ({
+test("a direct cold Heaven arrival waits for loaded clouds even after scroll stops", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -226,6 +259,47 @@ test("Heaven waits for arrival and loaded clouds, including a cold load after sc
   }
 });
 
+test("cold clouds join the current Heaven scroll phase without waiting for alignment", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  let release!: () => void;
+  const pending = new Promise<void>((resolve) => (release = resolve));
+  await page.route("**/hero-cloud-ivory-*.webp", async (route) => {
+    await pending;
+    await route.fulfill({
+      path: "public/hero-cloud-ivory-a26e472d.webp",
+      contentType: "image/webp",
+    });
+  });
+  try {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
+    const tops = await stations(page),
+      viewport = await page.evaluate(() => innerHeight);
+    const heaven = page.locator('[data-atmosphere-effect="heaven"]');
+    await position(page, tops[0]!.top - viewport * 0.8);
+    await expect(heaven).toHaveCSS("visibility", "hidden");
+    release();
+    await expect(heaven).toHaveCSS("visibility", "visible");
+    await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
+      "data-atmosphere-moving",
+      "false",
+    );
+    const pose = await heaven
+      .locator("img")
+      .evaluateAll((es) => es.map((e) => e.getAttribute("style")));
+    await page.waitForTimeout(250);
+    expect(
+      await heaven.locator("img").evaluateAll((es) => es.map((e) => e.getAttribute("style"))),
+    ).toEqual(pose);
+    await position(page, tops[0]!.top);
+    await expect(heaven).toHaveCSS("visibility", "hidden", { timeout: 1500 });
+  } finally {
+    release();
+  }
+});
+
 test("reduced motion preserves static palette/photos and never requests effect assets", async ({
   page,
 }) => {
@@ -249,6 +323,98 @@ test("reduced motion preserves static palette/photos and never requests effect a
   }
   expect(requests).toEqual([]);
 });
+
+test("new decorative transfers wait behind pending front photos and wake without another scroll", async ({
+  page,
+  request,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  const catalogue = await (
+    await request.get("http://127.0.0.1:54329/rest/v1/rpc/published_hub_catalogue_v1")
+  ).json();
+  for (const destination of catalogue.destinations)
+    destination.image_key = `/atmosphere-priority/cover-${destination.id}.png`;
+  await page.route("**/_serverFn/**", async (route) => {
+    const response = await route.fetch();
+    if (response.headers()["server-timing"]?.includes("catalogue;"))
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(catalogue),
+      });
+    else await route.fulfill({ response });
+  });
+  let release!: () => void;
+  const pending = new Promise<void>((resolve) => (release = resolve));
+  let heldPhotos = 0;
+  await page.route("**/atmosphere-priority/**", async (route) => {
+    heldPhotos++;
+    await pending;
+    await route.fulfill({
+      path: "public/intercontinental-touch-icon.png",
+      contentType: "image/png",
+    });
+  });
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (effects.test(request.url())) requests.push(request.url());
+  });
+  try {
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
+    const tops = await stations(page),
+      viewport = await page.evaluate(() => innerHeight);
+    await position(page, tops[1]!.top - viewport * 0.42);
+    await expect.poll(() => heldPhotos).toBeGreaterThan(0);
+    await expect
+      .poll(() =>
+        page
+          .locator('#sky .perspective-card[data-card-offset="0"] img')
+          .first()
+          .evaluate(
+            (image) =>
+              Boolean(image.getAttribute("src") || image.getAttribute("srcset")) &&
+              !(image as HTMLImageElement).complete,
+          ),
+      )
+      .toBe(true);
+    await page.waitForTimeout(200);
+    expect(requests).toEqual([]);
+    release();
+    await expect.poll(() => requests.some((url) => url.includes("bee-eater"))).toBe(true);
+  } finally {
+    release();
+  }
+});
+
+for (const connection of [
+  { saveData: true, effectiveType: "4g" },
+  { saveData: false, effectiveType: "2g" },
+]) {
+  test(`constrained network ${JSON.stringify(connection)} keeps the journey usable without new decoration downloads`, async ({
+    page,
+  }) => {
+    await page.addInitScript(
+      (value) => Object.defineProperty(navigator, "connection", { configurable: true, value }),
+      connection,
+    );
+    const requests: string[] = [];
+    page.on("request", (request) => {
+      if (effects.test(request.url())) requests.push(request.url());
+    });
+    await page.goto("/");
+    const tops = await stations(page);
+    for (const station of tops) {
+      await position(page, station.top);
+      await expect(page.locator(`[data-atmosphere-effect="${station.id}"]`)).toHaveCSS(
+        "visibility",
+        "hidden",
+      );
+    }
+    expect(requests).toEqual([]);
+    await expect(page.locator('#sea .perspective-card[data-card-offset="0"]')).toBeVisible();
+  });
+}
 
 test("resizing recomputes the scene position and motion can be disabled during a passage", async ({
   page,

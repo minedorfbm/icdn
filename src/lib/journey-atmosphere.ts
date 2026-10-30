@@ -6,12 +6,20 @@ import {
   clampAtmosphere,
   passageProgress,
   plantPoses,
+  smoothAtmosphere,
+  waveLayout,
   wavePoses,
   type AtmosphericPose,
+  type WaveCardAnchor,
 } from "./atmosphere-motion";
 
-export type AtmosphereStation = { id: Level; top: number; height: number };
-const durations: Record<Level, number> = { heaven: 2100, sky: 950, earth: 750, sea: 1700 };
+export type AtmosphereStation = {
+  id: Level;
+  top: number;
+  height: number;
+  card?: WaveCardAnchor | undefined;
+};
+const durations: Record<Level, number> = { heaven: 2100, sky: 950, earth: 750, sea: 1800 };
 function write(element: HTMLElement | undefined | null, property: string, value: string) {
   if (element && element.style.getPropertyValue(property) !== value)
     element.style.setProperty(property, value);
@@ -31,6 +39,20 @@ function paintPoses(elements: HTMLElement[], poses: AtmosphericPose[]) {
 
 /** Shares the rail's existing scroll clock. No scroll interception or perpetual RAF. */
 export function createJourneyAtmosphere(root: HTMLElement) {
+  const connection = (
+    navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }
+  ).connection;
+  const decorationsAllowed =
+    !connection?.saveData && !["slow-2g", "2g"].includes(connection?.effectiveType ?? "");
+  const warmed = new Set<Level>();
+  const chapters = new Map(
+    Array.from(root.querySelectorAll<HTMLElement>(".level-chapter"), (chapter) => [
+      chapter.id,
+      chapter,
+    ]),
+  );
   const plate = root.querySelector<HTMLElement>(".journey-atmosphere");
   const container = root.querySelector<HTMLElement>(".journey-worlds");
   const worlds = new Map(
@@ -62,23 +84,53 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     lastViewport = NaN;
   const tails = new Map<Level, number>();
   let previousY: number | undefined, introStart: number | undefined;
+  let introFrom = 0,
+    introLast = 0;
 
   function warm(id: Level) {
+    if (warmed.has(id)) return;
+    // Clouds reuse an already requested hero file. New artwork yields to all
+    // admitted high-priority front photos; image load/error wakes this clock.
+    if (id !== "heaven") {
+      const cover = chapters
+        .get(id)
+        ?.querySelector<HTMLImageElement>('.destination-panel[aria-hidden="false"] img');
+      // IO/React may not yet have admitted the approaching level's photo on the
+      // first scroll frame. Absence of an eager cover is not an idle network.
+      if (
+        !cover ||
+        cover.getAttribute("fetchpriority") !== "high" ||
+        !cover.complete ||
+        (!cover.currentSrc && !cover.getAttribute("src"))
+      )
+        return;
+      if (
+        Array.from(
+          root.querySelectorAll<HTMLImageElement>(
+            '.destination-panel[aria-hidden="false"] img[fetchpriority="high"]',
+          ),
+        ).some((image) => !image.complete || (!image.currentSrc && !image.getAttribute("src")))
+      )
+        return;
+    }
     for (const element of sprites.get(id) ?? []) {
       const image = element as HTMLImageElement;
       if (!image.hasAttribute("src") && image.dataset["src"]) image.src = image.dataset["src"];
     }
+    warmed.add(id);
   }
   function hide() {
     for (const group of groups.values()) write(group, "visibility", "hidden");
     tails.clear();
     introStart = undefined;
+    introLast = 0;
     if (plate) plate.dataset["atmosphereMoving"] = "false";
   }
-  function heaven(progress: number, width: number, height: number) {
+  function heaven(progress: number, width: number, height: number, entry = 1) {
     const group = groups.get("heaven");
     visibleEffects.add("heaven");
-    const glow = Math.pow(Math.sin(progress * Math.PI), 1.1);
+    const appearance = smoothAtmosphere(entry / 0.12);
+    const glow = Math.pow(Math.sin(progress * Math.PI), 1.1) * appearance;
     const halo = group?.querySelector<HTMLElement>(".atmosphere-halo"),
       rays = group?.querySelector<HTMLElement>(".atmosphere-rays");
     write(halo, "opacity", (glow * 0.85).toFixed(3));
@@ -92,7 +144,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
         y: -progress * height * 0.14,
         rotate: 0,
         scale: 1,
-        opacity: (1 - progress) * 0.73,
+        opacity: (1 - progress) * 0.73 * appearance,
       })),
     );
   }
@@ -128,25 +180,46 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     target: string | null,
   ) {
     if (
-      !root.dataset["heavenIlluminated"] &&
-      y >= first.top - viewport * 0.07 &&
-      y < first.top + viewport * 0.2 &&
-      (!target || target === "heaven") &&
-      (sprites.get("heaven") ?? []).every((element) => {
+      root.dataset["heavenIlluminated"] ||
+      y + viewport <= first.top ||
+      y >= first.top + viewport * 0.2 ||
+      (target && target !== "heaven")
+    ) {
+      introStart = undefined;
+      introLast = 0;
+      return false;
+    }
+    if (
+      !(sprites.get("heaven") ?? []).every((element) => {
         const image = element as HTMLImageElement;
         return image.complete && image.naturalWidth > 0;
       })
-    ) {
-      root.dataset["heavenIlluminated"] = "true";
-      introStart = now;
-    }
-    if (introStart === undefined) return false;
-    const progress = clampAtmosphere((now - introStart) / durations.heaven);
-    if (progress >= 1 || y >= first.top + viewport * 0.4) {
+    )
+      return false;
+    const entry = clampAtmosphere((y + viewport - first.top) / Math.max(1, viewport));
+    if (y < first.top - 2) {
+      // The real scroll opens the clouds from the first visible part of HEAVEN.
+      // A stationary/reversed approach cannot consume or finish the entrance.
       introStart = undefined;
+      introLast = entry * 0.65;
+      heaven(introLast, width, viewport, entry);
       return false;
     }
-    heaven(progress, width, viewport);
+    if (introStart === undefined) {
+      introStart = now;
+      introFrom = introLast;
+    }
+    // A direct/cold arrival still gets a gentle full entrance; ordinary scrolling
+    // has already played its approach and only needs the short finishing fade.
+    const duration = introFrom > 0 ? 900 : durations.heaven;
+    const tail = clampAtmosphere((now - introStart) / duration);
+    if (tail >= 1) {
+      root.dataset["heavenIlluminated"] = "true";
+      introStart = undefined;
+      introLast = 0;
+      return false;
+    }
+    heaven(introFrom + (1 - introFrom) * smoothAtmosphere(tail), width, viewport);
     return true;
   }
   function phaseFor(
@@ -188,7 +261,12 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     let poses: AtmosphericPose[];
     if (station.id === "sky") poses = birdPoses(phase, boundary, width, viewport);
     else if (station.id === "earth") poses = plantPoses(phase, boundary, width, viewport);
-    else poses = wavePoses(phase, width, viewport);
+    else {
+      const card = station.card && { ...station.card, centerY: station.card.centerY - y };
+      const layout = waveLayout(width, viewport, card);
+      write(groups.get("sea"), "--atmosphere-wave-width", `${layout.width.toFixed(2)}px`);
+      poses = wavePoses(phase, width, viewport, card);
+    }
     paintPoses(sprites.get(station.id) ?? [], poses);
   }
   function paint(
@@ -202,7 +280,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     const first = stations[0]!,
       last = stations.at(-1)!;
     paintWorlds(stations, y, viewport);
-    if (y + viewport <= first.top || y >= last.top + last.height) {
+    if (!decorationsAllowed || y + viewport <= first.top || y >= last.top + last.height) {
       hide();
       previousY = y;
       return false;

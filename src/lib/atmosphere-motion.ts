@@ -122,26 +122,29 @@ export function plantPoses(phase: number, boundary: number, width: number, heigh
   });
 }
 
-export function wavePoses(phase: number, width: number, height: number) {
+export type WaveCardAnchor = { left: number; width: number; centerY: number };
+
+/** Fit the complete illustration over the real card, including narrow phones. */
+export function waveLayout(width: number, height: number, card?: WaveCardAnchor) {
+  const anchor = card ?? { left: width * 0.12, width: width * 0.76, centerY: height * 0.55 };
+  const waveWidth = Math.min(width * 0.92, anchor.width * 1.28, 880);
+  const inset = width * 0.02;
+  const left = Math.max(
+    inset,
+    Math.min(width - waveWidth - inset, anchor.left + (anchor.width - waveWidth) / 2),
+  );
+  return { width: waveWidth, left, top: anchor.centerY - waveWidth * 0.15 };
+}
+
+export function wavePoses(phase: number, width: number, height: number, card?: WaveCardAnchor) {
   const p = clampAtmosphere(phase),
     t = clampAtmosphere(phase - 1);
-  const envelope = smoothAtmosphere((p - 0.14) / 0.52) * (1 - smoothAtmosphere(t));
-  const entry = smoothAtmosphere((p - 0.12) / 0.88),
-    retreat = smoothAtmosphere(t);
+  const { width: waveWidth, left, top } = waveLayout(width, height, card);
+  const envelope = smoothAtmosphere((p - 0.15) / 0.4) * (1 - smoothAtmosphere((t - 0.5) / 0.5));
+  const entry = smoothAtmosphere((p - 0.28) / 0.6);
+  const x = left + (1 - entry) * (width + waveWidth * 0.04 - left);
   return [
-    pose(
-      (1 - entry) * width * 0.11 + width * 0.025 + retreat * width * 0.09,
-      (1 - entry) * height * 0.11 + retreat * height * 0.12,
-      -6 + entry * 2,
-      1,
-      envelope * 0.27,
-    ),
-    pose(
-      (1 - entry) * width * 0.14 + retreat * width * 0.12,
-      (1 - entry) * height * 0.15 + retreat * height * 0.13,
-      -5 + entry * 2,
-      1,
-      envelope * 0.64,
-    ),
+    pose(x + waveWidth * 0.025, top - waveWidth * 0.025, 0, 0.95, envelope * 0.22),
+    pose(x, top, 0, 1, envelope * 0.64),
   ];
 }

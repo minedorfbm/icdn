@@ -1,7 +1,7 @@
 import { useEffect, useState, type RefObject } from "react";
 import type { Level } from "@/data/resort";
 import { arrivalProgress, journeyPosition } from "./journey-motion";
-import { createJourneyAtmosphere } from "./journey-atmosphere";
+import { createJourneyAtmosphere, type AtmosphereStation } from "./journey-atmosphere";
 
 type JourneySection = {
   id: Level;
@@ -13,6 +13,7 @@ type JourneySection = {
   height: number;
   deckTop: number;
   arrivalTop: number;
+  card: AtmosphereStation["card"];
 };
 
 function layoutTop(element: HTMLElement): number {
@@ -67,6 +68,7 @@ export function useJourneyMotion(
               height: 0,
               deckTop: 0,
               arrivalTop: 0,
+              card: undefined as AtmosphereStation["card"],
             },
           ]
         : [];
@@ -123,6 +125,20 @@ export function useJourneyMotion(
           section.headingTop = section.heading ? layoutTop(section.heading) : section.top;
           section.arrivalTop =
             section.top - parseFloat(getComputedStyle(section.element).scrollMarginTop || "0");
+          // SEA follows the actual front card. Measure on geometry changes only,
+          // never while painting a scroll frame or a swipe.
+          if (section.id === "sea") {
+            const card = section.deck?.querySelector<HTMLElement>(
+              '.perspective-card[data-card-offset="0"]',
+            );
+            section.card = card
+              ? {
+                  left: card.getBoundingClientRect().left,
+                  width: card.offsetWidth,
+                  centerY: layoutTop(card) + card.offsetHeight / 2,
+                }
+              : undefined;
+          }
         }
         dirty = false;
       }
@@ -136,6 +152,7 @@ export function useJourneyMotion(
           id: section.id,
           top: section.arrivalTop,
           height: section.height,
+          card: section.card,
         })),
         y,
         viewport,
@@ -153,12 +170,17 @@ export function useJourneyMotion(
       schedule();
     };
     const resize = new ResizeObserver(refresh);
-    sections.forEach(({ element }) => resize.observe(element));
+    sections.forEach(({ element, heading, deck }) => {
+      resize.observe(element);
+      if (heading) resize.observe(heading);
+      if (deck) resize.observe(deck);
+    });
     // The translated discovery choices above the levels can also change their offsets.
     resize.observe(root);
     window.addEventListener("scroll", schedule, { passive: true });
     // A cold cloud asset may become ready after scrolling has already stopped.
     root.addEventListener("load", schedule, true);
+    root.addEventListener("error", schedule, true);
     window.addEventListener("resize", refresh);
     reducedMotion.addEventListener("change", refresh);
     const visibility = () => {
@@ -174,6 +196,7 @@ export function useJourneyMotion(
       resize.disconnect();
       window.removeEventListener("scroll", schedule);
       root.removeEventListener("load", schedule, true);
+      root.removeEventListener("error", schedule, true);
       window.removeEventListener("resize", refresh);
       reducedMotion.removeEventListener("change", refresh);
       document.removeEventListener("visibilitychange", visibility);
