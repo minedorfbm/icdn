@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useHub } from "@/data/hub-context";
 import { prepareDetailPhoto } from "./prepare-detail-photo";
-import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
+import { useLocation, useNavigate, useRouter, type HistoryState } from "@tanstack/react-router";
 import { destinationSlug } from "@/lib/destination-route";
 import { loadDestinationMedia } from "./hub-client";
 import type { SearchSnapshot } from "@/features/search/search-context";
@@ -30,6 +30,39 @@ declare module "@tanstack/react-router" {
   }
 }
 
+function cardHistoryState(
+  pathname: string,
+  state: HistoryState,
+  search: MapRequest,
+  latestState: HistoryState,
+): HistoryState {
+  const isDestination = isDestinationPath(pathname);
+  const { hubCardTrail, hubScreenFromState: _screenReturn, ...previousState } = state;
+  // Search records its snapshot immediately before opening a card, possibly
+  // before the hook renders again. Use the live state for the origin snapshot.
+  const { hubCardOrigin: _origin, ...originState } = latestState;
+  const origin = isDestination
+    ? state.hubCardOrigin
+    : {
+        path: pathname as HubScreen | "/",
+        search: pathname === "/map" ? search : {},
+        state: originState,
+      };
+  return {
+    ...(isDestination && !state.hubSearch
+      ? {
+          hubPreviousCard: pathname.slice(1),
+          hubCardTrail: [
+            ...(hubCardTrail ?? []),
+            { destinationId: pathname.slice(1), state: previousState },
+          ],
+        }
+      : {}),
+    ...(origin ? { hubCardOrigin: origin } : {}),
+    ...(state.hubCardHistoryDetached ? { hubCardHistoryDetached: true } : {}),
+  };
+}
+
 /** Keep the hub mounted and preserve its scroll, collection and carousel state. */
 export function useDestinationNavigation() {
   const router = useRouter();
@@ -56,17 +89,6 @@ export function useDestinationNavigation() {
       const searchIndex = location.state.hubSearch
         ? location.state.__TSR_index
         : location.state.hubSearchIndex;
-      const { hubCardTrail, hubScreenFromState: _screenReturn, ...previousState } = location.state;
-      // Search records its result snapshot immediately before opening the card.
-      // That replace may precede this hook's next render; read the router's live state.
-      const { hubCardOrigin: _origin, ...originState } = router.latestLocation.state;
-      const origin = isDestination
-        ? location.state.hubCardOrigin
-        : {
-            path: location.pathname as HubScreen | "/",
-            search: (location.pathname === "/map" ? location.search : {}) as MapRequest,
-            state: originState,
-          };
       return navigate({
         to: "/$destinationId",
         params: { destinationId: slug },
@@ -80,18 +102,13 @@ export function useDestinationNavigation() {
               ? { hubScreenIndex: location.state.hubScreenIndex }
               : {}),
           ...(location.pathname === "/map" || location.state.hubMap ? { hubMap: true } : {}),
-          ...(isDestination && !location.state.hubSearch
-            ? {
-                hubPreviousCard: location.pathname.slice(1),
-                hubCardTrail: [
-                  ...(hubCardTrail ?? []),
-                  { destinationId: location.pathname.slice(1), state: previousState },
-                ],
-              }
-            : {}),
           ...(ordered ? { hubSequence: ordered } : {}),
-          ...(origin ? { hubCardOrigin: origin } : {}),
-          ...(location.state.hubCardHistoryDetached ? { hubCardHistoryDetached: true } : {}),
+          ...cardHistoryState(
+            location.pathname,
+            location.state,
+            location.search as MapRequest,
+            router.latestLocation.state,
+          ),
         },
         resetScroll: false,
       });
