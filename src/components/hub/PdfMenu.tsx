@@ -39,7 +39,8 @@ export default function PdfMenu({
   const [error, setError] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const pagesRef = useRef<HTMLDivElement>(null);
-  const anchorPage = useRef(1);
+  const readingPosition = useRef({ page: 1, fraction: 0 });
+  const renderedWidth = useRef(0);
   const pinchRef = useRef<Pinch | null>(null);
   const pendingPinchRef = useRef<Pinch | null>(null);
   const showError = useCallback(() => {
@@ -47,14 +48,37 @@ export default function PdfMenu({
     onReady();
   }, [onReady]);
 
+  const rememberPosition = useCallback(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const focus = container.getBoundingClientRect().top + container.clientHeight / 2;
+    const page = pageAt(container, focus);
+    if (!page) return;
+    const bounds = page.getBoundingClientRect();
+    if (!bounds.height) return;
+    readingPosition.current = {
+      page: Number(page.dataset["pdfPage"]),
+      fraction: Math.min(1, Math.max(0, (focus - bounds.top) / bounds.height)),
+    };
+  }, []);
+
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
+    const onScroll = () => {
+      // A resized viewport still contains the old page geometry until React
+      // commits the new width. Keep the pre-resize reading anchor until then.
+      if (renderedWidth.current === container.clientWidth) rememberPosition();
+    };
+    container.addEventListener("scroll", onScroll, { passive: true });
     const observer = new ResizeObserver(() => setWidth(container.clientWidth));
     observer.observe(container);
     setWidth(container.clientWidth);
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      observer.disconnect();
+      container.removeEventListener("scroll", onScroll);
+    };
+  }, [rememberPosition]);
 
   useEffect(() => {
     let active = true;
@@ -108,15 +132,22 @@ export default function PdfMenu({
         container.scrollTop +=
           bounds.top + bounds.height * pendingPinch.pageY - pendingPinch.center.y;
       }
-      return;
+    } else {
+      const anchor = readingPosition.current;
+      const page = container.querySelector<HTMLElement>(`[data-pdf-page="${anchor.page}"]`);
+      if (page) {
+        const bounds = page.getBoundingClientRect();
+        container.scrollTop +=
+          bounds.top +
+          bounds.height * anchor.fraction -
+          container.getBoundingClientRect().top -
+          container.clientHeight / 2;
+      }
+      container.scrollLeft = zoom > 1 ? (container.scrollWidth - container.clientWidth) / 2 : 0;
     }
-    const page = container.querySelector<HTMLElement>(`[data-pdf-page="${anchorPage.current}"]`);
-    if (page) {
-      const top = page.getBoundingClientRect().top - container.getBoundingClientRect().top;
-      container.scrollTop += top - 16;
-    }
-    container.scrollLeft = zoom > 1 ? (container.scrollWidth - container.clientWidth) / 2 : 0;
-  }, [zoom, width, pdf]);
+    renderedWidth.current = container.clientWidth;
+    rememberPosition();
+  }, [zoom, width, pdf, rememberPosition]);
 
   useEffect(() => {
     const container = scrollRef.current;
@@ -198,12 +229,7 @@ export default function PdfMenu({
   }, [pdf, zoom]);
 
   const toggleZoom = () => {
-    const container = scrollRef.current;
-    if (container) {
-      const focus = container.getBoundingClientRect().top + container.clientHeight * 0.35;
-      const current = pageAt(container, focus);
-      if (current) anchorPage.current = Number(current.dataset["pdfPage"]);
-    }
+    rememberPosition();
     setZoom((value) => (value > 1 ? 1 : 2));
   };
 
@@ -241,7 +267,7 @@ export default function PdfMenu({
         ref={scrollRef}
         className="min-h-0 flex-1 overflow-auto overscroll-contain"
         aria-label={title}
-        style={{ touchAction: "pan-x pan-y" }}
+        style={{ touchAction: "pan-x pan-y", overflowAnchor: "none" }}
       >
         {renderDocument()}
       </div>
