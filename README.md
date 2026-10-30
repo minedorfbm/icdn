@@ -34,7 +34,7 @@ bun run lint
 bun run deploy:check
 ```
 
-Le workflow [Validate hub](.github/workflows/ci.yml) exécute ces contrôles sur les pull requests et `main`. `bun run preview:cloudflare` permet ensuite de tester le Worker construit en local. Les gestes tactiles et le rendu responsive doivent aussi être vérifiés dans un navigateur et sur téléphone.
+Le workflow [Validate hub](.github/workflows/ci.yml) exécute ces contrôles sur les pull requests et `main`. Les quatre combinaisons navigateur/construction sont réparties chacune sur trois runners isolés, sans retirer de scénarios ni de couverture ; voir [l’organisation de la validation](docs/ci-validation.md). `bun run preview:cloudflare` permet ensuite de tester le Worker construit en local. Les gestes tactiles et le rendu responsive doivent aussi être vérifiés dans un navigateur et sur téléphone.
 
 Le dernier [audit du code et de la sécurité](docs/audits/code-security-2026-10-14.md) détaille les corrections, les vérifications et la dette de synchronisation Supabase restante.
 
