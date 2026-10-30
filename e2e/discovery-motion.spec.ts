@@ -22,9 +22,11 @@ async function threePreviews(page: Page) {
 async function finishEntry(page: Page, selector: string) {
   const node = page.locator(selector);
   await node.evaluate((el) => {
-    for (const animation of el.getAnimations({ subtree: true })) {
-      if (animation instanceof CSSAnimation && animation.animationName.startsWith("discovery-"))
-        animation.finish();
+    for (const node of [el, ...el.querySelectorAll("img")]) {
+      for (const animation of node.getAnimations()) {
+        if (animation instanceof CSSAnimation && animation.animationName.startsWith("discovery-"))
+          animation.finish();
+      }
     }
   });
   await expect(node).toHaveAttribute("data-discovery-entry", "done");
@@ -53,10 +55,23 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       const card = page.locator(`.discovery-${kind}`);
       await card.scrollIntoViewIfNeeded();
       await expect(card).toHaveAttribute("data-discovery-entry", "enter");
-      const animations = await card.evaluate(
-        (el) => el.getAnimations({ subtree: true }).filter((a) => a instanceof CSSAnimation).length,
-      );
-      expect(animations).toBeGreaterThan(1);
+      // The card fade may already have finished when WebKit scrolls a stable target.
+      // Inspect the visual's own timeline instead of requiring overlapping animations.
+      await expect
+        .poll(() =>
+          card
+            .locator("img")
+            .first()
+            .evaluate(
+              (el) =>
+                el
+                  .getAnimations()
+                  .filter(
+                    (a) => a instanceof CSSAnimation && a.animationName.startsWith("discovery-"),
+                  ).length,
+            ),
+        )
+        .toBeGreaterThan(0);
       await finishEntry(page, `.discovery-${kind}`);
       await expect(card).toHaveCSS("opacity", "1");
       await expect(card).toHaveCSS("transform", "none");
