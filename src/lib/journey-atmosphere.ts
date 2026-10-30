@@ -5,6 +5,8 @@ import {
   birdPoses,
   clampAtmosphere,
   passageProgress,
+  heavenEntryLead,
+  settlePlantPoses,
   plantPoses,
   smoothAtmosphere,
   waveLayout,
@@ -87,6 +89,9 @@ export function createJourneyAtmosphere(root: HTMLElement) {
   let introFrom = 0,
     introLast = 0;
 
+  let earthPoses: AtmosphericPose[] | undefined;
+  let earthFrame = 0;
+
   function warm(id: Level) {
     if (warmed.has(id)) return;
     // Clouds reuse an already requested hero file. New artwork yields to all
@@ -122,6 +127,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
   function hide() {
     for (const group of groups.values()) write(group, "visibility", "hidden");
     tails.clear();
+    earthPoses = undefined;
     introStart = undefined;
     introLast = 0;
     if (plate) plate.dataset["atmosphereMoving"] = "false";
@@ -181,7 +187,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
   ) {
     if (
       root.dataset["heavenIlluminated"] ||
-      y + viewport <= first.top ||
+      y + viewport <= first.top - heavenEntryLead(viewport) ||
       y >= first.top + viewport * 0.2 ||
       (target && target !== "heaven")
     ) {
@@ -196,9 +202,10 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       })
     )
       return false;
-    const entry = clampAtmosphere((y + viewport - first.top) / Math.max(1, viewport));
+    const lead = heavenEntryLead(viewport);
+    const entry = clampAtmosphere((y + viewport - first.top + lead) / Math.max(1, viewport + lead));
     if (y < first.top - 2) {
-      // The real scroll opens the clouds from the first visible part of HEAVEN.
+      // A small, clipped foreground lead announces HEAVEN before its title enters.
       // A stationary/reversed approach cannot consume or finish the entrance.
       introStart = undefined;
       introLast = entry * 0.65;
@@ -255,19 +262,32 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     y: number,
     viewport: number,
     width: number,
+    now: number,
   ) {
     visibleEffects.add(station.id);
+    let settling = false;
     const boundary = Math.max(0, station.top - y);
     let poses: AtmosphericPose[];
     if (station.id === "sky") poses = birdPoses(phase, boundary, width, viewport);
-    else if (station.id === "earth") poses = plantPoses(phase, boundary, width, viewport);
-    else {
+    else if (station.id === "earth") {
+      const target = plantPoses(phase, boundary, width, viewport);
+      // Snap distant navigation/resize, smooth only local decorative movement.
+      const previous =
+        previousY !== undefined && Math.abs(y - previousY) < viewport * 0.5
+          ? earthPoses
+          : undefined;
+      const result = settlePlantPoses(previous, target, now - earthFrame);
+      earthPoses = poses = result.poses;
+      earthFrame = now;
+      settling = result.moving;
+    } else {
       const card = station.card && { ...station.card, centerY: station.card.centerY - y };
-      const layout = waveLayout(width, viewport, card);
+      const layout = waveLayout(width, viewport, card, boundary);
       write(groups.get("sea"), "--atmosphere-wave-width", `${layout.width.toFixed(2)}px`);
-      poses = wavePoses(phase, width, viewport, card);
+      poses = wavePoses(phase, width, viewport, card, boundary);
     }
     paintPoses(sprites.get(station.id) ?? [], poses);
+    return settling;
   }
   function paint(
     stations: AtmosphereStation[],
@@ -280,7 +300,12 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     const first = stations[0]!,
       last = stations.at(-1)!;
     paintWorlds(stations, y, viewport);
-    if (!decorationsAllowed || y + viewport <= first.top || y >= last.top + last.height) {
+    write(container, "--atmosphere-entry-lead", heavenEntryLead(viewport).toFixed(2) + "px");
+    if (
+      !decorationsAllowed ||
+      y + viewport <= first.top - heavenEntryLead(viewport) ||
+      y >= last.top + last.height
+    ) {
       hide();
       previousY = y;
       return false;
@@ -299,17 +324,19 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     for (const station of stations.slice(1)) {
       const phase = phaseFor(station, y, viewport, now, target);
       if (phase === null) continue;
-      paintPassage(station, phase, y, viewport, width);
-      moving = phase >= 1 || moving;
+      const settling = paintPassage(station, phase, y, viewport, width, now);
+      moving = settling || phase >= 1 || moving;
     }
     for (const [id, group] of groups)
       write(group, "visibility", visibleEffects.has(id as Level) ? "visible" : "hidden");
+    if (!visibleEffects.has("earth")) earthPoses = undefined;
     previousY = y;
     if (plate.dataset["atmosphereMoving"] !== String(moving))
       plate.dataset["atmosphereMoving"] = String(moving);
     return moving;
   }
   const invalidate = () => {
+    earthPoses = undefined;
     lastWorldY = NaN;
     lastViewport = NaN;
   };

@@ -2,7 +2,8 @@
   position: relative;
   isolation: isolate;
   /* A zero-flow sticky surface must not paint beyond the final station. */
-  clip-path: inset(0);
+  --atmosphere-entry-lead: clamp(36px, 6vh, 64px);
+  clip-path: inset(calc(-1 * var(--atmosphere-entry-lead)) 0 0);
 }
 .journey-worlds > .level-chapter {
   transition: none;
@@ -18,6 +19,7 @@
   z-index: 0;
 }
 .journey-atmosphere-foreground {
+  overflow: visible;
   z-index: 2;
 }
 .journey-worlds[data-atmosphere="true"][data-atmosphere-ready="true"] > .level-chapter {
@@ -33,8 +35,16 @@
 }
 .journey-atmosphere-decor {
   contain: layout paint;
-  height: 100dvh;
+  top: calc(-1 * var(--atmosphere-entry-lead));
+  height: calc(100dvh + var(--atmosphere-entry-lead));
   bottom: auto;
+}
+.atmosphere-effect {
+  top: var(--atmosphere-entry-lead);
+}
+.atmosphere-effect[data-atmosphere-effect="heaven"] {
+  top: 0;
+  bottom: var(--atmosphere-entry-lead);
 }
 .journey-world {
   opacity: 0;

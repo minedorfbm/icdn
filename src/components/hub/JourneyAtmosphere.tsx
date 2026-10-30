@@ -90,7 +90,7 @@ export function JourneyAtmosphere({
             ))}
           </div>
           <div data-atmosphere-effect="sea" className="atmosphere-effect">
-            {[0, 1, 2].map((part) => (
+            {[0, 1, 2, 3].map((part) => (
               <img
                 key={part}
                 className="atmosphere-wave"

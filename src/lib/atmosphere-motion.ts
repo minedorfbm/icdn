@@ -80,10 +80,40 @@ export function birdPoses(phase: number, boundary: number, width: number, height
   });
 }
 
+/** A short, bounded follow-through absorbs coarse wheel/touch scroll steps. */
+export function settlePlantPoses(
+  previous: AtmosphericPose[] | undefined,
+  target: AtmosphericPose[],
+  elapsed: number,
+) {
+  if (!previous) return { poses: target, moving: false };
+  const alpha = 1 - Math.exp(-Math.min(32, Math.max(1, elapsed)) / 60);
+  let moving = false;
+  const poses = target.map((next, i) => {
+    const old = previous[i] ?? next;
+    const blend = (key: keyof AtmosphericPose, epsilon: number) => {
+      const delta = next[key] - old[key];
+      if (Math.abs(delta) < epsilon) return next[key];
+      moving = true;
+      return old[key] + delta * alpha;
+    };
+    return pose(
+      blend("x", 0.1),
+      blend("y", 0.1),
+      blend("rotate", 0.02),
+      next.scale,
+      blend("opacity", 0.001),
+    );
+  });
+  return { poses, moving };
+}
+
+export const heavenEntryLead = (viewport: number) => Math.min(64, Math.max(36, viewport * 0.06));
+
 export function plantPoses(phase: number, boundary: number, width: number, height: number) {
   const p = clampAtmosphere(phase),
     t = clampAtmosphere(phase - 1),
-    r = p + t * 0.16;
+    r = p + smoothAtmosphere(t) * 0.16;
   const edge = Math.min(1, width / 1024),
     h = Math.min(height, 900),
     mobile = width < 768;
@@ -124,24 +154,34 @@ export function plantPoses(phase: number, boundary: number, width: number, heigh
 
 export type WaveCardAnchor = { left: number; width: number; centerY: number; height?: number };
 
-/** Three small currents share one vector file and follow the real card's rows. */
-export function waveLayout(width: number, height: number, card?: WaveCardAnchor) {
+/** Four sizes share one vector; rows span the section entrance to the card's upper quarter. */
+export function waveLayout(width: number, height: number, card?: WaveCardAnchor, boundary = 0) {
   const anchor = card ?? { left: width * 0.12, width: width * 0.76, centerY: height * 0.55 };
   const waveWidth = Math.min(width * 0.42, anchor.width * 0.5, 220);
+  const cardHeight = anchor.height ?? height * 0.66;
+  const halfWaveHeight = (waveWidth * (130 / 360)) / 2;
+  const top = boundary + 10 + halfWaveHeight;
+  const bottom = Math.max(top, anchor.centerY - cardHeight * 0.25 - 10 - halfWaveHeight);
   return {
     width: waveWidth,
     left: Math.max(-waveWidth, anchor.left - waveWidth * 1.1),
-    top: anchor.centerY,
-    height: anchor.height ?? height * 0.66,
+    top,
+    height: bottom - top,
   };
 }
 
-export function wavePoses(phase: number, width: number, height: number, card?: WaveCardAnchor) {
+export function wavePoses(
+  phase: number,
+  width: number,
+  height: number,
+  card?: WaveCardAnchor,
+  boundary = 0,
+) {
   const p = clampAtmosphere(phase),
     t = clampAtmosphere(phase - 1);
-  const layout = waveLayout(width, height, card);
-  return [0.78, 0.66, 0.7].map((arrival, index) => {
-    const delay = [0, 0.12, 0.24][index]!;
+  const layout = waveLayout(width, height, card, boundary);
+  return [0.78, 0.66, 0.7, 0.62].map((arrival, index) => {
+    const delay = [0, 0.08, 0.16, 0.24][index]!;
     const q =
       phase > 1
         ? arrival + (1 - arrival) * smoothAtmosphere(t)
@@ -149,10 +189,10 @@ export function wavePoses(phase: number, width: number, height: number, card?: W
     const opacity = smoothAtmosphere(q / 0.12) * (1 - smoothAtmosphere((q - 0.78) / 0.22));
     return pose(
       width + layout.width * 0.2 + (layout.left - width - layout.width * 0.2) * q,
-      layout.top + [-0.18, 0.05, 0.28][index]! * layout.height - (layout.width * (130 / 360)) / 2,
+      layout.top + [0, 0.33, 0.66, 1][index]! * layout.height - (layout.width * (130 / 360)) / 2,
       0,
-      [0.9, 1.05, 0.72][index]!,
-      opacity * [0.7, 0.8, 0.6][index]!,
+      [0.48, 1, 0.67, 0.83][index]!,
+      opacity * [0.65, 0.8, 0.65, 0.7][index]!,
     );
   });
 }

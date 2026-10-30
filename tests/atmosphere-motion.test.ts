@@ -5,6 +5,8 @@ import {
   passageProgress,
   plantPoses,
   waveLayout,
+  heavenEntryLead,
+  settlePlantPoses,
   wavePoses,
 } from "../src/lib/atmosphere-motion";
 
@@ -48,7 +50,7 @@ test("botanical and wave tails finish transparent at mobile and desktop sizes", 
       const plants = plantPoses(p, 0, width!, height!),
         waves = wavePoses(p, width!, height!);
       expect(plants).toHaveLength(7);
-      expect(waves).toHaveLength(3);
+      expect(waves).toHaveLength(4);
       expect(
         [...plants, ...waves].every((pose) => Object.values(pose).every(Number.isFinite)),
       ).toBe(true);
@@ -60,15 +62,15 @@ test("botanical and wave tails finish transparent at mobile and desktop sizes", 
   }
 });
 
-test("three small waves share a right-to-left direction on separate rows and finish cleanly", () => {
+test("four differently sized waves share a right-to-left direction on separate rows and finish cleanly", () => {
   for (const width of [320, 390, 768, 1024, 1440]) {
     const card = { left: width * 0.08, width: width * 0.75, centerY: 510, height: 600 };
     const layout = waveLayout(width, 844, card);
     expect(layout.width).toBeLessThanOrEqual(card.width * 0.5);
     const early = wavePoses(0.4, width, 844, card),
       late = wavePoses(0.8, width, 844, card);
-    expect(new Set(late.map((wave) => wave.y)).size).toBe(3);
-    expect(new Set(late.map((wave) => wave.scale)).size).toBe(3);
+    expect(new Set(late.map((wave) => wave.y)).size).toBe(4);
+    expect(new Set(late.map((wave) => wave.scale)).size).toBe(4);
     early.forEach((wave, index) => expect(wave.x).toBeGreaterThan(late[index]!.x));
   }
   const arriving = wavePoses(1, 390, 844),
@@ -84,4 +86,53 @@ test("three small waves share a right-to-left direction on separate rows and fin
     expect(retreat.y).toBe(wave.y);
     expect(retreat.opacity).toBeLessThan(wave.opacity);
   });
+});
+
+test("Heaven announces its entrance slightly before the section without adding flow", () => {
+  expect(heavenEntryLead(400)).toBe(36);
+  expect(heavenEntryLead(844)).toBeCloseTo(50.64);
+  expect(heavenEntryLead(2000)).toBe(64);
+});
+
+test("wave rows stay between the new section boundary and the upper quarter of its real card", () => {
+  for (const [width, height] of [
+    [320, 568],
+    [390, 844],
+    [768, 1024],
+    [1440, 900],
+  ]) {
+    const card = {
+      left: width! * 0.1,
+      width: width! * 0.75,
+      height: height! * 0.6,
+      centerY: height! * 0.6,
+    };
+    for (const boundary of [0, 100, 200]) {
+      const shifted = { ...card, centerY: card.centerY + boundary };
+      const layout = waveLayout(width!, height!, shifted, boundary);
+      const baseHeight = (layout.width * 130) / 360;
+      for (const wave of wavePoses(0.85, width!, height!, shifted, boundary)) {
+        const center = wave.y + baseHeight / 2;
+        expect(center - (baseHeight * wave.scale) / 2).toBeGreaterThanOrEqual(boundary);
+        expect(center + (baseHeight * wave.scale) / 2).toBeLessThanOrEqual(
+          shifted.centerY - card.height * 0.25,
+        );
+      }
+    }
+  }
+});
+
+test("plants interpolate coarse scroll steps without overshoot, reverse, and settle to an idle pose", () => {
+  const start = plantPoses(0.3, 400, 390, 844),
+    target = plantPoses(0.65, 160, 390, 844);
+  let result = settlePlantPoses(start, target, 16.67);
+  expect(result.moving).toBe(true);
+  expect(result.poses[0]!.y).toBeLessThan(start[0]!.y);
+  expect(result.poses[0]!.y).toBeGreaterThan(target[0]!.y);
+  const reversed = settlePlantPoses(result.poses, start, 16.67);
+  expect(reversed.poses[0]!.y).toBeGreaterThan(result.poses[0]!.y);
+  for (let i = 0; i < 50; i++) result = settlePlantPoses(result.poses, target, 16.67);
+  expect(result.moving).toBe(false);
+  expect(result.poses).toEqual(target);
+  expect(settlePlantPoses(undefined, target, 16.67).moving).toBe(false);
 });

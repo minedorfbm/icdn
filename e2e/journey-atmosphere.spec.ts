@@ -64,11 +64,13 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       const blend = await world.evaluate((el) => Number(getComputedStyle(el).opacity));
       expect(blend).toBeGreaterThan(0);
       expect(blend).toBeLessThan(1);
+      if (station.id === "earth") await page.waitForTimeout(650);
       const pose = await group
         .locator("img")
         .evaluateAll((imgs) => imgs.map((img) => img.getAttribute("style")));
       await position(page, y + 60);
       await position(page, y);
+      if (station.id === "earth") await page.waitForTimeout(650);
       expect(
         await group
           .locator("img")
@@ -78,7 +80,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       await expect(world).toHaveCSS("opacity", "1");
       if (station.id === "sea") {
         const waves = group.locator("img");
-        await expect(waves).toHaveCount(3);
+        await expect(waves).toHaveCount(4);
         const card = await page
           .locator('#sea .perspective-card[data-card-offset="0"]')
           .boundingBox();
@@ -87,13 +89,14 @@ for (const width of [320, 390, 768, 1024, 1440]) {
             x: el.getBoundingClientRect().x,
             y: el.getBoundingClientRect().y,
             width: el.getBoundingClientRect().width,
+            bottom: el.getBoundingClientRect().bottom,
           })),
         );
-        expect(new Set(start.map((wave) => wave.y)).size).toBe(3);
+        expect(new Set(start.map((wave) => wave.y)).size).toBe(4);
         for (const wave of start) {
           expect(wave.width).toBeLessThan(card!.width * 0.6);
-          expect(wave.y).toBeGreaterThan(card!.y + card!.height * 0.2);
-          expect(wave.y).toBeLessThan(card!.y + card!.height * 0.85);
+          expect(wave.y).toBeGreaterThanOrEqual(0);
+          expect(wave.bottom).toBeLessThan(card!.y + card!.height * 0.25 + 1);
         }
         await page.waitForTimeout(200);
         const end = await waves.evaluateAll((es) => es.map((el) => el.getBoundingClientRect().x));
@@ -164,9 +167,9 @@ test("Heaven illuminates once, native scrolling stays free and hidden tabs stop 
   await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
   const tops = await stations(page);
   const heaven = page.locator('[data-atmosphere-effect="heaven"]');
-  await position(page, tops[0]!.top - 844 - 10);
+  await position(page, tops[0]!.top - 844 - 64 - 10);
   await expect(heaven).toHaveCSS("visibility", "hidden");
-  await position(page, tops[0]!.top - 844 * 0.94);
+  await position(page, tops[0]!.top - 844 - 25);
   await expect
     .poll(() =>
       heaven
@@ -180,6 +183,13 @@ test("Heaven illuminates once, native scrolling stays free and hidden tabs stop 
     )
     .toBe(true);
   await expect(heaven).toHaveCSS("visibility", "visible");
+  expect(await heaven.evaluate((el) => el.getBoundingClientRect().top)).toBeLessThan(844);
+  expect(
+    await heaven
+      .locator("img")
+      .first()
+      .evaluate((el) => Number(getComputedStyle(el).opacity)),
+  ).toBeGreaterThan(0);
   await position(page, tops[0]!.top - 844 * 0.2);
   const approaching = await heaven
     .locator("img")
@@ -477,4 +487,37 @@ test("resizing recomputes the scene position and motion can be disabled during a
   await expect(page.locator("[data-atmosphere-level]")).toHaveCount(0);
   await expect(page.locator(".journey-atmosphere")).toHaveCSS("display", "none");
   await expect(page.locator("#sky header")).toHaveCSS("opacity", "1");
+});
+
+test("Earth absorbs wheel steps, settles without an idle loop and cancels after fast navigation", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
+  const tops = await stations(page),
+    earth = tops[2]!,
+    sea = tops[3]!;
+  await position(page, earth.top - 500);
+  const plant = page.locator('.atmosphere-plant[data-part="3"]');
+  const initial = await plant.getAttribute("style");
+  await position(page, earth.top - 300);
+  const following = await plant.getAttribute("style");
+  await page.waitForTimeout(100);
+  expect(await plant.getAttribute("style")).not.toBe(following);
+  expect(following).not.toBe(initial);
+  await page.waitForTimeout(650);
+  const settled = await plant.getAttribute("style");
+  await page.waitForTimeout(150);
+  expect(await plant.getAttribute("style")).toBe(settled);
+  await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
+    "data-atmosphere-moving",
+    "false",
+  );
+  await position(page, earth.top - 450);
+  await page.waitForTimeout(100);
+  expect(await plant.getAttribute("style")).not.toBe(settled);
+  await position(page, sea.top);
+  await expect(page.locator('[data-atmosphere-effect="earth"]')).toHaveCSS("visibility", "hidden");
 });
