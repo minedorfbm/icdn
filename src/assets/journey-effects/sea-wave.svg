@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 130" fill="none">
+  <defs>
+    <linearGradient id="water" x1="180" y1="28" x2="185" y2="120" gradientUnits="userSpaceOnUse"><stop stop-color="#539aa4"/><stop offset="1" stop-color="#98cfc6"/></linearGradient>
+    <linearGradient id="foam" x1="180" y1="25" x2="180" y2="108" gradientUnits="userSpaceOnUse"><stop stop-color="#fbf5e1"/><stop offset="1" stop-color="#d0e8d9"/></linearGradient>
+  </defs>
+  <g transform="translate(360 0) scale(-1 1)">
+  <path fill="url(#water)" d="M4 105C61 106 95 75 130 47C166 18 204 20 222 43C230 54 229 65 220 69C223 57 213 48 202 51C188 55 187 69 200 81C219 99 264 102 302 103C323 103 342 102 357 106C317 122 269 124 229 115C193 107 166 101 134 111C85 126 39 116 4 105Z"/>
+  <path fill="url(#foam)" d="M8 104C71 97 103 61 136 38C171 13 205 18 223 38C237 54 234 66 225 70C231 57 219 43 206 46C191 48 187 59 191 70C183 61 184 48 195 41C174 35 155 44 135 59C95 88 64 102 8 104Z"/>
+  <path fill="#d1e8db" d="M31 109C87 109 117 93 151 96C181 98 197 115 231 117C272 119 310 107 351 107C309 118 272 128 231 123C197 119 177 106 148 104C111 102 80 119 31 109Z"/>
+  <path d="M101 95C133 80 147 51 173 44M229 101C250 108 276 110 302 108" stroke="#d8eee1" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+  </g>
+</svg>

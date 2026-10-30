@@ -8,7 +8,7 @@ import fern from "@/assets/journey-effects/fern-3c37df926b.webp?no-inline";
 import leafGreen from "@/assets/journey-effects/leaf-green-192cab1cbd.webp?no-inline";
 import leafGold from "@/assets/journey-effects/leaf-gold-2afa1bf432.webp?no-inline";
 import leafSmall from "@/assets/journey-effects/leaf-small-71d189f850.webp?no-inline";
-import waves from "@/assets/journey-effects/corner-waves.svg?no-inline";
+import waves from "@/assets/journey-effects/sea-wave.svg?no-inline";
 import "./journey-atmosphere.css";
 
 const birds = [
@@ -90,14 +90,14 @@ export function JourneyAtmosphere({
             ))}
           </div>
           <div data-atmosphere-effect="sea" className="atmosphere-effect">
-            {[0, 1].map((part) => (
+            {[0, 1, 2].map((part) => (
               <img
                 key={part}
                 className="atmosphere-wave"
                 data-part={part}
                 data-src={waves}
-                width={1200}
-                height={360}
+                width={360}
+                height={130}
                 alt=""
                 decoding="async"
                 fetchPriority="low"

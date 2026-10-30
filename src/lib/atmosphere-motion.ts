@@ -122,29 +122,37 @@ export function plantPoses(phase: number, boundary: number, width: number, heigh
   });
 }
 
-export type WaveCardAnchor = { left: number; width: number; centerY: number };
+export type WaveCardAnchor = { left: number; width: number; centerY: number; height?: number };
 
-/** Fit the complete illustration over the real card, including narrow phones. */
+/** Three small currents share one vector file and follow the real card's rows. */
 export function waveLayout(width: number, height: number, card?: WaveCardAnchor) {
   const anchor = card ?? { left: width * 0.12, width: width * 0.76, centerY: height * 0.55 };
-  const waveWidth = Math.min(width * 0.92, anchor.width * 1.28, 880);
-  const inset = width * 0.02;
-  const left = Math.max(
-    inset,
-    Math.min(width - waveWidth - inset, anchor.left + (anchor.width - waveWidth) / 2),
-  );
-  return { width: waveWidth, left, top: anchor.centerY - waveWidth * 0.15 };
+  const waveWidth = Math.min(width * 0.42, anchor.width * 0.5, 220);
+  return {
+    width: waveWidth,
+    left: Math.max(-waveWidth, anchor.left - waveWidth * 1.1),
+    top: anchor.centerY,
+    height: anchor.height ?? height * 0.66,
+  };
 }
 
 export function wavePoses(phase: number, width: number, height: number, card?: WaveCardAnchor) {
   const p = clampAtmosphere(phase),
     t = clampAtmosphere(phase - 1);
-  const { width: waveWidth, left, top } = waveLayout(width, height, card);
-  const envelope = smoothAtmosphere((p - 0.15) / 0.4) * (1 - smoothAtmosphere((t - 0.5) / 0.5));
-  const entry = smoothAtmosphere((p - 0.28) / 0.6);
-  const x = left + (1 - entry) * (width + waveWidth * 0.04 - left);
-  return [
-    pose(x + waveWidth * 0.025, top - waveWidth * 0.025, 0, 0.95, envelope * 0.22),
-    pose(x, top, 0, 1, envelope * 0.64),
-  ];
+  const layout = waveLayout(width, height, card);
+  return [0.78, 0.66, 0.7].map((arrival, index) => {
+    const delay = [0, 0.12, 0.24][index]!;
+    const q =
+      phase > 1
+        ? arrival + (1 - arrival) * smoothAtmosphere(t)
+        : smoothAtmosphere((p - delay) / (1 - delay)) * arrival;
+    const opacity = smoothAtmosphere(q / 0.12) * (1 - smoothAtmosphere((q - 0.78) / 0.22));
+    return pose(
+      width + layout.width * 0.2 + (layout.left - width - layout.width * 0.2) * q,
+      layout.top + [-0.18, 0.05, 0.28][index]! * layout.height - (layout.width * (130 / 360)) / 2,
+      0,
+      [0.9, 1.05, 0.72][index]!,
+      opacity * [0.7, 0.8, 0.6][index]!,
+    );
+  });
 }

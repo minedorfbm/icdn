@@ -48,7 +48,7 @@ test("botanical and wave tails finish transparent at mobile and desktop sizes", 
       const plants = plantPoses(p, 0, width!, height!),
         waves = wavePoses(p, width!, height!);
       expect(plants).toHaveLength(7);
-      expect(waves).toHaveLength(2);
+      expect(waves).toHaveLength(3);
       expect(
         [...plants, ...waves].every((pose) => Object.values(pose).every(Number.isFinite)),
       ).toBe(true);
@@ -60,17 +60,16 @@ test("botanical and wave tails finish transparent at mobile and desktop sizes", 
   }
 });
 
-test("waves travel right to left, hold fully visible at the real card centre, then fade in place", () => {
+test("three small waves share a right-to-left direction on separate rows and finish cleanly", () => {
   for (const width of [320, 390, 768, 1024, 1440]) {
-    const card = { left: width * 0.08, width: width * 0.75, centerY: 510 };
+    const card = { left: width * 0.08, width: width * 0.75, centerY: 510, height: 600 };
     const layout = waveLayout(width, 844, card);
-    expect(layout.left).toBeGreaterThanOrEqual(0);
-    expect(layout.left + layout.width).toBeLessThanOrEqual(width);
-    expect(layout.top + layout.width * 0.15).toBe(card.centerY);
-    expect(wavePoses(0.4, width, 844, card)[1]!.x).toBeGreaterThan(
-      wavePoses(0.8, width, 844, card)[1]!.x,
-    );
-    expect(wavePoses(1, width, 844, card)).toEqual(wavePoses(1.4, width, 844, card));
+    expect(layout.width).toBeLessThanOrEqual(card.width * 0.5);
+    const early = wavePoses(0.4, width, 844, card),
+      late = wavePoses(0.8, width, 844, card);
+    expect(new Set(late.map((wave) => wave.y)).size).toBe(3);
+    expect(new Set(late.map((wave) => wave.scale)).size).toBe(3);
+    early.forEach((wave, index) => expect(wave.x).toBeGreaterThan(late[index]!.x));
   }
   const arriving = wavePoses(1, 390, 844),
     justArrived = wavePoses(1.00001, 390, 844),
@@ -81,7 +80,7 @@ test("waves travel right to left, hold fully visible at the real card centre, th
     expect(Math.abs(next.x - wave.x)).toBeLessThan(0.01);
     expect(Math.abs(next.y - wave.y)).toBeLessThan(0.01);
     expect(Math.abs(next.opacity - wave.opacity)).toBeLessThan(0.01);
-    expect(retreat.x).toBe(wave.x);
+    expect(retreat.x).toBeLessThan(wave.x);
     expect(retreat.y).toBe(wave.y);
     expect(retreat.opacity).toBeLessThan(wave.opacity);
   });

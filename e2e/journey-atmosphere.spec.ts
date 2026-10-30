@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "./fixtures";
 
 const effects =
-  /(?:bee-eater|drongo|sunbird|branch-left|branch-right|liana-|fern-|leaf-green|leaf-gold|leaf-small|corner-waves).*\.(?:webp|svg)/;
+  /(?:bee-eater|drongo|sunbird|branch-left|branch-right|liana-|fern-|leaf-green|leaf-gold|leaf-small|sea-wave).*\.(?:webp|svg)/;
 async function position(page: Page, y: number) {
   await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), y);
   await page.evaluate(
@@ -59,7 +59,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       const group = page.locator(`[data-atmosphere-effect="${station.id}"]`);
       await expect(group).toHaveCSS("visibility", "visible");
       if (station.id === "sea")
-        await expect(group.locator("img").first()).toHaveAttribute("src", /corner-waves.*\.svg/);
+        await expect(group.locator("img").first()).toHaveAttribute("src", /sea-wave.*\.svg/);
       const world = page.locator(`[data-atmosphere-level="${station.id}"]`);
       const blend = await world.evaluate((el) => Number(getComputedStyle(el).opacity));
       expect(blend).toBeGreaterThan(0);
@@ -77,19 +77,27 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       await position(page, station.top);
       await expect(world).toHaveCSS("opacity", "1");
       if (station.id === "sea") {
-        const wave = group.locator('img[data-part="1"]');
-        const bounds = await wave.boundingBox();
+        const waves = group.locator("img");
+        await expect(waves).toHaveCount(3);
         const card = await page
           .locator('#sea .perspective-card[data-card-offset="0"]')
           .boundingBox();
-        expect(bounds!.x).toBeGreaterThanOrEqual(0);
-        expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
-        expect(Math.abs(bounds!.y + bounds!.height / 2 - card!.y - card!.height / 2)).toBeLessThan(
-          2,
+        const start = await waves.evaluateAll((es) =>
+          es.map((el) => ({
+            x: el.getBoundingClientRect().x,
+            y: el.getBoundingClientRect().y,
+            width: el.getBoundingClientRect().width,
+          })),
         );
-        const held = await wave.getAttribute("style");
+        expect(new Set(start.map((wave) => wave.y)).size).toBe(3);
+        for (const wave of start) {
+          expect(wave.width).toBeLessThan(card!.width * 0.6);
+          expect(wave.y).toBeGreaterThan(card!.y + card!.height * 0.2);
+          expect(wave.y).toBeLessThan(card!.y + card!.height * 0.85);
+        }
         await page.waitForTimeout(200);
-        expect(await wave.getAttribute("style")).toBe(held);
+        const end = await waves.evaluateAll((es) => es.map((el) => el.getBoundingClientRect().x));
+        start.forEach((wave, index) => expect(end[index]).toBeLessThan(wave.x));
       }
       await expect(group).toHaveCSS("visibility", "hidden", { timeout: 2500 });
       await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
@@ -220,6 +228,35 @@ test("Heaven illuminates once, native scrolling stays free and hidden tabs stop 
     document.dispatchEvent(new Event("visibilitychange"));
   });
 });
+
+for (const width of [390, 1440]) {
+  test(`Heaven keeps both cloud bodies and warm light in the visible section at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
+    const tops = await stations(page);
+    await position(page, tops[0]!.top - 900 * 0.5);
+    const group = page.locator('[data-atmosphere-effect="heaven"]');
+    await expect(group).toHaveCSS("visibility", "visible");
+    const visibleClouds = await group.locator("img").evaluateAll((es) => {
+      const section = document.querySelector("#heaven")!.getBoundingClientRect();
+      return es.map((el) => {
+        const box = el.getBoundingClientRect();
+        return Math.max(0, Math.min(innerHeight, box.bottom) - Math.max(section.top, box.top));
+      });
+    });
+    expect(visibleClouds.every((height) => height > 70)).toBe(true);
+    for (const light of [".atmosphere-halo", ".atmosphere-rays"]) {
+      await expect(group.locator(light)).toHaveCSS("mix-blend-mode", "normal");
+      expect(
+        await group.locator(light).evaluate((el) => Number(getComputedStyle(el).opacity)),
+      ).toBeGreaterThan(0.1);
+    }
+  });
+}
 
 test("a direct cold Heaven arrival waits for loaded clouds even after scroll stops", async ({
   page,

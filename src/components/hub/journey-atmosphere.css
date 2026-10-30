@@ -73,34 +73,36 @@
   opacity: 0;
 }
 .atmosphere-cloud {
-  width: 86%;
+  width: min(70%, 960px);
+  z-index: 1;
 }
 .atmosphere-effect .atmosphere-cloud {
-  top: -18%;
-  left: -26%;
+  top: 1%;
+  left: -19%;
 }
 .atmosphere-effect .atmosphere-cloud[data-part="1"] {
   left: auto;
-  right: -30%;
-  top: -13%;
+  right: -19%;
+  top: 4%;
 }
 .atmosphere-halo,
 .atmosphere-rays {
   position: absolute;
   inset: -10%;
   opacity: 0;
-  mix-blend-mode: screen;
+  mix-blend-mode: normal;
 }
 .atmosphere-halo {
   background: radial-gradient(
-    ellipse at 40% 0%,
-    #fffef7f0,
-    #ffedb572 15%,
-    #f4cd5530 32%,
-    transparent 58%
+    ellipse at 50% 12%,
+    #fff5c9e0,
+    #ffe1a18c 18%,
+    #f5d39138 38%,
+    transparent 65%
   );
 }
 .atmosphere-rays {
+  z-index: 2;
   inset: -10% -15%;
   transform-origin: 40% 0;
   background: conic-gradient(
@@ -145,19 +147,19 @@
 .atmosphere-effect .atmosphere-wave {
   top: 0;
   left: 0;
-  width: var(--atmosphere-wave-width, 90vw);
+  width: var(--atmosphere-wave-width, 150px);
   transform-origin: left center;
 }
 @media (max-width: 767px) {
   .atmosphere-effect .atmosphere-cloud {
-    width: 150%;
-    left: -60%;
-    top: -13%;
+    width: 115%;
+    left: -38%;
+    top: 2%;
   }
   .atmosphere-effect .atmosphere-cloud[data-part="1"] {
     left: auto;
-    right: -60%;
-    top: -12%;
+    right: -38%;
+    top: 5%;
   }
   .atmosphere-bird {
     width: clamp(78px, 26vw, 112px);

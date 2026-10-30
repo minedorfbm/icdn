@@ -133,18 +133,18 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     const glow = Math.pow(Math.sin(progress * Math.PI), 1.1) * appearance;
     const halo = group?.querySelector<HTMLElement>(".atmosphere-halo"),
       rays = group?.querySelector<HTMLElement>(".atmosphere-rays");
-    write(halo, "opacity", (glow * 0.85).toFixed(3));
+    write(halo, "opacity", (glow * (width < 768 ? 0.55 : 0.8)).toFixed(3));
     write(halo, "transform", `translate3d(${(progress * width * 0.08).toFixed(2)}px,0,0)`);
-    write(rays, "opacity", (glow * 0.8).toFixed(3));
+    write(rays, "opacity", (glow * (width < 768 ? 0.4 : 0.65)).toFixed(3));
     write(rays, "transform", `rotate(${-8 + progress * 15}deg)`);
     paintPoses(
       sprites.get("heaven") ?? [],
       [0, 1].map((i) => ({
         x: (i ? 1 : -1) * progress * width * 0.17,
-        y: -progress * height * 0.14,
+        y: -progress * Math.min(height * 0.06, 48),
         rotate: 0,
         scale: 1,
-        opacity: (1 - progress) * 0.73 * appearance,
+        opacity: (1 - progress) * 0.83 * appearance,
       })),
     );
   }

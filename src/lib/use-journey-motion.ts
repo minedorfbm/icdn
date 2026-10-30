@@ -135,6 +135,7 @@ export function useJourneyMotion(
               ? {
                   left: card.getBoundingClientRect().left,
                   width: card.offsetWidth,
+                  height: card.offsetHeight,
                   centerY: layoutTop(card) + card.offsetHeight / 2,
                 }
               : undefined;
