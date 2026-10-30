@@ -2,7 +2,8 @@ import { HERO_DESKTOP_MEDIA, HERO_LANDSCAPE_MEDIA } from "@/lib/hero-media";
 import { ResortLogo } from "./ResortLogo";
 import { useI18n } from "@/i18n";
 import { ArrowDown } from "lucide-react";
-import { lazy, Suspense, useCallback, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { mountHeroMotion } from "@/lib/hero-motion";
 
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
 import {
@@ -22,6 +23,11 @@ export function HubHero({
   const { t } = useI18n();
   const [filmOpen, setFilmOpen] = useState(false);
   const closeFilm = useCallback(() => setFilmOpen(false), []);
+  const heroRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!heroRef.current) return;
+    return mountHeroMotion(heroRef.current);
+  }, []);
   const portrait = responsiveImage(image, homeHeroSizes(image));
   const landscape = responsiveImage(landscapeImage, homeHeroSizes(landscapeImage));
   const desktop = responsiveImage(desktopImage, homeHeroSizes(desktopImage));
@@ -29,7 +35,7 @@ export function HubHero({
   const landscapeAvif = responsiveAvif(landscapeImage, homeHeroSizes(landscapeImage));
   const desktopAvif = responsiveAvif(desktopImage, homeHeroSizes(desktopImage));
   return (
-    <section className="brand-ui hub-hero">
+    <section ref={heroRef} className="brand-ui hub-hero">
       <div className="hero-photograph">
         <picture>
           {desktopAvif && (
@@ -71,6 +77,16 @@ export function HubHero({
             className="threshold-img"
           />
         </picture>
+        <div className="hero-cloud-layer hero-cloud-main" aria-hidden="true">
+          <div className="hero-cloud-arrival">
+            <div className="hero-cloud-texture" />
+          </div>
+        </div>
+        <div className="hero-cloud-layer hero-cloud-front" aria-hidden="true">
+          <div className="hero-cloud-arrival">
+            <div className="hero-cloud-texture" />
+          </div>
+        </div>
       </div>
 
       <div className="hero-brand">
@@ -96,9 +112,8 @@ export function HubHero({
           </h1>
           <button onClick={() => scrollToHubSection("discover")} className="hero-invitation">
             <span className="hero-invitation-title font-serif">
-              {t("hero_title_1")}
-              <br />
-              {t("hero_title_2")}
+              <span className="hero-title-first">{t("hero_title_1")}</span>
+              <span className="hero-title-second">{t("hero_title_2")}</span>
             </span>
             <span className="hero-invitation-caption">{t("hero_sub")}</span>
             <ArrowDown className="hero-invitation-arrow" strokeWidth={1.2} aria-hidden />
@@ -115,15 +130,21 @@ export function HubHero({
         aria-haspopup="dialog"
         className="hero-film-button grid place-items-center rounded-full transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4"
       >
-        <img
-          {...thumbnailImage("/michelin-key.webp", "80px")}
-          fetchPriority="high"
-          loading="eager"
-          alt=""
-          width={494}
-          height={585}
-          className="size-full object-contain"
-        />
+        <span className="hero-key-arrival">
+          <span className="hero-key-float">
+            <span className="hero-key-sway">
+              <img
+                {...thumbnailImage("/michelin-key.webp", "80px")}
+                fetchPriority="high"
+                loading="eager"
+                alt=""
+                width={494}
+                height={585}
+                className="size-full object-contain"
+              />
+            </span>
+          </span>
+        </span>
       </button>
       {filmOpen && (
         <Suspense fallback={null}>
