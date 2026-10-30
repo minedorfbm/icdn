@@ -30,9 +30,7 @@ for (const viewport of [
         );
         await expect
           .poll(() =>
-            page
-              .locator(".hero-photograph")
-              .evaluate((el) => getComputedStyle(el, "::after").opacity),
+            page.locator(".hero-cloud-main").evaluate((el) => getComputedStyle(el).opacity),
           )
           .toBe("0.78");
       } else {
