@@ -25,6 +25,8 @@ test("level heading, controls, categories and full cards fit together on mobile"
           ),
         )
         .toBeLessThanOrEqual(10);
+      // Contextual controls follow an observer update after programmatic scrolling.
+      await expect(page.locator("main")).not.toHaveAttribute("data-hero-active", "true");
       const geometry = await chapter.evaluate((el) => {
         const rect = (selector: string) => el.querySelector(selector)!.getBoundingClientRect();
         const language = document.querySelector(".hub-tools button")!.getBoundingClientRect();
