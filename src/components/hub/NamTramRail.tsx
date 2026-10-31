@@ -17,11 +17,12 @@ interface Props {
 export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const pendingLevelRef = useRef<Level | null>(null);
   const { t, levelLabel } = useI18n();
 
   const selectLevel = (level: Level) => {
+    pendingLevelRef.current = level;
     setOpen(false);
-    onJump(level);
   };
 
   return (
@@ -83,6 +84,10 @@ export function NamTramRail({ active, visible = true, onJump }: Readonly<Props>)
         onCloseAutoFocus={(event) => {
           event.preventDefault();
           triggerRef.current?.focus({ preventScroll: true });
+          // Let the sheet release its native scroll lock before starting the jump.
+          const level = pendingLevelRef.current;
+          pendingLevelRef.current = null;
+          if (level) onJump(level);
         }}
       >
         <div aria-hidden className="nam-tram-art">

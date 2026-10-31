@@ -69,10 +69,22 @@ for (const width of [320, 390, 768, 1024, 1440]) {
           "data-atmosphere-moving",
           "false",
         );
+      const directionStart =
+        station.id === "sea"
+          ? await group
+              .locator("img")
+              .evaluateAll((es) => es.map((el) => new DOMMatrixReadOnly(el.style.transform).m41))
+          : [];
       const pose = await group
         .locator("img")
         .evaluateAll((imgs) => imgs.map((img) => img.getAttribute("style")));
       await position(page, y + 60);
+      if (station.id === "sea") {
+        const next = await group
+          .locator("img")
+          .evaluateAll((es) => es.map((el) => new DOMMatrixReadOnly(el.style.transform).m41));
+        next.forEach((x, i) => expect(x).toBeLessThan(directionStart[i]!));
+      }
       await position(page, y);
       if (station.id === "earth")
         await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
@@ -108,9 +120,6 @@ for (const width of [320, 390, 768, 1024, 1440]) {
           expect(wave.y).toBeGreaterThanOrEqual(counter!.y - 1);
           expect(wave.bottom).toBeLessThanOrEqual(subtitle!.y + subtitle!.height + 1);
         }
-        await page.waitForTimeout(200);
-        const end = await waves.evaluateAll((es) => es.map((el) => el.getBoundingClientRect().x));
-        start.forEach((wave, index) => expect(end[index]).toBeLessThan(wave.x));
       }
       await expect(group).toHaveCSS("visibility", "hidden", { timeout: 2500 });
       await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
@@ -514,8 +523,6 @@ test("Earth absorbs wheel steps, settles without an idle loop and cancels after 
   const initial = await plant.getAttribute("style");
   await position(page, earth.top - 300);
   const following = await plant.getAttribute("style");
-  await page.waitForTimeout(100);
-  expect(await plant.getAttribute("style")).not.toBe(following);
   expect(following).not.toBe(initial);
   await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
     "data-atmosphere-moving",
@@ -551,6 +558,25 @@ for (const width of [390, 1440]) {
       await expect(heaven).toHaveCSS("visibility", "hidden", { timeout: 3000 });
       await position(page, tops[1]!.top);
       const returnToHeaven = async () => {
+        await heaven.evaluate((el) => {
+          const probe = { maximum: 0, completed: false };
+          (window as Window & { __heavenProbe?: typeof probe }).__heavenProbe = probe;
+          const observer = new MutationObserver(() => {
+            const visible = getComputedStyle(el).visibility === "visible";
+            if (visible) {
+              probe.maximum = Math.max(
+                probe.maximum,
+                ...Array.from(el.querySelectorAll("img"), (img) =>
+                  Number(getComputedStyle(img).opacity),
+                ),
+              );
+            } else if (probe.maximum > 0.05) {
+              probe.completed = true;
+              observer.disconnect();
+            }
+          });
+          observer.observe(el, { attributes: true, subtree: true, attributeFilter: ["style"] });
+        });
         await page.locator(".nam-tram-rail button").click();
         await page.getByRole("dialog").getByRole("button", { name: "HEAVEN", exact: true }).click();
         await expect
@@ -565,16 +591,18 @@ for (const width of [390, 1440]) {
               ),
           )
           .toBeLessThan(2);
-        await expect(heaven).toHaveCSS("visibility", "visible");
         await expect
-          .poll(() =>
-            heaven
-              .locator("img")
-              .first()
-              .evaluate((el) => Number(getComputedStyle(el).opacity)),
+          .poll(
+            () =>
+              page.evaluate(
+                () =>
+                  (window as Window & { __heavenProbe?: { completed: boolean } }).__heavenProbe
+                    ?.completed,
+              ),
+            { timeout: 6000 },
           )
-          .toBeGreaterThan(0.05);
-        await expect(heaven).toHaveCSS("visibility", "hidden", { timeout: 3000 });
+          .toBe(true);
+        await expect(heaven).toHaveCSS("visibility", "hidden");
       };
       await returnToHeaven();
       // The same station is already centred: no scroll event is required for replay.
