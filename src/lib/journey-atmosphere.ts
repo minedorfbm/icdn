@@ -90,6 +90,8 @@ export function createJourneyAtmosphere(root: HTMLElement) {
   let previousY: number | undefined, introStart: number | undefined;
   let scrollDirection = 0;
   let introComplete = false;
+  let heavenVisible = false;
+  let heavenFadeStart: number | undefined;
   let introRevision = getHubScrollSnapshot().revision;
   let introFrom = 0,
     introLast = 0;
@@ -139,6 +141,9 @@ export function createJourneyAtmosphere(root: HTMLElement) {
   function hide() {
     for (const group of groups.values()) write(group, "visibility", "hidden");
     tails.clear();
+    heavenVisible = false;
+    heavenFadeStart = undefined;
+    write(groups.get("heaven"), "opacity", "0");
     earthPoses = undefined;
     resetIntro();
     if (plate) plate.dataset["atmosphereMoving"] = "false";
@@ -164,6 +169,28 @@ export function createJourneyAtmosphere(root: HTMLElement) {
         opacity: (1 - progress) * 0.83 * appearance,
       })),
     );
+  }
+  function finishHeaven(now: number) {
+    const group = groups.get("heaven");
+    if (visibleEffects.has("heaven")) {
+      heavenVisible = true;
+      heavenFadeStart = undefined;
+      write(group, "opacity", "1");
+      return false;
+    }
+    if (!heavenVisible) return false;
+    // Freeze the last entrance pose and dissolve it briefly instead of cutting
+    // visibility. The existing clock stops again as soon as this fade completes.
+    heavenFadeStart ??= now;
+    const opacity = 1 - smoothAtmosphere((now - heavenFadeStart) / 180);
+    write(group, "opacity", opacity.toFixed(3));
+    if (opacity > 0) {
+      visibleEffects.add("heaven");
+      return true;
+    }
+    heavenVisible = false;
+    heavenFadeStart = undefined;
+    return false;
   }
   function paintWorlds(stations: AtmosphereStation[], y: number, viewport: number) {
     if (lastWorldY === y && lastViewport === viewport) return;
@@ -371,6 +398,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       const settling = paintPassage(station, phase, y, sceneHeight, width, now);
       moving = settling || phase >= 1 || moving;
     }
+    moving = finishHeaven(now) || moving;
     for (const [id, group] of groups)
       write(group, "visibility", visibleEffects.has(id as Level) ? "visible" : "hidden");
     if (!visibleEffects.has("earth")) earthPoses = undefined;

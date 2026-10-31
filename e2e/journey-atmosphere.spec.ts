@@ -9,6 +9,12 @@ async function position(page: Page, y: number) {
   );
 }
 async function stations(page: Page) {
+  // Font completion above the journey can move its arrival coordinates. Let
+  // ResizeObserver and the shared motion clock consume that layout first.
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  });
   return page.locator(".level-chapter").evaluateAll((elements) =>
     elements.map((el) => ({
       id: el.id,
