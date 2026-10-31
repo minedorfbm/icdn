@@ -4,7 +4,6 @@ test("large formats keep the editorial heading, portrait cards and controls with
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
   for (const viewport of [
     { width: 1440, height: 900 },
     { width: 1280, height: 720 },
@@ -14,12 +13,9 @@ test("large formats keep the editorial heading, portrait cards and controls with
     { width: 768, height: 1024 },
   ]) {
     await page.setViewportSize(viewport);
-    await page.evaluate(
-      () =>
-        new Promise<void>((resolve) =>
-          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-        ),
-    );
+    // Check each layout from a clean load. Resize/reversal behavior is covered
+    // separately; chaining six resizes here races native scroll anchoring.
+    await page.goto("/");
     const chapter = page.locator("#heaven");
     // The deck can mount after the resize frames when the catalogue/chunk is late.
     // Measure its settled layout, not the +10px group-enter animation offset.
