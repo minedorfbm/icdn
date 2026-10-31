@@ -8,13 +8,14 @@ async function position(page: Page, y: number) {
     () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
   );
 }
-async function stations(page: Page) {
+async function stations(page: Page, waitForFonts = true) {
   // Font completion above the journey can move its arrival coordinates. Let
   // ResizeObserver and the shared motion clock consume that layout first.
-  await page.evaluate(async () => {
-    await document.fonts.ready;
+  await page.evaluate(async (wait) => {
+    // WebKit can defer fonts.ready while a test deliberately holds an image.
+    if (wait) await document.fonts.ready;
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  });
+  }, waitForFonts);
   return page.locator(".level-chapter").evaluateAll((elements) =>
     elements.map((el) => ({
       id: el.id,
@@ -310,7 +311,7 @@ test("a direct cold Heaven arrival waits for loaded clouds even after scroll sto
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
-    const tops = await stations(page);
+    const tops = await stations(page, false);
     const heaven = page.locator('[data-atmosphere-effect="heaven"]');
     await position(page, tops[0]!.top - 844 * 0.2);
     await expect(heaven).toHaveCSS("visibility", "hidden");
@@ -347,7 +348,7 @@ test("cold clouds join the current Heaven scroll phase without waiting for align
   try {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
-    const tops = await stations(page),
+    const tops = await stations(page, false),
       viewport = await page.evaluate(() => innerHeight);
     const heaven = page.locator('[data-atmosphere-effect="heaven"]');
     await position(page, tops[0]!.top - viewport * 0.8);
