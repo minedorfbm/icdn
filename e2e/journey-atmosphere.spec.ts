@@ -659,3 +659,48 @@ for (const width of [390, 1440]) {
     },
   );
 }
+
+test("mobile Earth keeps its path and smoothing through height-only refreshes", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
+  const tops = await stations(page);
+  await position(page, tops[2]!.top - 320);
+  const plane = page.locator(".journey-atmosphere");
+  const plant = page.locator('.atmosphere-plant[data-part="3"]');
+  await expect(plane).toHaveAttribute("data-atmosphere-moving", "false");
+  const step = await plant.evaluate(async (el) => {
+    const y = () => new DOMMatrixReadOnly(el.style.transform).m42;
+    const before = y();
+    scrollTo({ top: scrollY + 80, behavior: "instant" });
+    dispatchEvent(new Event("resize"));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return { before, first: y() };
+  });
+  await expect(plane).toHaveAttribute("data-atmosphere-moving", "false");
+  const settled = await plant.evaluate((el) => new DOMMatrixReadOnly(el.style.transform).m42);
+  const total = Math.abs(settled - step.before);
+  expect(total).toBeGreaterThan(20);
+  expect(Math.abs(step.first - step.before)).toBeLessThan(total * 0.98);
+  expect(Math.abs(step.first - settled)).toBeGreaterThan(0.1);
+  const pose = await plant.getAttribute("style");
+  // Simulate Safari's innerHeight notification while the CSS large viewport stays fixed.
+  for (const height of [740, 790, 844]) {
+    await page.evaluate((value) => {
+      Object.defineProperty(window, "innerHeight", { configurable: true, value });
+      dispatchEvent(new Event("resize"));
+    }, height);
+    await page.evaluate(
+      () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+    );
+    await expect(plant).toHaveAttribute("style", pose!);
+    await expect(plane).toHaveAttribute("data-atmosphere-moving", "false");
+  }
+  await page.evaluate(() => {
+    delete (window as unknown as { innerHeight?: number }).innerHeight;
+    dispatchEvent(new Event("resize"));
+  });
+});

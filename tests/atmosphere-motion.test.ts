@@ -153,3 +153,16 @@ test("plant smoothing uses elapsed time consistently at slow and fast frame rate
   for (let i = 0; i < 3; i++) slow = settlePlantPoses(slow, target, 66.68).poses;
   expect(Math.abs(fast[0]!.y - slow[0]!.y)).toBeLessThan(0.1);
 });
+
+test("mobile foliage follows coarse steps more gently and still reaches an exact idle pose", () => {
+  const start = plantPoses(0.3, 400, 390, 844),
+    target = plantPoses(0.65, 160, 390, 844);
+  const desktop = settlePlantPoses(start, target, 16.67);
+  let mobile = settlePlantPoses(start, target, 16.67, 90);
+  expect(Math.abs(mobile.poses[0]!.y - start[0]!.y)).toBeLessThan(
+    Math.abs(desktop.poses[0]!.y - start[0]!.y),
+  );
+  for (let i = 0; i < 80; i++) mobile = settlePlantPoses(mobile.poses, target, 16.67, 90);
+  expect(mobile.moving).toBe(false);
+  expect(mobile.poses).toEqual(target);
+});

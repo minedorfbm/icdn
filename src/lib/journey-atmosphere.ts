@@ -96,6 +96,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
 
   let earthPoses: AtmosphericPose[] | undefined;
   let earthFrame = 0;
+  let earthWidth = 0;
 
   function warm(id: Level) {
     if (warmed.has(id)) return;
@@ -297,10 +298,16 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       const target = plantPoses(phase, boundary, width, viewport);
       // Snap distant navigation/resize, smooth only local decorative movement.
       const previous =
-        previousY !== undefined && Math.abs(y - previousY) < viewport * 0.5
+        earthWidth === width && previousY !== undefined && Math.abs(y - previousY) < viewport * 0.5
           ? earthPoses
           : undefined;
-      const result = settlePlantPoses(previous, target, earthFrame ? now - earthFrame : 16.67);
+      const result = settlePlantPoses(
+        previous,
+        target,
+        earthFrame ? now - earthFrame : 16.67,
+        width < 768 ? 90 : 60,
+      );
+      earthWidth = width;
       earthPoses = poses = result.poses;
       earthFrame = result.moving ? now : 0;
       settling = result.moving;
@@ -356,9 +363,12 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     visibleEffects.clear();
     let moving = paintIntro(first, y, viewport, width, now, target);
     for (const station of stations.slice(1)) {
-      const phase = phaseFor(station, y, viewport, now, target);
+      // Mobile browser chrome changes innerHeight during a gesture. The level's
+      // stable layout height keeps foliage on one path while the toolbar moves.
+      const sceneHeight = station.id === "earth" && width < 768 ? station.height : viewport;
+      const phase = phaseFor(station, y, sceneHeight, now, target);
       if (phase === null) continue;
-      const settling = paintPassage(station, phase, y, viewport, width, now);
+      const settling = paintPassage(station, phase, y, sceneHeight, width, now);
       moving = settling || phase >= 1 || moving;
     }
     for (const [id, group] of groups)
@@ -370,7 +380,9 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     return moving;
   }
   const invalidate = () => {
-    earthPoses = undefined;
+    // Mobile toolbar refreshes must not snap an in-flight foliage pose.
+    // Width changes and distant navigation reset it in paintPassage instead.
+    if (earthWidth >= 768) earthPoses = undefined;
     lastWorldY = NaN;
     lastViewport = NaN;
   };
