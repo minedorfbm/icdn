@@ -21,8 +21,13 @@ export function useLevelImageReadiness(id: string, section: RefObject<HTMLElemen
       return;
     }
     const observer = new IntersectionObserver(
-      ([entry]) => setNear({ revision, value: Boolean(entry?.isIntersecting) }),
-      { rootMargin: "0px 0px 200px 0px" },
+      ([entry]) =>
+        setNear({
+          revision,
+          value: Boolean(entry?.isIntersecting && entry.intersectionRatio >= 0.01),
+        }),
+      // Adjacent chapters may share a subpixel edge; that is not a visible visit.
+      { rootMargin: "0px 0px 200px 0px", threshold: [0, 0.01] },
     );
     observer.observe(element);
     return () => observer.disconnect();

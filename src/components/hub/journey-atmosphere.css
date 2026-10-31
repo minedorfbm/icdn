@@ -1,0 +1,200 @@
+.journey-worlds {
+  position: relative;
+  isolation: isolate;
+  /* A zero-flow sticky surface must not paint beyond the final station. */
+  --atmosphere-entry-lead: clamp(36px, 6vh, 64px);
+  clip-path: inset(calc(-1 * var(--atmosphere-entry-lead)) 0 0);
+}
+.journey-worlds > .level-chapter {
+  transition: none;
+}
+.journey-atmosphere,
+.journey-atmosphere-foreground {
+  position: sticky;
+  top: 0;
+  height: 100lvh;
+  margin-bottom: -100lvh;
+  overflow: clip;
+  pointer-events: none;
+  z-index: 0;
+}
+.journey-atmosphere-foreground {
+  overflow: visible;
+  z-index: 2;
+}
+.journey-worlds[data-atmosphere="true"][data-atmosphere-ready="true"] > .level-chapter {
+  background: transparent;
+  z-index: 1;
+}
+.journey-atmosphere-photos,
+.journey-atmosphere-decor,
+.journey-world,
+.atmosphere-effect {
+  position: absolute;
+  inset: 0;
+}
+.journey-atmosphere-decor {
+  contain: layout paint;
+  top: calc(-1 * var(--atmosphere-entry-lead));
+  height: calc(100dvh + var(--atmosphere-entry-lead));
+  bottom: auto;
+}
+.atmosphere-effect {
+  top: var(--atmosphere-entry-lead);
+}
+.atmosphere-effect[data-atmosphere-effect="heaven"] {
+  top: 0;
+  bottom: var(--atmosphere-entry-lead);
+}
+.journey-world {
+  opacity: 0;
+  background: var(--world-heaven);
+}
+.journey-world[data-atmosphere-level="heaven"] {
+  background: var(--world-heaven);
+}
+.journey-world[data-atmosphere-level="sky"] {
+  background: var(--world-sky);
+}
+.journey-world[data-atmosphere-level="earth"] {
+  background: var(--world-earth);
+}
+.journey-world[data-atmosphere-level="sea"] {
+  background: var(--world-sea);
+}
+.journey-world:first-child {
+  opacity: 1;
+}
+.journey-world .chapter-backdrop {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+.journey-world .level-bg {
+  opacity: 0.1;
+}
+.atmosphere-effect {
+  visibility: hidden;
+}
+.atmosphere-effect img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: auto;
+  opacity: 0;
+}
+.atmosphere-cloud {
+  width: min(70%, 960px);
+  z-index: 1;
+}
+.atmosphere-effect .atmosphere-cloud {
+  top: 1%;
+  left: -19%;
+}
+.atmosphere-effect .atmosphere-cloud[data-part="1"] {
+  left: auto;
+  right: -19%;
+  top: 4%;
+}
+.atmosphere-halo,
+.atmosphere-rays {
+  position: absolute;
+  inset: -10%;
+  opacity: 0;
+  mix-blend-mode: normal;
+}
+.atmosphere-halo {
+  background: radial-gradient(
+    ellipse at 50% 12%,
+    #fff5c9e0,
+    #ffe1a18c 18%,
+    #f5d39138 38%,
+    transparent 65%
+  );
+}
+.atmosphere-rays {
+  z-index: 2;
+  inset: -10% -15%;
+  transform-origin: 40% 0;
+  background: conic-gradient(
+    from 125deg at 40% 0%,
+    transparent 0 15deg,
+    #fff2ccaa 20deg,
+    #fff9e166 24deg,
+    transparent 30deg 35deg,
+    #fff3ce77 39deg,
+    transparent 44deg 51deg,
+    #fff8df88 54deg,
+    transparent 60deg
+  );
+  mask-image: linear-gradient(#000, #0009 40%, transparent 85%);
+}
+.atmosphere-bird {
+  width: clamp(84px, 10vw, 145px);
+  transform-origin: center;
+}
+.atmosphere-plant {
+  width: clamp(180px, 23vw, 290px);
+  transform-origin: 0 0;
+}
+.atmosphere-plant[data-part="1"] {
+  width: clamp(150px, 18vw, 230px);
+  transform-origin: 100% 0;
+}
+.atmosphere-plant[data-part="2"] {
+  width: clamp(35px, 4vw, 62px);
+  transform-origin: 50% 0;
+}
+.atmosphere-plant[data-part="3"] {
+  width: clamp(140px, 18vw, 220px);
+  transform-origin: 0 100%;
+}
+.atmosphere-plant[data-part="4"],
+.atmosphere-plant[data-part="5"],
+.atmosphere-plant[data-part="6"] {
+  width: clamp(24px, 2.8vw, 38px);
+  transform-origin: center;
+}
+.atmosphere-effect .atmosphere-wave {
+  top: 0;
+  left: 0;
+  width: var(--atmosphere-wave-width, 150px);
+  transform-origin: left center;
+}
+@media (max-width: 767px) {
+  .atmosphere-effect .atmosphere-cloud {
+    width: 115%;
+    left: -38%;
+    top: 2%;
+  }
+  .atmosphere-effect .atmosphere-cloud[data-part="1"] {
+    left: auto;
+    right: -38%;
+    top: 5%;
+  }
+  .atmosphere-bird {
+    width: clamp(78px, 26vw, 112px);
+  }
+  .atmosphere-plant {
+    width: min(46vw, 180px);
+  }
+  .atmosphere-plant[data-part="1"] {
+    width: min(37vw, 145px);
+  }
+  .atmosphere-plant[data-part="2"] {
+    width: 34px;
+  }
+  .atmosphere-plant[data-part="3"] {
+    width: min(38vw, 150px);
+  }
+  .atmosphere-plant[data-part="4"],
+  .atmosphere-plant[data-part="5"],
+  .atmosphere-plant[data-part="6"] {
+    width: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-atmosphere,
+  .journey-atmosphere-foreground {
+    display: none;
+  }
+}

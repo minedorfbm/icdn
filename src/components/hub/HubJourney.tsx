@@ -1,4 +1,4 @@
-import { Fragment, useRef, type CSSProperties } from "react";
+import { useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { useChapterDocking } from "@/lib/use-chapter-docking";
 import { scrollToHubSection } from "@/lib/scroll-to-hub-section";
@@ -16,12 +16,17 @@ import { ResortLink } from "./ResortBrowser";
 import { ConciergeContact } from "./ConciergeContact";
 import { LevelChapter } from "./LevelChapter";
 import { NamTramRail } from "./NamTramRail";
+import { JourneyAtmosphere } from "./JourneyAtmosphere";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 export default function HubJourney() {
   const { openMap } = useResortMap();
   const hubRef = useRef<HTMLDivElement>(null);
+  const [backdropRoot, setBackdropRoot] = useState<HTMLDivElement | null>(null);
+  const reduced = useReducedMotion();
+  const backdropTarget = reduced ? null : backdropRoot;
   const { levels, links } = useHub();
-  const { active, visible } = useJourneyMotion(hubRef, levels);
+  const { active, visible } = useJourneyMotion(hubRef, levels, Boolean(backdropTarget));
   useChapterDocking(hubRef);
   const { lang, t, linkLabel } = useI18n();
 
@@ -37,24 +42,10 @@ export default function HubJourney() {
       <DiscoveryPaths onJourney={() => scrollTo(levels[0]?.id ?? "heaven")} />
 
       {/* THE DESCENT */}
-      <div>
-        {levels.map((l, index) => (
-          <Fragment key={l.id}>
-            <LevelChapter {...l} />
-            {levels[index + 1] && (
-              <div
-                className="chapter-gradient"
-                data-from={l.id}
-                aria-hidden
-                style={
-                  {
-                    "--chapter-from": `var(--world-${l.id})`,
-                    "--chapter-to": `var(--world-${levels[index + 1]!.id})`,
-                  } as CSSProperties
-                }
-              />
-            )}
-          </Fragment>
+      <div className="journey-worlds" data-atmosphere={Boolean(backdropTarget)}>
+        <JourneyAtmosphere onBackdropRoot={setBackdropRoot} />
+        {levels.map((level) => (
+          <LevelChapter key={level.id} {...level} backdropTarget={backdropTarget} />
         ))}
       </div>
 

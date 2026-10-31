@@ -1,6 +1,8 @@
 import { useEffect, useState, type RefObject } from "react";
 import type { Level } from "@/data/resort";
+import { subscribeHubScrollTarget } from "./scroll-to-hub-section";
 import { arrivalProgress, journeyPosition } from "./journey-motion";
+import { createJourneyAtmosphere, type AtmosphereStation } from "./journey-atmosphere";
 
 type JourneySection = {
   id: Level;
@@ -11,6 +13,9 @@ type JourneySection = {
   top: number;
   height: number;
   deckTop: number;
+  arrivalTop: number;
+  card: AtmosphereStation["card"];
+  waveEntry: AtmosphereStation["waveEntry"];
 };
 
 function layoutTop(element: HTMLElement): number {
@@ -26,15 +31,10 @@ function layoutTop(element: HTMLElement): number {
 function paintSection(section: JourneySection, y: number, viewport: number, reduced: boolean) {
   const near =
     section.top < y + viewport * 1.25 && section.top + section.height > y - viewport * 0.25;
-  section.element.dataset["journeyNear"] = String(near && !reduced);
   if (!near && !reduced) return;
   const entrance = reduced ? 1 : arrivalProgress(section.headingTop, y, viewport);
   const cards = reduced ? 1 : arrivalProgress(section.deckTop, y, viewport);
   const headingY = (1 - entrance) * 28;
-  const parallax = reduced
-    ? 0
-    : Math.max(-40, Math.min(40, (y + viewport / 2 - section.top - section.height / 2) * 0.06));
-  section.element.style.setProperty("--journey-scene-y", `${parallax.toFixed(2)}px`);
   section.element.style.setProperty("--journey-heading-y", `${headingY.toFixed(2)}px`);
   section.element.style.setProperty("--journey-heading-opacity", String(0.3 + entrance * 0.7));
   section.element.style.setProperty("--journey-deck-y", `${((1 - cards) * 24).toFixed(2)}px`);
@@ -45,6 +45,7 @@ function paintSection(section: JourneySection, y: number, viewport: number, redu
 export function useJourneyMotion(
   rootRef: RefObject<HTMLElement | null>,
   levels: readonly Readonly<{ id: Level }>[],
+  atmosphereEnabled = false,
 ) {
   const [journey, setJourney] = useState<{ active: Level; visible: boolean }>({
     active: "heaven",
@@ -68,30 +69,24 @@ export function useJourneyMotion(
               top: 0,
               height: 0,
               deckTop: 0,
+              arrivalTop: 0,
+              card: undefined as AtmosphereStation["card"],
+              waveEntry: undefined as AtmosphereStation["waveEntry"],
             },
           ]
         : [];
     });
     if (!sections.length) return;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const atmosphere = atmosphereEnabled ? createJourneyAtmosphere(root) : null;
     let raf = 0;
     let dirty = true;
     let previousActive: Level | undefined;
     let previousVisible: boolean | undefined;
+    let lastPaintY = NaN,
+      lastViewport = NaN;
 
-    const measure = () => {
-      raf = 0;
-      const y = window.scrollY;
-      const viewport = window.innerHeight;
-      if (dirty) {
-        for (const section of sections) {
-          section.top = layoutTop(section.element);
-          section.height = section.element.offsetHeight;
-          section.deckTop = section.deck ? layoutTop(section.deck) : section.top;
-          section.headingTop = section.heading ? layoutTop(section.heading) : section.top;
-        }
-        dirty = false;
-      }
+    const paintJourney = (y: number, viewport: number) => {
       const { progress, station } = journeyPosition(
         y,
         sections.map((section) => section.top),
@@ -115,41 +110,119 @@ export function useJourneyMotion(
       }
     };
 
+    const measure = (now = performance.now()) => {
+      raf = 0;
+      if (document.hidden) {
+        atmosphere?.hide();
+        return;
+      }
+      const y = window.scrollY;
+      const viewport = window.innerHeight;
+      const repaint = dirty || lastPaintY !== y || lastViewport !== viewport;
+      if (dirty) {
+        atmosphere?.invalidate();
+        for (const [index, section] of sections.entries()) {
+          section.top = section.element.getBoundingClientRect().top + y;
+          section.height = section.element.offsetHeight;
+          section.deckTop = section.deck ? layoutTop(section.deck) : section.top;
+          section.headingTop = section.heading ? layoutTop(section.heading) : section.top;
+          section.arrivalTop =
+            section.top - parseFloat(getComputedStyle(section.element).scrollMarginTop || "0");
+          // SEA follows the actual front card. Measure on geometry changes only,
+          // never while painting a scroll frame or a swipe.
+          if (section.id === "sea") {
+            const card = section.deck?.querySelector<HTMLElement>(
+              '.perspective-card[data-card-offset="0"]',
+            );
+            const counter =
+              sections[index - 1]?.element.querySelector<HTMLElement>(".card-stack-pagination");
+            const subtitle = section.heading?.querySelector<HTMLElement>("p");
+            section.waveEntry =
+              counter && subtitle
+                ? { top: layoutTop(counter), bottom: layoutTop(subtitle) + subtitle.offsetHeight }
+                : undefined;
+            section.card = card
+              ? {
+                  left: card.getBoundingClientRect().left,
+                  width: card.offsetWidth,
+                  height: card.offsetHeight,
+                  centerY: layoutTop(card) + card.offsetHeight / 2,
+                }
+              : undefined;
+          }
+        }
+        dirty = false;
+      }
+      if (repaint) {
+        paintJourney(y, viewport);
+        lastPaintY = y;
+        lastViewport = viewport;
+      }
+      const finishing = atmosphere?.paint(
+        sections.map((section) => ({
+          id: section.id,
+          top: section.arrivalTop,
+          height: section.height,
+          card: section.card,
+          waveEntry: section.waveEntry,
+        })),
+        y,
+        viewport,
+        window.innerWidth,
+        now,
+      );
+      if (finishing && !raf) raf = requestAnimationFrame(measure);
+    };
+
     const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(measure);
+      if (!raf && !document.hidden) raf = requestAnimationFrame(measure);
     };
     const refresh = () => {
       dirty = true;
       schedule();
     };
     const resize = new ResizeObserver(refresh);
-    sections.forEach(({ element }) => resize.observe(element));
+    sections.forEach(({ element, heading, deck }) => {
+      resize.observe(element);
+      if (heading) resize.observe(heading);
+      if (deck) resize.observe(deck);
+    });
     // The translated discovery choices above the levels can also change their offsets.
     resize.observe(root);
+    const unsubscribeNavigation = subscribeHubScrollTarget(schedule);
     window.addEventListener("scroll", schedule, { passive: true });
+    // A cold cloud asset may become ready after scrolling has already stopped.
+    root.addEventListener("load", schedule, true);
+    root.addEventListener("error", schedule, true);
     window.addEventListener("resize", refresh);
     reducedMotion.addEventListener("change", refresh);
+    const visibility = () => {
+      if (document.hidden) {
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+        atmosphere?.hide();
+      } else refresh();
+    };
+    document.addEventListener("visibilitychange", visibility);
     measure();
     return () => {
       resize.disconnect();
+      unsubscribeNavigation();
       window.removeEventListener("scroll", schedule);
+      root.removeEventListener("load", schedule, true);
+      root.removeEventListener("error", schedule, true);
       window.removeEventListener("resize", refresh);
       reducedMotion.removeEventListener("change", refresh);
+      document.removeEventListener("visibilitychange", visibility);
+      atmosphere?.hide();
       if (raf) cancelAnimationFrame(raf);
       carriage?.style.removeProperty("--tram-progress");
       for (const { element } of sections) {
-        delete element.dataset["journeyNear"];
-        for (const property of [
-          "scene-y",
-          "heading-y",
-          "heading-opacity",
-          "deck-y",
-          "deck-opacity",
-        ])
+        for (const property of ["heading-y", "heading-opacity", "deck-y", "deck-opacity"])
           element.style.removeProperty(`--journey-${property}`);
       }
     };
-  }, [levels, rootRef]);
+  }, [levels, rootRef, atmosphereEnabled]);
 
   return journey;
 }

@@ -60,7 +60,7 @@
   margin-top: 0;
 }
 /* Fade the whole photo layer, independently of its moving parallax image.
-   Both edges meet the solid colors used by the inter-chapter gradient. */
+   This fallback remains available without motion or before enhancement. */
 .chapter-backdrop {
   --chapter-photo-fade: 80px;
   -webkit-mask-image: linear-gradient(
@@ -78,34 +78,6 @@
     transparent
   );
 }
-/* Simple color transition, completed before the next level heading. */
-.chapter-gradient {
-  height: clamp(120px, 16svh, 180px);
-  overflow: hidden;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    var(--chapter-from) 0%,
-    color-mix(in oklab, var(--chapter-from) 90%, var(--chapter-to)) 20%,
-    color-mix(in oklab, var(--chapter-from) 66%, var(--chapter-to)) 40%,
-    color-mix(in oklab, var(--chapter-from) 34%, var(--chapter-to)) 60%,
-    color-mix(in oklab, var(--chapter-from) 10%, var(--chapter-to)) 80%,
-    var(--chapter-to) 100%
-  );
-}
-/* Daylight blue keeps ivory-to-navy clear rather than passing through grey. */
-.chapter-gradient[data-from="heaven"] {
-  background: linear-gradient(
-    180deg,
-    var(--chapter-from) 0%,
-    color-mix(in oklab, var(--chapter-from) 70%, var(--world-sea)) 20%,
-    var(--world-sea) 38%,
-    color-mix(in oklab, var(--world-sea) 66%, var(--chapter-to)) 58%,
-    color-mix(in oklab, var(--world-sea) 20%, var(--chapter-to)) 82%,
-    var(--chapter-to) 100%
-  );
-}
-
 .chapter-deck-controls {
   display: none;
 }
@@ -176,16 +148,6 @@
   .level-chapter .destination-panel-actions a {
     font-size: var(--readable-11);
   }
-  /* Daylight blue keeps ivory-to-navy clear rather than passing through grey. */
-  .chapter-gradient[data-from="heaven"] {
-    background: linear-gradient(
-      180deg,
-      var(--chapter-from) 0%,
-      var(--world-sea) 38%,
-      var(--chapter-to) 100%
-    );
-  }
-
   .chapter-deck-controls {
     display: flex;
     gap: 6px;

@@ -4,7 +4,6 @@ test("large formats keep the editorial heading, portrait cards and controls with
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
   for (const viewport of [
     { width: 1440, height: 900 },
     { width: 1280, height: 720 },
@@ -14,19 +13,29 @@ test("large formats keep the editorial heading, portrait cards and controls with
     { width: 768, height: 1024 },
   ]) {
     await page.setViewportSize(viewport);
-    await page.evaluate(
-      () =>
-        new Promise<void>((resolve) =>
-          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
-        ),
-    );
+    // Check each layout from a clean load. Resize/reversal behavior is covered
+    // separately; chaining six resizes here races native scroll anchoring.
+    await page.goto("/");
     const chapter = page.locator("#heaven");
-    await chapter.evaluate((el) => el.scrollIntoView({ behavior: "instant" }));
     // The deck can mount after the resize frames when the catalogue/chunk is late.
     // Measure its settled layout, not the +10px group-enter animation offset.
     await chapter.locator(".chapter-stack").evaluate(async (deck) => {
       await Promise.allSettled(deck.getAnimations().map((animation) => animation.finished));
     });
+    // Fonts and the final deck size must settle before the native scroll target is measured.
+    await page.evaluate(() => document.fonts.ready);
+    await expect(chapter).toHaveCSS("min-height", viewport.height + "px");
+    await chapter.evaluate((el) => el.scrollIntoView({ behavior: "instant" }));
+    await expect
+      .poll(() =>
+        chapter.evaluate((el) =>
+          Math.abs(
+            el.getBoundingClientRect().top -
+              parseFloat(getComputedStyle(el).scrollMarginTop || "0"),
+          ),
+        ),
+      )
+      .toBeLessThan(2);
     const geometry = await chapter.evaluate((el) => {
       const box = (selector: string) => el.querySelector(selector)!.getBoundingClientRect();
       const size = (selector: string) =>

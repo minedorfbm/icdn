@@ -110,7 +110,17 @@ test("rotating a scrolled PDF preserves the page and reading position without pr
   const scroller = viewer.locator("div.overflow-auto[aria-label]");
   const second = viewer.locator('[data-pdf-page="2"]');
   await expect(second).toBeAttached();
-  await second.evaluate((el) => el.scrollIntoView({ block: "start" }));
+  await second.evaluate(async (el) => {
+    const container = el.closest<HTMLElement>("div.overflow-auto[aria-label]")!;
+    await new Promise<void>((resolve) => {
+      container.addEventListener(
+        "scroll",
+        () => requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        { once: true },
+      );
+      el.scrollIntoView({ block: "start" });
+    });
+  });
   await expect.poll(() => scroller.evaluate((el) => el.scrollTop)).toBeGreaterThan(100);
   const position = () =>
     scroller.evaluate((el) => {
