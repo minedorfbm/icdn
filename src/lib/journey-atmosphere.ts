@@ -291,9 +291,9 @@ export function createJourneyAtmosphere(root: HTMLElement) {
         previousY !== undefined && Math.abs(y - previousY) < viewport * 0.5
           ? earthPoses
           : undefined;
-      const result = settlePlantPoses(previous, target, now - earthFrame);
+      const result = settlePlantPoses(previous, target, earthFrame ? now - earthFrame : 16.67);
       earthPoses = poses = result.poses;
-      earthFrame = now;
+      earthFrame = result.moving ? now : 0;
       settling = result.moving;
     } else {
       const card = station.card && { ...station.card, centerY: station.card.centerY - y };

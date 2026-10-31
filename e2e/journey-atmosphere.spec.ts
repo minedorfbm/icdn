@@ -64,13 +64,21 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       const blend = await world.evaluate((el) => Number(getComputedStyle(el).opacity));
       expect(blend).toBeGreaterThan(0);
       expect(blend).toBeLessThan(1);
-      if (station.id === "earth") await page.waitForTimeout(650);
+      if (station.id === "earth")
+        await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
+          "data-atmosphere-moving",
+          "false",
+        );
       const pose = await group
         .locator("img")
         .evaluateAll((imgs) => imgs.map((img) => img.getAttribute("style")));
       await position(page, y + 60);
       await position(page, y);
-      if (station.id === "earth") await page.waitForTimeout(650);
+      if (station.id === "earth")
+        await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
+          "data-atmosphere-moving",
+          "false",
+        );
       expect(
         await group
           .locator("img")
@@ -509,7 +517,10 @@ test("Earth absorbs wheel steps, settles without an idle loop and cancels after 
   await page.waitForTimeout(100);
   expect(await plant.getAttribute("style")).not.toBe(following);
   expect(following).not.toBe(initial);
-  await page.waitForTimeout(650);
+  await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
+    "data-atmosphere-moving",
+    "false",
+  );
   const settled = await plant.getAttribute("style");
   await page.waitForTimeout(150);
   expect(await plant.getAttribute("style")).toBe(settled);

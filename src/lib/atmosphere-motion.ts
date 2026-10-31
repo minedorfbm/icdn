@@ -87,7 +87,7 @@ export function settlePlantPoses(
   elapsed: number,
 ) {
   if (!previous) return { poses: target, moving: false };
-  const alpha = 1 - Math.exp(-Math.min(32, Math.max(1, elapsed)) / 60);
+  const alpha = 1 - Math.exp(-Math.min(160, Math.max(1, elapsed)) / 60);
   let moving = false;
   const poses = target.map((next, i) => {
     const old = previous[i] ?? next;

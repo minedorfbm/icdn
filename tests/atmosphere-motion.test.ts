@@ -143,3 +143,13 @@ test("plants interpolate coarse scroll steps without overshoot, reverse, and set
   expect(result.poses).toEqual(target);
   expect(settlePlantPoses(undefined, target, 16.67).moving).toBe(false);
 });
+
+test("plant smoothing uses elapsed time consistently at slow and fast frame rates", () => {
+  const start = plantPoses(0.3, 400, 390, 844),
+    target = plantPoses(0.65, 160, 390, 844);
+  let fast = start,
+    slow = start;
+  for (let i = 0; i < 12; i++) fast = settlePlantPoses(fast, target, 16.67).poses;
+  for (let i = 0; i < 3; i++) slow = settlePlantPoses(slow, target, 66.68).poses;
+  expect(Math.abs(fast[0]!.y - slow[0]!.y)).toBeLessThan(0.1);
+});
