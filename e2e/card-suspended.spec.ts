@@ -338,3 +338,35 @@ test("native vertical touch scroll cancels the card gesture without navigating",
   await expect.poll(snapshot).toBeGreaterThan(before + 5);
   await expect(stage.locator('article[aria-hidden="false"]')).toContainText("Citron");
 });
+
+test("a cancelled current photo effect releases navigation after the remaining card effects finish", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await catalogue(page);
+  await page.goto("/surprise-me");
+  const stage = page.locator(".discovery-stack .card-stack-stage");
+  await stage.scrollIntoViewIfNeeded();
+  const next = (await stage.locator('[data-destination-id="tingara"]').boundingBox())!;
+  await page.mouse.click(next.x + next.width - 8, next.y + next.height / 2);
+  await expect(stage.locator('article[aria-hidden="false"]')).toContainText("TINGARA");
+  await expect(stage).toHaveAttribute("data-card-navigation", "true");
+  await stage.evaluate((el) => {
+    const photo = el.querySelector('[data-card-offset="0"] .destination-panel > picture > img');
+    const effects = el
+      .getAnimations({ subtree: true })
+      .filter(
+        (animation) =>
+          !(animation instanceof CSSAnimation) && !(animation instanceof CSSTransition),
+      );
+    const current = effects.find(
+      (animation) => (animation.effect as KeyframeEffect).target === photo,
+    );
+    if (!current) throw new Error("Expected the current card's native photo effect");
+    current.cancel();
+    for (const animation of effects) if (animation !== current) animation.finish();
+  });
+  await expect(stage).not.toHaveAttribute("data-card-navigation");
+  await expect(stage.locator('article[aria-hidden="false"]')).toContainText("TINGARA");
+});

@@ -118,13 +118,11 @@ export function useCardStackTransition(
       animations.push(...animateCard(card, transition, index, metrics.current));
     playing.current = animations;
     stage.current.dataset["cardNavigation"] = "true";
-    void Promise.all(animations.map((animation) => animation.finished))
-      .then(() => {
-        if (playing.current === animations) stop();
-      })
-      .catch(() => {
-        /* Pointer interruption or a later click owns the replacement timeline. */
-      });
+    // A browser may cancel an individual photo effect. Still release this
+    // transition after the remaining effects finish; never stop its successor.
+    void Promise.allSettled(animations.map((animation) => animation.finished)).then(() => {
+      if (playing.current === animations) stop();
+    });
   }, [index, metrics, reduced, stage, stop]);
 
   useLayoutEffect(() => stop, [stop]);
