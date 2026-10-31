@@ -88,6 +88,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     lastViewport = NaN;
   const tails = new Map<Level, number>();
   let previousY: number | undefined, introStart: number | undefined;
+  let scrollDirection = 0;
   let introComplete = false;
   let introRevision = getHubScrollSnapshot().revision;
   let introFrom = 0,
@@ -200,6 +201,14 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       (target && target !== "heaven")
     ) {
       resetIntro();
+      return false;
+    }
+    // This is an arrival, never a departure overlay. Keep the direction across
+    // stationary tail frames; an upward return is still an entrance to HEAVEN.
+    if (y > first.top + 2 && scrollDirection >= 0) {
+      introComplete = true;
+      introStart = undefined;
+      introLast = 0;
       return false;
     }
     if (introComplete) {
@@ -318,6 +327,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     if (!plate || !stations.length) return false;
     const first = stations[0]!,
       last = stations.at(-1)!;
+    if (previousY !== undefined && y !== previousY) scrollDirection = y > previousY ? 1 : -1;
     paintWorlds(stations, y, viewport);
     write(container, "--atmosphere-entry-lead", heavenEntryLead(viewport).toFixed(2) + "px");
     if (

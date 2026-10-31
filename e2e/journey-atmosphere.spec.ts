@@ -619,3 +619,43 @@ for (const width of [390, 1440]) {
     },
   );
 }
+
+for (const width of [390, 1440]) {
+  test(
+    "Heaven is hidden on departure to Sky and reappears only on return at " + width + "px",
+    async ({ page }) => {
+      const height = 900;
+      await page.setViewportSize({ width, height });
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.goto("/");
+      await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
+      const tops = await stations(page),
+        top = tops[0]!.top;
+      const heaven = page.locator('[data-atmosphere-effect="heaven"]');
+      const sky = page.locator('[data-atmosphere-effect="sky"]');
+      await position(page, top - height * 0.4);
+      await expect(heaven).toHaveCSS("visibility", "visible");
+      await position(page, top);
+      await expect(heaven).toHaveCSS("visibility", "visible");
+      // Depart before the time-driven arrival has finished.
+      await position(page, top + 40);
+      await expect(heaven).toHaveCSS("visibility", "hidden");
+      await page.waitForTimeout(100);
+      await expect(heaven).toHaveCSS("visibility", "hidden");
+      await position(page, tops[1]!.top - height * 0.5);
+      await expect(sky).toHaveCSS("visibility", "visible");
+      await expect(heaven).toHaveCSS("visibility", "hidden");
+      await position(page, tops[1]!.top);
+      await expect(heaven).toHaveCSS("visibility", "hidden");
+      // Scrolling upward announces HEAVEN, but reversing toward SKY cancels it.
+      await position(page, top + 180);
+      await expect(heaven).toHaveCSS("visibility", "visible");
+      await position(page, top + 240);
+      await expect(heaven).toHaveCSS("visibility", "hidden");
+      await position(page, top + 80);
+      await expect(heaven).toHaveCSS("visibility", "visible");
+      await position(page, top);
+      await expect(heaven).toHaveCSS("visibility", "hidden", { timeout: 3000 });
+    },
+  );
+}
