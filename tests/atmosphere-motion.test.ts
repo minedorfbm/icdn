@@ -84,7 +84,7 @@ test("four differently sized waves share a right-to-left direction on separate r
     expect(Math.abs(next.opacity - wave.opacity)).toBeLessThan(0.01);
     expect(retreat.x).toBeLessThan(wave.x);
     expect(retreat.y).toBe(wave.y);
-    expect(retreat.opacity).toBeLessThan(wave.opacity);
+    expect(retreat.opacity).toBeLessThanOrEqual(wave.opacity);
   });
 });
 
@@ -94,7 +94,7 @@ test("Heaven announces its entrance slightly before the section without adding f
   expect(heavenEntryLead(2000)).toBe(64);
 });
 
-test("wave rows stay between the new section boundary and the upper quarter of its real card", () => {
+test("wave rows follow the preceding counter and SEA subtitle, and reach beyond the left edge", () => {
   for (const [width, height] of [
     [320, 568],
     [390, 844],
@@ -109,14 +109,21 @@ test("wave rows stay between the new section boundary and the upper quarter of i
     };
     for (const boundary of [0, 100, 200]) {
       const shifted = { ...card, centerY: card.centerY + boundary };
-      const layout = waveLayout(width!, height!, shifted, boundary);
+      const entry = { top: boundary - 90, bottom: boundary + (width! >= 1024 ? 450 : 135) };
+      const layout = waveLayout(width!, height!, shifted, boundary, entry);
       const baseHeight = (layout.width * 130) / 360;
-      for (const wave of wavePoses(0.85, width!, height!, shifted, boundary)) {
+      for (const wave of wavePoses(0.85, width!, height!, shifted, boundary, entry)) {
         const center = wave.y + baseHeight / 2;
-        expect(center - (baseHeight * wave.scale) / 2).toBeGreaterThanOrEqual(boundary);
-        expect(center + (baseHeight * wave.scale) / 2).toBeLessThanOrEqual(
-          shifted.centerY - card.height * 0.25,
-        );
+        expect(center - (baseHeight * wave.scale) / 2).toBeGreaterThanOrEqual(entry.top);
+        expect(center + (baseHeight * wave.scale) / 2).toBeLessThanOrEqual(entry.bottom);
+      }
+      for (const wave of wavePoses(1.94, width!, height!, shifted, boundary, entry)) {
+        expect(wave.x).toBeLessThan(0);
+        expect(wave.opacity).toBeGreaterThan(0);
+      }
+      for (const wave of wavePoses(2, width!, height!, shifted, boundary, entry)) {
+        expect(wave.x + layout.width * wave.scale).toBeLessThanOrEqual(0);
+        expect(wave.opacity).toBe(0);
       }
     }
   }

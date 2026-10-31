@@ -1,5 +1,6 @@
 import { useEffect, useState, type RefObject } from "react";
 import type { Level } from "@/data/resort";
+import { subscribeHubScrollTarget } from "./scroll-to-hub-section";
 import { arrivalProgress, journeyPosition } from "./journey-motion";
 import { createJourneyAtmosphere, type AtmosphereStation } from "./journey-atmosphere";
 
@@ -14,6 +15,7 @@ type JourneySection = {
   deckTop: number;
   arrivalTop: number;
   card: AtmosphereStation["card"];
+  waveEntry: AtmosphereStation["waveEntry"];
 };
 
 function layoutTop(element: HTMLElement): number {
@@ -69,6 +71,7 @@ export function useJourneyMotion(
               deckTop: 0,
               arrivalTop: 0,
               card: undefined as AtmosphereStation["card"],
+              waveEntry: undefined as AtmosphereStation["waveEntry"],
             },
           ]
         : [];
@@ -118,7 +121,7 @@ export function useJourneyMotion(
       const repaint = dirty || lastPaintY !== y || lastViewport !== viewport;
       if (dirty) {
         atmosphere?.invalidate();
-        for (const section of sections) {
+        for (const [index, section] of sections.entries()) {
           section.top = section.element.getBoundingClientRect().top + y;
           section.height = section.element.offsetHeight;
           section.deckTop = section.deck ? layoutTop(section.deck) : section.top;
@@ -131,6 +134,13 @@ export function useJourneyMotion(
             const card = section.deck?.querySelector<HTMLElement>(
               '.perspective-card[data-card-offset="0"]',
             );
+            const counter =
+              sections[index - 1]?.element.querySelector<HTMLElement>(".card-stack-pagination");
+            const subtitle = section.heading?.querySelector<HTMLElement>("p");
+            section.waveEntry =
+              counter && subtitle
+                ? { top: layoutTop(counter), bottom: layoutTop(subtitle) + subtitle.offsetHeight }
+                : undefined;
             section.card = card
               ? {
                   left: card.getBoundingClientRect().left,
@@ -154,6 +164,7 @@ export function useJourneyMotion(
           top: section.arrivalTop,
           height: section.height,
           card: section.card,
+          waveEntry: section.waveEntry,
         })),
         y,
         viewport,
@@ -178,6 +189,7 @@ export function useJourneyMotion(
     });
     // The translated discovery choices above the levels can also change their offsets.
     resize.observe(root);
+    const unsubscribeNavigation = subscribeHubScrollTarget(schedule);
     window.addEventListener("scroll", schedule, { passive: true });
     // A cold cloud asset may become ready after scrolling has already stopped.
     root.addEventListener("load", schedule, true);
@@ -195,6 +207,7 @@ export function useJourneyMotion(
     measure();
     return () => {
       resize.disconnect();
+      unsubscribeNavigation();
       window.removeEventListener("scroll", schedule);
       root.removeEventListener("load", schedule, true);
       root.removeEventListener("error", schedule, true);

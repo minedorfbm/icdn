@@ -84,6 +84,8 @@ for (const width of [320, 390, 768, 1024, 1440]) {
         const card = await page
           .locator('#sea .perspective-card[data-card-offset="0"]')
           .boundingBox();
+        const counter = await page.locator("#earth .card-stack-pagination").boundingBox();
+        const subtitle = await page.locator("#sea header p").boundingBox();
         const start = await waves.evaluateAll((es) =>
           es.map((el) => ({
             x: el.getBoundingClientRect().x,
@@ -95,8 +97,8 @@ for (const width of [320, 390, 768, 1024, 1440]) {
         expect(new Set(start.map((wave) => wave.y)).size).toBe(4);
         for (const wave of start) {
           expect(wave.width).toBeLessThan(card!.width * 0.6);
-          expect(wave.y).toBeGreaterThanOrEqual(0);
-          expect(wave.bottom).toBeLessThan(card!.y + card!.height * 0.25 + 1);
+          expect(wave.y).toBeGreaterThanOrEqual(counter!.y - 1);
+          expect(wave.bottom).toBeLessThanOrEqual(subtitle!.y + subtitle!.height + 1);
         }
         await page.waitForTimeout(200);
         const end = await waves.evaluateAll((es) => es.map((el) => el.getBoundingClientRect().x));
@@ -157,7 +159,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
   });
 }
 
-test("Heaven illuminates once, native scrolling stays free and hidden tabs stop the effects", async ({
+test("Heaven completes each visit, native scrolling stays free and hidden tabs stop the effects", async ({
   page,
   browserName,
 }) => {
@@ -521,3 +523,60 @@ test("Earth absorbs wheel steps, settles without an idle loop and cancels after 
   await position(page, sea.top);
   await expect(page.locator('[data-atmosphere-effect="earth"]')).toHaveCSS("visibility", "hidden");
 });
+
+for (const width of [390, 1440]) {
+  test(
+    "Heaven replays on upward scrolling and repeated Nam Tram arrivals at " + width + "px",
+    async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await page.goto("/");
+      await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
+      const tops = await stations(page),
+        top = tops[0]!.top;
+      const heaven = page.locator('[data-atmosphere-effect="heaven"]');
+      await position(page, top);
+      await expect(heaven).toHaveCSS("visibility", "visible");
+      await expect(heaven).toHaveCSS("visibility", "hidden", { timeout: 3000 });
+      await position(page, tops[1]!.top);
+      const returnToHeaven = async () => {
+        await page.locator(".nam-tram-rail button").click();
+        await page.getByRole("dialog").getByRole("button", { name: "HEAVEN", exact: true }).click();
+        await expect
+          .poll(() =>
+            page
+              .locator("#heaven")
+              .evaluate((el) =>
+                Math.abs(
+                  el.getBoundingClientRect().top -
+                    parseFloat(getComputedStyle(el).scrollMarginTop || "0"),
+                ),
+              ),
+          )
+          .toBeLessThan(2);
+        await expect(heaven).toHaveCSS("visibility", "visible");
+        await expect
+          .poll(() =>
+            heaven
+              .locator("img")
+              .first()
+              .evaluate((el) => Number(getComputedStyle(el).opacity)),
+          )
+          .toBeGreaterThan(0.05);
+        await expect(heaven).toHaveCSS("visibility", "hidden", { timeout: 3000 });
+      };
+      await returnToHeaven();
+      // The same station is already centred: no scroll event is required for replay.
+      await returnToHeaven();
+      await page.waitForTimeout(200);
+      await expect(heaven).toHaveCSS("visibility", "hidden");
+      await position(page, top + 400);
+      await position(page, top + 180);
+      await expect(heaven).toHaveCSS("visibility", "visible");
+      await position(page, top);
+      await expect(heaven).toHaveCSS("visibility", "hidden", { timeout: 2000 });
+      await position(page, top - 250);
+      await expect(heaven).toHaveCSS("visibility", "visible");
+    },
+  );
+}

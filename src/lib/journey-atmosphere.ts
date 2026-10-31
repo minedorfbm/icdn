@@ -13,6 +13,7 @@ import {
   wavePoses,
   type AtmosphericPose,
   type WaveCardAnchor,
+  type WaveEntryBounds,
 } from "./atmosphere-motion";
 
 export type AtmosphereStation = {
@@ -20,8 +21,9 @@ export type AtmosphereStation = {
   top: number;
   height: number;
   card?: WaveCardAnchor | undefined;
+  waveEntry?: WaveEntryBounds | undefined;
 };
-const durations: Record<Level, number> = { heaven: 2100, sky: 950, earth: 750, sea: 1800 };
+const durations: Record<Level, number> = { heaven: 2100, sky: 950, earth: 750, sea: 850 };
 function write(element: HTMLElement | undefined | null, property: string, value: string) {
   if (element && element.style.getPropertyValue(property) !== value)
     element.style.setProperty(property, value);
@@ -86,6 +88,8 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     lastViewport = NaN;
   const tails = new Map<Level, number>();
   let previousY: number | undefined, introStart: number | undefined;
+  let introComplete = false;
+  let introRevision = getHubScrollSnapshot().revision;
   let introFrom = 0,
     introLast = 0;
 
@@ -124,12 +128,17 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     }
     warmed.add(id);
   }
+  function resetIntro() {
+    introStart = undefined;
+    introLast = 0;
+    introFrom = 0;
+    introComplete = false;
+  }
   function hide() {
     for (const group of groups.values()) write(group, "visibility", "hidden");
     tails.clear();
     earthPoses = undefined;
-    introStart = undefined;
-    introLast = 0;
+    resetIntro();
     if (plate) plate.dataset["atmosphereMoving"] = "false";
   }
   function heaven(progress: number, width: number, height: number, entry = 1) {
@@ -186,14 +195,19 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     target: string | null,
   ) {
     if (
-      root.dataset["heavenIlluminated"] ||
       y + viewport <= first.top - heavenEntryLead(viewport) ||
-      y >= first.top + viewport * 0.2 ||
+      y >= first.top + viewport * 0.75 ||
       (target && target !== "heaven")
     ) {
-      introStart = undefined;
-      introLast = 0;
+      resetIntro();
       return false;
+    }
+    if (introComplete) {
+      const returning =
+        y < first.top - 2 ||
+        (previousY !== undefined && previousY > first.top + 24 && y < previousY);
+      if (!returning) return false;
+      resetIntro();
     }
     if (
       !(sprites.get("heaven") ?? []).every((element) => {
@@ -204,12 +218,13 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       return false;
     const lead = heavenEntryLead(viewport);
     const entry = clampAtmosphere((y + viewport - first.top + lead) / Math.max(1, viewport + lead));
-    if (y < first.top - 2) {
-      // A small, clipped foreground lead announces HEAVEN before its title enters.
-      // A stationary/reversed approach cannot consume or finish the entrance.
+    if (y < first.top - 2 || (y > first.top + 2 && introStart === undefined)) {
+      // Both scroll directions announce HEAVEN, without consuming a stationary approach.
+      const approach =
+        y > first.top ? clampAtmosphere((first.top + viewport - y) / viewport) : entry;
       introStart = undefined;
-      introLast = entry * 0.65;
-      heaven(introLast, width, viewport, entry);
+      introLast = approach * 0.65;
+      heaven(introLast, width, viewport, approach);
       return false;
     }
     if (introStart === undefined) {
@@ -221,7 +236,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     const duration = introFrom > 0 ? 900 : durations.heaven;
     const tail = clampAtmosphere((now - introStart) / duration);
     if (tail >= 1) {
-      root.dataset["heavenIlluminated"] = "true";
+      introComplete = true;
       introStart = undefined;
       introLast = 0;
       return false;
@@ -282,9 +297,13 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       settling = result.moving;
     } else {
       const card = station.card && { ...station.card, centerY: station.card.centerY - y };
-      const layout = waveLayout(width, viewport, card, boundary);
+      const entry = station.waveEntry && {
+        top: station.waveEntry.top - y,
+        bottom: station.waveEntry.bottom - y,
+      };
+      const layout = waveLayout(width, viewport, card, boundary, entry);
       write(groups.get("sea"), "--atmosphere-wave-width", `${layout.width.toFixed(2)}px`);
-      poses = wavePoses(phase, width, viewport, card, boundary);
+      poses = wavePoses(phase, width, viewport, card, boundary, entry);
     }
     paintPoses(sprites.get(station.id) ?? [], poses);
     return settling;
@@ -310,7 +329,12 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       previousY = y;
       return false;
     }
-    const target = getHubScrollSnapshot().target;
+    const navigation = getHubScrollSnapshot();
+    const target = navigation.target;
+    if (navigation.revision !== introRevision) {
+      introRevision = navigation.revision;
+      if (target === "heaven") resetIntro();
+    }
     for (const station of stations) {
       if (
         (!target || target === station.id) &&

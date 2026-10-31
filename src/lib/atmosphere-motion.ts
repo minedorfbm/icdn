@@ -152,19 +152,28 @@ export function plantPoses(phase: number, boundary: number, width: number, heigh
   });
 }
 
+export type WaveEntryBounds = { top: number; bottom: number };
+
 export type WaveCardAnchor = { left: number; width: number; centerY: number; height?: number };
 
-/** Four sizes share one vector; rows span the section entrance to the card's upper quarter. */
-export function waveLayout(width: number, height: number, card?: WaveCardAnchor, boundary = 0) {
+/** Four sizes share one vector, between the preceding counter and SEA's subtitle. */
+export function waveLayout(
+  width: number,
+  height: number,
+  card?: WaveCardAnchor,
+  boundary = 0,
+  entry?: WaveEntryBounds,
+) {
   const anchor = card ?? { left: width * 0.12, width: width * 0.76, centerY: height * 0.55 };
   const waveWidth = Math.min(width * 0.42, anchor.width * 0.5, 220);
-  const cardHeight = anchor.height ?? height * 0.66;
   const halfWaveHeight = (waveWidth * (130 / 360)) / 2;
-  const top = boundary + 10 + halfWaveHeight;
-  const bottom = Math.max(top, anchor.centerY - cardHeight * 0.25 - 10 - halfWaveHeight);
+  const entryTop = entry?.top ?? boundary - Math.min(100, height * 0.13);
+  const entryBottom = entry?.bottom ?? boundary + Math.min(150, height * 0.17);
+  const top = entryTop + halfWaveHeight;
+  const bottom = Math.max(top, entryBottom - halfWaveHeight);
   return {
     width: waveWidth,
-    left: Math.max(-waveWidth, anchor.left - waveWidth * 1.1),
+    left: -waveWidth * 1.1,
     top,
     height: bottom - top,
   };
@@ -176,17 +185,18 @@ export function wavePoses(
   height: number,
   card?: WaveCardAnchor,
   boundary = 0,
+  entry?: WaveEntryBounds,
 ) {
   const p = clampAtmosphere(phase),
     t = clampAtmosphere(phase - 1);
-  const layout = waveLayout(width, height, card, boundary);
-  return [0.78, 0.66, 0.7, 0.62].map((arrival, index) => {
+  const layout = waveLayout(width, height, card, boundary, entry);
+  return [0.8, 0.76, 0.72, 0.68].map((arrival, index) => {
     const delay = [0, 0.08, 0.16, 0.24][index]!;
     const q =
       phase > 1
         ? arrival + (1 - arrival) * smoothAtmosphere(t)
         : smoothAtmosphere((p - delay) / (1 - delay)) * arrival;
-    const opacity = smoothAtmosphere(q / 0.12) * (1 - smoothAtmosphere((q - 0.78) / 0.22));
+    const opacity = smoothAtmosphere(q / 0.12) * (1 - smoothAtmosphere((q - 0.94) / 0.06));
     return pose(
       width + layout.width * 0.2 + (layout.left - width - layout.width * 0.2) * q,
       layout.top + [0, 0.33, 0.66, 1][index]! * layout.height - (layout.width * (130 / 360)) / 2,
