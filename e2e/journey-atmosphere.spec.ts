@@ -217,17 +217,25 @@ test("Heaven completes each visit, native scrolling stays free and hidden tabs s
       .evaluate((el) => Number(getComputedStyle(el).opacity)),
   ).toBeGreaterThan(0);
   await position(page, tops[0]!.top - 844 * 0.2);
-  const approaching = await heaven
-    .locator("img")
-    .evaluateAll((es) => es.map((e) => e.getAttribute("style")));
+  const cloudPoses = () =>
+    heaven.locator("img").evaluateAll((es) =>
+      es.map((e) => {
+        const matrix = new DOMMatrixReadOnly(e.style.transform);
+        return { x: matrix.m41, y: matrix.m42, opacity: Number(e.style.opacity) };
+      }),
+    );
+  const approaching = await cloudPoses();
   await position(page, tops[0]!.top - 844 * 0.5);
-  expect(
-    await heaven.locator("img").evaluateAll((es) => es.map((e) => e.getAttribute("style"))),
-  ).not.toEqual(approaching);
+  expect(await cloudPoses()).not.toEqual(approaching);
   await position(page, tops[0]!.top - 844 * 0.2);
-  expect(
-    await heaven.locator("img").evaluateAll((es) => es.map((e) => e.getAttribute("style"))),
-  ).toEqual(approaching);
+  const returned = await cloudPoses();
+  // WebKit rounds fractional scroll positions differently after a reverse.
+  // Verify the same visible pose within one pixel, rather than serialized CSS.
+  returned.forEach((pose, index) => {
+    expect(Math.abs(pose.x - approaching[index]!.x)).toBeLessThan(1);
+    expect(Math.abs(pose.y - approaching[index]!.y)).toBeLessThan(1);
+    expect(Math.abs(pose.opacity - approaching[index]!.opacity)).toBeLessThan(0.002);
+  });
   await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
     "data-atmosphere-moving",
     "false",
@@ -711,3 +719,34 @@ test("mobile Earth keeps its path and smoothing through height-only refreshes", 
     dispatchEvent(new Event("resize"));
   });
 });
+
+for (const width of [320, 390]) {
+  test(`mobile Earth fades back in after a finished entrance at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.goto("/");
+    await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
+    const tops = await stations(page),
+      top = tops[2]!.top;
+    const earth = page.locator('[data-atmosphere-effect="earth"]');
+    const plane = page.locator(".journey-atmosphere");
+    const branch = earth.locator('img[data-part="0"]');
+    await position(page, top - 100);
+    await position(page, top);
+    await expect(earth).toHaveCSS("visibility", "hidden", { timeout: 2500 });
+    await expect(plane).toHaveAttribute("data-atmosphere-moving", "false");
+    const first = await branch.evaluate(async (el, target) => {
+      scrollTo({ top: target - 12, behavior: "instant" });
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return Number(el.style.opacity);
+    }, top);
+    await expect(earth).toHaveCSS("visibility", "visible");
+    await expect(plane).toHaveAttribute("data-atmosphere-moving", "false");
+    const settled = await branch.evaluate((el) => Number(el.style.opacity));
+    expect(first).toBeGreaterThan(0);
+    expect(first).toBeLessThan(settled * 0.8);
+    expect(settled).toBeGreaterThan(0.3);
+    await position(page, tops[3]!.top);
+    await expect(earth).toHaveCSS("visibility", "hidden");
+  });
+}

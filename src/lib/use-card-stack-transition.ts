@@ -71,7 +71,10 @@ export function useCardStackTransition(
 ) {
   const pending = useRef<Pending | null>(null);
   const playing = useRef<Animation[]>([]);
+  const completion = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const stop = useCallback(() => {
+    clearTimeout(completion.current);
+    completion.current = undefined;
     for (const animation of playing.current) animation.cancel();
     playing.current = [];
     if (stage.current) delete stage.current.dataset["cardNavigation"];
@@ -127,6 +130,9 @@ export function useCardStackTransition(
     const release = () => {
       if (playing.current === animations) stop();
     };
+    // Some WebKit compositors can stall even the front timeline at time zero.
+    // One bounded wake-up releases that finished navigation; no frame polling.
+    completion.current = setTimeout(release, STACK_DURATION + 50);
     void (front?.finished ?? Promise.resolve()).then(release, release);
   }, [index, metrics, reduced, stage, stop]);
 

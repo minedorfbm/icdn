@@ -273,22 +273,7 @@ for (const layout of ["journey", "surprise"]) {
       await page.locator("#heaven .chapter-deck-controls button").first().click();
       await expect(active).toContainText("Citron");
     }
-    try {
-      await expect(stage).not.toHaveAttribute("data-card-navigation", "true", { timeout: 2000 });
-    } catch (error) {
-      console.error(
-        "Unfinished card effects",
-        await stage.evaluate((el) =>
-          el.getAnimations({ subtree: true }).map((animation) => ({
-            target: (animation.effect as KeyframeEffect).target?.getAttribute("class"),
-            state: animation.playState,
-            time: Number(animation.currentTime),
-            end: animation.effect?.getComputedTiming().endTime,
-          })),
-        ),
-      );
-      throw error;
-    }
+    await expect(stage).not.toHaveAttribute("data-card-navigation", "true", { timeout: 2000 });
     expect(await envelope(stage)).toEqual(before);
     if (layout === "surprise") {
       await gesture(stage, 240);
@@ -388,3 +373,32 @@ for (const interrupted of ["cancelled", "paused"] as const) {
     await expect(stage.locator('article[aria-hidden="false"]')).toContainText("TINGARA");
   });
 }
+
+test("a stalled front timeline cannot leave navigation active indefinitely", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await catalogue(page);
+  await page.goto("/surprise-me");
+  const stage = page.locator(".discovery-stack .card-stack-stage");
+  await expect(stage.locator('article[aria-hidden="false"]')).toContainText("Citron");
+  const preview = await stage.locator('[data-destination-id="tingara"]').boundingBox();
+  expect(preview).not.toBeNull();
+  await page.mouse.click(preview!.x + preview!.width - 8, preview!.y + preview!.height / 2);
+  await expect(stage).toHaveAttribute("data-card-navigation", "true");
+  await stage.evaluate((el) => {
+    for (const animation of el.getAnimations({ subtree: true })) {
+      animation.pause();
+      animation.currentTime = 0;
+    }
+  });
+  await expect(stage).not.toHaveAttribute("data-card-navigation", "true", { timeout: 2000 });
+  await expect(stage.locator('article[aria-hidden="false"]')).toContainText("TINGARA");
+  expect(
+    await stage.evaluate(
+      (el) =>
+        el
+          .getAnimations({ subtree: true })
+          .filter((a) => !(a instanceof CSSAnimation) && !(a instanceof CSSTransition)).length,
+    ),
+  ).toBe(0);
+});
