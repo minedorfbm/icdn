@@ -114,15 +114,20 @@ export function useCardStackTransition(
     }
     if (!transition || transition.to !== index || !stage.current) return;
     const animations: Animation[] = [];
-    for (const card of stage.current.querySelectorAll<HTMLElement>(".perspective-card"))
-      animations.push(...animateCard(card, transition, index, metrics.current));
+    let front: Animation | undefined;
+    for (const card of stage.current.querySelectorAll<HTMLElement>(".perspective-card")) {
+      const effects = animateCard(card, transition, index, metrics.current);
+      animations.push(...effects);
+      if (card.dataset["cardOffset"] === "0") front = effects[0];
+    }
     playing.current = animations;
     stage.current.dataset["cardNavigation"] = "true";
-    // A browser may cancel an individual photo effect. Still release this
-    // transition after the remaining effects finish; never stop its successor.
-    void Promise.allSettled(animations.map((animation) => animation.finished)).then(() => {
+    // The visible front card owns the finite transition. A hidden decorative
+    // effect must not retain navigation if WebKit suspends or cancels it.
+    const release = () => {
       if (playing.current === animations) stop();
-    });
+    };
+    void (front?.finished ?? Promise.resolve()).then(release, release);
   }, [index, metrics, reduced, stage, stop]);
 
   useLayoutEffect(() => stop, [stop]);
