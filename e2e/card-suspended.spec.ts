@@ -338,3 +338,67 @@ test("native vertical touch scroll cancels the card gesture without navigating",
   await expect.poll(snapshot).toBeGreaterThan(before + 5);
   await expect(stage.locator('article[aria-hidden="false"]')).toContainText("Citron");
 });
+
+for (const interrupted of ["cancelled", "paused"] as const) {
+  test(`a ${interrupted} photo effect cannot retain navigation after the front card finishes`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await catalogue(page);
+    await page.goto("/surprise-me");
+    const stage = page.locator(".discovery-stack .card-stack-stage");
+    await stage.scrollIntoViewIfNeeded();
+    const next = (await stage.locator('[data-destination-id="tingara"]').boundingBox())!;
+    await page.mouse.click(next.x + next.width - 8, next.y + next.height / 2);
+    await expect(stage.locator('article[aria-hidden="false"]')).toContainText("TINGARA");
+    await expect(stage).toHaveAttribute("data-card-navigation", "true");
+    await stage.evaluate((el, mode) => {
+      const photo = el.querySelector('[data-card-offset="0"] .destination-panel > picture > img');
+      const effects = el
+        .getAnimations({ subtree: true })
+        .filter(
+          (animation) =>
+            !(animation instanceof CSSAnimation) && !(animation instanceof CSSTransition),
+        );
+      const current = effects.find(
+        (animation) => (animation.effect as KeyframeEffect).target === photo,
+      );
+      if (!current) throw new Error("Expected the current card's native photo effect");
+      if (mode === "cancelled") current.cancel();
+      else current.pause();
+      for (const animation of effects) if (animation !== current) animation.finish();
+    }, interrupted);
+    await expect(stage).not.toHaveAttribute("data-card-navigation");
+    await expect(stage.locator('article[aria-hidden="false"]')).toContainText("TINGARA");
+  });
+}
+
+test("a stalled front timeline cannot leave navigation active indefinitely", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await catalogue(page);
+  await page.goto("/surprise-me");
+  const stage = page.locator(".discovery-stack .card-stack-stage");
+  await expect(stage.locator('article[aria-hidden="false"]')).toContainText("Citron");
+  const preview = await stage.locator('[data-destination-id="tingara"]').boundingBox();
+  expect(preview).not.toBeNull();
+  await page.mouse.click(preview!.x + preview!.width - 8, preview!.y + preview!.height / 2);
+  await expect(stage).toHaveAttribute("data-card-navigation", "true");
+  await stage.evaluate((el) => {
+    for (const animation of el.getAnimations({ subtree: true })) {
+      animation.pause();
+      animation.currentTime = 0;
+    }
+  });
+  await expect(stage).not.toHaveAttribute("data-card-navigation", "true", { timeout: 2000 });
+  await expect(stage.locator('article[aria-hidden="false"]')).toContainText("TINGARA");
+  expect(
+    await stage.evaluate(
+      (el) =>
+        el
+          .getAnimations({ subtree: true })
+          .filter((a) => !(a instanceof CSSAnimation) && !(a instanceof CSSTransition)).length,
+    ),
+  ).toBe(0);
+});

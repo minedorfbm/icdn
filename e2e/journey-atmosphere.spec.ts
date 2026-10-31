@@ -217,17 +217,25 @@ test("Heaven completes each visit, native scrolling stays free and hidden tabs s
       .evaluate((el) => Number(getComputedStyle(el).opacity)),
   ).toBeGreaterThan(0);
   await position(page, tops[0]!.top - 844 * 0.2);
-  const approaching = await heaven
-    .locator("img")
-    .evaluateAll((es) => es.map((e) => e.getAttribute("style")));
+  const cloudPoses = () =>
+    heaven.locator("img").evaluateAll((es) =>
+      es.map((e) => {
+        const matrix = new DOMMatrixReadOnly(e.style.transform);
+        return { x: matrix.m41, y: matrix.m42, opacity: Number(e.style.opacity) };
+      }),
+    );
+  const approaching = await cloudPoses();
   await position(page, tops[0]!.top - 844 * 0.5);
-  expect(
-    await heaven.locator("img").evaluateAll((es) => es.map((e) => e.getAttribute("style"))),
-  ).not.toEqual(approaching);
+  expect(await cloudPoses()).not.toEqual(approaching);
   await position(page, tops[0]!.top - 844 * 0.2);
-  expect(
-    await heaven.locator("img").evaluateAll((es) => es.map((e) => e.getAttribute("style"))),
-  ).toEqual(approaching);
+  const returned = await cloudPoses();
+  // WebKit rounds fractional scroll positions differently after a reverse.
+  // Verify the same visible pose within one pixel, rather than serialized CSS.
+  returned.forEach((pose, index) => {
+    expect(Math.abs(pose.x - approaching[index]!.x)).toBeLessThan(1);
+    expect(Math.abs(pose.y - approaching[index]!.y)).toBeLessThan(1);
+    expect(Math.abs(pose.opacity - approaching[index]!.opacity)).toBeLessThan(0.002);
+  });
   await expect(page.locator(".journey-atmosphere")).toHaveAttribute(
     "data-atmosphere-moving",
     "false",

@@ -71,7 +71,10 @@ export function useCardStackTransition(
 ) {
   const pending = useRef<Pending | null>(null);
   const playing = useRef<Animation[]>([]);
+  const completion = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const stop = useCallback(() => {
+    clearTimeout(completion.current);
+    completion.current = undefined;
     for (const animation of playing.current) animation.cancel();
     playing.current = [];
     if (stage.current) delete stage.current.dataset["cardNavigation"];
@@ -114,17 +117,23 @@ export function useCardStackTransition(
     }
     if (!transition || transition.to !== index || !stage.current) return;
     const animations: Animation[] = [];
-    for (const card of stage.current.querySelectorAll<HTMLElement>(".perspective-card"))
-      animations.push(...animateCard(card, transition, index, metrics.current));
+    let front: Animation | undefined;
+    for (const card of stage.current.querySelectorAll<HTMLElement>(".perspective-card")) {
+      const effects = animateCard(card, transition, index, metrics.current);
+      animations.push(...effects);
+      if (card.dataset["cardOffset"] === "0") front = effects[0];
+    }
     playing.current = animations;
     stage.current.dataset["cardNavigation"] = "true";
-    void Promise.all(animations.map((animation) => animation.finished))
-      .then(() => {
-        if (playing.current === animations) stop();
-      })
-      .catch(() => {
-        /* Pointer interruption or a later click owns the replacement timeline. */
-      });
+    // The visible front card owns the finite transition. A hidden decorative
+    // effect must not retain navigation if WebKit suspends or cancels it.
+    const release = () => {
+      if (playing.current === animations) stop();
+    };
+    // Some WebKit compositors can stall even the front timeline at time zero.
+    // One bounded wake-up releases that finished navigation; no frame polling.
+    completion.current = setTimeout(release, STACK_DURATION + 50);
+    void (front?.finished ?? Promise.resolve()).then(release, release);
   }, [index, metrics, reduced, stage, stop]);
 
   useLayoutEffect(() => stop, [stop]);
