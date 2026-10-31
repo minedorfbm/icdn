@@ -339,14 +339,13 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       earthFrame = result.moving ? now : 0;
       settling = result.moving;
     } else {
-      const card = station.card && { ...station.card, centerY: station.card.centerY - y };
       const entry = station.waveEntry && {
         top: station.waveEntry.top - y,
         bottom: station.waveEntry.bottom - y,
       };
-      const layout = waveLayout(width, viewport, card, boundary, entry);
+      const layout = waveLayout(width, viewport, station.card, boundary, entry);
       write(groups.get("sea"), "--atmosphere-wave-width", `${layout.width.toFixed(2)}px`);
-      poses = wavePoses(phase, width, viewport, card, boundary, entry);
+      poses = wavePoses(phase, width, viewport, station.card, boundary, entry);
     }
     paintPoses(sprites.get(station.id) ?? [], poses);
     return settling;

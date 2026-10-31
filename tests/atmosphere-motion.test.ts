@@ -64,7 +64,7 @@ test("botanical and wave tails finish transparent at mobile and desktop sizes", 
 
 test("four differently sized waves share a right-to-left direction on separate rows and finish cleanly", () => {
   for (const width of [320, 390, 768, 1024, 1440]) {
-    const card = { left: width * 0.08, width: width * 0.75, centerY: 510, height: 600 };
+    const card = { width: width * 0.75 };
     const layout = waveLayout(width, 844, card);
     expect(layout.width).toBeLessThanOrEqual(card.width * 0.5);
     const early = wavePoses(0.4, width, 844, card),
@@ -101,27 +101,21 @@ test("wave rows follow the preceding counter and SEA subtitle, and reach beyond 
     [768, 1024],
     [1440, 900],
   ]) {
-    const card = {
-      left: width! * 0.1,
-      width: width! * 0.75,
-      height: height! * 0.6,
-      centerY: height! * 0.6,
-    };
+    const card = { width: width! * 0.75 };
     for (const boundary of [0, 100, 200]) {
-      const shifted = { ...card, centerY: card.centerY + boundary };
       const entry = { top: boundary - 90, bottom: boundary + (width! >= 1024 ? 450 : 135) };
-      const layout = waveLayout(width!, height!, shifted, boundary, entry);
+      const layout = waveLayout(width!, height!, card, boundary, entry);
       const baseHeight = (layout.width * 130) / 360;
-      for (const wave of wavePoses(0.85, width!, height!, shifted, boundary, entry)) {
+      for (const wave of wavePoses(0.85, width!, height!, card, boundary, entry)) {
         const center = wave.y + baseHeight / 2;
         expect(center - (baseHeight * wave.scale) / 2).toBeGreaterThanOrEqual(entry.top);
         expect(center + (baseHeight * wave.scale) / 2).toBeLessThanOrEqual(entry.bottom);
       }
-      for (const wave of wavePoses(1.94, width!, height!, shifted, boundary, entry)) {
+      for (const wave of wavePoses(1.94, width!, height!, card, boundary, entry)) {
         expect(wave.x).toBeLessThan(0);
         expect(wave.opacity).toBeGreaterThan(0);
       }
-      for (const wave of wavePoses(2, width!, height!, shifted, boundary, entry)) {
+      for (const wave of wavePoses(2, width!, height!, card, boundary, entry)) {
         expect(wave.x + layout.width * wave.scale).toBeLessThanOrEqual(0);
         expect(wave.opacity).toBe(0);
       }

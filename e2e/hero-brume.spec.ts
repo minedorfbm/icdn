@@ -152,3 +152,59 @@ test("server HTML keeps the title and still photograph visible without JavaScrip
     await context.close();
   }
 });
+
+test("responsive hero layers pause when CSS hides them and resume without a new entrance", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const hero = page.locator(".hub-hero");
+  await expect(hero).toHaveAttribute("data-hero-motion", "running");
+  const hiddenRunning = () =>
+    hero.evaluate(
+      (el) =>
+        el.getAnimations({ subtree: true }).filter((animation) => {
+          const target = (animation.effect as KeyframeEffect).target;
+          return animation.playState === "running" && target?.getClientRects().length === 0;
+        }).length,
+    );
+  await expect.poll(hiddenRunning).toBe(0);
+  const cloud = page.locator(".hero-cloud-main");
+  const state = () =>
+    cloud.evaluate(
+      (el) =>
+        el.getAnimations().find((animation) => animation.id === "hero-brume-loop-cloud")?.playState,
+    );
+  await expect.poll(state).toBe("paused");
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 1024, height: 768 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await expect.poll(state).toBe(viewport.width === 1024 ? "paused" : "running");
+    await expect.poll(hiddenRunning).toBe(0);
+    await expect(page.locator(".hero-title-first")).toHaveCSS("opacity", "1");
+  }
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await expect.poll(state).toBe("paused");
+  const times = await hero.evaluate(async (el) => {
+    const loops = el
+      .getAnimations({ subtree: true })
+      .filter(
+        (animation) =>
+          animation.id.includes("loop") &&
+          (animation.effect as KeyframeEffect).target?.getClientRects().length === 0,
+      );
+    await Promise.all(loops.map((animation) => animation.ready));
+    const before = loops.map((animation) => Number(animation.currentTime));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return { before, after: loops.map((animation) => Number(animation.currentTime)) };
+  });
+  expect(times.before).toHaveLength(4);
+  expect(times.after).toEqual(times.before);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(hero).toHaveAttribute("data-hero-motion", "static");
+  expect(await hero.evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0);
+});

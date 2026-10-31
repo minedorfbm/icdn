@@ -1,3 +1,5 @@
+import { HERO_DESKTOP_MEDIA, HERO_LANDSCAPE_MEDIA } from "./hero-media";
+
 const entered = new WeakSet<Document>();
 const easeOut = "cubic-bezier(0.33, 1, 0.68, 1)";
 
@@ -5,7 +7,8 @@ const easeOut = "cubic-bezier(0.33, 1, 0.68, 1)";
 export function mountHeroMotion(hero: HTMLElement) {
   const doc = hero.ownerDocument;
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-  const desktop = matchMedia("(min-width: 1200px) and (orientation: landscape)");
+  const desktop = matchMedia(HERO_DESKTOP_MEDIA);
+  const landscape = matchMedia(HERO_LANDSCAPE_MEDIA);
   let animations: Animation[] = [];
   let supported = true;
   let visible =
@@ -142,13 +145,25 @@ export function mountHeroMotion(hero: HTMLElement) {
         effect.setKeyframes(wave(18, (p) => ({ opacity: opacity + Math.sin(p) * 0.035 })));
       }
     }
+    sync();
   }
 
   function sync() {
     const running = visible && !doc.hidden && !reduced.matches;
+    const renderedTargets = new Map<Element, boolean>();
     for (const animation of animations) {
       if (animation.playState === "finished") continue;
-      if (running) animation.play();
+      const target = (animation.effect as KeyframeEffect).target;
+      let rendered = false;
+      if (target) {
+        if (!renderedTargets.has(target))
+          renderedTargets.set(target, target.getClientRects().length > 0);
+        rendered = renderedTargets.get(target)!;
+      }
+      // CSS can hide a logo or all clouds at a responsive breakpoint. Finish
+      // hidden entrances so rotating later never starts an old delayed entry.
+      if (!rendered && animation.id === "hero-brume-entry") animation.finish();
+      else if (running && rendered) animation.play();
       else animation.pause();
     }
     hero.dataset["heroMotion"] = reduced.matches ? "static" : running ? "running" : "paused";
@@ -179,11 +194,13 @@ export function mountHeroMotion(hero: HTMLElement) {
   doc.addEventListener("visibilitychange", sync);
   reduced.addEventListener("change", preference);
   desktop.addEventListener("change", refreshCloudOpacity);
+  landscape.addEventListener("change", sync);
   return () => {
     observer.disconnect();
     doc.removeEventListener("visibilitychange", sync);
     reduced.removeEventListener("change", preference);
     desktop.removeEventListener("change", refreshCloudOpacity);
+    landscape.removeEventListener("change", sync);
     for (const animation of animations) animation.cancel();
     delete hero.dataset["heroMotion"];
   };
