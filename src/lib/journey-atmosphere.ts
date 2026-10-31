@@ -88,13 +88,17 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     lastViewport = NaN;
   const tails = new Map<Level, number>();
   let previousY: number | undefined, introStart: number | undefined;
+  let scrollDirection = 0;
   let introComplete = false;
+  let heavenVisible = false;
+  let heavenFadeStart: number | undefined;
   let introRevision = getHubScrollSnapshot().revision;
   let introFrom = 0,
     introLast = 0;
 
   let earthPoses: AtmosphericPose[] | undefined;
   let earthFrame = 0;
+  let earthWidth = 0;
 
   function warm(id: Level) {
     if (warmed.has(id)) return;
@@ -137,6 +141,9 @@ export function createJourneyAtmosphere(root: HTMLElement) {
   function hide() {
     for (const group of groups.values()) write(group, "visibility", "hidden");
     tails.clear();
+    heavenVisible = false;
+    heavenFadeStart = undefined;
+    write(groups.get("heaven"), "opacity", "0");
     earthPoses = undefined;
     resetIntro();
     if (plate) plate.dataset["atmosphereMoving"] = "false";
@@ -162,6 +169,28 @@ export function createJourneyAtmosphere(root: HTMLElement) {
         opacity: (1 - progress) * 0.83 * appearance,
       })),
     );
+  }
+  function finishHeaven(now: number) {
+    const group = groups.get("heaven");
+    if (visibleEffects.has("heaven")) {
+      heavenVisible = true;
+      heavenFadeStart = undefined;
+      write(group, "opacity", "1");
+      return false;
+    }
+    if (!heavenVisible) return false;
+    // Freeze the last entrance pose and dissolve it briefly instead of cutting
+    // visibility. The existing clock stops again as soon as this fade completes.
+    heavenFadeStart ??= now;
+    const opacity = 1 - smoothAtmosphere((now - heavenFadeStart) / 180);
+    write(group, "opacity", opacity.toFixed(3));
+    if (opacity > 0) {
+      visibleEffects.add("heaven");
+      return true;
+    }
+    heavenVisible = false;
+    heavenFadeStart = undefined;
+    return false;
   }
   function paintWorlds(stations: AtmosphereStation[], y: number, viewport: number) {
     if (lastWorldY === y && lastViewport === viewport) return;
@@ -200,6 +229,14 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       (target && target !== "heaven")
     ) {
       resetIntro();
+      return false;
+    }
+    // This is an arrival, never a departure overlay. Keep the direction across
+    // stationary tail frames; an upward return is still an entrance to HEAVEN.
+    if (y > first.top + 2 && scrollDirection >= 0) {
+      introComplete = true;
+      introStart = undefined;
+      introLast = 0;
       return false;
     }
     if (introComplete) {
@@ -288,10 +325,16 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       const target = plantPoses(phase, boundary, width, viewport);
       // Snap distant navigation/resize, smooth only local decorative movement.
       const previous =
-        previousY !== undefined && Math.abs(y - previousY) < viewport * 0.5
+        earthWidth === width && previousY !== undefined && Math.abs(y - previousY) < viewport * 0.5
           ? earthPoses
           : undefined;
-      const result = settlePlantPoses(previous, target, earthFrame ? now - earthFrame : 16.67);
+      const result = settlePlantPoses(
+        previous,
+        target,
+        earthFrame ? now - earthFrame : 16.67,
+        width < 768 ? 90 : 60,
+      );
+      earthWidth = width;
       earthPoses = poses = result.poses;
       earthFrame = result.moving ? now : 0;
       settling = result.moving;
@@ -318,6 +361,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     if (!plate || !stations.length) return false;
     const first = stations[0]!,
       last = stations.at(-1)!;
+    if (previousY !== undefined && y !== previousY) scrollDirection = y > previousY ? 1 : -1;
     paintWorlds(stations, y, viewport);
     write(container, "--atmosphere-entry-lead", heavenEntryLead(viewport).toFixed(2) + "px");
     if (
@@ -346,11 +390,15 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     visibleEffects.clear();
     let moving = paintIntro(first, y, viewport, width, now, target);
     for (const station of stations.slice(1)) {
-      const phase = phaseFor(station, y, viewport, now, target);
+      // Mobile browser chrome changes innerHeight during a gesture. The level's
+      // stable layout height keeps foliage on one path while the toolbar moves.
+      const sceneHeight = station.id === "earth" && width < 768 ? station.height : viewport;
+      const phase = phaseFor(station, y, sceneHeight, now, target);
       if (phase === null) continue;
-      const settling = paintPassage(station, phase, y, viewport, width, now);
+      const settling = paintPassage(station, phase, y, sceneHeight, width, now);
       moving = settling || phase >= 1 || moving;
     }
+    moving = finishHeaven(now) || moving;
     for (const [id, group] of groups)
       write(group, "visibility", visibleEffects.has(id as Level) ? "visible" : "hidden");
     if (!visibleEffects.has("earth")) earthPoses = undefined;
@@ -360,7 +408,9 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     return moving;
   }
   const invalidate = () => {
-    earthPoses = undefined;
+    // Mobile toolbar refreshes must not snap an in-flight foliage pose.
+    // Width changes and distant navigation reset it in paintPassage instead.
+    if (earthWidth >= 768) earthPoses = undefined;
     lastWorldY = NaN;
     lastViewport = NaN;
   };

@@ -85,9 +85,10 @@ export function settlePlantPoses(
   previous: AtmosphericPose[] | undefined,
   target: AtmosphericPose[],
   elapsed: number,
+  responseMs = 60,
 ) {
   if (!previous) return { poses: target, moving: false };
-  const alpha = 1 - Math.exp(-Math.min(160, Math.max(1, elapsed)) / 60);
+  const alpha = 1 - Math.exp(-Math.min(160, Math.max(1, elapsed)) / responseMs);
   let moving = false;
   const poses = target.map((next, i) => {
     const old = previous[i] ?? next;
