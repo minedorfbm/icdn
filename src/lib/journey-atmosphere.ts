@@ -308,58 +308,6 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     }
     return 1 + tail;
   }
-  function followEarth(
-    target: AtmosphericPose[],
-    y: number,
-    viewport: number,
-    width: number,
-    now: number,
-  ) {
-    const previous =
-      earthWidth === width && previousY !== undefined && Math.abs(y - previousY) < viewport * 0.5
-        ? earthPoses
-        : undefined;
-    // Returning from a finished entrance must fade in from transparent, rather
-    // than restore an already opaque pose in the first scroll frame.
-    const result = settlePlantPoses(
-      previous ?? target.map((pose) => ({ ...pose, opacity: 0 })),
-      target,
-      earthFrame ? now - earthFrame : 16.67,
-      width < 768 ? 90 : 60,
-    );
-    earthWidth = width;
-    earthPoses = result.poses;
-    earthFrame = result.moving ? now : 0;
-    return result;
-  }
-  function finishEarth(
-    station: AtmosphereStation,
-    y: number,
-    viewport: number,
-    width: number,
-    now: number,
-    target: string | null,
-  ) {
-    if (
-      !earthPoses ||
-      (target && target !== "earth") ||
-      (previousY !== undefined && Math.abs(y - previousY) >= viewport * 0.5) ||
-      Math.abs(y - station.top) > viewport * 1.2
-    )
-      return false;
-    const result = followEarth(
-      earthPoses.map((pose) => ({ ...pose, opacity: 0 })),
-      y,
-      viewport,
-      width,
-      now,
-    );
-    if (result.moving) {
-      visibleEffects.add("earth");
-      paintPoses(sprites.get("earth") ?? [], result.poses);
-    }
-    return result.moving;
-  }
   function paintPassage(
     station: AtmosphereStation,
     phase: number,
@@ -375,17 +323,30 @@ export function createJourneyAtmosphere(root: HTMLElement) {
     if (station.id === "sky") poses = birdPoses(phase, boundary, width, viewport);
     else if (station.id === "earth") {
       const target = plantPoses(phase, boundary, width, viewport);
-      const result = followEarth(target, y, viewport, width, now);
-      poses = result.poses;
+      // Snap distant navigation/resize, smooth only local decorative movement.
+      const previous =
+        earthWidth === width && previousY !== undefined && Math.abs(y - previousY) < viewport * 0.5
+          ? earthPoses
+          : undefined;
+      const result = settlePlantPoses(
+        previous,
+        target,
+        earthFrame ? now - earthFrame : 16.67,
+        width < 768 ? 90 : 60,
+      );
+      earthWidth = width;
+      earthPoses = poses = result.poses;
+      earthFrame = result.moving ? now : 0;
       settling = result.moving;
     } else {
+      const card = station.card && { ...station.card, centerY: station.card.centerY - y };
       const entry = station.waveEntry && {
         top: station.waveEntry.top - y,
         bottom: station.waveEntry.bottom - y,
       };
-      const layout = waveLayout(width, viewport, station.card, boundary, entry);
+      const layout = waveLayout(width, viewport, card, boundary, entry);
       write(groups.get("sea"), "--atmosphere-wave-width", `${layout.width.toFixed(2)}px`);
-      poses = wavePoses(phase, width, viewport, station.card, boundary, entry);
+      poses = wavePoses(phase, width, viewport, card, boundary, entry);
     }
     paintPoses(sprites.get(station.id) ?? [], poses);
     return settling;
@@ -433,11 +394,7 @@ export function createJourneyAtmosphere(root: HTMLElement) {
       // stable layout height keeps foliage on one path while the toolbar moves.
       const sceneHeight = station.id === "earth" && width < 768 ? station.height : viewport;
       const phase = phaseFor(station, y, sceneHeight, now, target);
-      if (phase === null) {
-        if (station.id === "earth")
-          moving = finishEarth(station, y, sceneHeight, width, now, target) || moving;
-        continue;
-      }
+      if (phase === null) continue;
       const settling = paintPassage(station, phase, y, sceneHeight, width, now);
       moving = settling || phase >= 1 || moving;
     }

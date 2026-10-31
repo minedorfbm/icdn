@@ -1,9 +1,9 @@
 /* Paint-only depth; the stage, card boxes and pagination keep their existing geometry. */
 .card-stack-stage .destination-panel > picture > img {
-  transition-property: opacity, translate, scale;
-  transition-duration: 700ms, 650ms, 650ms;
+  transition-property: transform, opacity, translate, scale;
+  transition-duration: 700ms, 700ms, 650ms, 650ms;
   transition-timing-function:
-    cubic-bezier(0.16, 1, 0.3, 1), cubic-bezier(0.25, 0.65, 0.25, 1),
+    cubic-bezier(0.16, 1, 0.3, 1), cubic-bezier(0.16, 1, 0.3, 1), cubic-bezier(0.25, 0.65, 0.25, 1),
     cubic-bezier(0.25, 0.65, 0.25, 1);
 }
 .card-stack-stage[data-card-dragging="true"] .destination-panel > picture > img {

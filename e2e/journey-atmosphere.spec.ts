@@ -719,34 +719,3 @@ test("mobile Earth keeps its path and smoothing through height-only refreshes", 
     dispatchEvent(new Event("resize"));
   });
 });
-
-for (const width of [320, 390]) {
-  test(`mobile Earth fades back in after a finished entrance at ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 844 });
-    await page.emulateMedia({ reducedMotion: "no-preference" });
-    await page.goto("/");
-    await expect(page.locator('.journey-worlds[data-atmosphere="true"]')).toHaveCount(1);
-    const tops = await stations(page),
-      top = tops[2]!.top;
-    const earth = page.locator('[data-atmosphere-effect="earth"]');
-    const plane = page.locator(".journey-atmosphere");
-    const branch = earth.locator('img[data-part="0"]');
-    await position(page, top - 100);
-    await position(page, top);
-    await expect(earth).toHaveCSS("visibility", "hidden", { timeout: 2500 });
-    await expect(plane).toHaveAttribute("data-atmosphere-moving", "false");
-    const first = await branch.evaluate(async (el, target) => {
-      scrollTo({ top: target - 12, behavior: "instant" });
-      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-      return Number(el.style.opacity);
-    }, top);
-    await expect(earth).toHaveCSS("visibility", "visible");
-    await expect(plane).toHaveAttribute("data-atmosphere-moving", "false");
-    const settled = await branch.evaluate((el) => Number(el.style.opacity));
-    expect(first).toBeGreaterThan(0);
-    expect(first).toBeLessThan(settled * 0.8);
-    expect(settled).toBeGreaterThan(0.3);
-    await position(page, tops[3]!.top);
-    await expect(earth).toHaveCSS("visibility", "hidden");
-  });
-}

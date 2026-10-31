@@ -155,7 +155,7 @@ export function plantPoses(phase: number, boundary: number, width: number, heigh
 
 export type WaveEntryBounds = { top: number; bottom: number };
 
-export type WaveCardAnchor = { width: number };
+export type WaveCardAnchor = { left: number; width: number; centerY: number; height?: number };
 
 /** Four sizes share one vector, between the preceding counter and SEA's subtitle. */
 export function waveLayout(
@@ -165,7 +165,7 @@ export function waveLayout(
   boundary = 0,
   entry?: WaveEntryBounds,
 ) {
-  const anchor = card ?? { width: width * 0.76 };
+  const anchor = card ?? { left: width * 0.12, width: width * 0.76, centerY: height * 0.55 };
   const waveWidth = Math.min(width * 0.42, anchor.width * 0.5, 220);
   const halfWaveHeight = (waveWidth * (130 / 360)) / 2;
   const entryTop = entry?.top ?? boundary - Math.min(100, height * 0.13);

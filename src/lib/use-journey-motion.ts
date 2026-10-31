@@ -141,7 +141,14 @@ export function useJourneyMotion(
               counter && subtitle
                 ? { top: layoutTop(counter), bottom: layoutTop(subtitle) + subtitle.offsetHeight }
                 : undefined;
-            section.card = card ? { width: card.offsetWidth } : undefined;
+            section.card = card
+              ? {
+                  left: card.getBoundingClientRect().left,
+                  width: card.offsetWidth,
+                  height: card.offsetHeight,
+                  centerY: layoutTop(card) + card.offsetHeight / 2,
+                }
+              : undefined;
           }
         }
         dirty = false;
